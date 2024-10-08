@@ -27,7 +27,8 @@ AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
 	GetCharacterMovement ( )->bOrientRotationToMovement = false; // Character moves in the direction of input...	
 	GetCharacterMovement ( )->RotationRate = FRotator ( 0.0f , 500.0f , 0.0f ); // ...at this rotation rate
 	GetCharacterMovement()->bUseControllerDesiredRotation=true;
-
+	//GetCharacterMovement()->UCharacterMovementComponent::SetMovementMode ( EMovementMode::MOVE_Flying);
+	GetCharacterMovement ( )->DefaultLandMovementMode = EMovementMode::MOVE_Flying;
 	// Note: For faster iteration times these variables, and many more, can be tweaked in the Character Blueprint
 	// instead of recompiling to adjust them
 	GetCharacterMovement ( )->JumpZVelocity = 700.f;
@@ -41,7 +42,7 @@ AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent> ( TEXT ( "CameraBoom" ) );
 	CameraBoom->SetupAttachment ( RootComponent );
 	CameraBoom->SetRelativeLocation(FVector(0.0f,0.0f,30.f));
-	CameraBoom->TargetArmLength = 120.f; // The camera follows at this distance behind the character	
+	CameraBoom->TargetArmLength = 250.f; // The camera follows at this distance behind the character	
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 
 	// Create a follow camera
@@ -106,7 +107,9 @@ void AHSW_ThirdPersonCharacter::Move ( const FInputActionValue& Value )
 	{
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation ( );
+		const FRotator PitchRotation (Rotation.Pitch , 0, 0 );
 		const FRotator YawRotation ( 0 , Rotation.Yaw , 0 );
+		const FRotator RollRotation(0, 0 , Rotation.Roll );
 
 		// get forward vector
 		const FVector ForwardDirection = FRotationMatrix ( YawRotation ).GetUnitAxis ( EAxis::X );
@@ -114,9 +117,21 @@ void AHSW_ThirdPersonCharacter::Move ( const FInputActionValue& Value )
 		// get right vector 
 		const FVector RightDirection = FRotationMatrix ( YawRotation ).GetUnitAxis ( EAxis::Y );
 
+		// get up vector
+		const FVector UpDirection = FRotationMatrix ( PitchRotation ).GetUnitAxis ( EAxis::X );
+		
 		// add movement 
 		AddMovementInput ( ForwardDirection , MovementVector.Y );
 		AddMovementInput ( RightDirection , MovementVector.X );
+
+		if (MovementVector.Y > 0)
+		{
+// 			FVector CurrentLocation = GetActorLocation();
+// 			CurrentLocation += FVector ( 0 , 0 , 1 ) * 200.f * GetWorld()->GetDeltaSeconds();
+// 			SetActorLocation(CurrentLocation);
+// 			UE_LOG ( LogTemp , Warning , TEXT ( "MovementVector: %s" ) , *MovementVector.ToString ( ) );
+			AddMovementInput ( UpDirection , MovementVector.Y );
+		}
 	}
 }
 
