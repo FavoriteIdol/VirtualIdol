@@ -15,10 +15,15 @@
 #include "Components/UniformGridSlot.h"
 #include "Components/GridPanel.h"
 #include "Components/GridSlot.h"
+#include "Engine/Texture2D.h"
+#include "KMK/VirtualGameInstance_KMK.h"
+#include "Components/TextBlock.h"
 
 void UStartWidget_KMK::NativeConstruct ( )
 {
     Super::NativeConstruct();
+	// GI 찾기
+	gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance() );
 #pragma region LoginPanel
 	if (Butt_Login)
 	{
@@ -68,12 +73,17 @@ void UStartWidget_KMK::NativeConstruct ( )
 		Butt_Left->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressLeft );
 		Butt_FLeft->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressFLeft );
 	}
+	if (Butt_ActivePanel)
+	{
+		Butt_ActivePanel->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PanelActive );
+	}
 	if (Image_Fever &&Image_Particle &&Image_Ticket)
 	{
 		Image_Fever->SetColorAndOpacity ( FLinearColor::Blue );
 		Image_Particle->SetColorAndOpacity ( FLinearColor::Blue );
 		Image_Ticket->SetColorAndOpacity ( FLinearColor::White );
 	}
+
 #pragma endregion
 #pragma region Entry
 	if (Butt_Yes)
@@ -89,6 +99,14 @@ void UStartWidget_KMK::NativeConstruct ( )
 		Butt_Back1->OnClicked.AddDynamic ( this , &UStartWidget_KMK::GoBack );
 		Butt_Back2->OnClicked.AddDynamic ( this , &UStartWidget_KMK::GoBack );
 	}
+#pragma endregion
+#pragma region Session
+	if (gi)
+	{
+		gi->OnSearchSignatureCompleteDelegate.AddDynamic(this, &UStartWidget_KMK::CreateRoomWidget );
+		gi->SetStartWidget(this);
+	}
+
 #pragma endregion
 
 
@@ -128,24 +146,50 @@ void UStartWidget_KMK::CreateStagePanel ( )
 // 공연 일정 잡는 판넬로 변경
 void UStartWidget_KMK::SettingStagePanel ( )
 {
-	StartSwitcher->SetActiveWidgetIndex ( 2 );
+	StartSwitcher->SetActiveWidgetIndex ( 3 );
+	ChangeFindRoomPanel(TEXT("무대 선택" ));
 }
 // 공연 시작 : 세션 생성
 void UStartWidget_KMK::StartConcertPanel ( )
 {
-
+	if (gi)
+	{
+		gi->CreateMySession(TEXT("1234"), 30);
+	}
 }
 
 void UStartWidget_KMK::ComeInStagePanel ( )
 {	
-	// VIP 입장 판넬 띄우기
-	StartSwitcher->SetActiveWidgetIndex ( 3 );
+	// 세션 찾기
+	FindRoom();
 }
 
 #pragma endregion
 
-
 #pragma region Setting StagePanel
+// 레벨 선택
+void UStartWidget_KMK::ChangeFindRoomPanel ( const FString& title )
+{
+	Text_Title->SetText(FText::FromString(title));
+	// 파섹해서 나온 정보의 값에 따라 createWidget이 되게 만들기
+	for (int i = 0; i < 5; i++)
+	{
+		CreateStageWidget(FString::FromInt(i));
+	}
+}
+
+void UStartWidget_KMK::CreateStageWidget ( const FString& createName )
+{
+	// wbp 생성
+	auto* wid = Cast<URoomWidget_KMK>(CreateWidget(GetWorld(), roomWidgetFact));
+	if (wid)
+	{
+		wid->SetStageText(createName);
+		wid->ActiveButton(false );
+		roomCount++;
+		SetPosWidget(wid, roomCount);
+	}
+}
 
 // 파티클 설정하는 부분
 void UStartWidget_KMK::PressRight ( )
@@ -247,40 +291,53 @@ void UStartWidget_KMK::ClearAll ( )
 	EditText_STime->SetText(FText::GetEmpty());
 	EditText_ETime->SetText(FText::GetEmpty());
 	EditText_Ticket->SetText(FText::GetEmpty());
+	EditText_SingTime->SetText(FText::GetEmpty());
 }
 #pragma endregion
 
 #pragma region Entry Panel
 // 세션 확인할 수 있는 UI 띄우기
-
 void UStartWidget_KMK::PressYesButt ( )
 {
-	StartSwitcher->SetActiveWidgetIndex ( 4 );
-
-	FindRoom();
+	if (gi && roomNum >= 0)
+	{
+		gi->JoinRoom(roomNum);
+		ChangeAudienceMesh(0);
+	}
 }
 
 void UStartWidget_KMK::PressNoButt ( )
 {
-	StartSwitcher->SetActiveWidgetIndex ( 4 );
-
-	FindRoom();
+	if (gi && roomNum >= 0)
+	{
+		gi->JoinRoom(roomNum);
+		ChangeAudienceMesh(1);
+	}
 }
 
 // 세션 찾기
 void UStartWidget_KMK::FindRoom( )
 {
-	CreateRoomWidget ( );
+	// VIP 입장 판넬 띄우기
+	StartSwitcher->SetActiveWidgetIndex ( 3 );
+	ChangeFindRoomPanel(TEXT("공연장 확인" ));
+	ClearChild();
+	if (gi)
+	{
+		gi->FindOtherSession();
+	}
 }
 // 세션을 만들면 wbp를 생성해서 그리드에 배치
-void UStartWidget_KMK::CreateRoomWidget ( )
+void UStartWidget_KMK::CreateRoomWidget (const struct FRoomInfo& info )
 {
 	// wbp 생성
 	auto* wid = Cast<URoomWidget_KMK>(CreateWidget(GetWorld(), roomWidgetFact));
 	if (wid)
 	{
-		roomNum++;
-		SetPosWidget(wid, roomNum);
+		wid->SetImageAndText(info);
+		wid->ActiveButton(true );
+		roomCount++;
+		SetPosWidget(wid, roomCount);
 	}
 }
 // 생성된 wbp의 개수에 따라 위치값 조정
@@ -296,18 +353,31 @@ void UStartWidget_KMK::SetPosWidget ( class URoomWidget_KMK* widget , int32 num 
 	{
 		childSlot->SetRow(row);
 		childSlot->SetColumn(col);
-
 	}
 	
 }
-
+// 그리드 삭제
 void UStartWidget_KMK::ClearChild ( )
 {
 	if (FindRoomGrid->GetChildrenCount ( ) > 0)
 	{
-		roomNum = 0;
+		roomCount = 0;
 		FindRoomGrid->ClearChildren();
 	}
+}
+
+void UStartWidget_KMK::ChangeAudienceMesh (int32 num )
+{
+	auto* player = GetWorld ( )->GetFirstPlayerController( )->GetPawn()->FindComponentByClass<USkeletalMeshComponent> ();
+	if (player)
+	{
+		player->SetSkeletalMesh(audienceMesh[num]);
+	}
+}
+
+void UStartWidget_KMK::PanelActive ( )
+{
+	StartSwitcher->SetActiveWidgetIndex ( 3 );
 }
 
 #pragma endregion

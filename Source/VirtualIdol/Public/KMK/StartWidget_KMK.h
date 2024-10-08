@@ -22,6 +22,10 @@ public:
 
 	UFUNCTION ()
 	void GoBack();
+
+	// 인터페이스
+	class UVirtualGameInstance_KMK* gi;
+
 #pragma region Login Widget Panel
 // ================================================================
 // Login Widget Panel
@@ -112,6 +116,8 @@ public:
 	class UEditableText* EditText_STime;
 	UPROPERTY(meta = (BindWidget))
 	class UEditableText* EditText_ETime;
+	UPROPERTY(meta = (BindWidget))
+	class UEditableText* EditText_SingTime;
 
 	UPROPERTY(meta = (BindWidget))
 	class UEditableText* EditText_Ticket;
@@ -136,6 +142,11 @@ public:
 	void ClearAll();
 	int32 particleNum = 0;
 	int32 feverNum = 0;
+	
+	UFUNCTION ()
+	void ChangeFindRoomPanel(const FString& title);
+	UFUNCTION()
+	void CreateStageWidget(const FString& createName);
 #pragma endregion
 #pragma region EntryPanel Widget Panel
 // ================================================================
@@ -165,16 +176,36 @@ public:
 	UFUNCTION()
 	void FindRoom();
 	UFUNCTION()
-	void CreateRoomWidget();
+	void CreateRoomWidget(const struct FRoomInfo& info);
 	UPROPERTY(EditAnywhere, Category="Room" )
 	TSubclassOf<class UUserWidget> roomWidgetFact;
 
-	int32 roomNum = 0;
+	int32 roomCount = 0;
 	UFUNCTION()
 	void SetPosWidget(class URoomWidget_KMK* widget, int32 num);
 
 	UFUNCTION ()
 	void ClearChild( );
+	
+	class UTexture2D* t;
+	UPROPERTY()
+	int32 roomNum = -1;
 
+	// 플레이어 메쉬 변경
+	UPROPERTY(EditAnywhere, Category = "Audience" )
+	TArray<class USkeletalMesh*> audienceMesh;
+	UFUNCTION( )
+	void ChangeAudienceMesh(int32 num );
 #pragma endregion
+#pragma region FindRoom & Select Stage
+	UPROPERTY(meta = (BindWidget))
+	class UButton* Butt_ActivePanel;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* Text_Title;
+
+	UFUNCTION( )
+	void PanelActive( );
+#pragma endregion
+
 };

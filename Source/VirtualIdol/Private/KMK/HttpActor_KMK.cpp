@@ -38,6 +38,7 @@ void AHttpActor_KMK::ReqTicket ( FString json )
 
 	req->SetURL ( "https://singular-swine-deeply.ngrok-free.app/posttest" );
 	req->SetVerb ( TEXT ( "POST" ) );
+	// TEXT ( "application/json" )  ->TEXT("image/jpeg")
 	req->SetHeader ( TEXT ( "content-type" ) , TEXT ( "application/json" ) );
 	//req->SetContentAsString ( UKMK_JsonParseLib::MakeJson ( data ) );
 	// 응답받을 함수를 연결
