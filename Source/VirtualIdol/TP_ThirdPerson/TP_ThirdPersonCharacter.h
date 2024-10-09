@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+﻿// Copyright Epic Games, Inc. All Rights Reserved.
 
 #pragma once
 
@@ -69,5 +69,14 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	UPROPERTY( )
+	class APlayerController* pc;
+
+	UPROPERTY(EditAnywhere )
+	TSubclassOf<class UAudience_KMK> mainWidgetFact;
+
+	UPROPERTY( )
+	class UAudience_KMK* widget;
 };
 

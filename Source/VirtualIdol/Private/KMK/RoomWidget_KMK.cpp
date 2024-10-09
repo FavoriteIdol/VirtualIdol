@@ -23,7 +23,9 @@ void URoomWidget_KMK::SetImageAndText (const struct FRoomInfo& info)
 	// 이미지 설정
 	//Image_Stage->SetBrushFromTexture( newTexture );
 	Image_Stage->SetColorAndOpacity(FLinearColor::Blue);
-	 PRINTLOG(TEXT("%s"), *info.hostName);
+	PRINTLOG(TEXT("%s"), *info.hostName);
+	Butt_JoinSession->SetVisibility ( ESlateVisibility::Visible );
+	Butt_SetStage->SetVisibility(ESlateVisibility::Hidden);
 	Text_Name->SetText( FText::FromString( info.hostName + TEXT ( "의 콘서트" ) ));
 	roomNum = info.index;
 }
@@ -31,7 +33,9 @@ void URoomWidget_KMK::SetImageAndText (const struct FRoomInfo& info)
 void URoomWidget_KMK::SetStageText ( const FString& createName )
 {
 	Image_Stage->SetColorAndOpacity(FLinearColor::Yellow);
-	 PRINTLOG(TEXT("%s"), *createName);
+    PRINTLOG ( TEXT ( "%s" ) , *createName );
+	Butt_JoinSession->SetVisibility ( ESlateVisibility::Hidden );
+    Butt_SetStage->SetVisibility ( ESlateVisibility::Visible );
 	Text_Name->SetText( FText::FromString( createName + TEXT ( "가 만든 무대" ) ));
 }
 
@@ -51,21 +55,6 @@ void URoomWidget_KMK::PressSetStageButt ( )
 	if (gi)
 	{
 		gi->VisibleStartWidget(false);
-	}
-}
-
-// 버튼 변경
-void URoomWidget_KMK::ActiveButton ( bool bJoinSessionButt )
-{
-	if (bJoinSessionButt)
-	{
-		Butt_JoinSession->bIsEnabled = true;
-		Butt_SetStage->bIsEnabled = false;
-	}
-	else
-	{
-		Butt_JoinSession->bIsEnabled = false;
-		Butt_SetStage->bIsEnabled = true;
 	}
 }
 

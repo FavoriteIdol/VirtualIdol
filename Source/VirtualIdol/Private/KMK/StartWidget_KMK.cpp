@@ -185,7 +185,6 @@ void UStartWidget_KMK::CreateStageWidget ( const FString& createName )
 	if (wid)
 	{
 		wid->SetStageText(createName);
-		wid->ActiveButton(false );
 		roomCount++;
 		SetPosWidget(wid, roomCount);
 	}
@@ -320,7 +319,8 @@ void UStartWidget_KMK::FindRoom( )
 {
 	// VIP 입장 판넬 띄우기
 	StartSwitcher->SetActiveWidgetIndex ( 3 );
-	ChangeFindRoomPanel(TEXT("공연장 확인" ));
+
+	Text_Title->SetText ( FText::FromString ( TEXT ( "공연장 확인" )) );
 	ClearChild();
 	if (gi)
 	{
@@ -335,7 +335,6 @@ void UStartWidget_KMK::CreateRoomWidget (const struct FRoomInfo& info )
 	if (wid)
 	{
 		wid->SetImageAndText(info);
-		wid->ActiveButton(true );
 		roomCount++;
 		SetPosWidget(wid, roomCount);
 	}
@@ -366,21 +365,21 @@ void UStartWidget_KMK::ClearChild ( )
 	}
 }
 
-void UStartWidget_KMK::ChangeAudienceMesh (int32 num )
-{
-	auto* player = GetWorld ( )->GetFirstPlayerController( )->GetPawn()->FindComponentByClass<USkeletalMeshComponent> ();
-	if (player)
-	{
-		player->SetSkeletalMesh(audienceMesh[num]);
-	}
-}
-
 void UStartWidget_KMK::PanelActive ( )
 {
 	StartSwitcher->SetActiveWidgetIndex ( 3 );
 }
 
 #pragma endregion
+// 플레이어 내부에 필요함
+void UStartWidget_KMK::ChangeAudienceMesh ( int32 num )
+{
+	auto* player = GetWorld ( )->GetFirstPlayerController ( )->GetPawn ( )->FindComponentByClass<USkeletalMeshComponent> ( );
+	if (player)
+	{
+		player->SetSkeletalMesh ( audienceMesh[num] );
+	}
+}
 
 
 

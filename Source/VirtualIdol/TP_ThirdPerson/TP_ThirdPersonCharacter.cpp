@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+﻿// Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "TP_ThirdPersonCharacter.h"
 #include "Engine/LocalPlayer.h"
@@ -10,6 +10,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "KMK/Audience_KMK.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -58,6 +59,15 @@ void ATP_ThirdPersonCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
+	pc = GetWorld()->GetFirstPlayerController();
+	if (IsLocallyControlled ( ))
+	{
+		if (mainWidgetFact && !widget)
+		{
+			widget = CreateWidget<UAudience_KMK> ( GetWorld ( ) , mainWidgetFact );
+			widget->AddToViewport ( );
+		}
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////

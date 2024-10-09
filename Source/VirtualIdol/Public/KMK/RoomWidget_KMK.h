@@ -44,8 +44,5 @@ public :
 	UFUNCTION( )
 	void SetStageText(const FString& createName);
 
-	UFUNCTION( )
-	void ActiveButton(bool bButton );
-
 	int32 roomNum = 0;
 };
