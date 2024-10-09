@@ -17,9 +17,6 @@ class VIRTUALIDOL_API UHSW_FeverGaugeWidget : public UUserWidget
 public:
 	virtual void NativeConstruct ( ) override;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = FeverGauge )
-	float CurrentGauge = 0.0f;
-
 	UPROPERTY(meta=(BindWidget))
 	class UProgressBar* FeverGauge;
 

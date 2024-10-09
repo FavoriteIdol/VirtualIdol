@@ -7,12 +7,10 @@
 
 void UHSW_FeverGaugeWidget::NativeConstruct ( )
 {
-	CurrentGauge = 0;
 	SetFeverGauge(0);
 }
 
 void UHSW_FeverGaugeWidget::SetFeverGauge ( float value)
 {
-	CurrentGauge += value;
-	FeverGauge->SetPercent( CurrentGauge / 1);
+	FeverGauge->SetPercent( value / 1);
 }

@@ -77,8 +77,14 @@ public:
 
 public:
 
-	UPROPERTY(EditDefaultsOnly )
+	UPROPERTY(EditDefaultsOnly , Category = FeverGauge )
 	class UHSW_FeverGaugeWidget* FeverGauge;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = FeverGauge )
+	float CurrentGauge = 0.0f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = FeverGauge )
+	float FeverPoint = 0.02f;
 
 	// MainWidget을 생성해서 기억하고싶다.
 	UPROPERTY(EditDefaultsOnly, Category = Pistol)

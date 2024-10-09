@@ -11,6 +11,7 @@
 #include "HSW/HSW_MainWidget.h"
 #include "Components/ProgressBar.h"
 #include "HSW/HSW_FeverGaugeWidget.h"
+#include "HSW/HSW_AuditoriumGameMode.h"
 
 // Sets default values
 AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
@@ -171,6 +172,18 @@ void AHSW_ThirdPersonCharacter::Look ( const FInputActionValue& Value )
 
 void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value )
 {
-	MainUI->FeverGauge->SetFeverGauge(0.02);
+	if (CurrentGauge <= 1)
+	{
+		CurrentGauge += FeverPoint;
+		MainUI->FeverGauge->SetFeverGauge( CurrentGauge );
+	}
+	else if (CurrentGauge > 1)
+	{
+		AHSW_AuditoriumGameMode* gameMode = Cast<AHSW_AuditoriumGameMode>(GetWorld()->GetAuthGameMode());
+		if (gameMode)
+		{
+			gameMode->bFevered = true;
+		}
+	}
 }
 

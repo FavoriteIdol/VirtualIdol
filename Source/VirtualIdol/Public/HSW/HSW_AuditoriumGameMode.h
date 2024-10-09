@@ -16,4 +16,17 @@ class VIRTUALIDOL_API AHSW_AuditoriumGameMode : public AGameModeBase
 	
 public:
 	AHSW_AuditoriumGameMode();
+
+	virtual void Tick ( float DeltaTime ) override;
+
+protected:
+	virtual void BeginPlay () override;
+
+public:
+	UPROPERTY (EditDefaultsOnly)
+	class AHSW_ThirdPersonCharacter* Player;
+
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="GameState" )
+	bool bFevered;
+
 };
