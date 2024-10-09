@@ -22,8 +22,9 @@ public:
 
 	UFUNCTION ()
 	void GoBack();
-
+	
 	// 인터페이스
+	UPROPERTY( )
 	class UVirtualGameInstance_KMK* gi;
 
 #pragma region Login Widget Panel
@@ -196,6 +197,7 @@ public:
 	TArray<class USkeletalMesh*> audienceMesh;
 	UFUNCTION( )
 	void ChangeAudienceMesh(int32 num );
+	
 #pragma endregion
 #pragma region FindRoom & Select Stage
 	UPROPERTY(meta = (BindWidget))

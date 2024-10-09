@@ -66,7 +66,7 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 	FFindSignature OnFindRoomCompDelegate;
 
 	// 방입장 요청
-	void JoinRoom(int32 ChooseRoomNum);
+	void JoinRoom(int32 ChooseRoomNum, int32 vipNum = 0);
 
 	// 방입장 응답
 	void JoinRoomComplete(FName SessionName, EOnJoinSessionCompleteResult::Type EOnJoinSessionCompleteResult);
@@ -92,4 +92,7 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 	void SwitchStartUIWidget(int32 num );
 	UFUNCTION( )
 	void VisibleStartWidget ( bool bVisible );
+
+	UPROPERTY( )
+	int32 playerMeshNum = 0;
 };

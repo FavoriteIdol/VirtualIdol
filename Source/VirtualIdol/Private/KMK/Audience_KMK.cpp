@@ -12,9 +12,11 @@
 #include "../TP_ThirdPerson/TP_ThirdPersonCharacter.h"
 #include "KMK/AudienceServerComponent_KMK.h"
 #include "Components/TextBlock.h"
+#include "KMK/VirtualGameInstance_KMK.h"
 void UAudience_KMK::NativeConstruct ( )
 {
     Super::NativeConstruct( );
+    gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance());
     if (Butt_Vip && Butt_Yes && Butt_No && PopUpPanel)
     {
         VisiblePanel(ESlateVisibility::Hidden);
@@ -34,16 +36,19 @@ void UAudience_KMK::NativeConstruct ( )
 
 void UAudience_KMK::PressVipButt ( )
 {
+   
     VisiblePanel ( ESlateVisibility::Visible );
 }
 
 void UAudience_KMK::PressYesButt ( )
 {
+    gi->playerMeshNum = 1;
     VisiblePanel ( ESlateVisibility::Hidden );
 }
 
 void UAudience_KMK::PressNoButt ( )
 {
+    gi->playerMeshNum = 0;
     VisiblePanel(ESlateVisibility::Hidden);
 }
 

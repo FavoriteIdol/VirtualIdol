@@ -154,7 +154,7 @@ void UStartWidget_KMK::StartConcertPanel ( )
 {
 	if (gi)
 	{
-		gi->CreateMySession(TEXT("1234"), 30);
+		gi->CreateMySession(TEXT("조준혁"), 30);
 	}
 }
 
@@ -300,8 +300,8 @@ void UStartWidget_KMK::PressYesButt ( )
 {
 	if (gi && roomNum >= 0)
 	{
-		gi->JoinRoom(roomNum);
-		ChangeAudienceMesh(0);
+		gi->JoinRoom(roomNum, 1);
+		//ChangeAudienceMesh(0);
 	}
 }
 
@@ -310,7 +310,7 @@ void UStartWidget_KMK::PressNoButt ( )
 	if (gi && roomNum >= 0)
 	{
 		gi->JoinRoom(roomNum);
-		ChangeAudienceMesh(1);
+		//ChangeAudienceMesh(1);
 	}
 }
 

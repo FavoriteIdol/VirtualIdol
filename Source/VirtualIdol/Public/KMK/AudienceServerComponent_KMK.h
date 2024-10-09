@@ -27,6 +27,9 @@ public:
 	// 플레이어 컨트롤러 들고오기
 	UPROPERTY( )
 	class ATP_ThirdPersonCharacter* player;
+	// 게임 인스턴스
+	UPROPERTY( )
+	class UVirtualGameInstance_KMK* gi;
 	
 	// 서버에게 채팅 요청
 	UFUNCTION(Server, Reliable )

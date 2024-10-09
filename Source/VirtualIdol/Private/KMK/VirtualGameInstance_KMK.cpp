@@ -149,16 +149,17 @@ void UVirtualGameInstance_KMK::OnMyFindSessionComplete ( bool bSuccessful )
 #pragma endregion
 #pragma region Join Session
 
-void UVirtualGameInstance_KMK::JoinRoom ( int32 ChooseRoomNum )
+void UVirtualGameInstance_KMK::JoinRoom ( int32 ChooseRoomNum, int32 vipNum)
 {
+    playerMeshNum = vipNum;
     auto res = sessionSearch->SearchResults[ChooseRoomNum];
     sessionInterface->JoinSession(0, FName(HostName), res);
 }
 
 
-void UVirtualGameInstance_KMK::JoinRoomComplete ( FName SessionName , EOnJoinSessionCompleteResult::Type EOnJoinSessionCompleteResult )
+void UVirtualGameInstance_KMK::JoinRoomComplete ( FName SessionName , EOnJoinSessionCompleteResult::Type result )
 {
-    if (EOnJoinSessionCompleteResult::Success == EOnJoinSessionCompleteResult)
+    if (EOnJoinSessionCompleteResult::Success == result)
     {
         auto* pc = GetWorld()->GetFirstPlayerController();
 
@@ -210,4 +211,5 @@ void UVirtualGameInstance_KMK::VisibleStartWidget (bool bVisible)
         widget->StartSwitcher->SetActiveWidgetIndex ( 5 );
     }
 }
+
 #pragma endregion

@@ -15,6 +15,9 @@ class VIRTUALIDOL_API UAudience_KMK : public UUserWidget
 	GENERATED_BODY()
 public :
 	virtual void NativeConstruct ( ) override;
+	
+	UPROPERTY( )
+	class UVirtualGameInstance_KMK* gi;
 #pragma region PopUp
 	// 캔버스
 	UPROPERTY(meta = (BindWidget ) )
@@ -63,6 +66,7 @@ public :
 
 	UPROPERTY(EditDefaultsOnly )
 	TSubclassOf<class USendChat_KMK> chatWidgetFact;
+
 #pragma endregion
 
 	
