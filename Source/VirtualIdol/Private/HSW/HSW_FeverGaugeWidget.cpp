@@ -5,8 +5,14 @@
 #include "Components/ProgressBar.h"
 
 
-void UHSW_FeverGaugeWidget::SetFeverGuage ( float value)
+void UHSW_FeverGaugeWidget::NativeConstruct ( )
+{
+	CurrentGauge = 0;
+	SetFeverGauge(0);
+}
+
+void UHSW_FeverGaugeWidget::SetFeverGauge ( float value)
 {
 	CurrentGauge += value;
-	FeverGuage->SetPercent( CurrentGauge / 1);
+	FeverGauge->SetPercent( CurrentGauge / 1);
 }

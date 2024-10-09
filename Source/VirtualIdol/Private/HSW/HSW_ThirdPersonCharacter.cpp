@@ -8,6 +8,9 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputSubsystems.h"
 #include "../../../../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputComponent.h"
+#include "HSW/HSW_MainWidget.h"
+#include "Components/ProgressBar.h"
+#include "HSW/HSW_FeverGaugeWidget.h"
 
 // Sets default values
 AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
@@ -60,6 +63,8 @@ AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
 void AHSW_ThirdPersonCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	InitMainUI();
 	
 }
 
@@ -68,6 +73,16 @@ void AHSW_ThirdPersonCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AHSW_ThirdPersonCharacter::InitMainUI ( )
+{
+	
+	MainUI = Cast<UHSW_MainWidget> ( CreateWidget ( GetWorld ( ) , MainUIFactory ) );
+	if (MainUI)
+	{
+		MainUI->AddToViewport ( );
+	}
 }
 
 // Called to bind functionality to input
@@ -96,6 +111,10 @@ void AHSW_ThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* Playe
 
 		// Looking
 		EnhancedInputComponent->BindAction ( LookAction , ETriggerEvent::Triggered , this , &AHSW_ThirdPersonCharacter::Look );
+
+		//FeverGauge
+		EnhancedInputComponent->BindAction ( FeverGaugeAction , ETriggerEvent::Started , this , &AHSW_ThirdPersonCharacter::OnMyFeverGauge );
+
 	}
 
 }
@@ -152,6 +171,6 @@ void AHSW_ThirdPersonCharacter::Look ( const FInputActionValue& Value )
 
 void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value )
 {
-	
+	MainUI->FeverGauge->SetFeverGauge(0.02);
 }
 

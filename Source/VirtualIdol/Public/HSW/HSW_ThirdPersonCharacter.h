@@ -79,4 +79,13 @@ public:
 
 	UPROPERTY(EditDefaultsOnly )
 	class UHSW_FeverGaugeWidget* FeverGauge;
+
+	// MainWidget을 생성해서 기억하고싶다.
+	UPROPERTY(EditDefaultsOnly, Category = Pistol)
+	TSubclassOf<class UUserWidget> MainUIFactory;
+
+	UPROPERTY(EditDefaultsOnly )
+	class UHSW_MainWidget* MainUI;
+
+	void InitMainUI();
 };
