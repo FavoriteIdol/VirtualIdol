@@ -98,4 +98,7 @@ public:
 	// 이모지 ------------------------------------
 	UPROPERTY(EditDefaultsOnly, Category = Imoji )
 	class UHSW_ImojiConponent* ImojiComponent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite,Category = Imoji )
+	class UBillboardComponent* ImojiImage;
 };

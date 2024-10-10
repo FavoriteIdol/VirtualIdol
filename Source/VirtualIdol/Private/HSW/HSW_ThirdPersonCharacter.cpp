@@ -13,6 +13,7 @@
 #include "HSW/HSW_FeverGaugeWidget.h"
 #include "HSW/HSW_AuditoriumGameMode.h"
 #include "HSW/HSW_ImojiConponent.h"
+#include "Components/BillboardComponent.h"
 
 // Sets default values
 AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
@@ -61,8 +62,10 @@ AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
 	// Imoji Component
 	ImojiComponent = CreateDefaultSubobject<UHSW_ImojiConponent>(TEXT("ImojiComponent" ));
 	ImojiComponent->SetupAttachment(GetMesh());
+	ImojiComponent->SetRelativeLocation(FVector(0,0,230.f));
 
-
+	ImojiImage = CreateDefaultSubobject<UBillboardComponent>(TEXT("ImojiBilboard" ));
+	ImojiImage->SetupAttachment(ImojiComponent);
 }
 
 // Called when the game starts or when spawned
