@@ -50,6 +50,7 @@ void UStartWidget_KMK::NativeConstruct ( )
 	}
 #pragma endregion
 #pragma region  Setting StagePanel
+
 	if (Butt_Back)
 	{
 		Butt_Back->OnClicked.AddDynamic ( this , &UStartWidget_KMK::GoBack );
@@ -63,24 +64,35 @@ void UStartWidget_KMK::NativeConstruct ( )
 		Butt_Complete->OnClicked.AddDynamic ( this , &UStartWidget_KMK::CompeleteSetting );
 	}
 
-	if (Butt_Right && Butt_FRight)
+	if (Butt_Right && Butt_FRight && Butt_HRight)
 	{
 		Butt_Right->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressRight );
 		Butt_FRight->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressFRight );
+		Butt_HRight->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressHRight );
 	}
-	if (Butt_Left && Butt_FLeft)
+	if (Butt_Left && Butt_FLeft && Butt_HLeft)
 	{
 		Butt_Left->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressLeft );
 		Butt_FLeft->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressFLeft );
+		Butt_HLeft->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressHLeft );
 	}
 	if (Butt_ActivePanel)
 	{
 		Butt_ActivePanel->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PanelActive );
 	}
-	if (Image_Fever &&Image_Particle &&Image_Ticket)
+	if (Butt_Select)
 	{
-		Image_Fever->SetColorAndOpacity ( FLinearColor::Blue );
-		Image_Particle->SetColorAndOpacity ( FLinearColor::Blue );
+		Butt_Select->OnClicked.AddDynamic ( this , &UStartWidget_KMK::StageSelect );
+	}
+	if (Text_SelectComp)
+    {
+        Text_SelectComp->SetVisibility ( ESlateVisibility::Hidden );
+    }
+	if (Image_Fever &&Image_Particle &&Image_Ticket && Image_HEffect)
+	{
+		Image_Fever->SetBrushFromMaterial ( FeversParticles[0] );
+		Image_Particle->SetBrushFromMaterial ( EffectParticles[0] );
+		Image_HEffect->SetBrushFromMaterial ( HighParticles[0] );
 		Image_Ticket->SetColorAndOpacity ( FLinearColor::White );
 	}
 
@@ -196,7 +208,7 @@ void UStartWidget_KMK::PressRight ( )
 	// 버튼 이름 확인
 	if (EffectParticles.IsEmpty ( )) return;
 	particleNum++;
-	if (particleNum > EffectParticles.Num ( )) particleNum = 0;
+	if (particleNum > EffectParticles.Num ( ) - 1) particleNum = 0;
 	PlayParticleSystem ( particleNum , EffectParticles, Image_Particle );
 }
 
@@ -212,7 +224,7 @@ void UStartWidget_KMK::PressFRight ( )
 {
 	if (FeversParticles.IsEmpty ( )) return;
 	feverNum++;
-	if (feverNum > FeversParticles.Num ( )) feverNum = 0;
+	if (feverNum > FeversParticles.Num ( ) - 1) feverNum = 0;
 	PlayParticleSystem ( feverNum , FeversParticles, Image_Fever );
 }
 
@@ -222,6 +234,22 @@ void UStartWidget_KMK::PressFLeft ( )
 	feverNum--;
 	if (feverNum < 0) feverNum = FeversParticles.Num ( ) - 1;
 	PlayParticleSystem ( feverNum , FeversParticles, Image_Fever );
+}
+
+void UStartWidget_KMK::PressHRight ( )
+{
+	if (HighParticles.IsEmpty ( )) return;
+	highNum++;
+	if (highNum > HighParticles.Num ( ) - 1) highNum = 0;
+	PlayParticleSystem ( highNum , HighParticles, Image_HEffect );
+}
+
+void UStartWidget_KMK::PressHLeft ( )
+{
+	if (HighParticles.IsEmpty ( )) return;
+	highNum--;
+	if (highNum < 0) highNum = HighParticles.Num ( ) - 1;
+	PlayParticleSystem ( highNum , HighParticles, Image_HEffect );
 }
 
 void UStartWidget_KMK::PressCreateTicket ( )
@@ -246,7 +274,7 @@ void UStartWidget_KMK::CompeleteSetting ( )
 		} ) , 3 , false );
 }
 
-void UStartWidget_KMK::PlayParticleSystem ( int32 index , TArray<class UParticleSystem*> ParticlesArray, class UImage* image )
+void UStartWidget_KMK::PlayParticleSystem ( int32 index , TArray<class UMaterial*> ParticlesArray, class UImage* image )
 {	
 	if(ParticlesArray.Num() < 1 || index > ParticlesArray.Num()) return;
 	//// 파티클 시스템 스폰
@@ -260,18 +288,7 @@ void UStartWidget_KMK::PlayParticleSystem ( int32 index , TArray<class UParticle
 	//{
 	//	ParticleComponent->ActivateSystem ( );  // 파티클 재생
 	//}
-	switch (index)
-	{
-	case 0:
-		image->SetColorAndOpacity ( FLinearColor::Blue );
-		break;
-	case 1:
-		image->SetColorAndOpacity ( FLinearColor::Black );
-		break;
-	case 2:
-		image->SetColorAndOpacity ( FLinearColor::Red );
-		break;
-	}
+	image->SetBrushFromMaterial ( ParticlesArray[index] );
 
 }
 
@@ -301,6 +318,7 @@ void UStartWidget_KMK::PressYesButt ( )
 	if (gi && roomNum >= 0)
 	{
 		gi->JoinRoom(roomNum, 1);
+
 		//ChangeAudienceMesh(0);
 	}
 }
@@ -370,16 +388,17 @@ void UStartWidget_KMK::PanelActive ( )
 	StartSwitcher->SetActiveWidgetIndex ( 3 );
 }
 
-#pragma endregion
-// 플레이어 내부에 필요함
-void UStartWidget_KMK::ChangeAudienceMesh ( int32 num )
+void UStartWidget_KMK::StageSelect ( )
 {
-	auto* player = GetWorld ( )->GetFirstPlayerController ( )->GetPawn ( )->FindComponentByClass<USkeletalMeshComponent> ( );
-	if (player)
-	{
-		player->SetSkeletalMesh ( audienceMesh[num] );
-	}
+	Text_SelectComp->SetVisibility(ESlateVisibility::Visible);
+	FTimerHandle handle;
+	GetWorld ( )->GetTimerManager ( ).SetTimer ( handle , FTimerDelegate::CreateLambda ( [this]( )
+		{
+			StartSwitcher->SetActiveWidgetIndex ( 2 );
+			Text_SelectComp->SetVisibility ( ESlateVisibility::Hidden );
+		} ) , 3 , false );
 }
 
+#pragma endregion
 
 

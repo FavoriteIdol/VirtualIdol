@@ -27,15 +27,30 @@ public:
 	// 플레이어 컨트롤러 들고오기
 	UPROPERTY( )
 	class ATP_ThirdPersonCharacter* player;
-	// 게임 인스턴스
-	UPROPERTY( )
-	class UVirtualGameInstance_KMK* gi;
-	
+
+#pragma region Chatting
 	// 서버에게 채팅 요청
 	UFUNCTION(Server, Reliable )
 	void ServerRPCChat(const FString& chat);
 	// 채팅 업데이트
 	UFUNCTION(NetMulticast, Reliable )
 	void MultiRPCChat ( const FString& chat );
-		
+#pragma endregion
+
+#pragma region ChangeMyMesh
+	// 플레이어 메쉬 변경
+	UPROPERTY(EditAnywhere, Category = "Audience" )
+	TArray<class USkeletalMesh*> audienceMesh;
+
+	UPROPERTY(Replicated)
+	int32 playerMeshNum = 0;
+
+	UFUNCTION(Server, Reliable )
+	void ServerRPC_ChangeMyMesh(int32 num );
+
+	UFUNCTION(NetMulticast, Reliable )
+	void MultiRPC_ChangeMyMesh(int32 num );
+
+#pragma endregion
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

@@ -11,6 +11,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "KMK/Audience_KMK.h"
+#include "VirtualIdol.h"
+#include "KMK/AudienceServerComponent_KMK.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -50,7 +52,7 @@ ATP_ThirdPersonCharacter::ATP_ThirdPersonCharacter()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
-
+	//serverComp= CreateDefaultSubobject<UAudienceServerComponent_KMK>(TEXT("ServerComp"));
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
@@ -68,6 +70,11 @@ void ATP_ThirdPersonCharacter::BeginPlay()
 			widget->AddToViewport ( );
 		}
 	}
+}
+
+void ATP_ThirdPersonCharacter::Tick ( float DeltaTime)
+{
+	Super::Tick(DeltaTime);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -137,4 +144,14 @@ void ATP_ThirdPersonCharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+void ATP_ThirdPersonCharacter::PrintNetLog()
+{
+	const FString conStr = GetNetConnection() != nullptr ? TEXT("Valid Connection.....") : TEXT("Invalid Connection.....");
+
+	const FString OwnerName = GetOwner() != nullptr ? GetOwner()->GetName() : TEXT("No Owner");
+
+	const FString logStr = FString::Printf(TEXT("Connection : %s\nLocal Role : %s\nRemote Role : %s\nOwner Name : %s"), *conStr , *LOCALROLE, *REMOTEROLE, *OwnerName);
+	 
+	DrawDebugString(GetWorld(), GetActorLocation() + FVector::UpVector * 100 , logStr , nullptr , FColor::Emerald , 0 , true , 1);
 }

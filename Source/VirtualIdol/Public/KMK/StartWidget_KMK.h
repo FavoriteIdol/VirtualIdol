@@ -77,9 +77,11 @@ public:
 // ================================================================
 	// 추가 기능
 	UPROPERTY(EditAnywhere, Category="Particle" )
-	TArray<class UParticleSystem*> EffectParticles;
+	TArray<class UMaterial*> EffectParticles;
 	UPROPERTY(EditAnywhere, Category = "Particle")
-	TArray<class UParticleSystem*> FeversParticles;
+	TArray<class UMaterial*> FeversParticles;
+	UPROPERTY(EditAnywhere, Category = "Particle")
+	TArray<class UMaterial*> HighParticles;
 	UPROPERTY(EditAnywhere, Category = "Particle" )
 	TArray<FVector> ParticlePositions;
 
@@ -99,6 +101,10 @@ public:
 	class UButton* Butt_FRight;
 	UPROPERTY(meta = (BindWidget))
 	class UButton* Butt_FLeft;
+	UPROPERTY(meta = (BindWidget))
+	class UButton* Butt_HRight;
+	UPROPERTY(meta = (BindWidget))
+	class UButton* Butt_HLeft;
 
 	// 이미지
 	UPROPERTY(meta = (BindWidget))
@@ -106,7 +112,9 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UImage* Image_Particle;
 	UPROPERTY(meta = (BindWidget))
-	class UImage* Image_Fever;
+    class UImage* Image_Fever;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UImage* Image_HEffect;
 	// 팝업
     UPROPERTY ( meta = ( BindWidget ) )
     class UCanvasPanel* CompletePopUp;
@@ -132,17 +140,22 @@ public:
 	UFUNCTION()
 	void PressFLeft ();
 	UFUNCTION()
+	void PressHRight();
+	UFUNCTION()
+	void PressHLeft ();
+	UFUNCTION()
 	void PressCreateTicket();
 	UFUNCTION()
 	void CompeleteSetting();
 	
 	// 추가함수
 	UFUNCTION()
-	void PlayParticleSystem(int32 index , TArray<class UParticleSystem*> ParticlesArray , class UImage* image );
+	void PlayParticleSystem(int32 index , TArray<class UMaterial*> ParticlesArray , class UImage* image );
 	UFUNCTION ()
 	void ClearAll();
 	int32 particleNum = 0;
 	int32 feverNum = 0;
+	int32 highNum = 0;
 	
 	UFUNCTION ()
 	void ChangeFindRoomPanel(const FString& title);
@@ -191,23 +204,23 @@ public:
 	class UTexture2D* t;
 	UPROPERTY()
 	int32 roomNum = -1;
-
-	// 플레이어 메쉬 변경
-	UPROPERTY(EditAnywhere, Category = "Audience" )
-	TArray<class USkeletalMesh*> audienceMesh;
-	UFUNCTION( )
-	void ChangeAudienceMesh(int32 num );
 	
 #pragma endregion
 #pragma region FindRoom & Select Stage
 	UPROPERTY(meta = (BindWidget))
-	class UButton* Butt_ActivePanel;
+    class UButton* Butt_ActivePanel;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UButton* Butt_Select;
 
 	UPROPERTY(meta = (BindWidget))
-	class UTextBlock* Text_Title;
+    class UTextBlock* Text_Title;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UTextBlock* Text_SelectComp;
 
 	UFUNCTION( )
 	void PanelActive( );
+	UFUNCTION( )
+	void StageSelect( );
 #pragma endregion
 
 };

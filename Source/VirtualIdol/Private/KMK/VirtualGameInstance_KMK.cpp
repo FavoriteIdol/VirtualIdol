@@ -10,6 +10,8 @@
 #include "KMK/StartWidget_KMK.h"
 #include "Components/WidgetSwitcher.h"
 #include "Blueprint/UserWidget.h"
+#include "../TP_ThirdPerson/TP_ThirdPersonCharacter.h"
+#include "KMK/AudienceServerComponent_KMK.h"
 
 void UVirtualGameInstance_KMK::Init ( )
 {
@@ -24,6 +26,7 @@ void UVirtualGameInstance_KMK::Init ( )
          // 방입장
         sessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this , &UVirtualGameInstance_KMK::JoinRoomComplete);
     }
+
 }
 
 #pragma region Create Session
