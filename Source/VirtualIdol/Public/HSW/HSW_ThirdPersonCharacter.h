@@ -87,11 +87,15 @@ public:
 	float FeverPoint = 0.02f;
 
 	// MainWidget을 생성해서 기억하고싶다.
-	UPROPERTY(EditDefaultsOnly, Category = Pistol)
+	UPROPERTY(EditDefaultsOnly, Category = MainUI)
 	TSubclassOf<class UUserWidget> MainUIFactory;
 
 	UPROPERTY(EditDefaultsOnly )
 	class UHSW_MainWidget* MainUI;
 
 	void InitMainUI();
+
+	// 이모지 ------------------------------------
+	UPROPERTY(EditDefaultsOnly, Category = Imoji )
+	class UHSW_ImojiConponent* ImojiComponent;
 };

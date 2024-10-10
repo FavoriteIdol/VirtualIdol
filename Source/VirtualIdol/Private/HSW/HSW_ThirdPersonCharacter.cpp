@@ -12,6 +12,7 @@
 #include "Components/ProgressBar.h"
 #include "HSW/HSW_FeverGaugeWidget.h"
 #include "HSW/HSW_AuditoriumGameMode.h"
+#include "HSW/HSW_ImojiConponent.h"
 
 // Sets default values
 AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
@@ -57,7 +58,11 @@ AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 
-	
+	// Imoji Component
+	ImojiComponent = CreateDefaultSubobject<UHSW_ImojiConponent>(TEXT("ImojiComponent" ));
+	ImojiComponent->SetupAttachment(GetMesh());
+
+
 }
 
 // Called when the game starts or when spawned
