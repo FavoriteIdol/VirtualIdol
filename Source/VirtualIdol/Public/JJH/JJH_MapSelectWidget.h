@@ -32,7 +32,8 @@ public:
 	void OnThemeButtonClicked ( );
 	UFUNCTION( )
 	void OnEffectButtonClicked ( );
-
+	UFUNCTION( )
+	void OnFloorButtonClicked ( );
 	//낮밤 바꾸기
 	UPROPERTY(meta = (BindWidget))
 	class UHorizontalBox* DayHorizontal;	
@@ -40,10 +41,14 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* AfternoonButton;
 	UPROPERTY ( meta = ( BindWidget ) )
-	class UButton* NightButton;
+	class UButton* NightButton;		
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* FloorButton;
 
 	UFUNCTION ()
 	void OnAfternoonButtonClicked ( );	
+	UFUNCTION ( )
+	void OnFogButtonClicked ( );
 	UFUNCTION ( )
 	void OnNightButtonClicked ( );
 
@@ -75,6 +80,16 @@ public:
 	class UButton* EffectButton1;	
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UButton* EffectButton2;
+
+	//지면 바꾸기
+
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UHorizontalBox* FloorHorizontal;
+
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* FogButton;
+	//UPROPERTY ( meta = ( BindWidget ) )
+	//class UButton* EffectButton2;
 
 	UFUNCTION( )
 	void OnEffectButton1Clicked ();

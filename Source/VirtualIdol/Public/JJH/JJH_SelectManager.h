@@ -27,25 +27,38 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Time")
     void UpdateSunNightPosition(bool isNight);
 
-	class ADirectionalLight* Sun;
-	
 	UPROPERTY(EditAnywhere)
-	FRotator AfternoonSunRotation;
-	
-	UPROPERTY (EditAnywhere )
-	FRotator NightSunRotation;
+	TSubclassOf<AActor>Skybox_NightFactory;
 
+	UPROPERTY ( EditAnywhere )
+	TSubclassOf<AActor>Skybox_MorningFactory;
 
 	//레벨 바꾸기
 	UFUNCTION ()
 	void ChangeMap(int32 index);
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AActor>Theme_1Factory;
+	
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AActor>Theme_2Factory;
+	
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AActor>Theme_3Factory;
+
+	void FindActorAndDestroy (FName tag);
 	//이펙트 바꾸기
 	UFUNCTION( )
 	void ChangeEffect(int32 index);
 
 	UPROPERTY(EditAnywhere)
-	UParticleSystem* Effect1;	
-	UPROPERTY ( EditAnywhere )
-	UParticleSystem* Effect2;
+	TSubclassOf<AActor>VFX_StarFactory;
+
+	//지면 바꾸기
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AActor>Floor_FogFactory;
+
+	void ChangeFloor (int32 index );
+
 };

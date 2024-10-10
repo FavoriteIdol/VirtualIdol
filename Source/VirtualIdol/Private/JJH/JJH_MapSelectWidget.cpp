@@ -33,6 +33,7 @@ void UJJH_MapSelectWidget::NativeConstruct ( )
 	WeatherButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnWeatherButtonClicked );
 	ThemeButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnThemeButtonClicked );
 	EffectButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnEffectButtonClicked );
+	FloorButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnFloorButtonClicked );
 	
 	//낮밤 바꾸기
 	NightButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnNightButtonClicked );
@@ -48,6 +49,9 @@ void UJJH_MapSelectWidget::NativeConstruct ( )
 	EffectButton1->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnEffectButton1Clicked );
 	EffectButton2->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnEffectButton2Clicked );
 
+	//지면 바꾸기
+	FogButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnFogButtonClicked );
+
 	DayHorizontal->SetVisibility ( ESlateVisibility::Hidden );
 	ThemeHorizontal->SetVisibility ( ESlateVisibility::Hidden );
 	VFXHorizontal->SetVisibility ( ESlateVisibility::Hidden );
@@ -57,11 +61,13 @@ void UJJH_MapSelectWidget::OnWeatherButtonClicked ( )
 	DayHorizontal->SetVisibility ( ESlateVisibility::Visible );
 	ThemeHorizontal->SetVisibility ( ESlateVisibility::Hidden );
 	VFXHorizontal->SetVisibility ( ESlateVisibility::Hidden );
+	FloorHorizontal->SetVisibility ( ESlateVisibility::Hidden );
 	ChooseBackground->SetBrushColor(FLinearColor::Green);
 
 	WeatherButton->SetBackgroundColor( FLinearColor::Green);
 	ThemeButton->SetBackgroundColor ( FLinearColor::Gray );
 	EffectButton->SetBackgroundColor ( FLinearColor::Gray );
+	FloorButton->SetBackgroundColor ( FLinearColor::Gray );
 }
 
 void UJJH_MapSelectWidget::OnThemeButtonClicked ( )
@@ -69,11 +75,13 @@ void UJJH_MapSelectWidget::OnThemeButtonClicked ( )
 	DayHorizontal->SetVisibility ( ESlateVisibility::Hidden );
 	ThemeHorizontal->SetVisibility(ESlateVisibility::Visible );
 	VFXHorizontal->SetVisibility(ESlateVisibility::Hidden);
+	FloorHorizontal->SetVisibility ( ESlateVisibility::Hidden );
 	ChooseBackground->SetBrushColor(FLinearColor::Blue);
 
 	ThemeButton->SetBackgroundColor ( FLinearColor::Blue );
 	WeatherButton->SetBackgroundColor ( FLinearColor::Gray );
 	EffectButton->SetBackgroundColor ( FLinearColor::Gray );
+	FloorButton->SetBackgroundColor ( FLinearColor::Gray );
 }
 
 void UJJH_MapSelectWidget::OnEffectButtonClicked ( )
@@ -81,13 +89,30 @@ void UJJH_MapSelectWidget::OnEffectButtonClicked ( )
 	DayHorizontal->SetVisibility ( ESlateVisibility::Hidden );
 	ThemeHorizontal->SetVisibility ( ESlateVisibility::Hidden );
 	VFXHorizontal->SetVisibility ( ESlateVisibility::Visible );
+	FloorHorizontal->SetVisibility ( ESlateVisibility::Hidden );
 	ChooseBackground->SetBrushColor ( FLinearColor::Red);
 
 	EffectButton->SetBackgroundColor ( FLinearColor::Red );
 	ThemeButton->SetBackgroundColor ( FLinearColor::Gray );
 	WeatherButton->SetBackgroundColor ( FLinearColor::Gray );
+	FloorButton->SetBackgroundColor ( FLinearColor::Gray );
 }
 
+void UJJH_MapSelectWidget::OnFloorButtonClicked ( )
+{
+	DayHorizontal->SetVisibility ( ESlateVisibility::Hidden );
+	ThemeHorizontal->SetVisibility ( ESlateVisibility::Hidden );
+	VFXHorizontal->SetVisibility ( ESlateVisibility::Hidden );
+	FloorHorizontal->SetVisibility ( ESlateVisibility::Visible );
+	ChooseBackground->SetBrushColor ( FLinearColor::Yellow );
+
+	FloorButton->SetBackgroundColor ( FLinearColor::Yellow );
+	EffectButton->SetBackgroundColor ( FLinearColor::Gray );
+	ThemeButton->SetBackgroundColor ( FLinearColor::Gray );
+	WeatherButton->SetBackgroundColor ( FLinearColor::Gray );
+}
+
+// 낮밤 바꾸기
 void UJJH_MapSelectWidget::OnNightButtonClicked ( )
 {
 	if(SM) 
@@ -96,11 +121,17 @@ void UJJH_MapSelectWidget::OnNightButtonClicked ( )
 	}
 }
 
+void UJJH_MapSelectWidget::OnAfternoonButtonClicked ( )
+{
+	if (SM) SM->UpdateSunNightPosition ( false );
+}
+
+
 void UJJH_MapSelectWidget::OnNaturalButtonClicked ( )
 {
 	if (SM)
 	{
-		SM->ChangeMap(1);
+		SM->ChangeMap ( 1 );
 	}
 }
 
@@ -116,12 +147,13 @@ void UJJH_MapSelectWidget::OnCyberpunkButtonClicked ( )
 {
 	if (SM)
 	{
-		SM->ChangeMap ( 1 );
+		SM->ChangeMap (1);
 	}
 }
 
-void UJJH_MapSelectWidget::OnAfternoonButtonClicked ( )
+
+void UJJH_MapSelectWidget::OnFogButtonClicked ( )
 {
-	if (SM) SM->UpdateSunNightPosition (false);
+	if (SM) SM->ChangeFloor(1);
 }
 
