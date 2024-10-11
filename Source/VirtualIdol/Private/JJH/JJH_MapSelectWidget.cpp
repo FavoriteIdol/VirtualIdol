@@ -7,6 +7,8 @@
 #include "Components/HorizontalBox.h"
 #include "Kismet/GameplayStatics.h"
 #include "JJH/JJH_SelectManager.h"
+#include "JJH_SetupPlayerController.h"
+#include "Components/WidgetSwitcher.h"
 
 void UJJH_MapSelectWidget::OnEffectButton1Clicked ( )
 {
@@ -55,6 +57,11 @@ void UJJH_MapSelectWidget::NativeConstruct ( )
 	DayHorizontal->SetVisibility ( ESlateVisibility::Hidden );
 	ThemeHorizontal->SetVisibility ( ESlateVisibility::Hidden );
 	VFXHorizontal->SetVisibility ( ESlateVisibility::Hidden );
+
+	//캡쳐
+	CaptureButton->OnClicked.AddDynamic( this , &UJJH_MapSelectWidget::OnCaptureButtonClicked );
+	SetThumbnailButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnSetThumbnailButtonClicked );
+	ReCaptureButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnReCaptureButtonClicked );
 }
 void UJJH_MapSelectWidget::OnWeatherButtonClicked ( )
 {
@@ -155,5 +162,39 @@ void UJJH_MapSelectWidget::OnCyberpunkButtonClicked ( )
 void UJJH_MapSelectWidget::OnFogButtonClicked ( )
 {
 	if (SM) SM->ChangeFloor(1);
+}
+
+void UJJH_MapSelectWidget::OnCaptureButtonClicked ( )
+{
+	AJJH_SetupPlayerController* SPC = Cast<AJJH_SetupPlayerController> ( GetWorld ( )->GetFirstPlayerController ( ) );
+	if (SPC)
+	{
+		SPC->TakeScreenshot ( );
+	}
+
+	// 0.3초 후에 SetImageWithCapturedImage 함수 호출
+	FTimerHandle UnusedHandle;
+	GetWorld ( )->GetTimerManager ( ).SetTimer (
+		UnusedHandle ,
+		this ,
+		&UJJH_MapSelectWidget::SetImageWithCapturedImage ,
+		0.3f ,
+		false
+	);
+}
+void UJJH_MapSelectWidget::OnReCaptureButtonClicked ( )
+{
+	AJJH_SetupPlayerController* SPC = Cast<AJJH_SetupPlayerController> ( GetWorld ( )->GetFirstPlayerController ( ) );
+	SPC->TakeScreenshot ( );
+}
+void UJJH_MapSelectWidget::OnSetThumbnailButtonClicked ( )
+{
+	AJJH_SetupPlayerController* SPC = Cast<AJJH_SetupPlayerController> ( GetWorld ( )->GetFirstPlayerController ( ) );
+	SPC->TakeScreenshot ( );
+}
+void UJJH_MapSelectWidget::SetImageWithCapturedImage ( )
+{
+	SetupWidgetSwitcher->SetActiveWidgetIndex ( 1 );
+	PlayAnimation ( ShutterAnimation );
 }
 

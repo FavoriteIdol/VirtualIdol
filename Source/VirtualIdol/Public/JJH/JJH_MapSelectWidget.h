@@ -17,6 +17,9 @@ class VIRTUALIDOL_API UJJH_MapSelectWidget : public UUserWidget
 
 public:
 	class AJJH_SelectManager* SM;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UWidgetSwitcher* SetupWidgetSwitcher;
 
 	//3대장 버튼
 	UPROPERTY(meta = (BindWidget))
@@ -25,6 +28,9 @@ public:
 	class UButton* ThemeButton;
 	UPROPERTY(meta = (BindWidget))
 	class UButton* EffectButton;
+		
+	UPROPERTY(meta = (BindWidget))
+	class UButton* CaptureButton;
 
 	UFUNCTION( )
 	void OnWeatherButtonClicked();
@@ -34,10 +40,11 @@ public:
 	void OnEffectButtonClicked ( );
 	UFUNCTION( )
 	void OnFloorButtonClicked ( );
+
 	//낮밤 바꾸기
 	UPROPERTY(meta = (BindWidget))
 	class UHorizontalBox* DayHorizontal;	
-	
+
 	UPROPERTY(meta = (BindWidget))
 	class UButton* AfternoonButton;
 	UPROPERTY ( meta = ( BindWidget ) )
@@ -52,6 +59,27 @@ public:
 	UFUNCTION ( )
 	void OnNightButtonClicked ( );
 
+	//캡쳐
+	UPROPERTY(meta = (BindWidget))
+	class UImage* CapturedImage;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UButton* SetThumbnailButton;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UButton* ReCaptureButton;
+	
+	UPROPERTY(Transient, meta = (BindWidgetAnim))
+	class UWidgetAnimation* ShutterAnimation;
+
+	UFUNCTION ( )
+	void OnCaptureButtonClicked ( );
+	UFUNCTION ( )
+	void OnReCaptureButtonClicked ( );
+	UFUNCTION ( )
+	void OnSetThumbnailButtonClicked ( );
+	UFUNCTION ( )
+	void SetImageWithCapturedImage ();
 
 
 	//테마 바꾸기
