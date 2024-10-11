@@ -27,6 +27,15 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	class UBillboardComponent* ImojiBilboard;
 
+	UPROPERTY ( )
+	class UTexture2D* Imoji01Texture;
+	UPROPERTY ( )
+	class UTexture2D* Imoji02Texture;
+	UPROPERTY ( )
+	class UTexture2D* Imoji03Texture;
+	UPROPERTY ( )
+	class UTexture2D* Imoji04Texture;
+
 	UFUNCTION ()
 	void Imoji01( );
 	UFUNCTION ( )
