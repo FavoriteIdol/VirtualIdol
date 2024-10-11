@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/SceneComponent.h"
+#include "Components/TimelineComponent.h"
 #include "HSW_ImojiConponent.generated.h"
 
 
@@ -47,5 +48,29 @@ public:
 
 	FTimerHandle TimerHandle;
 
+	void AppearImoji(UTexture2D* imojiTexture );
+
 	void DisappearImoji ( );
+
+
+protected:
+	// Fade In/ Fade Out
+	UPROPERTY ()
+	UTimelineComponent* MyTimeline;
+
+	UPROPERTY ()
+	UCurveFloat* FloatCurve;
+
+	UFUNCTION( )
+	void TimelineCallback(float val );
+
+	UFUNCTION( )
+	void TimelineFinishedCallback();
+
+	void PlayTimeline( );
+
+	UPROPERTY( )
+	TEnumAsByte<ETimelineDirection::Type> TimelineDirection;
+
+
 };

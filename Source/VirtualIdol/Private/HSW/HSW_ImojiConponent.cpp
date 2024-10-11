@@ -77,8 +77,7 @@ void UHSW_ImojiConponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 void UHSW_ImojiConponent::Imoji01 ( )
 {	
 	//GEngine->AddOnScreenDebugMessage ( -1 , 2.0f , FColor::Red , TEXT ( "Imoji01" ) );
-	ImojiBilboard->SetVisibility ( true );
-	ImojiBilboard->SetSprite ( Imoji01Texture); // Get() 대신 Object 사용
+	AppearImoji ( Imoji01Texture );
 
 	GetWorld ( )->GetTimerManager ( ).ClearTimer ( TimerHandle );
 	GetWorld ( )->GetTimerManager ( ).SetTimer ( TimerHandle , this , &UHSW_ImojiConponent::DisappearImoji,  2.0f );
@@ -87,8 +86,7 @@ void UHSW_ImojiConponent::Imoji01 ( )
 
 void UHSW_ImojiConponent::Imoji02 ( )
 {
-	ImojiBilboard->SetVisibility ( true );
-	ImojiBilboard->SetSprite ( Imoji02Texture );
+	AppearImoji ( Imoji02Texture );
 
 	GetWorld ( )->GetTimerManager ( ).ClearTimer ( TimerHandle );
 	GetWorld ( )->GetTimerManager ( ).SetTimer ( TimerHandle , this , &UHSW_ImojiConponent::DisappearImoji , 2.0f );
@@ -96,8 +94,7 @@ void UHSW_ImojiConponent::Imoji02 ( )
 
 void UHSW_ImojiConponent::Imoji03 ( )
 {
-	ImojiBilboard->SetVisibility ( true );
-	ImojiBilboard->SetSprite ( Imoji03Texture );
+	AppearImoji ( Imoji03Texture );
 
 	GetWorld ( )->GetTimerManager ( ).ClearTimer ( TimerHandle );
 	GetWorld ( )->GetTimerManager ( ).SetTimer ( TimerHandle , this , &UHSW_ImojiConponent::DisappearImoji , 2.0f );
@@ -105,16 +102,22 @@ void UHSW_ImojiConponent::Imoji03 ( )
 
 void UHSW_ImojiConponent::Imoji04 ( )
 {
-	ImojiBilboard->SetVisibility ( true );
-	ImojiBilboard->SetSprite ( Imoji04Texture );
+	AppearImoji(Imoji04Texture );
 
 	GetWorld ( )->GetTimerManager ( ).ClearTimer ( TimerHandle );
 	GetWorld ( )->GetTimerManager ( ).SetTimer ( TimerHandle , this , &UHSW_ImojiConponent::DisappearImoji , 2.0f );
 }
 
+void UHSW_ImojiConponent::AppearImoji ( UTexture2D* imojiTexture )
+{
+	ImojiBilboard->SetVisibility ( true );
+	ImojiBilboard->SetSprite ( imojiTexture );
+}
+
 void UHSW_ImojiConponent::DisappearImoji ( )
 {
-	
 	ImojiBilboard->SetVisibility ( false );
 	ImojiBilboard->SetSprite (nullptr );
 }
+
+
