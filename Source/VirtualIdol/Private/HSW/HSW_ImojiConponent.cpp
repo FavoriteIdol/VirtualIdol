@@ -80,23 +80,41 @@ void UHSW_ImojiConponent::Imoji01 ( )
 	ImojiBilboard->SetVisibility ( true );
 	ImojiBilboard->SetSprite ( Imoji01Texture); // Get() 대신 Object 사용
 
+	GetWorld ( )->GetTimerManager ( ).ClearTimer ( TimerHandle );
+	GetWorld ( )->GetTimerManager ( ).SetTimer ( TimerHandle , this , &UHSW_ImojiConponent::DisappearImoji,  2.0f );
+
 }
 
 void UHSW_ImojiConponent::Imoji02 ( )
 {
 	ImojiBilboard->SetVisibility ( true );
 	ImojiBilboard->SetSprite ( Imoji02Texture );
+
+	GetWorld ( )->GetTimerManager ( ).ClearTimer ( TimerHandle );
+	GetWorld ( )->GetTimerManager ( ).SetTimer ( TimerHandle , this , &UHSW_ImojiConponent::DisappearImoji , 2.0f );
 }
 
 void UHSW_ImojiConponent::Imoji03 ( )
 {
-
 	ImojiBilboard->SetVisibility ( true );
 	ImojiBilboard->SetSprite ( Imoji03Texture );
+
+	GetWorld ( )->GetTimerManager ( ).ClearTimer ( TimerHandle );
+	GetWorld ( )->GetTimerManager ( ).SetTimer ( TimerHandle , this , &UHSW_ImojiConponent::DisappearImoji , 2.0f );
 }
 
 void UHSW_ImojiConponent::Imoji04 ( )
 {
 	ImojiBilboard->SetVisibility ( true );
 	ImojiBilboard->SetSprite ( Imoji04Texture );
+
+	GetWorld ( )->GetTimerManager ( ).ClearTimer ( TimerHandle );
+	GetWorld ( )->GetTimerManager ( ).SetTimer ( TimerHandle , this , &UHSW_ImojiConponent::DisappearImoji , 2.0f );
+}
+
+void UHSW_ImojiConponent::DisappearImoji ( )
+{
+	
+	ImojiBilboard->SetVisibility ( false );
+	ImojiBilboard->SetSprite (nullptr );
 }

@@ -44,4 +44,8 @@ public:
 	void Imoji03 ( );
 	UFUNCTION ( )
 	void Imoji04 ( );
+
+	FTimerHandle TimerHandle;
+
+	void DisappearImoji ( );
 };
