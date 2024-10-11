@@ -166,12 +166,17 @@ public:
 // ================================================================
 // EntryPanel Widget Panel
 // ================================================================
-
+	UPROPERTY(meta = (BindWidget))
+	class UCanvasPanel* VIPPopUpPanel;
 	// 버튼
 	UPROPERTY(meta = (BindWidget))
 	class UButton* Butt_Yes;
 	UPROPERTY(meta = (BindWidget))
+    class UButton* Butt_NormalEntry;	
+	UPROPERTY(meta = (BindWidget))
     class UButton* Butt_No;	
+	UPROPERTY(meta = (BindWidget))
+    class UButton* Butt_VipEntry;	
 	UPROPERTY ( meta = ( BindWidget ) )
     class UButton* Butt_Back1;
 	UPROPERTY ( meta = ( BindWidget ) )
@@ -179,9 +184,13 @@ public:
 
 	// 버튼 연동 함수
     UFUNCTION ( )
-    void PressYesButt ( );
+	void PressYesButt( );
+	UFUNCTION ( )
+	void PressNoButt( );
+    UFUNCTION ( )
+    void PressVipEntry ( );
 	UFUNCTION()
-	void PressNoButt();
+	void PressNormalEntry();
 
 	// 그리드
 	UPROPERTY ( meta = ( BindWidget ) )
@@ -207,18 +216,8 @@ public:
 	
 #pragma endregion
 #pragma region FindRoom & Select Stage
-	UPROPERTY(meta = (BindWidget))
-    class UButton* Butt_ActivePanel;
 	UPROPERTY ( meta = ( BindWidget ) )
     class UButton* Butt_Select;
-
-	UPROPERTY(meta = (BindWidget))
-    class UTextBlock* Text_Title;
-	UPROPERTY ( meta = ( BindWidget ) )
-    class UTextBlock* Text_SelectComp;
-
-	UFUNCTION( )
-	void PanelActive( );
 	UFUNCTION( )
 	void StageSelect( );
 #pragma endregion

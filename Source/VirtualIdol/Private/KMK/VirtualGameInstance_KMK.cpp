@@ -25,6 +25,8 @@ void UVirtualGameInstance_KMK::Init ( )
         sessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &UVirtualGameInstance_KMK::OnMyFindSessionComplete);
          // 방입장
         sessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this , &UVirtualGameInstance_KMK::JoinRoomComplete);
+        // 방 퇴장
+        sessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this , &UVirtualGameInstance_KMK::OnMyDestroyRoomComplete);
     }
 
 }
@@ -172,6 +174,33 @@ void UVirtualGameInstance_KMK::JoinRoomComplete ( FName SessionName , EOnJoinSes
         {
             pc->ClientTravel(url , ETravelType::TRAVEL_Absolute);
         }
+    }
+}
+
+void UVirtualGameInstance_KMK::ExitRoom ( )
+{
+    ServerRPCExitRoom();
+}
+
+void UVirtualGameInstance_KMK::ServerRPCExitRoom_Implementation ( )
+{
+    MultiRPCExitRoom();
+}
+
+void UVirtualGameInstance_KMK::MultiRPCExitRoom_Implementation ( )
+{
+    // 방퇴장 요청
+    sessionInterface->DestroySession(FName(HostName));
+}
+
+void UVirtualGameInstance_KMK::OnMyDestroyRoomComplete ( FName RoomName , bool bWasSucessful )
+{
+    if ( bWasSucessful )
+    {
+        // 로비로 돌아가고 싶다 = 클라이언트가 여행을 갈것이다.
+        auto* pc = GetWorld()->GetFirstPlayerController();
+        pc->ClientTravel(TEXT("/Game/Project/Personal/KMK/Maps/KMK_Maps.KMK_Maps'?listen"), ETravelType::TRAVEL_Absolute);
+        // 방을 만들었다면 방을 부수고 아니라면 그냥 나감
     }
 }
 

@@ -75,13 +75,12 @@ public:
 	class APlayerController* pc;
 
 	UPROPERTY(EditAnywhere )
-	TSubclassOf<class UAudience_KMK> mainWidgetFact;
+	TSubclassOf<class UAudience_KMK> audienceWidgetFact;
 
 	UPROPERTY( )
-	class UAudience_KMK* widget;
+	class UAudience_KMK* audienceWidget;
 	
-	// 네트워크 상태로그 찍기
-	void PrintNetLog();
+	
 	UPROPERTY(VisibleAnywhere)
 	class UAudienceServerComponent_KMK* serverComp;
 };

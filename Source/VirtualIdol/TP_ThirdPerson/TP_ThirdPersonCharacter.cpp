@@ -64,12 +64,26 @@ void ATP_ThirdPersonCharacter::BeginPlay()
 	pc = GetWorld()->GetFirstPlayerController();
 	if (IsLocallyControlled ( ))
 	{
-		if (mainWidgetFact && !widget)
+		if (HasAuthority ( ))
 		{
-			widget = CreateWidget<UAudience_KMK> ( GetWorld ( ) , mainWidgetFact );
-			widget->AddToViewport ( );
+			if (audienceWidgetFact && !audienceWidget)
+            {
+                audienceWidget = CreateWidget<UAudience_KMK> ( GetWorld ( ) , audienceWidgetFact );
+                audienceWidget->AddToViewport ( );
+                audienceWidget->pc = this;
+            }
+		}
+		else
+		{
+			if (audienceWidgetFact && !audienceWidget)
+            {
+                audienceWidget = CreateWidget<UAudience_KMK> ( GetWorld ( ) , audienceWidgetFact );
+                audienceWidget->AddToViewport ( );
+                audienceWidget->pc = this;
+            }
 		}
 	}
+
 }
 
 void ATP_ThirdPersonCharacter::Tick ( float DeltaTime)
@@ -144,14 +158,4 @@ void ATP_ThirdPersonCharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
-}
-void ATP_ThirdPersonCharacter::PrintNetLog()
-{
-	const FString conStr = GetNetConnection() != nullptr ? TEXT("Valid Connection.....") : TEXT("Invalid Connection.....");
-
-	const FString OwnerName = GetOwner() != nullptr ? GetOwner()->GetName() : TEXT("No Owner");
-
-	const FString logStr = FString::Printf(TEXT("Connection : %s\nLocal Role : %s\nRemote Role : %s\nOwner Name : %s"), *conStr , *LOCALROLE, *REMOTEROLE, *OwnerName);
-	 
-	DrawDebugString(GetWorld(), GetActorLocation() + FVector::UpVector * 100 , logStr , nullptr , FColor::Emerald , 0 , true , 1);
 }

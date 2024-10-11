@@ -24,6 +24,14 @@ void UStartWidget_KMK::NativeConstruct ( )
     Super::NativeConstruct();
 	// GI 찾기
 	gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance() );
+	if (gi->bLogin)
+	{
+		StartSwitcher->SetActiveWidgetIndex ( 1 );
+	}
+	else
+	{
+		gi->bLogin = true;
+	}
 #pragma region LoginPanel
 	if (Butt_Login)
 	{
@@ -76,18 +84,11 @@ void UStartWidget_KMK::NativeConstruct ( )
 		Butt_FLeft->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressFLeft );
 		Butt_HLeft->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressHLeft );
 	}
-	if (Butt_ActivePanel)
-	{
-		Butt_ActivePanel->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PanelActive );
-	}
 	if (Butt_Select)
 	{
 		Butt_Select->OnClicked.AddDynamic ( this , &UStartWidget_KMK::StageSelect );
 	}
-	if (Text_SelectComp)
-    {
-        Text_SelectComp->SetVisibility ( ESlateVisibility::Hidden );
-    }
+
 	if (Image_Fever &&Image_Particle &&Image_Ticket && Image_HEffect)
 	{
 		Image_Fever->SetBrushFromMaterial ( FeversParticles[0] );
@@ -98,12 +99,15 @@ void UStartWidget_KMK::NativeConstruct ( )
 
 #pragma endregion
 #pragma region Entry
-	if (Butt_Yes)
+	if (Butt_Yes && Butt_VipEntry && VIPPopUpPanel)
 	{
+		Butt_VipEntry->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressVipEntry );
 		Butt_Yes->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressYesButt );
+		VIPPopUpPanel->SetVisibility(ESlateVisibility::Hidden);
 	}
-	if (Butt_No)
+	if (Butt_NormalEntry && Butt_No)
 	{
+		Butt_NormalEntry->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressNormalEntry );
 		Butt_No->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressNoButt );
 	}	
 	if (Butt_Back1 && Butt_Back2)
@@ -182,9 +186,8 @@ void UStartWidget_KMK::ComeInStagePanel ( )
 // 레벨 선택
 void UStartWidget_KMK::ChangeFindRoomPanel ( const FString& title )
 {
-	Text_Title->SetText(FText::FromString(title));
 	// 파섹해서 나온 정보의 값에 따라 createWidget이 되게 만들기
-	for (int i = 0; i < 5; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		CreateStageWidget(FString::FromInt(i));
 	}
@@ -312,7 +315,7 @@ void UStartWidget_KMK::ClearAll ( )
 #pragma endregion
 
 #pragma region Entry Panel
-// 세션 확인할 수 있는 UI 띄우기
+// vip 접속
 void UStartWidget_KMK::PressYesButt ( )
 {
 	if (gi && roomNum >= 0)
@@ -322,8 +325,8 @@ void UStartWidget_KMK::PressYesButt ( )
 		//ChangeAudienceMesh(0);
 	}
 }
-
-void UStartWidget_KMK::PressNoButt ( )
+// 일반 접속
+void UStartWidget_KMK::PressNormalEntry ( )
 {
 	if (gi && roomNum >= 0)
 	{
@@ -331,6 +334,18 @@ void UStartWidget_KMK::PressNoButt ( )
 		//ChangeAudienceMesh(1);
 	}
 }
+void UStartWidget_KMK::PressNoButt ( )
+{
+	VIPPopUpPanel->SetVisibility(ESlateVisibility::Hidden);
+}
+
+// 세션 확인할 수 있는 UI 띄우기
+void UStartWidget_KMK::PressVipEntry ( )
+{
+	VIPPopUpPanel->SetVisibility(ESlateVisibility::Visible);
+}
+
+
 
 // 세션 찾기
 void UStartWidget_KMK::FindRoom( )
@@ -338,7 +353,6 @@ void UStartWidget_KMK::FindRoom( )
 	// VIP 입장 판넬 띄우기
 	StartSwitcher->SetActiveWidgetIndex ( 3 );
 
-	Text_Title->SetText ( FText::FromString ( TEXT ( "공연장 확인" )) );
 	ClearChild();
 	if (gi)
 	{
@@ -361,14 +375,12 @@ void UStartWidget_KMK::CreateRoomWidget (const struct FRoomInfo& info )
 void UStartWidget_KMK::SetPosWidget ( class URoomWidget_KMK* widget , int32 num )
 {
 	// row 계산 
-	int32 row = ( num - 1 ) / 3;
 	// col 계산
 	int32 col = (num - 1) % 3;
 	// 위치 설정
 	UGridSlot* childSlot = FindRoomGrid->AddChildToGrid( widget );
 	if (childSlot)
 	{
-		childSlot->SetRow(row);
 		childSlot->SetColumn(col);
 	}
 	
@@ -383,20 +395,10 @@ void UStartWidget_KMK::ClearChild ( )
 	}
 }
 
-void UStartWidget_KMK::PanelActive ( )
-{
-	StartSwitcher->SetActiveWidgetIndex ( 3 );
-}
 
 void UStartWidget_KMK::StageSelect ( )
 {
-	Text_SelectComp->SetVisibility(ESlateVisibility::Visible);
-	FTimerHandle handle;
-	GetWorld ( )->GetTimerManager ( ).SetTimer ( handle , FTimerDelegate::CreateLambda ( [this]( )
-		{
-			StartSwitcher->SetActiveWidgetIndex ( 2 );
-			Text_SelectComp->SetVisibility ( ESlateVisibility::Hidden );
-		} ) , 3 , false );
+
 }
 
 #pragma endregion

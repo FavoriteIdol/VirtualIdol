@@ -50,6 +50,9 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 	// 호스트 이름은 서버에서 닉네임 받아올 예정
 	FString HostName ="!!!!";
 
+	UPROPERTY( )
+	bool bLogin = false;
+
 	void CreateMySession(FString RoomName, int32 PlayerCount);
 
 	void OnMyCreateSessionComplete(FName SessionName, bool bSuccessful);
@@ -73,6 +76,12 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 
 	// 방퇴장 요청 => 클라이언트가 퇴장함, UI 호출 => 서버로 날리고 > 서버는 멀티로 날림 -> 응답 완료시 OnMyDestroyRoomComplete 불림
 	void ExitRoom();
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPCExitRoom();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MultiRPCExitRoom();
 
 	// 방퇴장 응답
 	void OnMyDestroyRoomComplete(FName RoomName, bool bWasSucessful);

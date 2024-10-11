@@ -27,6 +27,7 @@ void UAudienceServerComponent_KMK::BeginPlay()
 	player = Cast<ATP_ThirdPersonCharacter> (GetOwner());
 	if (gi)
 	{
+		// 플레이어가 로컬 플레이어 일때
 		if (player->IsLocallyControlled())
         {
 			// 클라이언트에서 서버로 RPC 호출
@@ -34,8 +35,8 @@ void UAudienceServerComponent_KMK::BeginPlay()
         }
 		else
 		{
+			// 로컬이 아닌 경우에 플레이어의 playerMeshNum에 따라 
 			player->GetMesh()->SetSkeletalMesh(audienceMesh[playerMeshNum]);
-            UE_LOG(LogTemp, Warning, TEXT("Mesh set on server for player: %d"), gi->playerMeshNum);
 		}
 	}
 }
@@ -55,9 +56,9 @@ void UAudienceServerComponent_KMK::ServerRPCChat_Implementation ( const FString&
 
 void UAudienceServerComponent_KMK::MultiRPCChat_Implementation ( const FString& chat )
 {
-	if (player->widget)
+	if (player->audienceWidget)
 	{
-		player->widget->CreateChatWidget(chat );
+		player->audienceWidget->CreateChatWidget(chat );
 	}
 }
 
@@ -84,7 +85,6 @@ void UAudienceServerComponent_KMK::MultiRPC_ChangeMyMesh_Implementation ( int32 
         if (playerMeshComp)
         {
             playerMeshComp->SetSkeletalMesh(audienceMesh[num]);
-            UE_LOG(LogTemp, Warning, TEXT("Mesh changed for player: %s to mesh: %d"), *player->GetName(), num);
         }
     }
 }
