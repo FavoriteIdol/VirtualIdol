@@ -21,6 +21,9 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UWidgetSwitcher* SetupWidgetSwitcher;
 
+	UPROPERTY(meta = (BindWidget))
+	class UCanvasPanel* SettingPanel;
+
 	//3대장 버튼
 	UPROPERTY(meta = (BindWidget))
 	class UButton* WeatherButton;
@@ -68,7 +71,7 @@ public:
 	
 	UPROPERTY(meta = (BindWidget))
 	class UButton* ReCaptureButton;
-	
+
 	UPROPERTY(Transient, meta = (BindWidgetAnim))
 	class UWidgetAnimation* ShutterAnimation;
 
@@ -81,6 +84,20 @@ public:
 	UFUNCTION ( )
 	void SetImageWithCapturedImage ();
 
+	//캡쳐를 위한 뒤로가기
+
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* BackButton;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* ReturnButton;
+
+	UFUNCTION ( )
+	void OnBackButtonClicked ( );	
+	UFUNCTION ( )
+	void OnReturnButtonClicked ( );
+
+	UPROPERTY(Transient, meta = (BindWidgetAnim))
+	class UWidgetAnimation* BackButtonAnimation;
 
 	//테마 바꾸기
 	UPROPERTY(meta = (BindWidget))

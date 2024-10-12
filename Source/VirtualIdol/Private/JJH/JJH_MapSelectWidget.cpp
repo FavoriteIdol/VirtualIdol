@@ -9,6 +9,7 @@
 #include "JJH/JJH_SelectManager.h"
 #include "JJH_SetupPlayerController.h"
 #include "Components/WidgetSwitcher.h"
+#include "Components/CanvasPanel.h"
 
 void UJJH_MapSelectWidget::OnEffectButton1Clicked ( )
 {
@@ -36,6 +37,11 @@ void UJJH_MapSelectWidget::NativeConstruct ( )
 	ThemeButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnThemeButtonClicked );
 	EffectButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnEffectButtonClicked );
 	FloorButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnFloorButtonClicked );
+
+	//뒤로가기
+	BackButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnBackButtonClicked );
+	ReturnButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnReturnButtonClicked );
+
 	
 	//낮밤 바꾸기
 	NightButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnNightButtonClicked );
@@ -62,6 +68,7 @@ void UJJH_MapSelectWidget::NativeConstruct ( )
 	CaptureButton->OnClicked.AddDynamic( this , &UJJH_MapSelectWidget::OnCaptureButtonClicked );
 	SetThumbnailButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnSetThumbnailButtonClicked );
 	ReCaptureButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnReCaptureButtonClicked );
+
 }
 void UJJH_MapSelectWidget::OnWeatherButtonClicked ( )
 {
@@ -170,9 +177,12 @@ void UJJH_MapSelectWidget::OnCaptureButtonClicked ( )
 	if (SPC)
 	{
 		SPC->TakeScreenshot ( );
+		CaptureButton->SetVisibility(ESlateVisibility::Hidden);
+		ReturnButton->SetVisibility ( ESlateVisibility::Hidden );
 	}
 
 	// 0.3초 후에 SetImageWithCapturedImage 함수 호출
+	//바로 찍는속도가 너무 빨라서 버튼이 사라지기전에 찍힘
 	FTimerHandle UnusedHandle;
 	GetWorld ( )->GetTimerManager ( ).SetTimer (
 		UnusedHandle ,
@@ -184,17 +194,28 @@ void UJJH_MapSelectWidget::OnCaptureButtonClicked ( )
 }
 void UJJH_MapSelectWidget::OnReCaptureButtonClicked ( )
 {
-	AJJH_SetupPlayerController* SPC = Cast<AJJH_SetupPlayerController> ( GetWorld ( )->GetFirstPlayerController ( ) );
-	SPC->TakeScreenshot ( );
+	SetupWidgetSwitcher->SetActiveWidgetIndex ( 0 );
+	CaptureButton->SetVisibility ( ESlateVisibility::Visible);
+	ReturnButton->SetVisibility ( ESlateVisibility::Visible );
 }
 void UJJH_MapSelectWidget::OnSetThumbnailButtonClicked ( )
 {
-	AJJH_SetupPlayerController* SPC = Cast<AJJH_SetupPlayerController> ( GetWorld ( )->GetFirstPlayerController ( ) );
-	SPC->TakeScreenshot ( );
+	
 }
 void UJJH_MapSelectWidget::SetImageWithCapturedImage ( )
 {
 	SetupWidgetSwitcher->SetActiveWidgetIndex ( 1 );
 	PlayAnimation ( ShutterAnimation );
+}
+
+void UJJH_MapSelectWidget::OnBackButtonClicked ( )
+{
+	PlayAnimation(BackButtonAnimation);
+}
+
+void UJJH_MapSelectWidget::OnReturnButtonClicked ( )
+{
+	PlayAnimation ( BackButtonAnimation, 1.0f, 1, EUMGSequencePlayMode::PingPong);
+	UE_LOG(LogTemp, Error, TEXT("!@#$"));
 }
 
