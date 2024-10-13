@@ -5,6 +5,10 @@
 #include "Components/BillboardComponent.h"
 #include "Engine/Texture2D.h"
 #include "UObject/ConstructorHelpers.h"
+#include "Curves/CurveFloat.h"
+#include "Components/TimelineComponent.h"
+#include "HSW/HSW_ThirdPersonCharacter.h"
+#include "Materials/Material.h"
 
 // Sets default values for this component's properties
 UHSW_ImojiConponent::UHSW_ImojiConponent()
@@ -12,7 +16,17 @@ UHSW_ImojiConponent::UHSW_ImojiConponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
+	
+	ImojiMesh = CreateDefaultSubobject<UStaticMeshComponent> ( TEXT ( "ImojiMeshComponent" ) );
+	ImojiMesh->SetupAttachment ( this );
 
+	// 빌보드 컴포넌트
+	ImojiBillboard = CreateDefaultSubobject<UBillboardComponent> ( TEXT ( "ImojiBilboard" ) );
+	ImojiBillboard->SetupAttachment ( ImojiMesh );
+
+	ImojiBillboard->SetSprite ( nullptr );
+
+	// 이모지 텍스쳐 정의
 	static ConstructorHelpers::FObjectFinder<UTexture2D> LoadedImoji01Texture ( TEXT ( "Texture2D'/Game/Project/Personal/HSW/Resources/Imogi/Imoji_01.Imoji_01'" ) );
 	if (LoadedImoji01Texture.Succeeded ( ))
 	{
@@ -52,6 +66,37 @@ UHSW_ImojiConponent::UHSW_ImojiConponent()
 	{
 		UE_LOG ( LogTemp , Warning , TEXT ( "Failed to load texture Imoji_04" ) );
 	}
+
+	static ConstructorHelpers::FObjectFinder<UMaterial> LoadedOpacityMaterial ( TEXT ( "Material'/Game/Project/Personal/HSW/Resources/Imogi/M_Imoji_Opacity'" ) );
+	if (LoadedOpacityMaterial.Succeeded())
+	{
+		OpacityMaterial= LoadedOpacityMaterial.Object;
+	}
+	else
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "Failed to load OpacityMaterial" ) );
+	}
+
+// 	// FadeIn, Out에 쓸 Curve 정의
+// 	static ConstructorHelpers::FObjectFinder<UCurveFloat> LoadedFadeInCurve(TEXT("'/Game/Project/Personal/HSW/Curves/HSW_C_FadeInCurve'" ) );
+// 	if (LoadedFadeInCurve.Succeeded ( ))
+// 	{
+// 		FadeInCurve = LoadedFadeInCurve.Object;
+// 	}
+// 	else
+// 	{
+// 		UE_LOG ( LogTemp , Warning , TEXT ( "Failed to load Fade In Curve" ) );
+// 	}
+// 
+// 	static ConstructorHelpers::FObjectFinder<UCurveFloat> LoadedFadeOutCurve ( TEXT ( "'/Game/Project/Personal/HSW/Curves/HSW_C_FadeOutCurve'" ) );
+// 	if (LoadedFadeOutCurve.Succeeded ( ))
+// 	{
+// 		FadeOutCurve = LoadedFadeOutCurve.Object;
+// 	}
+// 	else
+// 	{
+// 		UE_LOG ( LogTemp , Warning , TEXT ( "Failed to load Fade Out Curve" ) );
+// 	}
 }
 
 
@@ -59,9 +104,35 @@ UHSW_ImojiConponent::UHSW_ImojiConponent()
 void UHSW_ImojiConponent::BeginPlay()
 {
 	Super::BeginPlay();
-	ImojiBilboard = Cast<UBillboardComponent>(GetChildComponent(0));
-	ImojiBilboard->SetVisibility(false);
-	ImojiBilboard->SetSprite(nullptr);
+
+	Me = Cast<AHSW_ThirdPersonCharacter>(GetOwner ( ));
+
+
+
+	if (OpacityMaterial)
+	{
+		ImojiMesh->SetMaterial ( 0 , OpacityMaterial );
+		UMaterialInterface* temp = ImojiMesh->GetMaterial ( 0 );
+		if (temp)
+		{
+			UE_LOG(LogTemp,Warning,TEXT("%s"),*( ImojiMesh->GetMaterial(0))->GetName() );
+		}
+		else
+		{
+		UE_LOG ( LogTemp , Warning , TEXT ( "ImojiMesh->GetMaterial ( 0 ) doesn't exsit" ) );
+
+		}
+	}
+
+// 	// 타임라인
+// 	FOnTimelineFloat onTimelineCallback;
+// 	FOnTimelineEventStatic onTimelineFinishedCallback;
+// 
+// 	if (FadeInCurve != NULL)
+// 	{
+// 		FadeInTimeline = NewObject<UTimelineComponent>(this , FName ( "FadeInTimelineAnimation" ) );
+// 
+// 	}
 
 }
 
@@ -81,6 +152,11 @@ void UHSW_ImojiConponent::Imoji01 ( )
 
 	GetWorld ( )->GetTimerManager ( ).ClearTimer ( TimerHandle );
 	GetWorld ( )->GetTimerManager ( ).SetTimer ( TimerHandle , this , &UHSW_ImojiConponent::DisappearImoji,  2.0f );
+
+// 	if (FindFunction ( TEXT ( "FadeInImogiEvent" ) ))
+// 	{
+// 		ProcessEvent ( FindFunction ( TEXT ( "FadeInImogiEvent" ) ) , nullptr );
+// 	}
 
 }
 
@@ -110,13 +186,14 @@ void UHSW_ImojiConponent::Imoji04 ( )
 
 void UHSW_ImojiConponent::AppearImoji ( UTexture2D* imojiTexture )
 {
-	ImojiBilboard->SetVisibility ( true );
 	ImojiBilboard->SetSprite ( imojiTexture );
+
+	Me->FadeInImogiBlueprint ( );
 }
 
 void UHSW_ImojiConponent::DisappearImoji ( )
 {
-	ImojiBilboard->SetVisibility ( false );
+	ImojiBilboard->Sprite->AdjustMaxAlpha=0;
 	ImojiBilboard->SetSprite (nullptr );
 }
 

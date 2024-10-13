@@ -63,9 +63,7 @@ AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
 	ImojiComponent = CreateDefaultSubobject<UHSW_ImojiConponent>(TEXT("ImojiComponent" ));
 	ImojiComponent->SetupAttachment(GetMesh());
 	ImojiComponent->SetRelativeLocation(FVector(0,0,230.f));
-
-	ImojiImage = CreateDefaultSubobject<UBillboardComponent>(TEXT("ImojiBilboard" ));
-	ImojiImage->SetupAttachment(ImojiComponent);
+	
 }
 
 // Called when the game starts or when spawned
