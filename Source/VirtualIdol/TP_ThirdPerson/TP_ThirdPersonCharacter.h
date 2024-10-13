@@ -77,7 +77,7 @@ public:
 	UPROPERTY(EditAnywhere )
 	TSubclassOf<class UAudience_KMK> audienceWidgetFact;
 	UPROPERTY(EditAnywhere )
-	TSubclassOf<class UUserWidget> virtualWidgetFact;
+	TSubclassOf<class UAudience_KMK> virtualWidgetFact;
 
 	UPROPERTY( )
 	class UAudience_KMK* audienceWidget;
@@ -88,5 +88,8 @@ public:
 	
 	UPROPERTY(VisibleAnywhere)
 	class UAudienceServerComponent_KMK* serverComp;
+
+	UFUNCTION( )
+	void InitializeAudienceWidget( TSubclassOf<class UAudience_KMK>  widgetFact );
 };
 

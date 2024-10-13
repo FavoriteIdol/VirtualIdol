@@ -72,10 +72,14 @@ void UAudience_KMK::NativeConstruct ( )
     {
         Butt_StartConcert->OnClicked.AddDynamic ( this , &UAudience_KMK::PressStartConcertButt );
     }
+    if (CountDownPanel)
+    {
+        CountDownPanel->SetVisibility ( ESlateVisibility::Hidden );
+    }
 #pragma endregion
 
-
 }
+
 #pragma region PopUp
 
 void UAudience_KMK::SetUpButtonInfo ( )
@@ -245,12 +249,7 @@ void UAudience_KMK::PressStartConcertButt ( )
 {
     gi->playerMeshNum = 2;
     Butt_StartConcert->SetVisibility(ESlateVisibility::Hidden);
-    FTimerHandle handle;
-    GetWorld ( )->GetTimerManager ( ).SetTimer ( handle , FTimerDelegate::CreateLambda ( [this]( )
-        {
-            pc->FindComponentByClass<UAudienceServerComponent_KMK> ( )->ServerRPC_ChangeMyMesh ( 2 );
-        } ) , 3 , false );
-    
+    pc->FindComponentByClass<UAudienceServerComponent_KMK> ( )->ServerRPC_StartConcert( );
 }
 
 void UAudience_KMK::PressYesButt ( )
@@ -322,16 +321,27 @@ void UAudience_KMK::PressCancelButt ( )
 void UAudience_KMK::PressObjectButt ( )
 {
     // 오브젝트 생성
-    UE_LOG(LogTemp, Warning, TEXT("!!!!!!!!" ));
+    UE_LOG(LogTemp, Warning, TEXT("111111" ));
 }
 void UAudience_KMK::PressObject1Butt ( )
 {
-
+    UE_LOG ( LogTemp , Warning , TEXT ( "22222" ) );
 }
 void UAudience_KMK::PressObject2Butt ( )
 {
-
+    UE_LOG ( LogTemp , Warning , TEXT ( "33333" ) );
 }
+
+void UAudience_KMK::CountDownText ( int32 time )
+{
+    Text_CoutDown->SetText(FText::AsNumber(time));
+}
+
+void UAudience_KMK::CountDownPanelVisible ( ESlateVisibility visiblePanel )
+{
+    if(CountDownPanel)CountDownPanel->SetVisibility(visiblePanel);
+}
+
 #pragma endregion
 
 

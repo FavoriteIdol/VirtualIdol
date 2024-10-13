@@ -23,25 +23,31 @@ void UAudienceServerComponent_KMK::BeginPlay()
 	Super::BeginPlay();
 	UVirtualGameInstance_KMK* gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance());
 
-	player = Cast<ATP_ThirdPersonCharacter> (GetOwner());
+	player = Cast<ATP_ThirdPersonCharacter> (GetWorld()->GetFirstPlayerController()->GetPawn());
+	playerMesh = Cast<ATP_ThirdPersonCharacter> (GetOwner());
 	if (gi)
 	{
 		// 플레이어가 로컬 플레이어 일때
-		if (player->IsLocallyControlled())
+		if (playerMesh->IsLocallyControlled())
         {
 			// 클라이언트에서 서버로 RPC 호출
 			ServerRPC_ChangeMyMesh(gi->playerMeshNum);
+			
         }
 		else
 		{
 			// 로컬이 아닌 경우에 플레이어의 playerMeshNum에 따라 
 			if (playerMeshNum < 0)
 			{
-				SetVirtualVisible ( player , false );
+				SetVirtualVisible ( playerMesh , false );
+			}
+			else if (playerMeshNum > 1)
+			{
+				SetVirtualVisible ( playerMesh , true );
 			}
 			else
 			{
-				player->GetMesh ( )->SetSkeletalMesh ( audienceMesh[playerMeshNum] );
+				playerMesh->GetMesh ( )->SetSkeletalMesh ( audienceMesh[playerMeshNum] );
 			}
 			
 		}
@@ -53,7 +59,19 @@ void UAudienceServerComponent_KMK::BeginPlay()
 void UAudienceServerComponent_KMK::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
+	if (bTime)
+	{
+		remainTime = GetWorld ( )->GetTimerManager ( ).GetTimerRemaining ( startCountDownHandle );
+		if (player && player->audienceWidget)
+		{
+			if (remainTime >= 0.0f)
+			{
+				UE_LOG ( LogTemp , Warning , TEXT ( "시간: %f" ) , remainTime );
+				// 남은 시간을 위젯에 표시
+				player->audienceWidget->CountDownText ( remainTime );
+			}
+		}
+	}
 }
 
 void UAudienceServerComponent_KMK::ServerRPCChat_Implementation ( const FString& chat )
@@ -85,15 +103,15 @@ void UAudienceServerComponent_KMK::MultiRPC_ChangeMyMesh_Implementation ( int32 
 	{
 		if (num < 0)
 		{
-			SetVirtualVisible ( player , false );
+			SetVirtualVisible ( playerMesh , false );
 		}
 		else if(num > 1)
 		{
-			SetVirtualVisible ( player , true );
+			SetVirtualVisible ( playerMesh , true );
 		}
 		else
 		{
-			player->GetMesh ( )->SetSkeletalMesh ( audienceMesh[num] );
+			playerMesh->GetMesh ( )->SetSkeletalMesh ( audienceMesh[num] );
 		}
 	}
 
@@ -118,6 +136,10 @@ void UAudienceServerComponent_KMK::OnRep_ChangePlayerMesh ( )
 			{
 				SetVirtualVisible(playerCharacter, false );
 			}
+			else if (playerMeshNum > 1)
+			{
+				SetVirtualVisible ( playerCharacter , true );
+			}
 			else
 			{
 				playerCharacter->GetMesh ( )->SetSkeletalMesh ( audienceMesh[playerMeshNum] );
@@ -132,9 +154,52 @@ void UAudienceServerComponent_KMK::SetVirtualVisible ( class ATP_ThirdPersonChar
 	mesh->GetMesh ( )->SetRenderInDepthPass ( bVisible );
 }
 
+void UAudienceServerComponent_KMK::StartCountDown ( )
+{
+	bTime = true;
+	GetWorld ( )->GetTimerManager ( ).SetTimer ( startCountDownHandle , FTimerDelegate::CreateLambda ( [this]( )
+		{
+			ServerRPC_ChangeMyMesh ( 2 );
+		} ) , 6 , false );
+
+}
 void UAudienceServerComponent_KMK::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const 
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	 DOREPLIFETIME(UAudienceServerComponent_KMK, playerMeshNum);
 }
+
+void UAudienceServerComponent_KMK::ServerRPC_StartConcert_Implementation ( )
+{
+	MultiRPC_StartConcert( durationTime );
+}
+
+void UAudienceServerComponent_KMK::MultiRPC_StartConcert_Implementation ( float CountdownTime )
+{
+	ATP_ThirdPersonCharacter* playerCharacter = Cast<ATP_ThirdPersonCharacter> ( GetWorld ( )->GetFirstPlayerController ( )->GetPawn ( ) );
+	bTime = true;
+	remainTime = CountdownTime;
+	// 카운트다운 UI 패널 표시
+	if (playerCharacter && playerCharacter->audienceWidget)
+	{
+		playerCharacter->audienceWidget->CountDownPanelVisible ( ESlateVisibility::Visible );
+	}
+
+	// 타이머 시작 (각 클라이언트에서 동작)
+	GetWorld ( )->GetTimerManager ( ).SetTimer (
+		startCountDownHandle ,
+		FTimerDelegate::CreateLambda ( [this, playerCharacter]( )
+			{
+				bTime = false;  // 카운트다운 종료
+				if (playerCharacter && playerCharacter->audienceWidget)
+				{
+					playerCharacter->audienceWidget->CountDownPanelVisible ( ESlateVisibility::Hidden );
+				}
+				ServerRPC_ChangeMyMesh ( 2 );
+			} ) ,
+		CountdownTime , false  // CountdownTime 후 한 번 실행
+	);
+
+}
+

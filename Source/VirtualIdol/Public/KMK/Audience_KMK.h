@@ -169,7 +169,7 @@ public :
 #pragma region Exit Room
 	// 나가기 
 	UPROPERTY ( meta = ( BindWidget ) )
-	class UCanvasPanel* ExitPanel;
+    class UCanvasPanel* ExitPanel;
 	UPROPERTY ( meta = ( BindWidget ) )
     class UButton* Butt_Exit;
 	UPROPERTY ( meta = ( BindWidget ) )
@@ -204,5 +204,18 @@ public :
 	void PressObject2Butt( );
 
 #pragma endregion
+
+#pragma region CountDow
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UCanvasPanel* CountDownPanel;
+	UPROPERTY(meta = (BindWidget))
+    class UTextBlock* Text_CoutDown;
+
+	UFUNCTION( )
+	void CountDownText(int32 time );
+	UFUNCTION( )
+	void CountDownPanelVisible( ESlateVisibility visiblePanel );
+#pragma endregion
+
 
 };

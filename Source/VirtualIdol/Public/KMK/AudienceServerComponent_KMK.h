@@ -26,7 +26,9 @@ public:
 
 	// 플레이어 컨트롤러 들고오기
 	UPROPERTY( )
-	class ATP_ThirdPersonCharacter* player;
+    class ATP_ThirdPersonCharacter* player;
+	UPROPERTY ( )
+    class ATP_ThirdPersonCharacter* playerMesh;
 
 #pragma region Chatting
 	// 서버에게 채팅 요청
@@ -58,4 +60,18 @@ public:
 
 #pragma endregion
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	UFUNCTION(Server, Reliable )
+	void ServerRPC_StartConcert( );
+	UFUNCTION(NetMulticast, Reliable )
+	void MultiRPC_StartConcert( float CountdownTime );
+	
+	FTimerHandle startCountDownHandle;
+	UPROPERTY(EditAnywhere )
+	float durationTime = 6;
+	float remainTime = 0.f;
+	UPROPERTY()
+	bool bTime = false;
+
+	UFUNCTION( )
+	void StartCountDown( );
 };
