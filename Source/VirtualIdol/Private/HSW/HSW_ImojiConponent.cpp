@@ -186,15 +186,15 @@ void UHSW_ImojiConponent::Imoji04 ( )
 
 void UHSW_ImojiConponent::AppearImoji ( UTexture2D* imojiTexture )
 {
-	ImojiBilboard->SetSprite ( imojiTexture );
+	ImojiBillboard->SetSprite ( imojiTexture );
 
 	Me->FadeInImogiBlueprint ( );
 }
 
 void UHSW_ImojiConponent::DisappearImoji ( )
 {
-	ImojiBilboard->Sprite->AdjustMaxAlpha=0;
-	ImojiBilboard->SetSprite (nullptr );
+	ImojiBillboard->Sprite->AdjustMaxAlpha=0;
+	ImojiBillboard->SetSprite (nullptr );
 }
 
 
