@@ -33,7 +33,8 @@ public :
 	UPROPERTY( )
 	class ATP_ThirdPersonCharacter* pc;
 
-	void OnOffFunction(class UTextBlock* textBlocks, int32 num );
+	void OnOffFunction(class UTextBlock* textBlocks, int32 num, bool bAllVisib = false );
+	void ChangeTextAndImage ( FLinearColor color , int32 num , TArray<FString> textArray , bool bMyAuth = false );
 #pragma region StructButt
 	TArray<FButtonInfo> ButtonsInfoArray;
 	void SetUpButtonInfo( );
@@ -44,7 +45,9 @@ public :
 	UPROPERTY(EditAnywhere )
 	TArray<FString> changeText = {TEXT("보이기"), TEXT("다인 vip모드"), TEXT("음소거"), TEXT("채팅"), TEXT("이모티콘"), TEXT("VIP")};
 	
-	void OnOffInfo(FLinearColor color,  ESlateVisibility bVisib, int32 num, TArray<FString> textArray, bool bMyAuth = false  );
+	void OnOffInfo(FLinearColor color,  ESlateVisibility bVisib, int32 num, TArray<FString> textArray );
+
+	bool bMyVip = false;
 	// 1. Hidden
 	UPROPERTY(meta = (BindWidget))
     class UButton* Butt_Hidden;
@@ -67,6 +70,11 @@ public :
     class UButton* Butt_Mike;
 	UPROPERTY(meta = (BindWidget))
     class UTextBlock* Text_Mike;
+	bool bMikeOn;
+	UFUNCTION( )
+	void StartVoiceChat( );
+	UFUNCTION( )
+	void StopVoiceChat( );
 
 	UFUNCTION( )
 	void PressMikeButt( );

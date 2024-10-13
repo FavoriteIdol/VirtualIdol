@@ -26,16 +26,6 @@ void UAudienceServerComponent_KMK::BeginPlay()
 	player = Cast<ATP_ThirdPersonCharacter> (GetOwner());
 	if (gi)
 	{
-		if (player->HasAuthority ( ))
-		{
-			// 서버에서 로직 실행
-			UE_LOG ( LogTemp , Warning , TEXT ( "Server: playerMeshNum on BeginPlay is %d" ) , playerMeshNum );
-		}
-		else
-		{
-			// 클라이언트에서 로직 실행
-			UE_LOG ( LogTemp , Warning , TEXT ( "Client: playerMeshNum on BeginPlay is %d" ) , playerMeshNum );
-		}
 		// 플레이어가 로컬 플레이어 일때
 		if (player->IsLocallyControlled())
         {
@@ -77,18 +67,9 @@ void UAudienceServerComponent_KMK::ServerRPC_ChangeMyMesh_Implementation ( int32
 {
 	if (playerMeshNum != num)
 	{
-		UE_LOG ( LogTemp , Warning , TEXT ( "Server: Changing playerMeshNum from %d to %d" ) , playerMeshNum , num );
 		playerMeshNum = num;
 		MultiRPC_ChangeMyMesh ( num ); // 클라이언트에게 RPC 호출
 	}
-    //if (player)
-    //{
-    //    USkeletalMeshComponent* playerMeshComp = player->GetMesh();
-    //    if (playerMeshComp)
-    //    {
-    //        
-    //    }
-    //}
 }
 
 void UAudienceServerComponent_KMK::MultiRPC_ChangeMyMesh_Implementation ( int32 num )
@@ -103,7 +84,6 @@ void UAudienceServerComponent_KMK::MultiRPC_ChangeMyMesh_Implementation ( int32 
 
 void UAudienceServerComponent_KMK::OnRep_ChangePlayerMesh ( )
 {
-	UE_LOG ( LogTemp , Warning , TEXT ( "OnRep_PlayerMeshNum called! playerMeshNum: %d" ) , playerMeshNum );
 	// Get the PlayerController owning this component
 	APlayerController* playerController = Cast<APlayerController> ( GetOwner ( ) );
 

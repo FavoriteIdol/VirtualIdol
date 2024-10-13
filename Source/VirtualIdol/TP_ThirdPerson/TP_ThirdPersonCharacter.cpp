@@ -91,6 +91,8 @@ void ATP_ThirdPersonCharacter::BeginPlay()
 				audienceWidget->VipAuthority ( );
 			}
 		}
+		UE_LOG ( LogTemp , Warning , TEXT ( "StartTalk" ) );
+		GetController<APlayerController> ( )->StartTalking ( );
 	}
 
 }

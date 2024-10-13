@@ -100,7 +100,7 @@ void UAudience_KMK::SetUpButtonInfo ( )
 
 void UAudience_KMK::PressHiddenButt ( )
 {
-    OnOffFunction(Text_Hidden, 0);
+    OnOffFunction(Text_Hidden, 0, true);
 }
 
 void UAudience_KMK::PressModeButt ( )
@@ -108,20 +108,54 @@ void UAudience_KMK::PressModeButt ( )
     OnOffFunction(Text_Mode, 1 );
 }
 
-void UAudience_KMK::PressMikeButt ( )
+void UAudience_KMK::StartVoiceChat ( )
 {
-    OnOffFunction(Text_Mike, 2);
+    UE_LOG(LogTemp, Warning, TEXT("StartTalk" ) );
+    pc->GetController<APlayerController> ( )->StartTalking ( );
 }
 
-void UAudience_KMK::OnOffFunction (class UTextBlock* textBlocks, int32 num )
+void UAudience_KMK::StopVoiceChat ( )
 {
-    if (textBlocks->GetText().ToString() == currentText[num])
+    UE_LOG ( LogTemp , Warning , TEXT ( "StopTalk" ) );
+    pc->GetController<APlayerController> ( )->StopTalking ( );
+}
+
+void UAudience_KMK::PressMikeButt ( )
+{
+    OnOffFunction ( Text_Mike , 2 );
+    if (bMikeOn)
     {
-        OnOffInfo(FLinearColor::Yellow, ESlateVisibility::Hidden, num, changeText );
+        StartVoiceChat ( );
+        bMikeOn = false;
     }
     else
     {
-        OnOffInfo(FLinearColor::White, ESlateVisibility::Visible, num, currentText);
+        StopVoiceChat ( );
+        bMikeOn = true;
+    }
+}
+
+void UAudience_KMK::OnOffFunction (class UTextBlock* textBlocks, int32 num , bool bAllVisib )
+{
+    if (textBlocks->GetText().ToString() == currentText[num])
+    {
+        if(bAllVisib)OnOffInfo(FLinearColor::Yellow, ESlateVisibility::Hidden, num, changeText );
+        else ChangeTextAndImage ( FLinearColor::Yellow , num , changeText );
+    }
+    else
+    {
+        if (bAllVisib) OnOffInfo(FLinearColor::White, ESlateVisibility::Visible, num, currentText);
+        else ChangeTextAndImage( FLinearColor::White, num, currentText);
+    }
+}
+
+void UAudience_KMK::ChangeTextAndImage ( FLinearColor color , int32 num , TArray<FString> textArray , bool bMyAuth )
+{
+    ButtonsInfoArray[num].image->SetBrushTintColor ( color );
+    ButtonsInfoArray[num].text->SetText ( FText::FromString ( textArray[num] ) );
+    if (bMyAuth)
+    {
+        VipAuthority ( );
     }
 }
 
@@ -131,13 +165,13 @@ void UAudience_KMK::PressChatButt ( )
     {
         ChatGridPanel->SetVisibility(ESlateVisibility::Visible);
         bChatOn = true;
-        OnOffInfo(FLinearColor::Yellow, ESlateVisibility::Hidden, 3, changeText );
+        ChangeTextAndImage (FLinearColor::Yellow, 3, changeText );
     }
     else
     {
         bChatOn = false;
         ChatGridPanel->SetVisibility(ESlateVisibility::Hidden);
-        OnOffInfo(FLinearColor::White, ESlateVisibility::Visible, 3, currentText);
+        ChangeTextAndImage (FLinearColor::White, 3, currentText);
     }
 }
 
@@ -146,12 +180,12 @@ void UAudience_KMK::PressEmotionButt ( )
     if (!bEmotion)
     {
         bEmotion = true;
-        OnOffInfo(FLinearColor::Yellow, ESlateVisibility::Hidden, 4, changeText );
+        ChangeTextAndImage ( FLinearColor::Yellow , 4 , changeText );
     }
     else
     {
         bEmotion = false;
-        OnOffInfo(FLinearColor::White, ESlateVisibility::Visible, 4, currentText);
+        ChangeTextAndImage ( FLinearColor::White , 4 , currentText );
     }
 }
 
@@ -161,12 +195,12 @@ void UAudience_KMK::PressVipButt ( )
     VisiblePanel ( ESlateVisibility::Visible );
     if (Text_Vip->GetText().ToString() == currentText[5])
     {
-        OnOffInfo(FLinearColor::Yellow, ESlateVisibility::Hidden, 5, changeText );
+        ChangeTextAndImage ( FLinearColor::White , 5 , changeText );
     }
 }
 
 
-void UAudience_KMK::OnOffInfo ( FLinearColor color,  ESlateVisibility bVisib, int32 num, TArray<FString> textArray , bool bMyAuth )
+void UAudience_KMK::OnOffInfo ( FLinearColor color,  ESlateVisibility bVisib, int32 num, TArray<FString> textArray  )
 {
     for (int i = 0; i < ButtonsInfoArray.Num(); i++)
     {
@@ -178,19 +212,17 @@ void UAudience_KMK::OnOffInfo ( FLinearColor color,  ESlateVisibility bVisib, in
         }
         else
         {
+            if(bMyVip && i == ButtonsInfoArray.Num() - 1) continue;
             ButtonsInfoArray[i].button->SetVisibility ( bVisib );
             ButtonsInfoArray[i].backImage->SetVisibility ( bVisib );
             ButtonsInfoArray[i].image->SetVisibility ( bVisib );
             ButtonsInfoArray[i].text->SetVisibility ( bVisib );
         }
     }
-    if (bMyAuth)
-    {
-        VipAuthority();
-    }
 }
 void UAudience_KMK::VipAuthority ( )
 {
+    bMyVip = true;
     ButtonsInfoArray[5].button->SetVisibility ( ESlateVisibility::Hidden );
     ButtonsInfoArray[5].backImage->SetVisibility ( ESlateVisibility::Hidden );
     ButtonsInfoArray[5].image->SetVisibility ( ESlateVisibility::Hidden );
@@ -201,7 +233,7 @@ void UAudience_KMK::PressYesButt ( )
 {
     gi->playerMeshNum = 1;
     pc->FindComponentByClass<UAudienceServerComponent_KMK>( )->ServerRPC_ChangeMyMesh(1);
-    OnOffInfo(FLinearColor::Yellow, ESlateVisibility::Visible, 5, changeText, true );
+    ChangeTextAndImage (FLinearColor::Yellow, 5, changeText, true );
     VisiblePanel ( ESlateVisibility::Hidden );
 }
 
@@ -209,7 +241,7 @@ void UAudience_KMK::PressNoButt ( )
 {
     gi->playerMeshNum = 0;
     pc->FindComponentByClass<UAudienceServerComponent_KMK>( )->ServerRPC_ChangeMyMesh(0);
-    OnOffInfo(FLinearColor::White, ESlateVisibility::Visible, 5, currentText );
+    ChangeTextAndImage (FLinearColor::White, 5, currentText );
     VisiblePanel(ESlateVisibility::Hidden);
 }
 
