@@ -53,6 +53,9 @@ public:
 	UFUNCTION( )
 	void OnRep_ChangePlayerMesh ( );
 
+	UFUNCTION( )
+	void SetVirtualVisible(class ATP_ThirdPersonCharacter* mesh, bool bVisible );
+
 #pragma endregion
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 };

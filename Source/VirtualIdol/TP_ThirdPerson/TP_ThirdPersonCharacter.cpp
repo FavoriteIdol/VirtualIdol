@@ -14,6 +14,7 @@
 #include "VirtualIdol.h"
 #include "KMK/AudienceServerComponent_KMK.h"
 #include "KMK/VirtualGameInstance_KMK.h"
+#include "Components/GridPanel.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -68,11 +69,14 @@ void ATP_ThirdPersonCharacter::BeginPlay()
 	{
         if (HasAuthority ( ))
         {
-            if (audienceWidgetFact && !audienceWidget)
+			GetMesh ( )->bRenderInMainPass = false;
+			GetMesh ( )->bRenderInDepthPass = false;
+            if (virtualWidgetFact && !audienceWidget)
             {
-                audienceWidget = CreateWidget<UAudience_KMK> ( GetWorld ( ) , audienceWidgetFact );
-                audienceWidget->AddToViewport ( );
-                audienceWidget->pc = this;
+				audienceWidget = CreateWidget<UAudience_KMK> ( GetWorld ( ) , virtualWidgetFact );
+				audienceWidget->AddToViewport ( );
+				audienceWidget->pc = this;
+				audienceWidget->SetVirtualWBP();
             }
         }
         else

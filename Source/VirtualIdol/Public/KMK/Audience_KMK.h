@@ -35,6 +35,9 @@ public :
 
 	void OnOffFunction(class UTextBlock* textBlocks, int32 num, bool bAllVisib = false );
 	void ChangeTextAndImage ( FLinearColor color , int32 num , TArray<FString> textArray , bool bMyAuth = false );
+		
+	UFUNCTION( )
+	void SetVirtualWBP( );
 #pragma region StructButt
 	TArray<FButtonInfo> ButtonsInfoArray;
 	void SetUpButtonInfo( );
@@ -99,7 +102,7 @@ public :
 	// 6. VIP
 	bool bVip = false;
 	UPROPERTY(meta = (BindWidget))
-    class UButton* Butt_Vip;	
+    class UButton* Butt_Vip;		
 	UPROPERTY(meta = (BindWidget))
     class UTextBlock* Text_Vip;
 
@@ -107,6 +110,13 @@ public :
 	void PressVipButt( );
 	UFUNCTION( )
 	void VipAuthority( );
+
+	// 콘서트 시작 5초전
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* Butt_StartConcert;
+
+	UFUNCTION( )
+	void PressStartConcertButt( );
 
 #pragma endregion
 #pragma region PopUp
@@ -119,7 +129,6 @@ public :
     class UButton* Butt_Yes;
 	UPROPERTY(meta = (BindWidget))
 	class UButton* Butt_No;
-
 
 	UFUNCTION( )
 	void PressYesButt ( );

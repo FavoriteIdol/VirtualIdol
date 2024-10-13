@@ -35,7 +35,15 @@ void UAudienceServerComponent_KMK::BeginPlay()
 		else
 		{
 			// 로컬이 아닌 경우에 플레이어의 playerMeshNum에 따라 
-			player->GetMesh()->SetSkeletalMesh(audienceMesh[playerMeshNum]);
+			if (playerMeshNum < 0)
+			{
+				SetVirtualVisible ( player , false );
+			}
+			else
+			{
+				player->GetMesh ( )->SetSkeletalMesh ( audienceMesh[playerMeshNum] );
+			}
+			
 		}
 	}
 }
@@ -60,16 +68,14 @@ void UAudienceServerComponent_KMK::MultiRPCChat_Implementation ( const FString& 
 	{
 		p->audienceWidget->CreateChatWidget(chat );
 	}
+
 }
 
 
 void UAudienceServerComponent_KMK::ServerRPC_ChangeMyMesh_Implementation ( int32 num)
 {
-	if (playerMeshNum != num)
-	{
-		playerMeshNum = num;
-		MultiRPC_ChangeMyMesh ( num ); // 클라이언트에게 RPC 호출
-	}
+	playerMeshNum = num;
+	MultiRPC_ChangeMyMesh ( num ); // 클라이언트에게 RPC 호출
 }
 
 void UAudienceServerComponent_KMK::MultiRPC_ChangeMyMesh_Implementation ( int32 num )
@@ -77,7 +83,18 @@ void UAudienceServerComponent_KMK::MultiRPC_ChangeMyMesh_Implementation ( int32 
 	UVirtualGameInstance_KMK* gi = Cast<UVirtualGameInstance_KMK> ( GetWorld ( )->GetGameInstance ( ) );
 	if (gi)
 	{
-		player->GetMesh ( )->SetSkeletalMesh ( audienceMesh[num] );
+		if (num < 0)
+		{
+			SetVirtualVisible ( player , false );
+		}
+		else if(num > 1)
+		{
+			SetVirtualVisible ( player , true );
+		}
+		else
+		{
+			player->GetMesh ( )->SetSkeletalMesh ( audienceMesh[num] );
+		}
 	}
 
 }
@@ -86,6 +103,7 @@ void UAudienceServerComponent_KMK::OnRep_ChangePlayerMesh ( )
 {
 	// Get the PlayerController owning this component
 	APlayerController* playerController = Cast<APlayerController> ( GetOwner ( ) );
+	UE_LOG ( LogTemp , Warning , TEXT ( "Player %s MeshNum: %d" ) , *GetOwner ( )->GetName ( ) , playerMeshNum );
 
 	// Make sure the PlayerController is valid
 	if (playerController)
@@ -96,9 +114,22 @@ void UAudienceServerComponent_KMK::OnRep_ChangePlayerMesh ( )
 		if (playerCharacter)
 		{
 			// Change the skeletal mesh of the character
-			playerCharacter->GetMesh ( )->SetSkeletalMesh ( audienceMesh[playerMeshNum] );
+			if (playerMeshNum < 0)
+			{
+				SetVirtualVisible(playerCharacter, false );
+			}
+			else
+			{
+				playerCharacter->GetMesh ( )->SetSkeletalMesh ( audienceMesh[playerMeshNum] );
+			}
 		}
 	}
+}
+
+void UAudienceServerComponent_KMK::SetVirtualVisible ( class ATP_ThirdPersonCharacter* mesh , bool bVisible )
+{
+	mesh->GetMesh ( )->SetRenderInMainPass ( bVisible );
+	mesh->GetMesh ( )->SetRenderInDepthPass ( bVisible );
 }
 
 void UAudienceServerComponent_KMK::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const 

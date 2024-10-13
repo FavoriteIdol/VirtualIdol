@@ -103,6 +103,6 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 	void VisibleStartWidget ( bool bVisible );
 
     UPROPERTY ( )
-    int32 playerMeshNum = 0;
+    int32 playerMeshNum = -1;
 
 };

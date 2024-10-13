@@ -76,9 +76,14 @@ public:
 
 	UPROPERTY(EditAnywhere )
 	TSubclassOf<class UAudience_KMK> audienceWidgetFact;
+	UPROPERTY(EditAnywhere )
+	TSubclassOf<class UUserWidget> virtualWidgetFact;
 
 	UPROPERTY( )
 	class UAudience_KMK* audienceWidget;
+
+	UPROPERTY( )
+	class UAudience_KMK* virtualWidget;
 	
 	
 	UPROPERTY(VisibleAnywhere)

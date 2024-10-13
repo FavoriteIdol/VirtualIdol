@@ -67,6 +67,12 @@ void UAudience_KMK::NativeConstruct ( )
         Butt_Object2->OnClicked.AddDynamic ( this , &UAudience_KMK::PressObject2Butt);
     }
 #pragma endregion
+#pragma region StartConcert
+    if (Butt_StartConcert)
+    {
+        Butt_StartConcert->OnClicked.AddDynamic ( this , &UAudience_KMK::PressStartConcertButt );
+    }
+#pragma endregion
 
 
 }
@@ -159,6 +165,12 @@ void UAudience_KMK::ChangeTextAndImage ( FLinearColor color , int32 num , TArray
     }
 }
 
+void UAudience_KMK::SetVirtualWBP ( )
+{
+    ChatGridPanel->SetVisibility ( ESlateVisibility::Visible );
+    ChatPanel->SetVisibility ( ESlateVisibility::Visible );
+}
+
 void UAudience_KMK::PressChatButt ( )
 {
     if (!bChatOn)
@@ -227,6 +239,18 @@ void UAudience_KMK::VipAuthority ( )
     ButtonsInfoArray[5].backImage->SetVisibility ( ESlateVisibility::Hidden );
     ButtonsInfoArray[5].image->SetVisibility ( ESlateVisibility::Hidden );
     ButtonsInfoArray[5].text->SetVisibility ( ESlateVisibility::Hidden );
+}
+
+void UAudience_KMK::PressStartConcertButt ( )
+{
+    gi->playerMeshNum = 2;
+    Butt_StartConcert->SetVisibility(ESlateVisibility::Hidden);
+    FTimerHandle handle;
+    GetWorld ( )->GetTimerManager ( ).SetTimer ( handle , FTimerDelegate::CreateLambda ( [this]( )
+        {
+            pc->FindComponentByClass<UAudienceServerComponent_KMK> ( )->ServerRPC_ChangeMyMesh ( 2 );
+        } ) , 3 , false );
+    
 }
 
 void UAudience_KMK::PressYesButt ( )
