@@ -53,7 +53,7 @@ public:
 	
 	// 버튼
 	UPROPERTY(meta = (BindWidget))
-	class UButton* Butt_CreateStage;
+    class UButton* Butt_CreateStage;
 	UPROPERTY(meta = (BindWidget))
 	class UButton* Butt_ReadyConcert;
 	UPROPERTY(meta = (BindWidget))
@@ -71,6 +71,7 @@ public:
 	UFUNCTION()
 	void ComeInStagePanel();
 #pragma endregion
+
 #pragma region Stage Setting Widget Panel
 // ================================================================
 // Stage Setting Widget Panel
@@ -84,83 +85,161 @@ public:
 	TArray<class UMaterial*> HighParticles;
 	UPROPERTY(EditAnywhere, Category = "Particle" )
 	TArray<FVector> ParticlePositions;
-
-	// 버튼
+	// 텍스트
 	UPROPERTY(meta = (BindWidget))
-    class UButton* Butt_Back;
+    class UTextBlock* Text_Title;	
 	UPROPERTY ( meta = ( BindWidget ) )
-    class UButton* Butt_CreateTicket;
+	class UButton* Butt_Select;
+	
+	UFUNCTION( )
+	void PressSelectButt( );
+
+	int32 selectNum = 0;
+
+	UFUNCTION( )
+	void SetTitleText(const FString& title );
+#pragma region Set Day
+	// 공연일자 패널
 	UPROPERTY ( meta = ( BindWidget ) )
-	class UButton* Butt_Complete;
+	class UCanvasPanel* SetDayPanel;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UEditableText* EditText_StageName;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UEditableText* EditText_Year;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UEditableText* EditText_Mon;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UEditableText* EditText_Day;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UEditableText* EditText_SHour;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UEditableText* EditText_SMin;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UEditableText* EditText_H;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UEditableText* EditText_M;
 
-	UPROPERTY(meta = (BindWidget))
-	class UButton* Butt_Right;
-	UPROPERTY(meta = (BindWidget))
-	class UButton* Butt_Left;
-	UPROPERTY(meta = (BindWidget))
-	class UButton* Butt_FRight;
-	UPROPERTY(meta = (BindWidget))
-	class UButton* Butt_FLeft;
-	UPROPERTY(meta = (BindWidget))
-	class UButton* Butt_HRight;
-	UPROPERTY(meta = (BindWidget))
-	class UButton* Butt_HLeft;
+	UFUNCTION( )
+	bool BEditTextEmpty( );
 
-	// 이미지
-	UPROPERTY(meta = (BindWidget))
-	class UImage* Image_Ticket;
-	UPROPERTY(meta = (BindWidget))
-	class UImage* Image_Particle;
-	UPROPERTY(meta = (BindWidget))
+#pragma endregion
+#pragma region Set Ticket
+	// 티켓 만드는 패널
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UCanvasPanel* SetTicketPanel;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UEditableText* EditText_Price;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* Butt_CreateTicket;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UMultiLineEditableText* EditMultiText_Ticket;
+
+	UFUNCTION( )
+	void PressCreateTicket();
+
+	void ClearAllText( );
+#pragma endregion
+#pragma region Set Effect
+	// 이펙트 결정 패널
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UCanvasPanel* SetEffectPanel;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UImage* Image_Particle;
+	UPROPERTY ( meta = ( BindWidget ) )
     class UImage* Image_Fever;
 	UPROPERTY ( meta = ( BindWidget ) )
-    class UImage* Image_HEffect;
-	// 팝업
-    UPROPERTY ( meta = ( BindWidget ) )
-    class UCanvasPanel* CompletePopUp;
-	// 텍스트 블럭
-	UPROPERTY(meta = (BindWidget))
-	class UEditableText* EditText_Day;
-	UPROPERTY(meta = (BindWidget))
-	class UEditableText* EditText_STime;
-	UPROPERTY(meta = (BindWidget))
-	class UEditableText* EditText_ETime;
-	UPROPERTY(meta = (BindWidget))
-	class UEditableText* EditText_SingTime;
+	class UButton* Butt_Right;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* Butt_Left;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* Butt_FRight;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* Butt_FLeft;
 
-	UPROPERTY(meta = (BindWidget))
-	class UEditableText* EditText_Ticket;
-	// 버튼 연동 함수
-	UFUNCTION()
-	void PressRight();
-	UFUNCTION()
-	void PressLeft ();
-	UFUNCTION()
-	void PressFRight();
-	UFUNCTION()
-	void PressFLeft ();
-	UFUNCTION()
-	void PressHRight();
-	UFUNCTION()
-	void PressHLeft ();
-	UFUNCTION()
-	void PressCreateTicket();
-	UFUNCTION()
-	void CompeleteSetting();
-	
-	// 추가함수
-	UFUNCTION()
-	void PlayParticleSystem(int32 index , TArray<class UMaterial*> ParticlesArray , class UImage* image );
-	UFUNCTION ()
-	void ClearAll();
 	int32 particleNum = 0;
 	int32 feverNum = 0;
-	int32 highNum = 0;
-	
-	UFUNCTION ()
-	void ChangeFindRoomPanel(const FString& title);
+
+	UFUNCTION( )
+	void PressRightButt( );
+	UFUNCTION( )
+	void PressLeftButt( );
+	UFUNCTION( )
+	void PressFRightButt( );
+	UFUNCTION( )
+	void PressFLeftButt( );
+	UFUNCTION( )
+	void SetPanelVisible( class UCanvasPanel* visiblePanel, class UCanvasPanel* hiddenPanel0 , class UCanvasPanel* hiddenPanel1 , class UCanvasPanel* hiddenPanel2 );
+
+	void AddIndex( int32 num , TArray<class UMaterial*> meshArray , class UImage* image );
+	void MinusIndex( int32 num , TArray<class UMaterial*>  meshArray , class UImage* image );
+#pragma endregion
+
+#pragma region Final Set Stage
+	// 최종 결제 페널
+	UPROPERTY(meta = (BindWidget))
+    class UCanvasPanel* StageChargePanel;	
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* Butt_Next;
+#pragma region Set Scale
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UGridPanel* StageScalePanel;	
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UEditableText* EditText_ScaleNum;
+
+	UFUNCTION( )
+	void PressNextButt( );
+
+#pragma endregion
+#pragma region Set Price
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UGridPanel* StagePayPanel;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UTextBlock* Text_Pay;	
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UButton* Butt_PayMoney;	
+	UFUNCTION( )
+	void PressPayMoney( );
+
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UCanvasPanel* PayPopUpPanel;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* Butt_Okay;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UTextBlock* Text_FinalStageName;
+
+	UFUNCTION( )
+	void PressOkayButt( );
+
+	void ResetWidget( );
+#pragma endregion
+
+
+#pragma endregion
+
+#pragma endregion
+
+#pragma region Select Stage
+	// 버튼
+	UPROPERTY(meta = (BindWidget))
+    class UButton* Butt_UserStage;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UButton* Butt_MyStage;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UButton* Butt_Star;
+	// 그리드
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UGridPanel* FindRoomGrid;	
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UScrollBox* SB_FindStage;
+	// 추가함수
 	UFUNCTION()
-	void CreateStageWidget(const FString& createName);
+	void PressUserStageButt( );
+	UFUNCTION()
+	void PressMyStageButt( );
+	UFUNCTION()
+	void CreateStageWidget( const FString& createName );
+	UFUNCTION( )
+	void ClearSB( );
 #pragma endregion
 #pragma region EntryPanel Widget Panel
 // ================================================================
@@ -178,6 +257,8 @@ public:
 	UPROPERTY(meta = (BindWidget))
     class UButton* Butt_VipEntry;	
 	UPROPERTY ( meta = ( BindWidget ) )
+    class UButton* Butt_Back;
+	UPROPERTY ( meta = ( BindWidget ) )
     class UButton* Butt_Back1;
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UButton* Butt_Back2;
@@ -192,9 +273,6 @@ public:
 	UFUNCTION()
 	void PressNormalEntry();
 
-	// 그리드
-	UPROPERTY ( meta = ( BindWidget ) )
-	class UGridPanel* FindRoomGrid;
 	// 추가함수
 	UFUNCTION()
 	void FindRoom();
@@ -204,8 +282,6 @@ public:
 	TSubclassOf<class UUserWidget> roomWidgetFact;
 
 	int32 roomCount = 0;
-	UFUNCTION()
-	void SetPosWidget(class URoomWidget_KMK* widget, int32 num);
 
 	UFUNCTION ()
 	void ClearChild( );
@@ -216,10 +292,7 @@ public:
 	
 #pragma endregion
 #pragma region FindRoom & Select Stage
-	UPROPERTY ( meta = ( BindWidget ) )
-    class UButton* Butt_Select;
-	UFUNCTION( )
-	void StageSelect( );
+
 #pragma endregion
 
 };

@@ -42,7 +42,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Audience" )
 	TArray<class USkeletalMesh*> audienceMesh;
 
-	UPROPERTY(Replicated)
+	UPROPERTY( ReplicatedUsing = OnRep_ChangePlayerMesh )
 	int32 playerMeshNum = 0;
 
 	UFUNCTION(Server, Reliable )
@@ -50,6 +50,8 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable )
 	void MultiRPC_ChangeMyMesh(int32 num );
+	UFUNCTION( )
+	void OnRep_ChangePlayerMesh ( );
 
 #pragma endregion
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;

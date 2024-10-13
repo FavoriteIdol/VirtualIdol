@@ -13,6 +13,7 @@
 #include "KMK/Audience_KMK.h"
 #include "VirtualIdol.h"
 #include "KMK/AudienceServerComponent_KMK.h"
+#include "KMK/VirtualGameInstance_KMK.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -23,7 +24,7 @@ ATP_ThirdPersonCharacter::ATP_ThirdPersonCharacter()
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
-		
+	bReplicates = true;
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -62,25 +63,33 @@ void ATP_ThirdPersonCharacter::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 	pc = GetWorld()->GetFirstPlayerController();
+	UVirtualGameInstance_KMK* gi = Cast<UVirtualGameInstance_KMK> ( GetWorld ( )->GetGameInstance ( ) );
 	if (IsLocallyControlled ( ))
 	{
-		if (HasAuthority ( ))
-		{
-			if (audienceWidgetFact && !audienceWidget)
+        if (HasAuthority ( ))
+        {
+            if (audienceWidgetFact && !audienceWidget)
             {
                 audienceWidget = CreateWidget<UAudience_KMK> ( GetWorld ( ) , audienceWidgetFact );
                 audienceWidget->AddToViewport ( );
                 audienceWidget->pc = this;
             }
-		}
-		else
-		{
-			if (audienceWidgetFact && !audienceWidget)
+        }
+        else
+        {
+            if (audienceWidgetFact && !audienceWidget)
             {
                 audienceWidget = CreateWidget<UAudience_KMK> ( GetWorld ( ) , audienceWidgetFact );
                 audienceWidget->AddToViewport ( );
                 audienceWidget->pc = this;
             }
+        }
+		if (gi)
+		{
+			if (audienceWidget && gi->playerMeshNum == 1)
+			{
+				audienceWidget->VipAuthority ( );
+			}
 		}
 	}
 

@@ -165,7 +165,8 @@ void UAudience_KMK::PressVipButt ( )
     }
 }
 
-void UAudience_KMK::OnOffInfo ( FLinearColor color,  ESlateVisibility bVisib, int32 num, TArray<FString> textArray )
+
+void UAudience_KMK::OnOffInfo ( FLinearColor color,  ESlateVisibility bVisib, int32 num, TArray<FString> textArray , bool bMyAuth )
 {
     for (int i = 0; i < ButtonsInfoArray.Num(); i++)
     {
@@ -183,19 +184,24 @@ void UAudience_KMK::OnOffInfo ( FLinearColor color,  ESlateVisibility bVisib, in
             ButtonsInfoArray[i].text->SetVisibility ( bVisib );
         }
     }
-    
+    if (bMyAuth)
+    {
+        VipAuthority();
+    }
 }
-
+void UAudience_KMK::VipAuthority ( )
+{
+    ButtonsInfoArray[5].button->SetVisibility ( ESlateVisibility::Hidden );
+    ButtonsInfoArray[5].backImage->SetVisibility ( ESlateVisibility::Hidden );
+    ButtonsInfoArray[5].image->SetVisibility ( ESlateVisibility::Hidden );
+    ButtonsInfoArray[5].text->SetVisibility ( ESlateVisibility::Hidden );
+}
 
 void UAudience_KMK::PressYesButt ( )
 {
     gi->playerMeshNum = 1;
     pc->FindComponentByClass<UAudienceServerComponent_KMK>( )->ServerRPC_ChangeMyMesh(1);
-    OnOffInfo(FLinearColor::Yellow, ESlateVisibility::Visible, 5, changeText );
-    ButtonsInfoArray[5].button->SetVisibility ( ESlateVisibility::Hidden );
-    ButtonsInfoArray[5].backImage->SetVisibility ( ESlateVisibility::Hidden );
-    ButtonsInfoArray[5].image->SetVisibility ( ESlateVisibility::Hidden );
-    ButtonsInfoArray[5].text->SetVisibility ( ESlateVisibility::Hidden );
+    OnOffInfo(FLinearColor::Yellow, ESlateVisibility::Visible, 5, changeText, true );
     VisiblePanel ( ESlateVisibility::Hidden );
 }
 

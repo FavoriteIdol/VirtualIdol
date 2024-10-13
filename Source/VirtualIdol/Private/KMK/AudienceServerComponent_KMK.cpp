@@ -13,7 +13,6 @@ UAudienceServerComponent_KMK::UAudienceServerComponent_KMK()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
 	// ...
 }
 
@@ -27,6 +26,16 @@ void UAudienceServerComponent_KMK::BeginPlay()
 	player = Cast<ATP_ThirdPersonCharacter> (GetOwner());
 	if (gi)
 	{
+		if (player->HasAuthority ( ))
+		{
+			// 서버에서 로직 실행
+			UE_LOG ( LogTemp , Warning , TEXT ( "Server: playerMeshNum on BeginPlay is %d" ) , playerMeshNum );
+		}
+		else
+		{
+			// 클라이언트에서 로직 실행
+			UE_LOG ( LogTemp , Warning , TEXT ( "Client: playerMeshNum on BeginPlay is %d" ) , playerMeshNum );
+		}
 		// 플레이어가 로컬 플레이어 일때
 		if (player->IsLocallyControlled())
         {
@@ -56,38 +65,62 @@ void UAudienceServerComponent_KMK::ServerRPCChat_Implementation ( const FString&
 
 void UAudienceServerComponent_KMK::MultiRPCChat_Implementation ( const FString& chat )
 {
-	if (player->audienceWidget)
+	auto* p = Cast<ATP_ThirdPersonCharacter> ( GetWorld ( )->GetFirstPlayerController ( )->GetPawn ( ) );
+	if (p->audienceWidget)
 	{
-		player->audienceWidget->CreateChatWidget(chat );
+		p->audienceWidget->CreateChatWidget(chat );
 	}
 }
 
 
 void UAudienceServerComponent_KMK::ServerRPC_ChangeMyMesh_Implementation ( int32 num)
 {
-	playerMeshNum = num;
-    
-    if (player)
-    {
-        USkeletalMeshComponent* playerMeshComp = player->GetMesh();
-        if (playerMeshComp)
-        {
-            MultiRPC_ChangeMyMesh(playerMeshNum);  // 모든 클라이언트에 메쉬 변경 전달
-        }
-    }
+	if (playerMeshNum != num)
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "Server: Changing playerMeshNum from %d to %d" ) , playerMeshNum , num );
+		playerMeshNum = num;
+		MultiRPC_ChangeMyMesh ( num ); // 클라이언트에게 RPC 호출
+	}
+    //if (player)
+    //{
+    //    USkeletalMeshComponent* playerMeshComp = player->GetMesh();
+    //    if (playerMeshComp)
+    //    {
+    //        
+    //    }
+    //}
 }
 
 void UAudienceServerComponent_KMK::MultiRPC_ChangeMyMesh_Implementation ( int32 num )
 {
-    if (player)
-    {
-        USkeletalMeshComponent* playerMeshComp = player->GetMesh();
-        if (playerMeshComp)
-        {
-            playerMeshComp->SetSkeletalMesh(audienceMesh[num]);
-        }
-    }
+	UVirtualGameInstance_KMK* gi = Cast<UVirtualGameInstance_KMK> ( GetWorld ( )->GetGameInstance ( ) );
+	if (gi)
+	{
+		player->GetMesh ( )->SetSkeletalMesh ( audienceMesh[num] );
+	}
+
 }
+
+void UAudienceServerComponent_KMK::OnRep_ChangePlayerMesh ( )
+{
+	UE_LOG ( LogTemp , Warning , TEXT ( "OnRep_PlayerMeshNum called! playerMeshNum: %d" ) , playerMeshNum );
+	// Get the PlayerController owning this component
+	APlayerController* playerController = Cast<APlayerController> ( GetOwner ( ) );
+
+	// Make sure the PlayerController is valid
+	if (playerController)
+	{
+		// Get the character (Pawn) that the PlayerController is controlling
+		ATP_ThirdPersonCharacter* playerCharacter = Cast<ATP_ThirdPersonCharacter> ( playerController->GetPawn ( ) );
+
+		if (playerCharacter)
+		{
+			// Change the skeletal mesh of the character
+			playerCharacter->GetMesh ( )->SetSkeletalMesh ( audienceMesh[playerMeshNum] );
+		}
+	}
+}
+
 void UAudienceServerComponent_KMK::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const 
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);

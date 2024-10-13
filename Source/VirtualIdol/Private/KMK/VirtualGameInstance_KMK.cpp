@@ -240,7 +240,8 @@ void UVirtualGameInstance_KMK::VisibleStartWidget (bool bVisible)
 {
     if (!bVisible)
     {
-        widget->StartSwitcher->SetActiveWidgetIndex ( 5 );
+        widget->ClearSB();
+        widget->StartSwitcher->SetActiveWidgetIndex ( 2 );
     }
 }
 

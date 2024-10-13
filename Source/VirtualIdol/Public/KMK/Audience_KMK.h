@@ -44,7 +44,7 @@ public :
 	UPROPERTY(EditAnywhere )
 	TArray<FString> changeText = {TEXT("보이기"), TEXT("다인 vip모드"), TEXT("음소거"), TEXT("채팅"), TEXT("이모티콘"), TEXT("VIP")};
 	
-	void OnOffInfo(FLinearColor color,  ESlateVisibility bVisib, int32 num, TArray<FString> textArray  );
+	void OnOffInfo(FLinearColor color,  ESlateVisibility bVisib, int32 num, TArray<FString> textArray, bool bMyAuth = false  );
 	// 1. Hidden
 	UPROPERTY(meta = (BindWidget))
     class UButton* Butt_Hidden;
@@ -97,6 +97,8 @@ public :
 
 	UFUNCTION( )
 	void PressVipButt( );
+	UFUNCTION( )
+	void VipAuthority( );
 
 #pragma endregion
 #pragma region PopUp

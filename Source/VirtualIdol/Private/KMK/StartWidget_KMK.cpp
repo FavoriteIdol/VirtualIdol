@@ -18,6 +18,8 @@
 #include "Engine/Texture2D.h"
 #include "KMK/VirtualGameInstance_KMK.h"
 #include "Components/TextBlock.h"
+#include "Components/MultiLineEditableText.h"
+#include "Components/ScrollBox.h"
 
 void UStartWidget_KMK::NativeConstruct ( )
 {
@@ -57,47 +59,71 @@ void UStartWidget_KMK::NativeConstruct ( )
 		Butt_ComeInStage->OnClicked.AddDynamic ( this , &UStartWidget_KMK::ComeInStagePanel );
 	}
 #pragma endregion
-#pragma region  Setting StagePanel
-
-	if (Butt_Back)
+#pragma region Select Stage
+	if (Butt_UserStage && Butt_MyStage)
 	{
-		Butt_Back->OnClicked.AddDynamic ( this , &UStartWidget_KMK::GoBack );
+		Butt_UserStage->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressUserStageButt );
+		Butt_MyStage->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressMyStageButt );
 	}
+#pragma endregion
+
+#pragma region  Setting StagePanel
+	if (Image_Particle && Image_Fever)
+	{
+		Image_Particle->SetBrushFromMaterial ( EffectParticles[0] );
+		Image_Fever->SetBrushFromMaterial ( FeversParticles[0] );
+	}
+#pragma region Create Ticket
 	if (Butt_CreateTicket)
 	{
 		Butt_CreateTicket->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressCreateTicket );
 	}
-	if (Butt_Complete)
+#pragma endregion
+#pragma region Set Particle
+	if (Butt_Right && Butt_FRight)
 	{
-		Butt_Complete->OnClicked.AddDynamic ( this , &UStartWidget_KMK::CompeleteSetting );
+		Butt_Right->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressRightButt );
+		Butt_FRight->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressFRightButt );
 	}
-
-	if (Butt_Right && Butt_FRight && Butt_HRight)
+	if (Butt_Left && Butt_FLeft)
 	{
-		Butt_Right->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressRight );
-		Butt_FRight->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressFRight );
-		Butt_HRight->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressHRight );
-	}
-	if (Butt_Left && Butt_FLeft && Butt_HLeft)
-	{
-		Butt_Left->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressLeft );
-		Butt_FLeft->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressFLeft );
-		Butt_HLeft->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressHLeft );
+		Butt_Left->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressLeftButt );
+		Butt_FLeft->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressFLeftButt );
 	}
 	if (Butt_Select)
 	{
-		Butt_Select->OnClicked.AddDynamic ( this , &UStartWidget_KMK::StageSelect );
-	}
-
-	if (Image_Fever &&Image_Particle &&Image_Ticket && Image_HEffect)
+		Butt_Select->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressSelectButt );
+    }	
+	if (SetDayPanel && SetTicketPanel && SetEffectPanel && StageChargePanel)
 	{
-		Image_Fever->SetBrushFromMaterial ( FeversParticles[0] );
-		Image_Particle->SetBrushFromMaterial ( EffectParticles[0] );
-		Image_HEffect->SetBrushFromMaterial ( HighParticles[0] );
-		Image_Ticket->SetColorAndOpacity ( FLinearColor::White );
+		SetTitleText(TEXT("공연 설정" ) );
+		SetPanelVisible ( SetDayPanel , SetTicketPanel , SetEffectPanel , StageChargePanel );
 	}
+#pragma endregion
+#pragma region Pay Moneny
+	if (Butt_PayMoney)
+	{
+		Butt_PayMoney->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressPayMoney );
+	}
+	if (Butt_Next)
+	{
+		Butt_Next->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressNextButt );
+	}
+	if (StagePayPanel && Text_Pay && Butt_PayMoney && PayPopUpPanel)
+	{
+		StagePayPanel->SetVisibility(ESlateVisibility::Hidden);
+		Text_Pay->SetVisibility(ESlateVisibility::Hidden);
+		Butt_PayMoney->SetVisibility(ESlateVisibility::Hidden);
+		PayPopUpPanel->SetVisibility(ESlateVisibility::Hidden);
+	}
+	if (Butt_Okay)
+	{
+		Butt_Okay->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressOkayButt );
+	}
+#pragma endregion
 
 #pragma endregion
+
 #pragma region Entry
 	if (Butt_Yes && Butt_VipEntry && VIPPopUpPanel)
 	{
@@ -110,8 +136,9 @@ void UStartWidget_KMK::NativeConstruct ( )
 		Butt_NormalEntry->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressNormalEntry );
 		Butt_No->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressNoButt );
 	}	
-	if (Butt_Back1 && Butt_Back2)
+	if (Butt_Back1 && Butt_Back2 && Butt_Back)
 	{
+		Butt_Back->OnClicked.AddDynamic ( this , &UStartWidget_KMK::GoBack );
 		Butt_Back1->OnClicked.AddDynamic ( this , &UStartWidget_KMK::GoBack );
 		Butt_Back2->OnClicked.AddDynamic ( this , &UStartWidget_KMK::GoBack );
 	}
@@ -131,8 +158,7 @@ void UStartWidget_KMK::NativeConstruct ( )
 void UStartWidget_KMK::GoBack ( )
 {
     StartSwitcher->SetActiveWidgetIndex (1);
-	ClearAll();
-	ClearChild();
+	ClearSB( );
 }
 #pragma endregion
 
@@ -163,7 +189,10 @@ void UStartWidget_KMK::CreateStagePanel ( )
 void UStartWidget_KMK::SettingStagePanel ( )
 {
 	StartSwitcher->SetActiveWidgetIndex ( 3 );
-	ChangeFindRoomPanel(TEXT("무대 선택" ));
+	for (int i = 0; i < 6; i++)
+	{
+		CreateStageWidget ( FString::FromInt ( i ) );
+	}
 }
 // 공연 시작 : 세션 생성
 void UStartWidget_KMK::StartConcertPanel ( )
@@ -182,136 +211,222 @@ void UStartWidget_KMK::ComeInStagePanel ( )
 
 #pragma endregion
 
-#pragma region Setting StagePanel
-// 레벨 선택
-void UStartWidget_KMK::ChangeFindRoomPanel ( const FString& title )
+#pragma region Select Stage
+
+void UStartWidget_KMK::PressUserStageButt ( )
 {
-	// 파섹해서 나온 정보의 값에 따라 createWidget이 되게 만들기
-	for (int i = 0; i < 4; i++)
+	ClearSB( );
+	for (int i = 0; i < 5; i++)
 	{
-		CreateStageWidget(FString::FromInt(i));
+		CreateStageWidget ( FString::FromInt ( i ) );
 	}
+}
+
+void UStartWidget_KMK::PressMyStageButt ( )
+{
+	ClearSB( );
+	for (int i = 0; i < 2; i++)
+	{
+		CreateStageWidget ( FString::FromInt ( i ) );
+	}
+
 }
 
 void UStartWidget_KMK::CreateStageWidget ( const FString& createName )
 {
-	// wbp 생성
-	auto* wid = Cast<URoomWidget_KMK>(CreateWidget(GetWorld(), roomWidgetFact));
+	auto* wid = Cast<URoomWidget_KMK> ( CreateWidget ( GetWorld ( ) , roomWidgetFact ) );
 	if (wid)
 	{
-		wid->SetStageText(createName);
-		roomCount++;
-		SetPosWidget(wid, roomCount);
+		wid->SetStageText ( createName );
+		SB_FindStage->AddChild(wid);
 	}
 }
 
-// 파티클 설정하는 부분
-void UStartWidget_KMK::PressRight ( )
+void UStartWidget_KMK::ClearSB ( )
 {
-	// 버튼 이름 확인
-	if (EffectParticles.IsEmpty ( )) return;
-	particleNum++;
-	if (particleNum > EffectParticles.Num ( ) - 1) particleNum = 0;
-	PlayParticleSystem ( particleNum , EffectParticles, Image_Particle );
+	if (SB_FindStage->GetChildrenCount ( ) > 0)
+	{
+		SB_FindStage->ClearChildren();
+	}
 }
 
-void UStartWidget_KMK::PressLeft ( )
+#pragma endregion
+
+
+#pragma region Setting StagePanel
+
+void UStartWidget_KMK::PressSelectButt ( )
 {
-	if (EffectParticles.IsEmpty ( )) return;
-	particleNum--;
-	if (particleNum < 0) particleNum = EffectParticles.Num ( ) - 1;
-	PlayParticleSystem ( particleNum , EffectParticles, Image_Particle );
+	if (selectNum == 0)
+	{
+		bool bNext = BEditTextEmpty ( );
+		if(!bNext) return;
+		SetTitleText ( TEXT ( "티켓" ) );
+		SetPanelVisible( SetTicketPanel , SetDayPanel, SetEffectPanel, StageChargePanel );
+		selectNum++;
+	}
+	else if (selectNum == 1)
+	{
+		if(EditText_Price->GetText().IsEmpty()) return;
+		SetTitleText ( TEXT ( "이펙트 설정" ) );
+		SetPanelVisible ( SetEffectPanel , SetTicketPanel , SetDayPanel , StageChargePanel );
+		selectNum++;
+	}
+	else
+	{
+		SetPanelVisible ( StageChargePanel , SetDayPanel , SetTicketPanel , SetEffectPanel );
+		ClearAllText( );
+		StageChargePanel->SetVisibility(ESlateVisibility::Visible);
+		selectNum = 0;
+	}
+
 }
 
-void UStartWidget_KMK::PressFRight ( )
+void UStartWidget_KMK::SetTitleText ( const FString& title )
 {
-	if (FeversParticles.IsEmpty ( )) return;
-	feverNum++;
-	if (feverNum > FeversParticles.Num ( ) - 1) feverNum = 0;
-	PlayParticleSystem ( feverNum , FeversParticles, Image_Fever );
+	if (Text_Title)
+	{
+		Text_Title->SetText ( FText::FromString ( title ) );
+	}
 }
 
-void UStartWidget_KMK::PressFLeft ( )
+bool UStartWidget_KMK::BEditTextEmpty ( )
 {
-	if (FeversParticles.IsEmpty ( )) return;
-	feverNum--;
-	if (feverNum < 0) feverNum = FeversParticles.Num ( ) - 1;
-	PlayParticleSystem ( feverNum , FeversParticles, Image_Fever );
-}
-
-void UStartWidget_KMK::PressHRight ( )
-{
-	if (HighParticles.IsEmpty ( )) return;
-	highNum++;
-	if (highNum > HighParticles.Num ( ) - 1) highNum = 0;
-	PlayParticleSystem ( highNum , HighParticles, Image_HEffect );
-}
-
-void UStartWidget_KMK::PressHLeft ( )
-{
-	if (HighParticles.IsEmpty ( )) return;
-	highNum--;
-	if (highNum < 0) highNum = HighParticles.Num ( ) - 1;
-	PlayParticleSystem ( highNum , HighParticles, Image_HEffect );
+	// 모든 텍스트가 채워진 경우
+	if (!EditText_StageName->GetText ( ).IsEmpty ( ) 
+	&& !EditText_Year->GetText ( ).IsEmpty ( ) && !EditText_Mon->GetText ( ).IsEmpty ( ) && !EditText_Day->GetText ( ).IsEmpty ( )
+	&& !EditText_SHour->GetText ( ).IsEmpty ( ) && !EditText_SMin->GetText ( ).IsEmpty ( )
+	&& !EditText_H->GetText ( ).IsEmpty ( ) && !EditText_M->GetText ( ).IsEmpty ( ))
+	{
+		return true;
+	}
+	else return false;
 }
 
 void UStartWidget_KMK::PressCreateTicket ( )
 {
-	if(EditText_Ticket->GetText().IsEmpty()) return;
-	// 서버에 티켓을 생성하라고 보내줌
-	Image_Ticket->SetColorAndOpacity(FLinearColor::Yellow);
+	if(!EditMultiText_Ticket->GetText().IsEmpty()) UE_LOG(LogTemp, Warning, TEXT("Create!" ) );
+	EditMultiText_Ticket->SetText ( FText::GetEmpty ( ) );
 }
 
-void UStartWidget_KMK::CompeleteSetting ( )
+void UStartWidget_KMK::ClearAllText ( )
 {
-	// 서버에 셋팅 내용 보내기
-	// 완료 되면 팝업 띄우기
-	CompletePopUp->SetVisibility(ESlateVisibility::Visible);
+	
+	EditText_StageName->SetText( FText::GetEmpty ( ) );
+	EditText_Year->SetText( FText::GetEmpty ( ) );
+	EditText_Mon->SetText( FText::GetEmpty ( ) );
+	EditText_Day->SetText( FText::GetEmpty ( ) );
+	EditText_SHour->SetText( FText::GetEmpty ( ) );
+	EditText_SMin->SetText( FText::GetEmpty ( ) );
+	EditText_H->SetText( FText::GetEmpty ( ) );
+	EditText_M->SetText( FText::GetEmpty ( ) );
 
-	FTimerHandle handle;
-	GetWorld ( )->GetTimerManager ( ).SetTimer ( handle , FTimerDelegate::CreateLambda ( [this]( )
-		{
-			StartSwitcher->SetActiveWidgetIndex ( 1 );
-			CompletePopUp->SetVisibility ( ESlateVisibility::Hidden );
-			ClearAll( );
-		} ) , 3 , false );
-}
+	EditText_Price->SetText( FText::GetEmpty ( ) );
+	EditMultiText_Ticket->SetText( FText::GetEmpty ( ) );
 
-void UStartWidget_KMK::PlayParticleSystem ( int32 index , TArray<class UMaterial*> ParticlesArray, class UImage* image )
-{	
-	if(ParticlesArray.Num() < 1 || index > ParticlesArray.Num()) return;
-	//// 파티클 시스템 스폰
-	//UParticleSystemComponent* ParticleComponent = UGameplayStatics::SpawnEmitterAtLocation (
-	//	GetWorld ( ) ,  // 파티클을 스폰할 월드
-	//	ParticlesArray[index] ,  // 재생할 파티클 시스템
-	//	ParticlePositions[num] ,  // 파티클이 생성될 위치
-	//	FRotator ( 0 , 0 , 0 )  // 파티클의 회전
-	//);
-	//if (ParticleComponent)
-	//{
-	//	ParticleComponent->ActivateSystem ( );  // 파티클 재생
-	//}
-	image->SetBrushFromMaterial ( ParticlesArray[index] );
+	Image_Particle->SetBrushFromMaterial ( EffectParticles[0] );
+	Image_Fever->SetBrushFromMaterial ( FeversParticles[0] );
 
-}
-
-void UStartWidget_KMK::ClearAll ( )
-{
 	particleNum = 0;
 	feverNum = 0;
-	
-	// 이미지 초기화
-	Image_Fever->SetColorAndOpacity ( FLinearColor::Blue );
-	Image_Particle->SetColorAndOpacity ( FLinearColor::Blue );
-	Image_Ticket->SetColorAndOpacity ( FLinearColor::White );
-
-	// 텍스트 초기화
-	EditText_Day->SetText(FText::GetEmpty());
-	EditText_STime->SetText(FText::GetEmpty());
-	EditText_ETime->SetText(FText::GetEmpty());
-	EditText_Ticket->SetText(FText::GetEmpty());
-	EditText_SingTime->SetText(FText::GetEmpty());
 }
+
+void UStartWidget_KMK::PressRightButt ( )
+{
+	if (EffectParticles.IsEmpty ( )) return;
+	particleNum++;
+	if (particleNum > EffectParticles.Num ( ) - 1) particleNum = 0;
+	Image_Particle->SetBrushFromMaterial ( EffectParticles[particleNum] );
+}
+
+void UStartWidget_KMK::PressLeftButt ( )
+{
+	if (EffectParticles.IsEmpty ( )) return;
+	particleNum--;
+	if (particleNum < 0) particleNum = EffectParticles.Num ( ) - 1;
+	Image_Particle->SetBrushFromMaterial ( EffectParticles[particleNum] );
+}
+
+void UStartWidget_KMK::PressFRightButt ( )
+{
+	if (FeversParticles.IsEmpty ( )) return;
+	feverNum++;
+	if (feverNum > FeversParticles.Num ( ) - 1) feverNum = 0;
+	Image_Fever->SetBrushFromMaterial ( FeversParticles[feverNum] );
+}
+
+void UStartWidget_KMK::PressFLeftButt ( )
+{
+	if (FeversParticles.IsEmpty ( )) return;
+	feverNum--;
+	if (feverNum < 0) feverNum = FeversParticles.Num ( ) - 1;
+	Image_Fever->SetBrushFromMaterial ( FeversParticles[feverNum] );
+}
+
+void UStartWidget_KMK::SetPanelVisible ( class UCanvasPanel* visiblePanel , class UCanvasPanel* hiddenPanel0 , class UCanvasPanel* hiddenPanel1 , class UCanvasPanel* hiddenPanel2 )
+{
+	hiddenPanel0->SetVisibility ( ESlateVisibility::Hidden );
+	hiddenPanel1->SetVisibility ( ESlateVisibility::Hidden );
+	hiddenPanel2->SetVisibility ( ESlateVisibility::Hidden );
+	visiblePanel->SetVisibility ( ESlateVisibility::Visible );
+}
+
+void UStartWidget_KMK::AddIndex ( int32 num , TArray<class UMaterial*>  meshArray , UImage* image )
+{
+	if (meshArray.IsEmpty ( )) return;
+	num++;
+	if (num > meshArray.Num ( ) - 1) num = 0;
+	image->SetBrushFromMaterial ( meshArray[num] );
+}
+
+void UStartWidget_KMK::MinusIndex ( int32 num , TArray<class UMaterial*>  meshArray , UImage* image )
+{
+	if (meshArray.IsEmpty ( )) return;
+	num--;
+	if (num < 0) num = meshArray.Num ( ) - 1;
+	image->SetBrushFromMaterial ( meshArray[num] );
+}
+
+#pragma region Final Setting
+
+void UStartWidget_KMK::PressNextButt ( )
+{
+	if(EditText_ScaleNum->GetText().IsEmpty()) return;
+	StagePayPanel->SetVisibility ( ESlateVisibility::Visible );
+	Text_Pay->SetVisibility ( ESlateVisibility::Visible );
+	Butt_PayMoney->SetVisibility ( ESlateVisibility::Visible );
+	StageScalePanel->SetVisibility ( ESlateVisibility::Hidden );
+	Butt_Next->SetVisibility ( ESlateVisibility::Hidden );
+	EditText_ScaleNum->SetText ( FText::GetEmpty ( ) );
+}
+void UStartWidget_KMK::PressPayMoney ( )
+{
+	PayPopUpPanel->SetVisibility(ESlateVisibility::Visible);
+	// Text_FinalStageName->SetText()
+}
+
+void UStartWidget_KMK::PressOkayButt ( )
+{
+	ClearSB ( );
+	StartSwitcher->SetActiveWidgetIndex ( 1 );
+	ResetWidget( );
+}
+
+void UStartWidget_KMK::ResetWidget ( )
+{
+	SetTitleText ( TEXT ( "공연 설정" ) );
+	SetPanelVisible ( SetDayPanel , SetTicketPanel , SetEffectPanel , StageChargePanel );
+
+	StageChargePanel->SetVisibility(ESlateVisibility::Hidden);
+	StageScalePanel->SetVisibility ( ESlateVisibility::Visible );
+	StagePayPanel->SetVisibility ( ESlateVisibility::Hidden );
+	Text_Pay->SetVisibility ( ESlateVisibility::Hidden );
+	Butt_PayMoney->SetVisibility ( ESlateVisibility::Hidden );
+	PayPopUpPanel->SetVisibility ( ESlateVisibility::Hidden );
+}
+
+#pragma endregion
+
 #pragma endregion
 
 #pragma region Entry Panel
@@ -368,38 +483,19 @@ void UStartWidget_KMK::CreateRoomWidget (const struct FRoomInfo& info )
 	{
 		wid->SetImageAndText(info);
 		roomCount++;
-		SetPosWidget(wid, roomCount);
+		SB_FindStage->AddChild(wid);
 	}
-}
-// 생성된 wbp의 개수에 따라 위치값 조정
-void UStartWidget_KMK::SetPosWidget ( class URoomWidget_KMK* widget , int32 num )
-{
-	// row 계산 
-	// col 계산
-	int32 col = (num - 1) % 3;
-	// 위치 설정
-	UGridSlot* childSlot = FindRoomGrid->AddChildToGrid( widget );
-	if (childSlot)
-	{
-		childSlot->SetColumn(col);
-	}
-	
 }
 // 그리드 삭제
 void UStartWidget_KMK::ClearChild ( )
 {
-	if (FindRoomGrid->GetChildrenCount ( ) > 0)
+	if (SB_FindStage->GetChildrenCount ( ) > 0)
 	{
 		roomCount = 0;
-		FindRoomGrid->ClearChildren();
+		SB_FindStage->ClearChildren();
 	}
 }
 
-
-void UStartWidget_KMK::StageSelect ( )
-{
-
-}
 
 #pragma endregion
 
