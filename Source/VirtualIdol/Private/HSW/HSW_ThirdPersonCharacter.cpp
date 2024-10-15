@@ -153,7 +153,7 @@ void AHSW_ThirdPersonCharacter::AppearImoji ( )
 
 void AHSW_ThirdPersonCharacter::DisappearImoji ( )
 {
-	ImojiComp->SetVisibility ( true );
+	ImojiComp->SetVisibility ( false );
 }
 
 // Called to bind functionality to input
