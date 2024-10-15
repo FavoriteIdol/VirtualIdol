@@ -14,6 +14,7 @@
 #include "HSW/HSW_AuditoriumGameMode.h"
 #include "HSW/HSW_ImojiConponent.h"
 #include "Components/BillboardComponent.h"
+#include "UObject/ConstructorHelpers.h"
 
 // Sets default values
 AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
@@ -64,6 +65,24 @@ AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
 	ImojiComponent->SetupAttachment(GetMesh());
 	ImojiComponent->SetRelativeLocation(FVector(0,0,230.f));
 	
+	ImojiMesh = CreateDefaultSubobject<UStaticMeshComponent> ( TEXT ( "ImojiMeshComponent" ) );
+	ImojiMesh->SetupAttachment ( ImojiComponent );
+
+	ImojiBillboard = CreateDefaultSubobject<UBillboardComponent> ( TEXT ( "ImojiBilboard" ) );
+	ImojiBillboard->SetVisibility ( true );
+	ImojiBillboard->bHiddenInGame = false;
+	ImojiBillboard->SetupAttachment ( ImojiMesh );
+
+	static ConstructorHelpers::FObjectFinder<UMaterial> LoadedOpacityMaterial ( TEXT ( "Material'/Game/Project/Personal/HSW/Resources/Imogi/M_Imoji_Opacity'" ) );
+	if (LoadedOpacityMaterial.Succeeded ( ))
+	{
+		OpacityMaterial = LoadedOpacityMaterial.Object;
+
+		if (OpacityMaterial)
+		{
+			ImojiMesh->SetMaterial ( 0 , OpacityMaterial );
+		}
+	}
 }
 
 // Called when the game starts or when spawned
@@ -71,7 +90,7 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	InitMainUI();
+	//InitMainUI();
 	
 }
 

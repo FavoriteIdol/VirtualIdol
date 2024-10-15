@@ -93,14 +93,23 @@ public:
 	UPROPERTY(EditDefaultsOnly )
 	class UHSW_MainWidget* MainUI;
 
+	UFUNCTION( )
 	void InitMainUI();
 
 	// 이모지 ------------------------------------
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Imoji )
 	class UHSW_ImojiConponent* ImojiComponent;
 
+	UPROPERTY ( EditDefaultsOnly , BlueprintReadWrite , Category = Imoji )
+	class UStaticMeshComponent* ImojiMesh;
 
-	UFUNCTION(BlueprintImplementableEvent, Category= "Imogi" )
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite,Category = Imoji )
+	class UBillboardComponent* ImojiBillboard;
+
+	UPROPERTY ( EditDefaultsOnly , BlueprintReadWrite, Category = Imoji )
+	class UMaterial* OpacityMaterial;
+
+	UFUNCTION(BlueprintImplementableEvent, Category= Imogi )
 	void FadeInImogiBlueprint( );
 
 };

@@ -28,10 +28,7 @@ public:
 	UPROPERTY( )
 	class AHSW_ThirdPersonCharacter* Me;
 
-	UPROPERTY ( EditDefaultsOnly , BlueprintReadWrite, Category = Imoji )
-	class UStaticMeshComponent* ImojiMesh;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite,Category = Imoji )
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Imoji )
 	class UBillboardComponent* ImojiBillboard;
 
 	UPROPERTY ( EditDefaultsOnly, BlueprintReadWrite )
@@ -42,9 +39,6 @@ public:
 	class UTexture2D* Imoji03Texture;
 	UPROPERTY ( EditDefaultsOnly, BlueprintReadWrite )
 	class UTexture2D* Imoji04Texture;
-
-	UPROPERTY ( EditDefaultsOnly , BlueprintReadWrite )
-	class UMaterial* OpacityMaterial;
 
 	UFUNCTION (BlueprintCallable)
 	void Imoji01( );
