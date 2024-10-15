@@ -107,6 +107,7 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 
 	InitMainUI();
 	ImojiComp->SetVisibility(false);
+	imojiWidget = Cast<UHSW_ImogiWidget> ( ImojiComp->GetWidget ( ) );
 	
 }
 
@@ -137,7 +138,6 @@ void AHSW_ThirdPersonCharacter::InitMainUI ( )
 
 void AHSW_ThirdPersonCharacter::Imoji ( int index )
 {
-	UHSW_ImogiWidget* imojiWidget = Cast<UHSW_ImogiWidget>( ImojiComp->GetWidget());
 	imojiWidget->ImogiImage->SetBrushFromTexture( ImojiImageArray[index] ) ;
 
 	AppearImoji( );
@@ -149,11 +149,12 @@ void AHSW_ThirdPersonCharacter::Imoji ( int index )
 void AHSW_ThirdPersonCharacter::AppearImoji ( )
 {
 	ImojiComp->SetVisibility(true);
+	imojiWidget->PlayFadeInImoji();
 }
 
 void AHSW_ThirdPersonCharacter::DisappearImoji ( )
 {
-	ImojiComp->SetVisibility ( false );
+	imojiWidget->PlayFadeOutImoji ( );
 }
 
 // Called to bind functionality to input

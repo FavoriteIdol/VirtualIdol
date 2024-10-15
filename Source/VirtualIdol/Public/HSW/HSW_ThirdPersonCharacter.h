@@ -122,6 +122,9 @@ public:
 
 	FTimerHandle TimerHandleImoji;
 
+	UPROPERTY( )
+	class UHSW_ImogiWidget* imojiWidget;
+
 	UFUNCTION(BlueprintImplementableEvent, Category= Imogi )
 	void FadeInImogiBlueprint( );
 

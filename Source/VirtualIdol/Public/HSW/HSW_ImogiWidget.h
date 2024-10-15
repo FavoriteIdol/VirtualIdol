@@ -17,4 +17,14 @@ class VIRTUALIDOL_API UHSW_ImogiWidget : public UUserWidget
 public:
 	UPROPERTY(meta=(BindWidget ) )
 	class UImage* ImogiImage;
+
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	class UWidgetAnimation* FadeInImoji;
+
+	void PlayFadeInImoji( );
+
+	UPROPERTY(meta = (BindWidgetAnim), Transient )
+	class UWidgetAnimation* FadeOutImoji;
+
+	void PlayFadeOutImoji ( );
 };
