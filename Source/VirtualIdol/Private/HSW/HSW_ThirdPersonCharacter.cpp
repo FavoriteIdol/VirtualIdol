@@ -17,6 +17,7 @@
 #include "UObject/ConstructorHelpers.h"
 #include "HSW/HSW_ImogiWidget.h"
 #include "Components/WidgetComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
@@ -111,7 +112,15 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 void AHSW_ThirdPersonCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (ImojiWidget && ImojiWidget->GetVisibleFlag ( ))
+	{
+		// 카메라 위치 
+		FVector CamLoc = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0 )->GetCameraLocation();
+		FVector Direction = CamLoc - ImojiWidget->GetComponentLocation();
+		Direction.Z=0;
 
+		ImojiWidget->SetWorldRotation(Direction.GetSafeNormal().ToOrientationRotator());
+	}
 }
 
 void AHSW_ThirdPersonCharacter::InitMainUI ( )
