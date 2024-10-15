@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+﻿// Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "TP_ThirdPersonCharacter.h"
 #include "Engine/LocalPlayer.h"
@@ -10,6 +10,12 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "KMK/Audience_KMK.h"
+#include "VirtualIdol.h"
+#include "KMK/AudienceServerComponent_KMK.h"
+#include "KMK/VirtualGameInstance_KMK.h"
+#include "Components/GridPanel.h"
+#include "GameFramework/PlayerController.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -20,7 +26,7 @@ ATP_ThirdPersonCharacter::ATP_ThirdPersonCharacter()
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
-		
+	bReplicates = true;
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -49,7 +55,7 @@ ATP_ThirdPersonCharacter::ATP_ThirdPersonCharacter()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
-
+	//serverComp= CreateDefaultSubobject<UAudienceServerComponent_KMK>(TEXT("ServerComp"));
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
@@ -58,6 +64,47 @@ void ATP_ThirdPersonCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
+	pc = GetWorld()->GetFirstPlayerController();
+	UVirtualGameInstance_KMK* gi = Cast<UVirtualGameInstance_KMK> ( GetWorld ( )->GetGameInstance ( ) );
+	if (IsLocallyControlled ( ))
+	{
+        if (HasAuthority ( ))
+        {
+			GetMesh ( )->bRenderInMainPass = false;
+			GetMesh ( )->bRenderInDepthPass = false;
+            if (virtualWidgetFact && !audienceWidget)
+            {
+				audienceWidget = CreateWidget<UAudience_KMK> ( GetWorld ( ) , virtualWidgetFact );
+				audienceWidget->AddToViewport ( );
+				audienceWidget->pc = this;
+				audienceWidget->SetVirtualWBP();
+            }
+			
+        }
+        else
+        {
+			audienceWidget = CreateWidget<UAudience_KMK> ( GetWorld ( ) , audienceWidgetFact );
+			audienceWidget->AddToViewport ( );
+			audienceWidget->pc = this;
+        }
+		if (gi)
+		{
+			if (audienceWidget && gi->playerMeshNum == 1)
+			{
+				audienceWidget->VipAuthority ( );
+			}
+		}
+		UE_LOG ( LogTemp , Warning , TEXT ( "StartTalk" ) );
+		GetController<APlayerController> ( )->StartTalking ( );
+		FInputModeGameAndUI inputMode;
+		GetController<APlayerController> ( )->SetInputMode(inputMode );
+	}
+
+}
+
+void ATP_ThirdPersonCharacter::Tick ( float DeltaTime)
+{
+	Super::Tick(DeltaTime);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -126,5 +173,21 @@ void ATP_ThirdPersonCharacter::Look(const FInputActionValue& Value)
 		// add yaw and pitch input to controller
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
+	}
+}
+void ATP_ThirdPersonCharacter::InitializeAudienceWidget ( TSubclassOf<class UAudience_KMK>  widgetFact )
+{
+	if (!widgetFact) // 위젯이 nullptr인 경우에만 생성
+	{
+		if (widgetFact)
+		{
+			audienceWidget = CreateWidget<UAudience_KMK> ( GetWorld ( ) , widgetFact );
+			audienceWidget->AddToViewport ( );
+			audienceWidget->pc = this;
+		}
+		else
+		{
+			UE_LOG ( LogTemp , Error , TEXT ( "AudienceWidgetClass is not set." ) );
+		}
 	}
 }
