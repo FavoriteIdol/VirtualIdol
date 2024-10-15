@@ -87,11 +87,45 @@ public:
 	float FeverPoint = 0.02f;
 
 	// MainWidget을 생성해서 기억하고싶다.
-	UPROPERTY(EditDefaultsOnly, Category = Pistol)
+	UPROPERTY(EditDefaultsOnly, Category = MainUI)
 	TSubclassOf<class UUserWidget> MainUIFactory;
 
 	UPROPERTY(EditDefaultsOnly )
 	class UHSW_MainWidget* MainUI;
 
+	UFUNCTION( )
 	void InitMainUI();
+
+	// 이모지 ------------------------------------
+// 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Imoji )
+// 	class UHSW_ImojiConponent* ImojiComponent;
+// 
+// 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite,Category = Imoji )
+// 	class UBillboardComponent* ImojiBillboard;
+// 
+// 	UPROPERTY ( EditDefaultsOnly , BlueprintReadWrite, Category = Imoji )
+// 	class UMaterial* OpacityMaterial;
+
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Imoji )
+	class UWidgetComponent* ImojiComp;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = Imoji )
+	TArray<class UTexture2D *> ImojiImageArray;
+
+	UFUNCTION ( )
+	void Imoji ( int index );
+
+	void AppearImoji ();
+
+	void DisappearImoji ();
+
+	FTimerHandle TimerHandleImoji;
+
+	UPROPERTY( )
+	class UHSW_ImogiWidget* imojiWidget;
+
+	UFUNCTION(BlueprintImplementableEvent, Category= Imogi )
+	void FadeInImogiBlueprint( );
+
 };

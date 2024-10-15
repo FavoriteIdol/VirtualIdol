@@ -17,6 +17,12 @@ class VIRTUALIDOL_API UJJH_MapSelectWidget : public UUserWidget
 
 public:
 	class AJJH_SelectManager* SM;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UWidgetSwitcher* SetupWidgetSwitcher;
+
+	UPROPERTY(meta = (BindWidget))
+	class UCanvasPanel* SettingPanel;
 
 	//3대장 버튼
 	UPROPERTY(meta = (BindWidget))
@@ -25,6 +31,9 @@ public:
 	class UButton* ThemeButton;
 	UPROPERTY(meta = (BindWidget))
 	class UButton* EffectButton;
+		
+	UPROPERTY(meta = (BindWidget))
+	class UButton* CaptureButton;
 
 	UFUNCTION( )
 	void OnWeatherButtonClicked();
@@ -32,22 +41,63 @@ public:
 	void OnThemeButtonClicked ( );
 	UFUNCTION( )
 	void OnEffectButtonClicked ( );
+	UFUNCTION( )
+	void OnFloorButtonClicked ( );
 
 	//낮밤 바꾸기
 	UPROPERTY(meta = (BindWidget))
 	class UHorizontalBox* DayHorizontal;	
-	
+
 	UPROPERTY(meta = (BindWidget))
 	class UButton* AfternoonButton;
 	UPROPERTY ( meta = ( BindWidget ) )
-	class UButton* NightButton;
+	class UButton* NightButton;		
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* FloorButton;
 
 	UFUNCTION ()
 	void OnAfternoonButtonClicked ( );	
 	UFUNCTION ( )
+	void OnFogButtonClicked ( );
+	UFUNCTION ( )
 	void OnNightButtonClicked ( );
 
+	//캡쳐
+	UPROPERTY(meta = (BindWidget))
+	class UImage* CapturedImage;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UButton* SetThumbnailButton;
+	
+	UPROPERTY(meta = (BindWidget))
+	class UButton* ReCaptureButton;
 
+	UPROPERTY(Transient, meta = (BindWidgetAnim))
+	class UWidgetAnimation* ShutterAnimation;
+
+	UFUNCTION ( )
+	void OnCaptureButtonClicked ( );
+	UFUNCTION ( )
+	void OnReCaptureButtonClicked ( );
+	UFUNCTION ( )
+	void OnSetThumbnailButtonClicked ( );
+	UFUNCTION ( )
+	void SetImageWithCapturedImage ();
+
+	//캡쳐를 위한 뒤로가기
+
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* BackButton;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* ReturnButton;
+
+	UFUNCTION ( )
+	void OnBackButtonClicked ( );	
+	UFUNCTION ( )
+	void OnReturnButtonClicked ( );
+
+	UPROPERTY(Transient, meta = (BindWidgetAnim))
+	class UWidgetAnimation* BackButtonAnimation;
 
 	//테마 바꾸기
 	UPROPERTY(meta = (BindWidget))
@@ -75,6 +125,16 @@ public:
 	class UButton* EffectButton1;	
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UButton* EffectButton2;
+
+	//지면 바꾸기
+
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UHorizontalBox* FloorHorizontal;
+
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* FogButton;
+	//UPROPERTY ( meta = ( BindWidget ) )
+	//class UButton* EffectButton2;
 
 	UFUNCTION( )
 	void OnEffectButton1Clicked ();
