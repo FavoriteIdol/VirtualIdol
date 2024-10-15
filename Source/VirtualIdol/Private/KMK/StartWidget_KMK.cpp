@@ -199,7 +199,7 @@ void UStartWidget_KMK::OnMyLogin ( )
 // 무대 꾸미기 레벨로 이동
 void UStartWidget_KMK::CreateStagePanel ( )
 {
-	UGameplayStatics::OpenLevel(GetWorld( ) , TEXT("JJH_Testmap" ));
+	UGameplayStatics::OpenLevel(GetWorld( ) , TEXT("JJH_SetupMap" ));
 }
 // 공연 일정 잡는 판넬로 변경
 void UStartWidget_KMK::SettingStagePanel ( )
