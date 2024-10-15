@@ -1,4 +1,4 @@
-﻿// VRM4U Copyright (c) 2021-2024 Haruyoshi Yamamoto. This software is released under the MIT License.
+// VRM4U Copyright (c) 2021-2024 Haruyoshi Yamamoto. This software is released under the MIT License.
 
 using UnrealBuildTool;
 using System.IO;
@@ -30,8 +30,8 @@ public class VRM4ULoader : ModuleRules
                 // ... add public include paths required here ...
             }
 		);
-        PublicDependencyModuleNames.AddRange(new string[] { "IKRig", "IKRigEditor" });
-        PrivateDependencyModuleNames.AddRange(
+
+		PrivateDependencyModuleNames.AddRange(
 			new string[] {
 				"Slate",
 				"SlateCore",
