@@ -20,6 +20,7 @@
 #include "Components/TextBlock.h"
 #include "Components/MultiLineEditableText.h"
 #include "Components/ScrollBox.h"
+#include "KMK/HttpActor_KMK.h"
 
 void UStartWidget_KMK::NativeConstruct ( )
 {	
@@ -198,7 +199,7 @@ void UStartWidget_KMK::OnMyLogin ( )
 // 무대 꾸미기 레벨로 이동
 void UStartWidget_KMK::CreateStagePanel ( )
 {
-
+	UGameplayStatics::OpenLevel(GetWorld( ) , TEXT("JJH_Testmap" ));
 }
 // 공연 일정 잡는 판넬로 변경
 void UStartWidget_KMK::SettingStagePanel ( )
@@ -317,17 +318,68 @@ bool UStartWidget_KMK::BEditTextEmpty ( )
 	{
 		Text_FinalName->SetText(EditText_StageName->GetText());
 		Text_FinalStageName->SetText(EditText_StageName->GetText());
+		
+		concertInfo.concertName = EditText_StageName->GetText().ToString();
+		bool bEditDigit 
+            = EditTextDigit ( EditText_Year->GetText ( ).ToString ( ) ) && EditTextDigit ( EditText_Mon->GetText ( ).ToString ( ) )
+            && EditTextDigit ( EditText_Day->GetText ( ).ToString ( ) ) && EditTextDigit ( EditText_SHour->GetText ( ).ToString ( ) )
+            && EditTextDigit ( EditText_SMin->GetText ( ).ToString ( ) ) && EditTextDigit ( EditText_H->GetText ( ).ToString ( ) )
+            && EditTextDigit ( EditText_M->GetText ( ).ToString ( ) );
+		if(!bEditDigit) return  false;
 
 		Text_FinalYear->SetText(EditText_Year->GetText());
 		Text_FinalMon->SetText(EditText_Mon->GetText());
 		Text_FinalDay->SetText(EditText_Day->GetText());
 
-		Text_StartHour->SetText(EditText_H->GetText());
-		Text_StartMin->SetText(EditText_M->GetText());
+		FString year = TEXT("20") + EditText_Year->GetText ( ).ToString ( );
+		FString mon = ChangeString(EditText_Day->GetText().ToString());
+		FString day = ChangeString(EditText_Day->GetText().ToString());
+
+		concertInfo.concertDay = year + TEXT("-") + mon + TEXT("-") + day;
+
+		Text_StartHour->SetText(EditText_SHour->GetText());
+		Text_StartMin->SetText(EditText_SMin->GetText());
+		FString sHour =  ChangeString(EditText_SHour->GetText().ToString());
+		FString sMin = ChangeString(EditText_SMin->GetText().ToString());
+		concertInfo.concertTime = sHour + TEXT(":" ) + sMin + TEXT(":" ) + TEXT("00");
+
+		FString sH = EditText_SHour->GetText().ToString();
+		FString sM = EditText_SMin->GetText().ToString();
+		FString bH = EditText_H->GetText().ToString();
+		FString bM = EditText_M->GetText().ToString();
+
+		int h = FCString::Atoi(*sH) + FCString::Atoi(*bH);
+		int m = FCString::Atoi(*sM) + FCString::Atoi(*bM);
+
+		sH = ChangeString(FString::FromInt(h));
+		sM = ChangeString(FString::FromInt(m));
+		concertInfo.endTime = sH + TEXT ( ":" ) + sM + TEXT ( ":" ) + TEXT ( "00" );
 
 		return true;
 	}
 	else return false;
+}
+
+FString UStartWidget_KMK::ChangeString ( const FString& editText )
+{
+    FString s = editText;
+    if (s.Len ( ) == 1)
+    {
+        s = TEXT ( "0" ) + s;
+    }
+	return s;
+}
+
+bool UStartWidget_KMK::EditTextDigit ( const FString& editText )
+{
+	for (char c : editText)
+	{
+		if (!isdigit ( c ))
+		{
+			return false;
+		}
+	}
+	return true;
 }
 
 void UStartWidget_KMK::PressCreateTicket ( )
@@ -353,6 +405,10 @@ void UStartWidget_KMK::ClearAllText ( )
 
 	Image_Particle->SetBrushFromMaterial ( EffectParticles[0] );
 	Image_Fever->SetBrushFromMaterial ( FeversParticles[0] );
+
+	concertInfo.appearEffectNum = particleNum;
+	concertInfo.feverEffectNum = feverNum;
+	UE_LOG(LogTemp, Warning, TEXT("%d, %d" ), concertInfo.appearEffectNum, concertInfo.feverEffectNum );
 
 	particleNum = 0;
 	feverNum = 0;

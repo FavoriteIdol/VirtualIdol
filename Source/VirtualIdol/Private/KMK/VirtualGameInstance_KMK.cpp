@@ -12,6 +12,7 @@
 #include "Blueprint/UserWidget.h"
 #include "../TP_ThirdPerson/TP_ThirdPersonCharacter.h"
 #include "KMK/AudienceServerComponent_KMK.h"
+#include "KMK/HttpActor_KMK.h"
 
 void UVirtualGameInstance_KMK::Init ( )
 {
@@ -243,6 +244,21 @@ void UVirtualGameInstance_KMK::VisibleStartWidget (bool bVisible)
         widget->ClearSB();
         widget->StartSwitcher->SetActiveWidgetIndex ( 2 );
     }
+}
+
+#pragma endregion
+#pragma region Token
+void UVirtualGameInstance_KMK::SetMyInfo (const struct FLoginInfo& info )
+{
+    loginInfo.email = info.email;
+    loginInfo.pw = info.pw;
+    loginInfo.token = info.token;
+    loginInfo.nickName = info.nickName;
+}
+
+FLoginInfo UVirtualGameInstance_KMK::GetMyInfo ( )
+{
+    return loginInfo;
 }
 
 #pragma endregion

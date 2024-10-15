@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
 #include "Interfaces/OnlineSessionInterface.h"
+#include "HttpActor_KMK.h"
 #include "VirtualGameInstance_KMK.generated.h"
 
 // 세션을 위한 roomInfo 구조체
@@ -104,5 +105,15 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 
     UPROPERTY ( )
     int32 playerMeshNum = -1;
+
+#pragma region Token
+	UPROPERTY( )
+	 FLoginInfo loginInfo;
+	UFUNCTION( )
+	void SetMyInfo(const struct FLoginInfo& info  );
+	UFUNCTION( )
+	FLoginInfo GetMyInfo( );
+#pragma endregion
+
 
 };

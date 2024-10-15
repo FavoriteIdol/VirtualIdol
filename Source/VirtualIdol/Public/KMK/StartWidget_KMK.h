@@ -5,6 +5,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "HttpActor_KMK.h"
 #include "StartWidget_KMK.generated.h"
 
 // 내부 프로젝트 시작시 나오는 화면들
@@ -17,7 +18,7 @@ class VIRTUALIDOL_API UStartWidget_KMK : public UUserWidget
 
 public:
 	virtual void NativeConstruct() override;
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 	UPROPERTY(meta = (BindWidget))
 	class UWidgetSwitcher* StartSwitcher;
 
@@ -101,6 +102,9 @@ public:
 
 	UFUNCTION( )
 	void SetTitleText(const FString& title );
+
+	UPROPERTY( )
+	FConcertInfo concertInfo;
 #pragma region Set Day
 	// 공연일자 패널
 	UPROPERTY ( meta = ( BindWidget ) )
@@ -124,6 +128,10 @@ public:
 
 	UFUNCTION( )
 	bool BEditTextEmpty( );
+
+	FString ChangeString(const FString& editText);
+
+	bool EditTextDigit(const FString& editText );
 
 #pragma endregion
 #pragma region Set Ticket

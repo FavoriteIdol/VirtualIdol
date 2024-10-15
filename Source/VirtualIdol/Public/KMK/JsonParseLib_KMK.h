@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "HttpActor_KMK.h"
 #include "JsonParseLib_KMK.generated.h"
 
 /**
@@ -15,11 +16,19 @@ class VIRTUALIDOL_API UJsonParseLib_KMK : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public :
-#pragma region MakeJson
-	static FString MakeJson ( const TMap<FString , FString> source );
+#pragma region Login
+	// 로그인
+	static FString MakeLoginJson( const FString& id,  const FString& pw);
+	static FLoginInfo ParsecMyInfo(const FString& json);
+#pragma endregion
+#pragma region Set Concert
+	static FString MakeConcertJson(const struct FConcertInfo& concert);
+
 #pragma endregion
 
-#pragma region Parsec_KMK
+
+#pragma region Example
+	static FString MakeJson ( const TMap<FString , FString> source );
 	static TMap<FString , FString>  ResultAlchemistParsec ( const FString& json );
 #pragma endregion
 
