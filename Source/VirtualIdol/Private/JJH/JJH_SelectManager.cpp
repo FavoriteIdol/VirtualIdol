@@ -17,8 +17,6 @@ AJJH_SelectManager::AJJH_SelectManager()
 void AJJH_SelectManager::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	Sun = Cast<ADirectionalLight>(UGameplayStatics::GetActorOfClass(GetWorld(), ADirectionalLight::StaticClass()));
 
 }
 
@@ -31,53 +29,48 @@ void AJJH_SelectManager::Tick(float DeltaTime)
 
 void AJJH_SelectManager::UpdateSunNightPosition ( bool isNight )
 {
+    FindActorAndDestroy ( TEXT ( "Skybox" ) );
 	if (isNight)
 	{
-		Sun->SetActorRotation ( NightSunRotation );
+		GetWorld()->SpawnActor<AActor>(SkyFactory[0], GetActorTransform ( ) );
 	}
 	else
 	{
-		Sun->SetActorRotation ( AfternoonSunRotation );
+        GetWorld()->SpawnActor<AActor>( SkyFactory[1] , GetActorTransform ());
 	}
 }
 
 void AJJH_SelectManager::ChangeMap ( int32 index )
 {
 	//케이스 나누어서 하기
-	UGameplayStatics::OpenLevel(this, TEXT("/Game/ThirdPerson/Maps/ThirdPersonMap"));
+    FindActorAndDestroy(TEXT("Theme"));
+    GetWorld ( )->SpawnActor<AActor>(ThemeFactory[index] , GetActorTransform ( ) );
+
+}
+
+void AJJH_SelectManager::FindActorAndDestroy(FName tag)
+{
+    TArray<AActor*> ActorToDestroy;
+    UGameplayStatics::GetAllActorsWithTag(GetWorld(), tag , ActorToDestroy);
+    if (!ActorToDestroy.IsEmpty ())
+    {
+		for (AActor* Actor : ActorToDestroy)
+		{
+			if (Actor) Actor->Destroy ( );
+		}
+    }
 }
 
 void AJJH_SelectManager::ChangeEffect ( int32 index )
 {
-    UParticleSystem* EffectToSpawn = nullptr;
-    UParticleSystem* EffectToSpawn1 = nullptr;
+    FindActorAndDestroy ( TEXT ( "VFX" ) );
+    GetWorld ( )->SpawnActor<AActor> (VFXFactory[index] , GetActorTransform ( ) );
+}
 
-    switch (index)
-    {
-    case 1:
-        EffectToSpawn = Effect1;
-        break;
-    case 2:
-        EffectToSpawn = Effect2;
-        break;
-    default:
-        UE_LOG ( LogTemp , Warning , TEXT ( "Invalid effect index: %d" ) , index );
-        return;
-    }
-
-    if (EffectToSpawn)
-    {
-        UGameplayStatics::SpawnEmitterAtLocation (
-            this ,
-            EffectToSpawn ,
-            GetActorLocation ( ) ,
-            FRotator::ZeroRotator ,
-            FVector ( 1.0f , 1.0f , 1.0f ) ,
-            true ,
-            EPSCPoolMethod::AutoRelease ,
-            true
-        );
-    }
+void AJJH_SelectManager::ChangeFloor (int32 index)
+{
+    FindActorAndDestroy ( TEXT ( "Floor" ) );
+    GetWorld ( )->SpawnActor<AActor> (FloorFactory[index] , GetActorTransform ( ) );
 }
 
 
