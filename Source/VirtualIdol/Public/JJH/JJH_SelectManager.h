@@ -28,23 +28,14 @@ public:
     void UpdateSunNightPosition(bool isNight);
 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<AActor>Skybox_NightFactory;
-
-	UPROPERTY ( EditAnywhere )
-	TSubclassOf<AActor>Skybox_MorningFactory;
+	TArray<TSubclassOf<AActor>> SkyFactory;
 
 	//레벨 바꾸기
 	UFUNCTION ()
 	void ChangeMap(int32 index);
 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<AActor>Theme_1Factory;
-	
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<AActor>Theme_2Factory;
-	
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<AActor>Theme_3Factory;
+	TArray<TSubclassOf<AActor>> ThemeFactory;
 
 	void FindActorAndDestroy (FName tag);
 	//이펙트 바꾸기
@@ -52,12 +43,12 @@ public:
 	void ChangeEffect(int32 index);
 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<AActor>VFX_StarFactory;
+	TArray<TSubclassOf<AActor>> VFXFactory;
 
 	//지면 바꾸기
 
 	UPROPERTY(EditAnywhere)
-	TSubclassOf<AActor>Floor_FogFactory;
+	TArray<TSubclassOf<AActor>> FloorFactory;
 
 	void ChangeFloor (int32 index );
 

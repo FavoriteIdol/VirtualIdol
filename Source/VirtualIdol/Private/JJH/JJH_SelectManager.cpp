@@ -32,11 +32,11 @@ void AJJH_SelectManager::UpdateSunNightPosition ( bool isNight )
     FindActorAndDestroy ( TEXT ( "Skybox" ) );
 	if (isNight)
 	{
-		GetWorld()->SpawnActor<AActor>(Skybox_NightFactory, GetActorTransform());
+		GetWorld()->SpawnActor<AActor>(SkyFactory[0], GetActorTransform ( ) );
 	}
 	else
 	{
-        GetWorld()->SpawnActor<AActor>(Skybox_MorningFactory, GetActorTransform ());
+        GetWorld()->SpawnActor<AActor>( SkyFactory[1] , GetActorTransform ());
 	}
 }
 
@@ -44,19 +44,8 @@ void AJJH_SelectManager::ChangeMap ( int32 index )
 {
 	//케이스 나누어서 하기
     FindActorAndDestroy(TEXT("Theme"));
-    switch (index)
-    {
-    case 1:
-        GetWorld ( )->SpawnActor<AActor>(Theme_1Factory , GetActorTransform ( ) );
-        break;
-    case 2:
-        GetWorld ( )->SpawnActor<AActor> ( Theme_2Factory , GetActorTransform ( ) );
-        break;
-    case 3:
-        GetWorld ( )->SpawnActor<AActor> ( Theme_3Factory , GetActorTransform ( ) );
-        break;
+    GetWorld ( )->SpawnActor<AActor>(ThemeFactory[index] , GetActorTransform ( ) );
 
-    }
 }
 
 void AJJH_SelectManager::FindActorAndDestroy(FName tag)
@@ -75,24 +64,13 @@ void AJJH_SelectManager::FindActorAndDestroy(FName tag)
 void AJJH_SelectManager::ChangeEffect ( int32 index )
 {
     FindActorAndDestroy ( TEXT ( "VFX" ) );
-    switch (index)
-    {
-    case 1:
-        GetWorld ( )->SpawnActor<AActor> ( VFX_StarFactory , GetActorTransform ( ) );
-        break;
-    case 2:
-        GetWorld ( )->SpawnActor<AActor> ( VFX_StarFactory , GetActorTransform ( ) );
-        break;
-    default:
-        UE_LOG ( LogTemp , Warning , TEXT ( "Invalid effect index: %d" ) , index );
-        return;
-    }
+    GetWorld ( )->SpawnActor<AActor> (VFXFactory[index] , GetActorTransform ( ) );
 }
 
 void AJJH_SelectManager::ChangeFloor (int32 index)
 {
     FindActorAndDestroy ( TEXT ( "Floor" ) );
-    GetWorld ( )->SpawnActor<AActor> ( Floor_FogFactory , GetActorTransform ( ) );
+    GetWorld ( )->SpawnActor<AActor> (FloorFactory[index] , GetActorTransform ( ) );
 }
 
 
