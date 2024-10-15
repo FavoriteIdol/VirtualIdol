@@ -19,20 +19,20 @@ void UHSW_MainWidget::NativeConstruct ( )
 
 void UHSW_MainWidget::OnMyImoji01 ( )
 {
-	ImojiComponent->Imoji01();
+	Player->Imoji (0);
 }
 
 void UHSW_MainWidget::OnMyImoji02 ( )
 {
-	ImojiComponent->Imoji02 ( );
+	Player->Imoji ( 1 );
 }
 
 void UHSW_MainWidget::OnMyImoji03 ( )
 {
-	ImojiComponent->Imoji03 ( );
+	Player->Imoji ( 2 );
 }
 
 void UHSW_MainWidget::OnMyImoji04 ( )
 {
-	ImojiComponent->Imoji04 ( );
+	Player->Imoji ( 3 );
 }

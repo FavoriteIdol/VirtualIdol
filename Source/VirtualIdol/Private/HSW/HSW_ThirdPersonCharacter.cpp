@@ -18,6 +18,7 @@
 #include "HSW/HSW_ImogiWidget.h"
 #include "Components/WidgetComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/Image.h"
 
 // Sets default values
 AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
@@ -74,17 +75,17 @@ AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
 // 	ImojiBillboard->SetupAttachment ( GetMesh() );
 // 	ImojiBillboard->SetRelativeLocation(FVector(0,0,230.f));
 
-	ImojiWidget = CreateDefaultSubobject<UWidgetComponent> ( TEXT ( "ImojiWidget" ) );
-	ImojiWidget->SetupAttachment(GetMesh());
+	ImojiComp = CreateDefaultSubobject<UWidgetComponent> ( TEXT ( "ImojiWidget" ) );
+	ImojiComp->SetupAttachment(GetMesh());
 
 	ConstructorHelpers::FClassFinder<UHSW_ImogiWidget> loadedImojiWidget ( TEXT ( "'/Game/Project/Personal/HSW/UI/WBP_Imogi.WBP_Imogi_C'" ) );
 
 	if (loadedImojiWidget.Succeeded ( ))
 	{
-		ImojiWidget->SetWidgetClass( loadedImojiWidget.Class);
-		ImojiWidget->SetDrawSize (FVector2D(100,20 ) );
-		ImojiWidget->SetRelativeLocation(FVector(0,0,230));
-		ImojiWidget->SetRelativeRotation( FRotator ( 0 , 90 , 0 ) );
+		ImojiComp->SetWidgetClass( loadedImojiWidget.Class);
+		ImojiComp->SetDrawSize (FVector2D(100,20 ) );
+		ImojiComp->SetRelativeLocation(FVector(0,0,230));
+		ImojiComp->SetRelativeRotation( FRotator ( 0 , 90 , 0 ) );
 	}
 
 // 	static ConstructorHelpers::FObjectFinder<UMaterial> LoadedOpacityMaterial ( TEXT ( "Material'/Game/Project/Personal/HSW/Resources/Imogi/M_Imoji_Opacity'" ) );
@@ -105,6 +106,7 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	InitMainUI();
+	ImojiComp->SetVisibility(false);
 	
 }
 
@@ -112,14 +114,14 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 void AHSW_ThirdPersonCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (ImojiWidget && ImojiWidget->GetVisibleFlag ( ))
+	if (ImojiComp && ImojiComp->GetVisibleFlag ( ))
 	{
 		// 카메라 위치 
 		FVector CamLoc = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0 )->GetCameraLocation();
-		FVector Direction = CamLoc - ImojiWidget->GetComponentLocation();
+		FVector Direction = CamLoc - ImojiComp->GetComponentLocation();
 		Direction.Z=0;
 
-		ImojiWidget->SetWorldRotation(Direction.GetSafeNormal().ToOrientationRotator());
+		ImojiComp->SetWorldRotation(Direction.GetSafeNormal().ToOrientationRotator());
 	}
 }
 
@@ -131,6 +133,27 @@ void AHSW_ThirdPersonCharacter::InitMainUI ( )
 	{
 		MainUI->AddToViewport ( );
 	}
+}
+
+void AHSW_ThirdPersonCharacter::Imoji ( int index )
+{
+	UHSW_ImogiWidget* imojiWidget = Cast<UHSW_ImogiWidget>( ImojiComp->GetWidget());
+	imojiWidget->ImogiImage->SetBrushFromTexture( ImojiImageArray[index] ) ;
+
+	AppearImoji( );
+
+	GetWorld ( )->GetTimerManager ( ).ClearTimer ( TimerHandleImoji );
+	GetWorld ( )->GetTimerManager ( ).SetTimer ( TimerHandleImoji , this , &AHSW_ThirdPersonCharacter::DisappearImoji , 2.0f );
+}
+
+void AHSW_ThirdPersonCharacter::AppearImoji ( )
+{
+	ImojiComp->SetVisibility(true);
+}
+
+void AHSW_ThirdPersonCharacter::DisappearImoji ( )
+{
+	ImojiComp->SetVisibility ( true );
 }
 
 // Called to bind functionality to input

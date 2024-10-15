@@ -108,7 +108,19 @@ public:
 
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Imoji )
-	class UWidgetComponent* ImojiWidget;
+	class UWidgetComponent* ImojiComp;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = Imoji )
+	TArray<class UTexture2D *> ImojiImageArray;
+
+	UFUNCTION ( )
+	void Imoji ( int index );
+
+	void AppearImoji ();
+
+	void DisappearImoji ();
+
+	FTimerHandle TimerHandleImoji;
 
 	UFUNCTION(BlueprintImplementableEvent, Category= Imogi )
 	void FadeInImogiBlueprint( );
