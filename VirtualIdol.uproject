@@ -59,6 +59,14 @@
 				"Linux",
 				"Android"
 			]
+		},
+		{
+			"Name": "OSC",
+			"Enabled": true
+		},
+		{
+			"Name": "RemoteControlProtocolOSC",
+			"Enabled": true
 		}
 	]
 }
