@@ -25,6 +25,9 @@ public :
 	static FString MakeConcertJson(const struct FConcertInfo& concert);
 
 #pragma endregion
+#pragma region CreateTicket
+	static FString CreateTicketJson( const TMap<FString , FString> ticketSetText);
+#pragma endregion
 
 
 #pragma region Example
@@ -32,4 +35,7 @@ public :
 	static TMap<FString , FString>  ResultAlchemistParsec ( const FString& json );
 #pragma endregion
 
+public:
+	static UTexture2D* MakeTexture ( const TArray<uint8>& ImageData );
+	static UTexture2D* CreateTextureFromImage(int32 Width, int32 Height, const TArray<uint8>& RawData);
 };

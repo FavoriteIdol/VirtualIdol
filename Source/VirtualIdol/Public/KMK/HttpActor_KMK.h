@@ -82,9 +82,11 @@ public:
 #pragma endregion
 #pragma region with Ai for Ticket
 	// 요청
-	void ReqTicket( FString json );
+	void ReqTicket( const TMap<FString , FString> data);
 	// 응답
 	void OnResTicket( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
+	
+	void OnTextureCreated(UTexture2D* texture );
 #pragma endregion
 #pragma region with Ai for Text
 

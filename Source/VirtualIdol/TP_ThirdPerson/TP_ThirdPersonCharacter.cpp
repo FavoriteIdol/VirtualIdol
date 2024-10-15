@@ -15,6 +15,7 @@
 #include "KMK/AudienceServerComponent_KMK.h"
 #include "KMK/VirtualGameInstance_KMK.h"
 #include "Components/GridPanel.h"
+#include "GameFramework/PlayerController.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -78,6 +79,7 @@ void ATP_ThirdPersonCharacter::BeginPlay()
 				audienceWidget->pc = this;
 				audienceWidget->SetVirtualWBP();
             }
+			
         }
         else
         {
@@ -94,6 +96,8 @@ void ATP_ThirdPersonCharacter::BeginPlay()
 		}
 		UE_LOG ( LogTemp , Warning , TEXT ( "StartTalk" ) );
 		GetController<APlayerController> ( )->StartTalking ( );
+		FInputModeGameAndUI inputMode;
+		GetController<APlayerController> ( )->SetInputMode(inputMode );
 	}
 
 }

@@ -234,7 +234,7 @@ void UVirtualGameInstance_KMK::SetStartWidget ( class UStartWidget_KMK* startUi 
 
 void UVirtualGameInstance_KMK::SwitchStartUIWidget (int32 num )
 {
-    widget->StartSwitcher->SetActiveWidgetIndex ( 4 );
+    SwitchWidget ( 4 );
     widget->roomNum = num;
 }
 void UVirtualGameInstance_KMK::VisibleStartWidget (bool bVisible)
@@ -242,8 +242,13 @@ void UVirtualGameInstance_KMK::VisibleStartWidget (bool bVisible)
     if (!bVisible)
     {
         widget->ClearSB();
-        widget->StartSwitcher->SetActiveWidgetIndex ( 2 );
+        SwitchWidget ( 2 );
     }
+}
+
+void UVirtualGameInstance_KMK::SwitchWidget ( int32 num )
+{
+    widget->StartSwitcher->SetActiveWidgetIndex ( num );
 }
 
 #pragma endregion

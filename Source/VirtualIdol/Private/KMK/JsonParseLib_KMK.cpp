@@ -3,6 +3,7 @@
 
 #include "KMK/JsonParseLib_KMK.h"
 #include "KMK/HttpActor_KMK.h"
+#include "IImageWrapperModule.h"
 
 #pragma region Login
 FString UJsonParseLib_KMK::MakeLoginJson ( const FString& id , const FString& pw )
@@ -54,6 +55,7 @@ FLoginInfo UJsonParseLib_KMK::ParsecMyInfo ( const FString& json )
 
 FString UJsonParseLib_KMK::MakeConcertJson (const struct FConcertInfo& concert )
 {
+
     // 로그인 데이터를 JsonObject 형식으로 만든다.
 	TSharedPtr<FJsonObject> jsonObject = MakeShareable ( new FJsonObject ( ) );
 
@@ -68,7 +70,28 @@ FString UJsonParseLib_KMK::MakeConcertJson (const struct FConcertInfo& concert )
 	// 반환한다.
 	return json;
 }
+
 #pragma endregion
+#pragma region Create Ticket
+FString UJsonParseLib_KMK::CreateTicketJson ( const TMap<FString , FString> ticketSetText )
+{
+    // source를 JsonObject 형식으로 만든다.
+	TSharedPtr<FJsonObject> jsonObject = MakeShareable ( new FJsonObject ( ) );
+    
+	for (TPair<FString , FString> pair : ticketSetText)
+	{
+		jsonObject->SetStringField ( pair.Key , pair.Value );
+	}
+    // 역직렬화 과정
+    FString json;
+	TSharedRef<TJsonWriter<TCHAR>> writer = TJsonWriterFactory<TCHAR>::Create ( &json );
+	FJsonSerializer::Serialize ( jsonObject.ToSharedRef ( ) , writer );
+	// 반환한다.
+	return json;
+}
+
+#pragma endregion
+
 // Json으로 만들어서 데이터 전송
 FString UJsonParseLib_KMK::MakeJson ( const TMap<FString , FString> source )
 {
@@ -120,4 +143,55 @@ TMap<FString , FString> UJsonParseLib_KMK::ResultAlchemistParsec ( const FString
 
     }
     return result;
+}
+
+UTexture2D* UJsonParseLib_KMK::MakeTexture(const TArray<uint8>& ImageData)
+{
+    IImageWrapperModule& ImageWrapperModule = FModuleManager::LoadModuleChecked<IImageWrapperModule>(FName("ImageWrapper"));
+    TSharedPtr<IImageWrapper> ImageWrapper = ImageWrapperModule.CreateImageWrapper(EImageFormat::PNG);
+
+    if (ImageWrapper.IsValid() && ImageWrapper->SetCompressed(ImageData.GetData(), ImageData.Num()))
+    {
+        // Create a TArray to hold the raw image data
+        TArray<uint8> RawImageData;
+
+        // Correctly call GetRaw by passing the TArray reference
+        if (ImageWrapper->GetRaw(ERGBFormat::BGRA, 8, RawImageData))
+        {
+            int32 Width = ImageWrapper->GetWidth();
+            int32 Height = ImageWrapper->GetHeight();
+
+            // Now you can create the texture from the raw image data
+            UTexture2D* Texture = CreateTextureFromImage(Width, Height, RawImageData);
+            return (Texture);
+        }
+    }
+    return (nullptr);
+}
+
+UTexture2D* UJsonParseLib_KMK::CreateTextureFromImage(int32 Width, int32 Height, const TArray<uint8>& RawData)
+{
+    UTexture2D* NewTexture = UTexture2D::CreateTransient(Width, Height, PF_B8G8R8A8);
+
+    if (!NewTexture)
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to create texture"));
+        return nullptr;
+    }
+
+    // Make sure the texture has space for the mip data
+    FTexture2DMipMap& Mip = NewTexture->GetPlatformData()->Mips[0];
+    Mip.SizeX = Width;
+    Mip.SizeY = Height;
+    Mip.BulkData.Lock(LOCK_READ_WRITE);
+
+    // Get the pointer to the texture data
+    void* TextureData = Mip.BulkData.Realloc(RawData.Num());
+    FMemory::Memcpy(TextureData, RawData.GetData(), RawData.Num());
+
+    // Unlock the texture and update the resource
+    Mip.BulkData.Unlock();
+    NewTexture->UpdateResource();
+
+    return NewTexture;
 }

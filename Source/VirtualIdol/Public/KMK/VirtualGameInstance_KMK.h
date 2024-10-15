@@ -102,6 +102,8 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 	void SwitchStartUIWidget(int32 num );
 	UFUNCTION( )
 	void VisibleStartWidget ( bool bVisible );
+	UFUNCTION( )
+	void SwitchWidget(int32 num );
 
     UPROPERTY ( )
     int32 playerMeshNum = -1;

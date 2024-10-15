@@ -31,6 +31,11 @@ public:
 	UPROPERTY( )
 	class UVirtualGameInstance_KMK* gi;
 
+	// httpactor
+	UPROPERTY( )
+	class AHttpActor_KMK* httpActor;
+	UPROPERTY(EditAnywhere, Category = Http )
+	TSubclassOf<class AHttpActor_KMK> httpFact;
 #pragma region Login Widget Panel
 // ================================================================
 // Login Widget Panel
@@ -141,12 +146,16 @@ public:
 	UPROPERTY ( meta = ( BindWidget ) )
     class UEditableText* EditText_Price;
 	UPROPERTY ( meta = ( BindWidget ) )
+    class UImage* Image_SetStage;
+	UPROPERTY ( meta = ( BindWidget ) )
 	class UButton* Butt_CreateTicket;
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UMultiLineEditableText* EditMultiText_Ticket;
 
 	UFUNCTION( )
 	void PressCreateTicket();
+	UFUNCTION( )
+	void CreateTicketMaterial(UTexture2D* texture);
 
 	void ClearAllText( );
 #pragma endregion

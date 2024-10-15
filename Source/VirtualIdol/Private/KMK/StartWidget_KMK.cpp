@@ -27,6 +27,7 @@ void UStartWidget_KMK::NativeConstruct ( )
     Super::NativeConstruct();
 	// GI 찾기
 	gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance() );
+	httpActor = Cast<AHttpActor_KMK>(UGameplayStatics::GetActorOfClass(GetWorld() , httpFact));
 	if (gi->bLogin)
 	{
 		StartSwitcher->SetActiveWidgetIndex ( 1 );
@@ -183,11 +184,12 @@ void UStartWidget_KMK::GoBack ( )
 
 void UStartWidget_KMK::OnMyLogin ( )
 {
+	if(!httpActor) return;
     // 아이디와 패스워드가 없으면 실행 안되게 하기
 	if (!EditText_ID->GetText ( ).IsEmpty ( ) && !EditText_PW->GetText ( ).IsEmpty ( ))
 	{
 		// 서버에 정보값 보내기
-
+		// httpActor->ReqLogin(EditText_ID->GetText().ToString(), EditText_PW->GetText().ToString());
 		// 선택지로 변경
 		StartSwitcher->SetActiveWidgetIndex ( 1 );
 	}
@@ -385,7 +387,16 @@ bool UStartWidget_KMK::EditTextDigit ( const FString& editText )
 void UStartWidget_KMK::PressCreateTicket ( )
 {
 	if(!EditMultiText_Ticket->GetText().IsEmpty()) UE_LOG(LogTemp, Warning, TEXT("Create!" ) );
+	TMap<FString, FString> data;
+	data.Add(TEXT("prompt" ), EditMultiText_Ticket->GetText().ToString());
+	data.Add(TEXT("description" ), TEXT("안녕하세요!! 오랜만입니다!!" ));
+	httpActor->ReqTicket(data);
 	EditMultiText_Ticket->SetText ( FText::GetEmpty ( ) );
+}
+
+void UStartWidget_KMK::CreateTicketMaterial ( UTexture2D* texture)
+{
+	Image_SetStage->SetBrushFromTexture(texture);
 }
 
 void UStartWidget_KMK::ClearAllText ( )
