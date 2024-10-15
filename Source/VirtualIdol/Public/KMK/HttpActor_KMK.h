@@ -7,7 +7,31 @@
 #include "Interfaces/IHttpRequest.h"
 #include "Interfaces/IHttpResponse.h"
 #include "HttpActor_KMK.generated.h"
+// 세션을 위한 roomInfo 구조체
+USTRUCT ( BlueprintType )
+struct FConcertInfo
+{
+	GENERATED_BODY ( )
 
+	UPROPERTY(BlueprintReadOnly)
+	FString concertName;
+	UPROPERTY(BlueprintReadOnly)
+	FString concertDay;
+	UPROPERTY(BlueprintReadOnly)
+	int32 concertTime;
+	UPROPERTY(BlueprintReadOnly)
+	int32 brrowTime;
+	UPROPERTY(BlueprintReadOnly)
+	int32 tickePrice;
+	UPROPERTY(BlueprintReadOnly)
+	FString ticketInfo;
+	UPROPERTY(BlueprintReadOnly)
+	int32 appearEffectNum;
+	UPROPERTY(BlueprintReadOnly)
+	int32 feverEffectNum;
+	UPROPERTY(BlueprintReadOnly)
+	int32 personNum;
+};
 UCLASS()
 class VIRTUALIDOL_API AHttpActor_KMK : public AActor
 {

@@ -66,7 +66,6 @@ void UAudienceServerComponent_KMK::TickComponent(float DeltaTime, ELevelTick Tic
 		{
 			if (remainTime >= 0.0f)
 			{
-				UE_LOG ( LogTemp , Warning , TEXT ( "시간: %f" ) , remainTime );
 				// 남은 시간을 위젯에 표시
 				player->audienceWidget->CountDownText ( remainTime );
 			}
@@ -181,7 +180,7 @@ void UAudienceServerComponent_KMK::MultiRPC_StartConcert_Implementation ( float 
 	bTime = true;
 	remainTime = CountdownTime;
 	// 카운트다운 UI 패널 표시
-	if (playerCharacter && playerCharacter->audienceWidget)
+	if (playerCharacter && !playerCharacter->HasAuthority() && playerCharacter->audienceWidget)
 	{
 		playerCharacter->audienceWidget->CountDownPanelVisible ( ESlateVisibility::Visible );
 	}
@@ -192,7 +191,7 @@ void UAudienceServerComponent_KMK::MultiRPC_StartConcert_Implementation ( float 
 		FTimerDelegate::CreateLambda ( [this, playerCharacter]( )
 			{
 				bTime = false;  // 카운트다운 종료
-				if (playerCharacter && playerCharacter->audienceWidget)
+				if (playerCharacter && !playerCharacter->HasAuthority() && playerCharacter->audienceWidget)
 				{
 					playerCharacter->audienceWidget->CountDownPanelVisible ( ESlateVisibility::Hidden );
 				}

@@ -22,7 +22,7 @@
 #include "Components/ScrollBox.h"
 
 void UStartWidget_KMK::NativeConstruct ( )
-{
+{	
     Super::NativeConstruct();
 	// GI 찾기
 	gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance() );
@@ -154,6 +154,21 @@ void UStartWidget_KMK::NativeConstruct ( )
 
 
 }
+
+void UStartWidget_KMK::NativeTick ( const FGeometry& MyGeometry , float InDeltaTime )
+{
+	Super::NativeTick(MyGeometry,InDeltaTime);
+	if (StageScalePanel->Visibility == ESlateVisibility::SelfHitTestInvisible)
+	{
+		if (!EditText_ScaleNum->GetText ( ).IsEmpty ( ))
+		{
+			FString s = EditText_ScaleNum->GetText().ToString();
+			int a = FCString::Atoi(*s) * concertPrice;
+			Text_Price->SetText(FText::AsNumber(a));
+		}
+	}
+}
+
 #pragma region BackFunction
 void UStartWidget_KMK::GoBack ( )
 {
@@ -269,6 +284,7 @@ void UStartWidget_KMK::PressSelectButt ( )
 	else if (selectNum == 1)
 	{
 		if(EditText_Price->GetText().IsEmpty()) return;
+
 		SetTitleText ( TEXT ( "이펙트 설정" ) );
 		SetPanelVisible ( SetEffectPanel , SetTicketPanel , SetDayPanel , StageChargePanel );
 		selectNum++;
@@ -299,6 +315,16 @@ bool UStartWidget_KMK::BEditTextEmpty ( )
 	&& !EditText_SHour->GetText ( ).IsEmpty ( ) && !EditText_SMin->GetText ( ).IsEmpty ( )
 	&& !EditText_H->GetText ( ).IsEmpty ( ) && !EditText_M->GetText ( ).IsEmpty ( ))
 	{
+		Text_FinalName->SetText(EditText_StageName->GetText());
+		Text_FinalStageName->SetText(EditText_StageName->GetText());
+
+		Text_FinalYear->SetText(EditText_Year->GetText());
+		Text_FinalMon->SetText(EditText_Mon->GetText());
+		Text_FinalDay->SetText(EditText_Day->GetText());
+
+		Text_StartHour->SetText(EditText_H->GetText());
+		Text_StartMin->SetText(EditText_M->GetText());
+
 		return true;
 	}
 	else return false;
@@ -398,6 +424,9 @@ void UStartWidget_KMK::PressNextButt ( )
 	Butt_PayMoney->SetVisibility ( ESlateVisibility::Visible );
 	StageScalePanel->SetVisibility ( ESlateVisibility::Hidden );
 	Butt_Next->SetVisibility ( ESlateVisibility::Hidden );
+	Text_FinalCount->SetText ( EditText_ScaleNum->GetText() );
+	Text_FinalPay->SetText ( Text_Price->GetText() );
+	Text_Price->SetText(FText::GetEmpty ( ) );
 	EditText_ScaleNum->SetText ( FText::GetEmpty ( ) );
 }
 void UStartWidget_KMK::PressPayMoney ( )

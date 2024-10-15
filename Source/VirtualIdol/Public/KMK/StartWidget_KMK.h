@@ -1,4 +1,5 @@
-﻿// Fill out your copyright notice in the Description page of Project Settings.
+﻿
+// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -16,10 +17,12 @@ class VIRTUALIDOL_API UStartWidget_KMK : public UUserWidget
 
 public:
 	virtual void NativeConstruct() override;
-
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime);
 	UPROPERTY(meta = (BindWidget))
 	class UWidgetSwitcher* StartSwitcher;
 
+	UPROPERTY(EditAnywhere, Category = Price)
+	int32 concertPrice = 100000;
 	UFUNCTION ()
 	void GoBack();
 	
@@ -177,7 +180,30 @@ public:
 #pragma region Final Set Stage
 	// 최종 결제 페널
 	UPROPERTY(meta = (BindWidget))
-    class UCanvasPanel* StageChargePanel;	
+    class UCanvasPanel* StageChargePanel;
+	UPROPERTY(meta = (BindWidget))
+    class UTextBlock* Text_FinalName;	
+	UPROPERTY(meta = (BindWidget))
+    class UTextBlock* Text_FinalYear;	
+	UPROPERTY(meta = (BindWidget))
+    class UTextBlock* Text_FinalMon;
+	UPROPERTY(meta = (BindWidget))
+    class UTextBlock* Text_FinalDay;	
+	UPROPERTY(meta = (BindWidget))
+    class UTextBlock* Text_StartHour;	
+	UPROPERTY(meta = (BindWidget))
+    class UTextBlock* Text_StartMin;	
+	UPROPERTY(meta = (BindWidget))
+    class UTextBlock* Text_FinalCount;	
+	UPROPERTY(meta = (BindWidget))
+    class UTextBlock* Text_FinalPay;		
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UTextBlock* Text_Price;
+	UPROPERTY(meta = (BindWidget))
+    class UImage* Image_FinalStageImage;
+	UPROPERTY(meta = (BindWidget))
+    class UImage* Image_FinalConcert;	
+
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UButton* Butt_Next;
 #pragma region Set Scale
