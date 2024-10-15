@@ -15,6 +15,8 @@
 #include "HSW/HSW_ImojiConponent.h"
 #include "Components/BillboardComponent.h"
 #include "UObject/ConstructorHelpers.h"
+#include "HSW/HSW_ImogiWidget.h"
+#include "Components/WidgetComponent.h"
 
 // Sets default values
 AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
@@ -61,28 +63,39 @@ AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 
 	// Imoji Component
-	ImojiComponent = CreateDefaultSubobject<UHSW_ImojiConponent>(TEXT("ImojiComponent" ));
-	ImojiComponent->SetupAttachment(GetMesh());
-	ImojiComponent->SetRelativeLocation(FVector(0,0,230.f));
-	
-	ImojiMesh = CreateDefaultSubobject<UStaticMeshComponent> ( TEXT ( "ImojiMeshComponent" ) );
-	ImojiMesh->SetupAttachment ( ImojiComponent );
+// 	ImojiComponent = CreateDefaultSubobject<UHSW_ImojiConponent>(TEXT("ImojiComponent" ));
+// 	ImojiComponent->SetupAttachment(GetMesh());
+// 	ImojiComponent->SetRelativeLocation(FVector(0,0,230.f));
 
-	ImojiBillboard = CreateDefaultSubobject<UBillboardComponent> ( TEXT ( "ImojiBilboard" ) );
-	ImojiBillboard->SetVisibility ( true );
-	ImojiBillboard->bHiddenInGame = false;
-	ImojiBillboard->SetupAttachment ( ImojiMesh );
+// 	ImojiBillboard = CreateDefaultSubobject<UBillboardComponent> ( TEXT ( "ImojiBilboard" ) );
+// 	ImojiBillboard->SetVisibility ( true );
+// 	ImojiBillboard->bHiddenInGame = false;
+// 	ImojiBillboard->SetupAttachment ( GetMesh() );
+// 	ImojiBillboard->SetRelativeLocation(FVector(0,0,230.f));
 
-	static ConstructorHelpers::FObjectFinder<UMaterial> LoadedOpacityMaterial ( TEXT ( "Material'/Game/Project/Personal/HSW/Resources/Imogi/M_Imoji_Opacity'" ) );
-	if (LoadedOpacityMaterial.Succeeded ( ))
+	ImojiWidget = CreateDefaultSubobject<UWidgetComponent> ( TEXT ( "ImojiWidget" ) );
+	ImojiWidget->SetupAttachment(GetMesh());
+
+	ConstructorHelpers::FClassFinder<UHSW_ImogiWidget> loadedImojiWidget ( TEXT ( "'/Game/Project/Personal/HSW/UI/WBP_Imogi.WBP_Imogi_C'" ) );
+
+	if (loadedImojiWidget.Succeeded ( ))
 	{
-		OpacityMaterial = LoadedOpacityMaterial.Object;
-
-		if (OpacityMaterial)
-		{
-			ImojiMesh->SetMaterial ( 0 , OpacityMaterial );
-		}
+		ImojiWidget->SetWidgetClass( loadedImojiWidget.Class);
+		ImojiWidget->SetDrawSize (FVector2D(100,20 ) );
+		ImojiWidget->SetRelativeLocation(FVector(0,0,230));
+		ImojiWidget->SetRelativeRotation( FRotator ( 0 , 90 , 0 ) );
 	}
+
+// 	static ConstructorHelpers::FObjectFinder<UMaterial> LoadedOpacityMaterial ( TEXT ( "Material'/Game/Project/Personal/HSW/Resources/Imogi/M_Imoji_Opacity'" ) );
+// 	if (LoadedOpacityMaterial.Succeeded ( ))
+// 	{
+// 		OpacityMaterial = LoadedOpacityMaterial.Object;
+// 
+// 		if (OpacityMaterial)
+// 		{
+// 			ImojiMesh->SetMaterial ( 0 , OpacityMaterial );
+// 		}
+// 	}
 }
 
 // Called when the game starts or when spawned
@@ -90,7 +103,7 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//InitMainUI();
+	InitMainUI();
 	
 }
 

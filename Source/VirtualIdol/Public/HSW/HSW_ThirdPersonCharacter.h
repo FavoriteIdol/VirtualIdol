@@ -97,17 +97,18 @@ public:
 	void InitMainUI();
 
 	// 이모지 ------------------------------------
+// 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Imoji )
+// 	class UHSW_ImojiConponent* ImojiComponent;
+// 
+// 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite,Category = Imoji )
+// 	class UBillboardComponent* ImojiBillboard;
+// 
+// 	UPROPERTY ( EditDefaultsOnly , BlueprintReadWrite, Category = Imoji )
+// 	class UMaterial* OpacityMaterial;
+
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Imoji )
-	class UHSW_ImojiConponent* ImojiComponent;
-
-	UPROPERTY ( EditDefaultsOnly , BlueprintReadWrite , Category = Imoji )
-	class UStaticMeshComponent* ImojiMesh;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite,Category = Imoji )
-	class UBillboardComponent* ImojiBillboard;
-
-	UPROPERTY ( EditDefaultsOnly , BlueprintReadWrite, Category = Imoji )
-	class UMaterial* OpacityMaterial;
+	class UWidgetComponent* ImojiWidget;
 
 	UFUNCTION(BlueprintImplementableEvent, Category= Imogi )
 	void FadeInImogiBlueprint( );
