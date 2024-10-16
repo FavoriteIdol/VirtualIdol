@@ -44,6 +44,9 @@ class VIRTUALIDOL_API AHSW_ThirdPersonCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* FeverGaugeAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* ThrowAction;
+
 public:
 	// Sets default values for this character's properties
 	AHSW_ThirdPersonCharacter();
@@ -64,6 +67,10 @@ protected:
 	void Look ( const FInputActionValue& Value );
 
 	void OnMyFeverGauge ( const FInputActionValue& value );
+
+	void OnMyThorwHold ( const FInputActionValue& value );
+
+	void OnMyThorwPitch ( const FInputActionValue& value );
 
 public:	
 	// Called every frame
@@ -127,5 +134,17 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, Category= Imogi )
 	void FadeInImogiBlueprint( );
+
+
+	// 3D 오브젝트 --------------------------------
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite )
+	class UArrowComponent* ThrowingArrow;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite )
+	class AHSW_ThrowingObject* ThrowingObject;
+
+	UPROPERTY(EditDefaultsOnly )
+	TSubclassOf<class AHSW_ThrowingObject*> ThrowingObjectFactory;
+
 
 };

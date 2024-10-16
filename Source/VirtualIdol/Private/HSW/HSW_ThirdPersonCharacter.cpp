@@ -19,6 +19,8 @@
 #include "Components/WidgetComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/Image.h"
+#include "Components/ArrowComponent.h"
+#include "HSW_ThrowingObject.h"
 
 // Sets default values
 AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
@@ -87,6 +89,10 @@ AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
 		ImojiComp->SetRelativeLocation(FVector(0,0,230));
 		ImojiComp->SetRelativeRotation( FRotator ( 0 , 90 , 0 ) );
 	}
+
+	ThrowingArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("ThrowingArrow" ) );
+	ThrowingArrow->SetupAttachment(RootComponent);
+	ThrowingArrow->SetRelativeLocation(FVector(60,0,70));
 
 // 	static ConstructorHelpers::FObjectFinder<UMaterial> LoadedOpacityMaterial ( TEXT ( "Material'/Game/Project/Personal/HSW/Resources/Imogi/M_Imoji_Opacity'" ) );
 // 	if (LoadedOpacityMaterial.Succeeded ( ))
@@ -255,6 +261,28 @@ void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value 
 		{
 			gameMode->bFevered = true;
 		}
+	}
+}
+
+void AHSW_ThirdPersonCharacter::OnMyThorwHold ( const FInputActionValue& value )
+{
+	FTransform t = ThrowingArrow->GetComponentTransform();
+	ThrowingObject= GetWorld()->SpawnActor<AHSW_ThrowingObject>(ThrowingObjectFactory, t);
+	if (ThrowingObject)
+	{
+		ThrowingObject->AttachToComponent( ThrowingArrow, FAttachmentTransformRules::KeepWorldTransform );
+	}
+
+
+}
+
+void AHSW_ThirdPersonCharacter::OnMyThorwPitch ( const FInputActionValue& value )
+{
+	if (ThrowingObject)
+	{
+		ThrowingObject->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		ThrowingObject->
+		UPrimitiveComponent::SetSimulatePhysics(true );
 	}
 }
 
