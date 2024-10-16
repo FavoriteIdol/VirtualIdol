@@ -4,6 +4,7 @@
 #include "HSW_ThrowingObject.h"
 #include "Engine/StaticMesh.h"
 #include "Materials/Material.h"
+#include "Components/SphereComponent.h"
 
 
 // Sets default values
@@ -11,6 +12,9 @@ AHSW_ThrowingObject::AHSW_ThrowingObject()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
+	SetRootComponent( SphereComp );
 
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp" ) );
 	MeshComp->SetupAttachment(RootComponent);

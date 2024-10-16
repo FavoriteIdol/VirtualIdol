@@ -26,6 +26,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite )
 	class UStaticMeshComponent* MeshComp;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite )
+	class USphereComponent* SphereComp;
+
 	UPROPERTY(EditAnywhere,BlueprintReadWrite )
 	bool bCanOverlap;
 
