@@ -14,23 +14,27 @@ struct FConcertInfo
 	GENERATED_BODY ( )
 
 	UPROPERTY(BlueprintReadOnly)
-	FString concertName;
+	FString name;
 	UPROPERTY(BlueprintReadOnly)
-	FString concertDay;
+	FString concertDate;
 	UPROPERTY(BlueprintReadOnly)
-	FString concertTime;
+	FString startTime;
 	UPROPERTY(BlueprintReadOnly)
 	FString endTime;
+	//UPROPERTY(BlueprintReadOnly)
+	//int32 tickePrice;
+	//UPROPERTY(BlueprintReadOnly)
+	//FString userName;
 	UPROPERTY(BlueprintReadOnly)
-	int32 tickePrice;
+	FString img;
 	UPROPERTY(BlueprintReadOnly)
-	FString ticketInfo;
+	int32 appearedVFX;
 	UPROPERTY(BlueprintReadOnly)
-	int32 appearEffectNum;
+	int32 feverVFX;
+	//UPROPERTY(BlueprintReadOnly)
+	//int32 personNum;
 	UPROPERTY(BlueprintReadOnly)
-	int32 feverEffectNum;
-	UPROPERTY(BlueprintReadOnly)
-	int32 personNum;
+	int32 stageId;
 };
 // 개인정보
 USTRUCT ( BlueprintType )
@@ -41,11 +45,13 @@ struct FLoginInfo
 	UPROPERTY(BlueprintReadOnly)
 	FString email;
 	UPROPERTY(BlueprintReadOnly)
-	FString pw;
+	FString password;
 	UPROPERTY(BlueprintReadOnly)
 	FString token;
 	UPROPERTY(BlueprintReadOnly)
-	FString nickName;
+	FString authority;
+	UPROPERTY(BlueprintReadOnly)
+	FString userName;
 };
 UCLASS()
 class VIRTUALIDOL_API AHttpActor_KMK : public AActor

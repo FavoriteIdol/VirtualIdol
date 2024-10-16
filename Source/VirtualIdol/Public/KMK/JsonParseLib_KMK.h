@@ -23,6 +23,7 @@ public :
 #pragma endregion
 #pragma region Set Concert
 	static FString MakeConcertJson(const struct FConcertInfo& concert);
+	static FString ParsecConcerJson(const FString& json );
 
 #pragma endregion
 #pragma region CreateTicket

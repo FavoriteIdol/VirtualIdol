@@ -81,11 +81,12 @@ void AHttpActor_KMK::ReqSetConcert ( const FConcertInfo& concert )
 	FHttpModule& httpModule = FHttpModule::Get ( );
 	TSharedRef<IHttpRequest> req = httpModule.CreateRequest ( );
 
-	req->SetHeader(TEXT("accessToken") , *loginInfo.token);
+	FString AuthHeader = FString::Printf ( TEXT ( "*/*" ) , *loginInfo.token );
+	req->SetHeader ( TEXT ( "accept" ) , TEXT ( "*/*" ) );
 	req->SetURL(TEXT("http://master-of-prediction.shop:8123/api/v1/concerts") );
 	req->SetVerb(TEXT("POST"));
 	req->SetHeader(TEXT("content-type") , TEXT("application/json"));
-	//req->SetContentAsString(UJsonParseLib_KMK::MakeLoginJson(id , pw));
+	req->SetContentAsString(UJsonParseLib_KMK::MakeConcertJson (concert));
 
 	req->OnProcessRequestComplete().BindUObject(this , &AHttpActor_KMK::OnResSetConcert);
 
@@ -94,7 +95,15 @@ void AHttpActor_KMK::ReqSetConcert ( const FConcertInfo& concert )
 
 void AHttpActor_KMK::OnResSetConcert ( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully )
 {
-
+	if (bConnectedSuccessfully)
+	{
+		FString s = Response->GetContentAsString ( );
+		UE_LOG ( LogTemp , Warning , TEXT ( "%s" ), *s );
+	}
+	else
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "OnResLogin Failed..." ) );
+	}
 }
 #pragma endregion
 

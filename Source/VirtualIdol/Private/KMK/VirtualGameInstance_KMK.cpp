@@ -256,9 +256,9 @@ void UVirtualGameInstance_KMK::SwitchWidget ( int32 num )
 void UVirtualGameInstance_KMK::SetMyInfo (const struct FLoginInfo& info )
 {
     loginInfo.email = info.email;
-    loginInfo.pw = info.pw;
+    loginInfo.password = info.password;
     loginInfo.token = info.token;
-    loginInfo.nickName = info.nickName;
+    loginInfo.userName = info.userName;
 }
 
 FLoginInfo UVirtualGameInstance_KMK::GetMyInfo ( )

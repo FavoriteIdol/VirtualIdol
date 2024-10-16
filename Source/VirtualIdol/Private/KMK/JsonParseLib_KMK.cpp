@@ -32,23 +32,7 @@ FLoginInfo UJsonParseLib_KMK::ParsecMyInfo ( const FString& json )
     TSharedPtr<FJsonObject> response = MakeShareable ( new FJsonObject ( ) );
     // 역직렬화 : josn 문자열을 FJsonObject로 변경하기
     FLoginInfo result;
-    FLoginInfo result1;
-    FJsonObjectConverter::JsonObjectStringToUStruct(json, &result1);
-    if (FJsonSerializer::Deserialize ( reader , response ))
-    {
-         FString token = response->GetStringField ( TEXT ( "token" ) );
-         if (response->TryGetStringField ( TEXT ( "token" ) , token ) && !token.IsEmpty ( ))
-         {
-            FString email = response->GetStringField ( TEXT ( "email" ) );
-            FString pw = response->GetStringField ( TEXT ( "password" ) );
-            FString nick = response->GetStringField ( TEXT ( "userName" ) );
-
-            result.email = email;
-            result.token = token;
-            result.pw = pw;
-            result.nickName = nick;
-         }
-    }
+    FJsonObjectConverter::JsonObjectStringToUStruct(json, &result );
     return result;
 }
 
@@ -62,9 +46,9 @@ FString UJsonParseLib_KMK::MakeConcertJson (const struct FConcertInfo& concert )
     // 로그인 데이터를 JsonObject 형식으로 만든다.
 	TSharedPtr<FJsonObject> jsonObject = MakeShareable ( new FJsonObject ( ) );
 
-    jsonObject->SetStringField("name" , concert.concertName);
     // 2024-10-24
-
+    FString JsonString;
+    FJsonObjectConverter::UStructToJsonObjectString ( concert , JsonString );
 
 	// writer를 만들어서 JsonObject를 인코딩해서 
 	FString json;
@@ -72,6 +56,14 @@ FString UJsonParseLib_KMK::MakeConcertJson (const struct FConcertInfo& concert )
 	FJsonSerializer::Serialize ( jsonObject.ToSharedRef ( ) , writer );
 	// 반환한다.
 	return json;
+}
+
+FString UJsonParseLib_KMK::ParsecConcerJson ( const FString& json )
+{
+    TSharedRef<TJsonReader<TCHAR>> reader = TJsonReaderFactory<TCHAR>::Create ( json );
+    // FJsonObject 형식으로 읽어온 json 데이터를 저장함 => 공유 포인터 형태로 객체 감싸기
+    TSharedPtr<FJsonObject> response = MakeShareable ( new FJsonObject ( ) );
+    return json;
 }
 
 #pragma endregion
@@ -109,7 +101,56 @@ FString UJsonParseLib_KMK::ParsecTicketJson ( const FString& json )
 	// 반환한다.
 	return image;
 }
+UTexture2D* UJsonParseLib_KMK::MakeTexture ( const TArray<uint8>& ImageData )
+{
+    IImageWrapperModule& ImageWrapperModule = FModuleManager::LoadModuleChecked<IImageWrapperModule> ( FName ( "ImageWrapper" ) );
+    TSharedPtr<IImageWrapper> ImageWrapper = ImageWrapperModule.CreateImageWrapper ( EImageFormat::PNG );
 
+    if (ImageWrapper.IsValid ( ) && ImageWrapper->SetCompressed ( ImageData.GetData ( ) , ImageData.Num ( ) ))
+    {
+        // Create a TArray to hold the raw image data
+        TArray<uint8> RawImageData;
+
+        // Correctly call GetRaw by passing the TArray reference
+        if (ImageWrapper->GetRaw ( ERGBFormat::BGRA , 8 , RawImageData ))
+        {
+            int32 Width = ImageWrapper->GetWidth ( );
+            int32 Height = ImageWrapper->GetHeight ( );
+
+            // Now you can create the texture from the raw image data
+            UTexture2D* Texture = CreateTextureFromImage ( Width , Height , RawImageData );
+            return ( Texture );
+        }
+    }
+    return ( nullptr );
+}
+
+UTexture2D* UJsonParseLib_KMK::CreateTextureFromImage ( int32 Width , int32 Height , const TArray<uint8>& RawData )
+{
+    UTexture2D* NewTexture = UTexture2D::CreateTransient ( Width , Height , PF_B8G8R8A8 );
+
+    if (!NewTexture)
+    {
+        UE_LOG ( LogTemp , Error , TEXT ( "Failed to create texture" ) );
+        return nullptr;
+    }
+
+    // Make sure the texture has space for the mip data
+    FTexture2DMipMap& Mip = NewTexture->GetPlatformData ( )->Mips[0];
+    Mip.SizeX = Width;
+    Mip.SizeY = Height;
+    Mip.BulkData.Lock ( LOCK_READ_WRITE );
+
+    // Get the pointer to the texture data
+    void* TextureData = Mip.BulkData.Realloc ( RawData.Num ( ) );
+    FMemory::Memcpy ( TextureData , RawData.GetData ( ) , RawData.Num ( ) );
+
+    // Unlock the texture and update the resource
+    Mip.BulkData.Unlock ( );
+    NewTexture->UpdateResource ( );
+
+    return NewTexture;
+}
 #pragma endregion
 
 // Json으로 만들어서 데이터 전송
@@ -165,53 +206,4 @@ TMap<FString , FString> UJsonParseLib_KMK::ResultAlchemistParsec ( const FString
     return result;
 }
 
-UTexture2D* UJsonParseLib_KMK::MakeTexture(const TArray<uint8>& ImageData)
-{
-    IImageWrapperModule& ImageWrapperModule = FModuleManager::LoadModuleChecked<IImageWrapperModule>(FName("ImageWrapper"));
-    TSharedPtr<IImageWrapper> ImageWrapper = ImageWrapperModule.CreateImageWrapper(EImageFormat::PNG);
 
-    if (ImageWrapper.IsValid() && ImageWrapper->SetCompressed(ImageData.GetData(), ImageData.Num()))
-    {
-        // Create a TArray to hold the raw image data
-        TArray<uint8> RawImageData;
-
-        // Correctly call GetRaw by passing the TArray reference
-        if (ImageWrapper->GetRaw(ERGBFormat::BGRA, 8, RawImageData))
-        {
-            int32 Width = ImageWrapper->GetWidth();
-            int32 Height = ImageWrapper->GetHeight();
-
-            // Now you can create the texture from the raw image data
-            UTexture2D* Texture = CreateTextureFromImage(Width, Height, RawImageData);
-            return (Texture);
-        }
-    }
-    return (nullptr);
-}
-
-UTexture2D* UJsonParseLib_KMK::CreateTextureFromImage(int32 Width, int32 Height, const TArray<uint8>& RawData)
-{
-    UTexture2D* NewTexture = UTexture2D::CreateTransient(Width, Height, PF_B8G8R8A8);
-
-    if (!NewTexture)
-    {
-        UE_LOG(LogTemp, Error, TEXT("Failed to create texture"));
-        return nullptr;
-    }
-
-    // Make sure the texture has space for the mip data
-    FTexture2DMipMap& Mip = NewTexture->GetPlatformData()->Mips[0];
-    Mip.SizeX = Width;
-    Mip.SizeY = Height;
-    Mip.BulkData.Lock(LOCK_READ_WRITE);
-
-    // Get the pointer to the texture data
-    void* TextureData = Mip.BulkData.Realloc(RawData.Num());
-    FMemory::Memcpy(TextureData, RawData.GetData(), RawData.Num());
-
-    // Unlock the texture and update the resource
-    Mip.BulkData.Unlock();
-    NewTexture->UpdateResource();
-
-    return NewTexture;
-}

@@ -162,9 +162,11 @@ void UStartWidget_KMK::NativeTick ( const FGeometry& MyGeometry , float InDeltaT
 	Super::NativeTick(MyGeometry,InDeltaTime);
 	if (StageScalePanel->Visibility == ESlateVisibility::SelfHitTestInvisible)
 	{
-		if (!EditText_ScaleNum->GetText ( ).IsEmpty ( ))
+		if(EditText_ScaleNum->GetText ( ).IsEmpty ( )) return;
+		FString s = EditText_ScaleNum->GetText ( ).ToString ( );
+		bool bDigit = EditTextDigit(s);
+		if (bDigit)
 		{
-			FString s = EditText_ScaleNum->GetText().ToString();
 			int a = FCString::Atoi(*s) * concertPrice;
 			Text_Price->SetText(FText::AsNumber(a));
 		}
@@ -176,6 +178,7 @@ void UStartWidget_KMK::GoBack ( )
 {
     StartSwitcher->SetActiveWidgetIndex (1);
 	ClearSB( );
+	ResetWidget ( );
 }
 #pragma endregion
 
@@ -189,7 +192,7 @@ void UStartWidget_KMK::OnMyLogin ( )
 	if (!EditText_ID->GetText ( ).IsEmpty ( ) && !EditText_PW->GetText ( ).IsEmpty ( ))
 	{
 		// 서버에 정보값 보내기
-		// httpActor->ReqLogin(EditText_ID->GetText().ToString(), EditText_PW->GetText().ToString());
+		httpActor->ReqLogin(EditText_ID->GetText().ToString(), EditText_PW->GetText().ToString());
 		// 선택지로 변경
 		StartSwitcher->SetActiveWidgetIndex ( 1 );
 	}
@@ -321,7 +324,7 @@ bool UStartWidget_KMK::BEditTextEmpty ( )
 		Text_FinalName->SetText(EditText_StageName->GetText());
 		Text_FinalStageName->SetText(EditText_StageName->GetText());
 		
-		concertInfo.concertName = EditText_StageName->GetText().ToString();
+		concertInfo.name = EditText_StageName->GetText().ToString();
 		bool bEditDigit 
             = EditTextDigit ( EditText_Year->GetText ( ).ToString ( ) ) && EditTextDigit ( EditText_Mon->GetText ( ).ToString ( ) )
             && EditTextDigit ( EditText_Day->GetText ( ).ToString ( ) ) && EditTextDigit ( EditText_SHour->GetText ( ).ToString ( ) )
@@ -337,13 +340,13 @@ bool UStartWidget_KMK::BEditTextEmpty ( )
 		FString mon = ChangeString(EditText_Day->GetText().ToString());
 		FString day = ChangeString(EditText_Day->GetText().ToString());
 
-		concertInfo.concertDay = year + TEXT("-") + mon + TEXT("-") + day;
+		concertInfo.concertDate = year + TEXT("-") + mon + TEXT("-") + day;
 
 		Text_StartHour->SetText(EditText_SHour->GetText());
 		Text_StartMin->SetText(EditText_SMin->GetText());
 		FString sHour =  ChangeString(EditText_SHour->GetText().ToString());
 		FString sMin = ChangeString(EditText_SMin->GetText().ToString());
-		concertInfo.concertTime = sHour + TEXT(":" ) + sMin + TEXT(":" ) + TEXT("00");
+		concertInfo.startTime = sHour + TEXT(":" ) + sMin + TEXT(":" ) + TEXT("00");
 
 		FString sH = EditText_SHour->GetText().ToString();
 		FString sM = EditText_SMin->GetText().ToString();
@@ -391,7 +394,9 @@ void UStartWidget_KMK::PressCreateTicket ( )
 	data.Add(TEXT("prompt" ), EditMultiText_Ticket->GetText().ToString());
 	data.Add(TEXT("description" ), TEXT("안녕하세요!! 오랜만입니다!!" ));
 	httpActor->ReqTicket(data);
-	EditMultiText_Ticket->SetText ( FText::GetEmpty ( ) );
+	// 콘서트 티켓 저장하는곳
+
+	// EditMultiText_Ticket->SetText ( FText::GetEmpty ( ) );
 }
 
 void UStartWidget_KMK::CreateTicketMaterial ( UTexture2D* texture)
@@ -417,9 +422,8 @@ void UStartWidget_KMK::ClearAllText ( )
 	Image_Particle->SetBrushFromMaterial ( EffectParticles[0] );
 	Image_Fever->SetBrushFromMaterial ( FeversParticles[0] );
 
-	concertInfo.appearEffectNum = particleNum;
-	concertInfo.feverEffectNum = feverNum;
-	UE_LOG(LogTemp, Warning, TEXT("%d, %d" ), concertInfo.appearEffectNum, concertInfo.feverEffectNum );
+	concertInfo.appearedVFX = particleNum;
+	concertInfo.feverVFX = feverNum;
 
 	particleNum = 0;
 	feverNum = 0;
@@ -492,6 +496,7 @@ void UStartWidget_KMK::PressNextButt ( )
 	StageScalePanel->SetVisibility ( ESlateVisibility::Hidden );
 	Butt_Next->SetVisibility ( ESlateVisibility::Hidden );
 	Text_FinalCount->SetText ( EditText_ScaleNum->GetText() );
+	//concertInfo.personNum = FCString::Atoi ( *EditText_ScaleNum->GetText().ToString() );
 	Text_FinalPay->SetText ( Text_Price->GetText() );
 	Text_Price->SetText(FText::GetEmpty ( ) );
 	EditText_ScaleNum->SetText ( FText::GetEmpty ( ) );
@@ -506,6 +511,7 @@ void UStartWidget_KMK::PressOkayButt ( )
 {
 	ClearSB ( );
 	StartSwitcher->SetActiveWidgetIndex ( 1 );
+	httpActor->ReqSetConcert(concertInfo);
 	ResetWidget( );
 }
 
