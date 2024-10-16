@@ -55,7 +55,7 @@ AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent> ( TEXT ( "CameraBoom" ) );
 	CameraBoom->SetupAttachment ( RootComponent );
 	CameraBoom->SetRelativeLocation(FVector(0.0f,0.0f,30.f));
-	CameraBoom->TargetArmLength = 250.f; // The camera follows at this distance behind the character	
+	CameraBoom->TargetArmLength = 450; // The camera follows at this distance behind the character	
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 
 	// Create a follow camera
@@ -92,7 +92,7 @@ AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
 
 	ThrowingArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("ThrowingArrow" ) );
 	ThrowingArrow->SetupAttachment(RootComponent);
-	ThrowingArrow->SetRelativeLocation(FVector(60,0,70));
+	ThrowingArrow->SetRelativeLocation(FVector(80,0,70));
 
 // 	static ConstructorHelpers::FObjectFinder<UMaterial> LoadedOpacityMaterial ( TEXT ( "Material'/Game/Project/Personal/HSW/Resources/Imogi/M_Imoji_Opacity'" ) );
 // 	if (LoadedOpacityMaterial.Succeeded ( ))
@@ -193,6 +193,10 @@ void AHSW_ThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* Playe
 		//FeverGauge
 		EnhancedInputComponent->BindAction ( FeverGaugeAction , ETriggerEvent::Started , this , &AHSW_ThirdPersonCharacter::OnMyFeverGauge );
 
+		//Throwing
+		EnhancedInputComponent->BindAction ( ThrowAction , ETriggerEvent::Started , this , &AHSW_ThirdPersonCharacter::OnMyThorwHold );
+		EnhancedInputComponent->BindAction ( ThrowAction , ETriggerEvent::Completed , this , &AHSW_ThirdPersonCharacter::OnMyThorwPitch );
+
 	}
 
 }
@@ -281,8 +285,11 @@ void AHSW_ThirdPersonCharacter::OnMyThorwPitch ( const FInputActionValue& value 
 	if (ThrowingObject)
 	{
 		ThrowingObject->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-		ThrowingObject->
-		UPrimitiveComponent::SetSimulatePhysics(true );
+		ThrowingObject->MeshComp->SetSimulatePhysics(true);
+
+		FVector ThrowingForce = ThrowingArrow->GetForwardVector() * ThrowingSpeed;
+		ThrowingObject->MeshComp->AddForce( ThrowingForce );
+		ThrowingObject = nullptr;
 	}
 }
 

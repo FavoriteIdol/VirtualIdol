@@ -23,7 +23,11 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditDefaultsOnly )
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite )
 	class UStaticMeshComponent* MeshComp;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite )
+	bool bCanOverlap;
+
 
 };

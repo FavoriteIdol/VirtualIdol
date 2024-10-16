@@ -143,8 +143,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite )
 	class AHSW_ThrowingObject* ThrowingObject;
 
-	UPROPERTY(EditDefaultsOnly )
-	TSubclassOf<class AHSW_ThrowingObject*> ThrowingObjectFactory;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite )
+	TSubclassOf<class AHSW_ThrowingObject> ThrowingObjectFactory;
+
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite )
+	float ThrowingSpeed = 8000000.0f;
 
 
 };

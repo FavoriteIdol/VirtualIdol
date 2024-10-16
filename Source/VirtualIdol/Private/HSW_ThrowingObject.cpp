@@ -5,6 +5,7 @@
 #include "Engine/StaticMesh.h"
 #include "Materials/Material.h"
 
+
 // Sets default values
 AHSW_ThrowingObject::AHSW_ThrowingObject()
 {
