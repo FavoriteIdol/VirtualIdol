@@ -81,7 +81,7 @@ AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
 // 	ImojiBillboard->SetRelativeLocation(FVector(0,0,230.f));
 
 	ImojiComp = CreateDefaultSubobject<UWidgetComponent> ( TEXT ( "ImojiWidget" ) );
-	ImojiComp->SetupAttachment(GetMesh());
+	ImojiComp->SetupAttachment(RootComponent);
 
 	ConstructorHelpers::FClassFinder<UHSW_ImogiWidget> loadedImojiWidget ( TEXT ( "'/Game/Project/Personal/HSW/UI/WBP_Imogi.WBP_Imogi_C'" ) );
 
@@ -89,8 +89,7 @@ AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
 	{
 		ImojiComp->SetWidgetClass( loadedImojiWidget.Class);
 		ImojiComp->SetDrawSize (FVector2D(100,20 ) );
-		ImojiComp->SetRelativeLocation(FVector(0,0,230));
-		ImojiComp->SetRelativeRotation( FRotator ( 0 , 90 , 0 ) );
+		ImojiComp->SetRelativeLocation(FVector(0,0,150));
 	}
 
 	ThrowingArrow = CreateDefaultSubobject<UArrowComponent>(TEXT("ThrowingArrow" ) );
@@ -161,7 +160,7 @@ void AHSW_ThirdPersonCharacter::AppearImoji ( )
 
 	
 	UNiagaraComponent* AppearComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation ( GetWorld ( ) , EmojiEffect , ImojiComp->GetComponentLocation ( ) );
-
+	AppearComponent->AttachToComponent( ImojiComp, FAttachmentTransformRules::KeepRelativeTransform);
 	AppearComponent->SetAutoDestroy(true );
 
 	imojiWidget->PlayFadeInImoji();
