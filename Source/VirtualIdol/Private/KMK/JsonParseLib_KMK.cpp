@@ -4,6 +4,7 @@
 #include "KMK/JsonParseLib_KMK.h"
 #include "KMK/HttpActor_KMK.h"
 #include "IImageWrapperModule.h"
+#include "JsonObjectConverter.h"
 
 #pragma region Login
 FString UJsonParseLib_KMK::MakeLoginJson ( const FString& id , const FString& pw )
@@ -31,6 +32,8 @@ FLoginInfo UJsonParseLib_KMK::ParsecMyInfo ( const FString& json )
     TSharedPtr<FJsonObject> response = MakeShareable ( new FJsonObject ( ) );
     // 역직렬화 : josn 문자열을 FJsonObject로 변경하기
     FLoginInfo result;
+    FLoginInfo result1;
+    FJsonObjectConverter::JsonObjectStringToUStruct(json, &result1);
     if (FJsonSerializer::Deserialize ( reader , response ))
     {
          FString token = response->GetStringField ( TEXT ( "token" ) );
@@ -88,6 +91,23 @@ FString UJsonParseLib_KMK::CreateTicketJson ( const TMap<FString , FString> tick
 	FJsonSerializer::Serialize ( jsonObject.ToSharedRef ( ) , writer );
 	// 반환한다.
 	return json;
+}
+
+FString UJsonParseLib_KMK::ParsecTicketJson ( const FString& json )
+{
+
+    // 서버에서 가져온 json 파일 읽기
+    TSharedRef<TJsonReader<TCHAR>> reader = TJsonReaderFactory<TCHAR>::Create ( json );
+    // FJsonObject 형식으로 읽어온 json 데이터를 저장함 => 공유 포인터 형태로 객체 감싸기
+    TSharedPtr<FJsonObject> response = MakeShareable ( new FJsonObject ( ) );
+    FString image;
+    if (FJsonSerializer::Deserialize ( reader , response ))
+    {
+        // sonObject 형식으로 만든다.
+	   image  = response->GetStringField ( TEXT ( "image" ) );
+    }
+	// 반환한다.
+	return image;
 }
 
 #pragma endregion

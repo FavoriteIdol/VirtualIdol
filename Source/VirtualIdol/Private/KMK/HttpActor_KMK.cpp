@@ -81,7 +81,7 @@ void AHttpActor_KMK::ReqSetConcert ( const FConcertInfo& concert )
 	FHttpModule& httpModule = FHttpModule::Get ( );
 	TSharedRef<IHttpRequest> req = httpModule.CreateRequest ( );
 
-	req->SetHeader(TEXT("accessToken") , FString::Printf(TEXT("%s") , *loginInfo.token));
+	req->SetHeader(TEXT("accessToken") , *loginInfo.token);
 	req->SetURL(TEXT("http://master-of-prediction.shop:8123/api/v1/concerts") );
 	req->SetVerb(TEXT("POST"));
 	req->SetHeader(TEXT("content-type") , TEXT("application/json"));
