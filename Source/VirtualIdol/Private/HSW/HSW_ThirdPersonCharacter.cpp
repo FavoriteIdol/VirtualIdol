@@ -12,6 +12,13 @@
 #include "Components/ProgressBar.h"
 #include "HSW/HSW_FeverGaugeWidget.h"
 #include "HSW/HSW_AuditoriumGameMode.h"
+#include "HSW/HSW_ImojiConponent.h"
+#include "Components/BillboardComponent.h"
+#include "UObject/ConstructorHelpers.h"
+#include "HSW/HSW_ImogiWidget.h"
+#include "Components/WidgetComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Components/Image.h"
 
 // Sets default values
 AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
@@ -57,7 +64,40 @@ AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 
-	
+	// Imoji Component
+// 	ImojiComponent = CreateDefaultSubobject<UHSW_ImojiConponent>(TEXT("ImojiComponent" ));
+// 	ImojiComponent->SetupAttachment(GetMesh());
+// 	ImojiComponent->SetRelativeLocation(FVector(0,0,230.f));
+
+// 	ImojiBillboard = CreateDefaultSubobject<UBillboardComponent> ( TEXT ( "ImojiBilboard" ) );
+// 	ImojiBillboard->SetVisibility ( true );
+// 	ImojiBillboard->bHiddenInGame = false;
+// 	ImojiBillboard->SetupAttachment ( GetMesh() );
+// 	ImojiBillboard->SetRelativeLocation(FVector(0,0,230.f));
+
+	ImojiComp = CreateDefaultSubobject<UWidgetComponent> ( TEXT ( "ImojiWidget" ) );
+	ImojiComp->SetupAttachment(GetMesh());
+
+	ConstructorHelpers::FClassFinder<UHSW_ImogiWidget> loadedImojiWidget ( TEXT ( "'/Game/Project/Personal/HSW/UI/WBP_Imogi.WBP_Imogi_C'" ) );
+
+	if (loadedImojiWidget.Succeeded ( ))
+	{
+		ImojiComp->SetWidgetClass( loadedImojiWidget.Class);
+		ImojiComp->SetDrawSize (FVector2D(100,20 ) );
+		ImojiComp->SetRelativeLocation(FVector(0,0,230));
+		ImojiComp->SetRelativeRotation( FRotator ( 0 , 90 , 0 ) );
+	}
+
+// 	static ConstructorHelpers::FObjectFinder<UMaterial> LoadedOpacityMaterial ( TEXT ( "Material'/Game/Project/Personal/HSW/Resources/Imogi/M_Imoji_Opacity'" ) );
+// 	if (LoadedOpacityMaterial.Succeeded ( ))
+// 	{
+// 		OpacityMaterial = LoadedOpacityMaterial.Object;
+// 
+// 		if (OpacityMaterial)
+// 		{
+// 			ImojiMesh->SetMaterial ( 0 , OpacityMaterial );
+// 		}
+// 	}
 }
 
 // Called when the game starts or when spawned
@@ -66,6 +106,8 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	InitMainUI();
+	ImojiComp->SetVisibility(false);
+	imojiWidget = Cast<UHSW_ImogiWidget> ( ImojiComp->GetWidget ( ) );
 	
 }
 
@@ -73,7 +115,15 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 void AHSW_ThirdPersonCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (ImojiComp && ImojiComp->GetVisibleFlag ( ))
+	{
+		// 카메라 위치 
+		FVector CamLoc = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0 )->GetCameraLocation();
+		FVector Direction = CamLoc - ImojiComp->GetComponentLocation();
+		Direction.Z=0;
 
+		ImojiComp->SetWorldRotation(Direction.GetSafeNormal().ToOrientationRotator());
+	}
 }
 
 void AHSW_ThirdPersonCharacter::InitMainUI ( )
@@ -84,6 +134,27 @@ void AHSW_ThirdPersonCharacter::InitMainUI ( )
 	{
 		MainUI->AddToViewport ( );
 	}
+}
+
+void AHSW_ThirdPersonCharacter::Imoji ( int index )
+{
+	imojiWidget->ImogiImage->SetBrushFromTexture( ImojiImageArray[index] ) ;
+
+	AppearImoji( );
+
+	GetWorld ( )->GetTimerManager ( ).ClearTimer ( TimerHandleImoji );
+	GetWorld ( )->GetTimerManager ( ).SetTimer ( TimerHandleImoji , this , &AHSW_ThirdPersonCharacter::DisappearImoji , 2.0f );
+}
+
+void AHSW_ThirdPersonCharacter::AppearImoji ( )
+{
+	ImojiComp->SetVisibility(true);
+	imojiWidget->PlayFadeInImoji();
+}
+
+void AHSW_ThirdPersonCharacter::DisappearImoji ( )
+{
+	imojiWidget->PlayFadeOutImoji ( );
 }
 
 // Called to bind functionality to input

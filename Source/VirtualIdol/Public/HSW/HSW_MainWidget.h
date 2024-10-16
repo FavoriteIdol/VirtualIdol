@@ -23,4 +23,30 @@ public:
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UHSW_FeverGaugeWidget* FeverGauge;
 
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UHorizontalBox* ImojiBox;
+
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* Btn_Imoji_1;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* Btn_Imoji_2;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* Btn_Imoji_3;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* Btn_Imoji_4;
+
+	UFUNCTION( )
+	void OnMyImoji01( );
+	UFUNCTION( )
+	void OnMyImoji02( );
+	UFUNCTION( )
+	void OnMyImoji03( );
+	UFUNCTION( )
+	void OnMyImoji04( );
+
+	UPROPERTY( )
+	class AHSW_ThirdPersonCharacter* Player;
+	UPROPERTY( )
+	class UHSW_ImojiConponent* ImojiComponent;
+
 };
