@@ -132,6 +132,9 @@ public:
 	UPROPERTY( )
 	class UHSW_ImogiWidget* imojiWidget;
 
+	UPROPERTY ( EditDefaultsOnly, Category = Imoji )
+	class UNiagaraSystem* EmojiEffect;
+
 	UFUNCTION(BlueprintImplementableEvent, Category= Imogi )
 	void FadeInImogiBlueprint( );
 

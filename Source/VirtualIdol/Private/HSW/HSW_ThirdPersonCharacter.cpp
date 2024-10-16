@@ -21,6 +21,9 @@
 #include "Components/Image.h"
 #include "Components/ArrowComponent.h"
 #include "HSW_ThrowingObject.h"
+#include "../../../../Plugins/FX/Niagara/Source/Niagara/Public/NiagaraFunctionLibrary.h"
+#include "../../../../Plugins/FX/Niagara/Source/Niagara/Public/NiagaraComponent.h"
+#include "../../../../Plugins/FX/Niagara/Source/Niagara/Classes/NiagaraSystem.h"
 
 // Sets default values
 AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
@@ -155,6 +158,12 @@ void AHSW_ThirdPersonCharacter::Imoji ( int index )
 void AHSW_ThirdPersonCharacter::AppearImoji ( )
 {
 	ImojiComp->SetVisibility(true);
+
+	
+	UNiagaraComponent* AppearComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation ( GetWorld ( ) , EmojiEffect , ImojiComp->GetComponentLocation ( ) );
+
+	AppearComponent->SetAutoDestroy(true );
+
 	imojiWidget->PlayFadeInImoji();
 }
 
