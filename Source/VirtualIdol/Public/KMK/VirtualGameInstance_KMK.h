@@ -49,7 +49,7 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 	IOnlineSessionPtr sessionInterface;
 
 	// 호스트 이름은 서버에서 닉네임 받아올 예정
-	FString HostName ="!!!!";
+	FString HostName ="AirJet";
 
 	UPROPERTY( )
 	bool bLogin = false;
