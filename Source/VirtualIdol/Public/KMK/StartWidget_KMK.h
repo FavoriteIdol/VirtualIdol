@@ -50,10 +50,15 @@ public:
 	class UEditableText* EditText_ID;
 	UPROPERTY(meta = (BindWidget))
 	class UEditableText* EditText_PW;
-
+	UPROPERTY(meta = (BindWidget))
+    class UButton* Butt_FailLogin;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UCanvasPanel* FailLoginPanel;
 	// 버튼 연동 함수
 	UFUNCTION ()
 	void OnMyLogin();
+	UFUNCTION ()
+	void OnFailLogin();
 #pragma endregion
 #pragma region  Four Button Widget Panel
 // ================================================================

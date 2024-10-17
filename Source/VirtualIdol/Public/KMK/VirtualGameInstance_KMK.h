@@ -103,7 +103,11 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 	UFUNCTION( )
 	void VisibleStartWidget ( bool bVisible );
 	UFUNCTION( )
-	void SwitchWidget(int32 num );
+    void SwitchWidget ( int32 num );
+	UFUNCTION ( )
+    void PopUpVisible ( );
+	UFUNCTION ( )
+    void LoginPanel ( );
 
     UPROPERTY ( )
     int32 playerMeshNum = -1;

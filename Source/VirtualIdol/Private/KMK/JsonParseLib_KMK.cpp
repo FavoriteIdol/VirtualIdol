@@ -32,8 +32,7 @@ FLoginInfo UJsonParseLib_KMK::ParsecMyInfo ( const FString& json )
     TSharedPtr<FJsonObject> response = MakeShareable ( new FJsonObject ( ) );
     // 역직렬화 : josn 문자열을 FJsonObject로 변경하기
     FLoginInfo result;
-    FLoginInfo result1;
-    FJsonObjectConverter::JsonObjectStringToUStruct(json, &result1);
+
     if (FJsonSerializer::Deserialize ( reader , response ))
     {
          FString token = response->GetStringField ( TEXT ( "token" ) );
@@ -45,10 +44,11 @@ FLoginInfo UJsonParseLib_KMK::ParsecMyInfo ( const FString& json )
 
             result.email = email;
             result.token = token;
-            result.pw = pw;
-            result.nickName = nick;
+            result.password = pw;
+            result.userName = nick;
          }
     }
+    UE_LOG(LogTemp, Log, TEXT ("%s" ) , *result.token );
     return result;
 }
 
@@ -61,13 +61,22 @@ FString UJsonParseLib_KMK::MakeConcertJson (const struct FConcertInfo& concert )
 
     // 로그인 데이터를 JsonObject 형식으로 만든다.
 	TSharedPtr<FJsonObject> jsonObject = MakeShareable ( new FJsonObject ( ) );
-
-    jsonObject->SetStringField("name" , concert.concertName);
     // 2024-10-24
+    FString json;
 
-
+    jsonObject->SetStringField("name" , *concert.name);
+	jsonObject->SetStringField("img" , *concert.img);
+	jsonObject->SetStringField("concertDate" , *concert.concertDate);
+	jsonObject->SetStringField("startTime" , *concert.startTime);
+	jsonObject->SetStringField("endTime" , *concert.endTime);
+	jsonObject->SetNumberField("appearedVFX" , concert.appearedVFX);
+	jsonObject->SetNumberField("feverVFX" , concert.feverVFX);
+	jsonObject->SetNumberField("stageId" , concert.stageId);
+	jsonObject->SetNumberField("ticketPrice" , concert.ticketPrice);
+	jsonObject->SetNumberField("peopleScale" , concert.peopleScale);
+  
 	// writer를 만들어서 JsonObject를 인코딩해서 
-	FString json;
+	
 	TSharedRef<TJsonWriter<TCHAR>> writer = TJsonWriterFactory<TCHAR>::Create ( &json );
 	FJsonSerializer::Serialize ( jsonObject.ToSharedRef ( ) , writer );
 	// 반환한다.

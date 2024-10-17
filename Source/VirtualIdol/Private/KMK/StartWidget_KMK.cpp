@@ -37,9 +37,11 @@ void UStartWidget_KMK::NativeConstruct ( )
 		gi->bLogin = true;
 	}
 #pragma region LoginPanel
-	if (Butt_Login)
+	if (Butt_Login && Butt_FailLogin && FailLoginPanel)
 	{
 		Butt_Login->OnClicked.AddDynamic(this, &UStartWidget_KMK::OnMyLogin);
+		Butt_FailLogin->OnClicked.AddDynamic(this, &UStartWidget_KMK::OnFailLogin);
+		FailLoginPanel->SetVisibility(ESlateVisibility::Hidden);
 	}
 #pragma endregion
 
@@ -189,10 +191,14 @@ void UStartWidget_KMK::OnMyLogin ( )
 	if (!EditText_ID->GetText ( ).IsEmpty ( ) && !EditText_PW->GetText ( ).IsEmpty ( ))
 	{
 		// 서버에 정보값 보내기
-		// httpActor->ReqLogin(EditText_ID->GetText().ToString(), EditText_PW->GetText().ToString());
-		// 선택지로 변경
-		StartSwitcher->SetActiveWidgetIndex ( 1 );
+		httpActor->ReqLogin(EditText_ID->GetText().ToString(), EditText_PW->GetText().ToString());
+		//StartSwitcher->SetActiveWidgetIndex ( 1 );
 	}
+}
+
+void UStartWidget_KMK::OnFailLogin ( )
+{
+	FailLoginPanel->SetVisibility(ESlateVisibility::Hidden);
 }
 
 #pragma endregion
@@ -281,13 +287,13 @@ void UStartWidget_KMK::PressSelectButt ( )
 		bool bNext = BEditTextEmpty ( );
 		if(!bNext) return;
 		SetTitleText ( TEXT ( "티켓" ) );
+		
 		SetPanelVisible( SetTicketPanel , SetDayPanel, SetEffectPanel, StageChargePanel );
 		selectNum++;
 	}
 	else if (selectNum == 1)
 	{
 		if(EditText_Price->GetText().IsEmpty()) return;
-
 		SetTitleText ( TEXT ( "이펙트 설정" ) );
 		SetPanelVisible ( SetEffectPanel , SetTicketPanel , SetDayPanel , StageChargePanel );
 		selectNum++;
@@ -321,7 +327,8 @@ bool UStartWidget_KMK::BEditTextEmpty ( )
 		Text_FinalName->SetText(EditText_StageName->GetText());
 		Text_FinalStageName->SetText(EditText_StageName->GetText());
 		
-		concertInfo.concertName = EditText_StageName->GetText().ToString();
+		concertInfo.name = EditText_StageName->GetText().ToString();
+
 		bool bEditDigit 
             = EditTextDigit ( EditText_Year->GetText ( ).ToString ( ) ) && EditTextDigit ( EditText_Mon->GetText ( ).ToString ( ) )
             && EditTextDigit ( EditText_Day->GetText ( ).ToString ( ) ) && EditTextDigit ( EditText_SHour->GetText ( ).ToString ( ) )
@@ -337,13 +344,13 @@ bool UStartWidget_KMK::BEditTextEmpty ( )
 		FString mon = ChangeString(EditText_Day->GetText().ToString());
 		FString day = ChangeString(EditText_Day->GetText().ToString());
 
-		concertInfo.concertDay = year + TEXT("-") + mon + TEXT("-") + day;
+		concertInfo.concertDate = year + TEXT("-") + mon + TEXT("-") + day;
 
 		Text_StartHour->SetText(EditText_SHour->GetText());
 		Text_StartMin->SetText(EditText_SMin->GetText());
 		FString sHour =  ChangeString(EditText_SHour->GetText().ToString());
 		FString sMin = ChangeString(EditText_SMin->GetText().ToString());
-		concertInfo.concertTime = sHour + TEXT(":" ) + sMin + TEXT(":" ) + TEXT("00");
+		concertInfo.startTime = sHour + TEXT(":" ) + sMin + TEXT(":" ) + TEXT("00");
 
 		FString sH = EditText_SHour->GetText().ToString();
 		FString sM = EditText_SMin->GetText().ToString();
@@ -389,9 +396,9 @@ void UStartWidget_KMK::PressCreateTicket ( )
 	if(!EditMultiText_Ticket->GetText().IsEmpty()) UE_LOG(LogTemp, Warning, TEXT("Create!" ) );
 	TMap<FString, FString> data;
 	data.Add(TEXT("prompt" ), EditMultiText_Ticket->GetText().ToString());
-	data.Add(TEXT("description" ), TEXT("안녕하세요!! 오랜만입니다!!" ));
+	data.Add(TEXT("description"), TEXT("안녕하세요!! 오랜만입니다!!" ));
 	httpActor->ReqTicket(data);
-	EditMultiText_Ticket->SetText ( FText::GetEmpty ( ) );
+	// EditMultiText_Ticket->SetText ( FText::GetEmpty ( ) );
 }
 
 void UStartWidget_KMK::CreateTicketMaterial ( UTexture2D* texture)
@@ -411,18 +418,20 @@ void UStartWidget_KMK::ClearAllText ( )
 	EditText_H->SetText( FText::GetEmpty ( ) );
 	EditText_M->SetText( FText::GetEmpty ( ) );
 
+	concertInfo.ticketPrice = FCString::Atoi(*EditText_Price->GetText().ToString());
+
 	EditText_Price->SetText( FText::GetEmpty ( ) );
 	EditMultiText_Ticket->SetText( FText::GetEmpty ( ) );
 
 	Image_Particle->SetBrushFromMaterial ( EffectParticles[0] );
 	Image_Fever->SetBrushFromMaterial ( FeversParticles[0] );
 
-	concertInfo.appearEffectNum = particleNum;
-	concertInfo.feverEffectNum = feverNum;
-	UE_LOG(LogTemp, Warning, TEXT("%d, %d" ), concertInfo.appearEffectNum, concertInfo.feverEffectNum );
+	concertInfo.appearedVFX = particleNum;
+	concertInfo.feverVFX = feverNum;
 
 	particleNum = 0;
 	feverNum = 0;
+	
 }
 
 void UStartWidget_KMK::PressRightButt ( )
@@ -486,20 +495,20 @@ void UStartWidget_KMK::MinusIndex ( int32 num , TArray<class UMaterial*>  meshAr
 void UStartWidget_KMK::PressNextButt ( )
 {
 	if(EditText_ScaleNum->GetText().IsEmpty()) return;
+	concertInfo.peopleScale = FCString::Atoi(*EditText_ScaleNum->GetText().ToString());
 	StagePayPanel->SetVisibility ( ESlateVisibility::Visible );
 	Text_Pay->SetVisibility ( ESlateVisibility::Visible );
 	Butt_PayMoney->SetVisibility ( ESlateVisibility::Visible );
 	StageScalePanel->SetVisibility ( ESlateVisibility::Hidden );
-	Butt_Next->SetVisibility ( ESlateVisibility::Hidden );
 	Text_FinalCount->SetText ( EditText_ScaleNum->GetText() );
 	Text_FinalPay->SetText ( Text_Price->GetText() );
+	Butt_Next->SetVisibility ( ESlateVisibility::Hidden );
 	Text_Price->SetText(FText::GetEmpty ( ) );
 	EditText_ScaleNum->SetText ( FText::GetEmpty ( ) );
 }
 void UStartWidget_KMK::PressPayMoney ( )
 {
-	PayPopUpPanel->SetVisibility(ESlateVisibility::Visible);
-	// Text_FinalStageName->SetText()
+	httpActor->ReqSetConcert(concertInfo);
 }
 
 void UStartWidget_KMK::PressOkayButt ( )

@@ -13,6 +13,7 @@
 #include "../TP_ThirdPerson/TP_ThirdPersonCharacter.h"
 #include "KMK/AudienceServerComponent_KMK.h"
 #include "KMK/HttpActor_KMK.h"
+#include "Components/CanvasPanel.h"
 
 void UVirtualGameInstance_KMK::Init ( )
 {
@@ -251,14 +252,24 @@ void UVirtualGameInstance_KMK::SwitchWidget ( int32 num )
     widget->StartSwitcher->SetActiveWidgetIndex ( num );
 }
 
+void UVirtualGameInstance_KMK::PopUpVisible ( )
+{
+    widget->PayPopUpPanel->SetVisibility(ESlateVisibility::Hidden);
+}
+
+void UVirtualGameInstance_KMK::LoginPanel ( )
+{
+    widget->FailLoginPanel->SetVisibility(ESlateVisibility::Visible);
+}
+
 #pragma endregion
 #pragma region Token
 void UVirtualGameInstance_KMK::SetMyInfo (const struct FLoginInfo& info )
 {
     loginInfo.email = info.email;
-    loginInfo.pw = info.pw;
+    loginInfo.password = info.password;
     loginInfo.token = info.token;
-    loginInfo.nickName = info.nickName;
+    loginInfo.userName = info.userName;
 }
 
 FLoginInfo UVirtualGameInstance_KMK::GetMyInfo ( )
