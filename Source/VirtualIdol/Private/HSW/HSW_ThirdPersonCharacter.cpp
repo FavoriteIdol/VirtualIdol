@@ -24,6 +24,7 @@
 #include "../../../../Plugins/FX/Niagara/Source/Niagara/Public/NiagaraFunctionLibrary.h"
 #include "../../../../Plugins/FX/Niagara/Source/Niagara/Public/NiagaraComponent.h"
 #include "../../../../Plugins/FX/Niagara/Source/Niagara/Classes/NiagaraSystem.h"
+#include "HSW_AnimInstance_Audience.h"
 
 // Sets default values
 AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
@@ -47,12 +48,13 @@ AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
 	// GetCharacterMovement ( )->DefaultLandMovementMode = EMovementMode::MOVE_Flying;
 	// Note: For faster iteration times these variables, and many more, can be tweaked in the Character Blueprint
 	// instead of recompiling to adjust them
-	GetCharacterMovement ( )->JumpZVelocity = 700.f;
+	GetCharacterMovement ( )->JumpZVelocity = 500.f;
 	GetCharacterMovement ( )->AirControl = 0.35f;
 	GetCharacterMovement ( )->MaxWalkSpeed = 500.f;
 	GetCharacterMovement ( )->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement ( )->BrakingDecelerationWalking = 2000.f;
 	GetCharacterMovement ( )->BrakingDecelerationFalling = 1500.0f;
+	GetCharacterMovement( )->GravityScale=0.8f;
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent> ( TEXT ( "CameraBoom" ) );
@@ -304,5 +306,9 @@ void AHSW_ThirdPersonCharacter::OnMyThorwPitch ( const FInputActionValue& value 
 		ThrowingObject->MeshComp->AddForce( ThrowingForce );
 		ThrowingObject = nullptr;
 	}
+
+	// 재장전 애니메이션 재생
+	auto* anim = Cast<UHSW_AnimInstance_Audience> ( GetMesh ( )->GetAnimInstance ( ) );
+	anim->PlayThrowMontage ( );
 }
 

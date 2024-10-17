@@ -152,5 +152,4 @@ public:
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite )
 	float ThrowingSpeed = 8000000.0f;
 
-
 };

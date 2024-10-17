@@ -31,3 +31,12 @@ void UHSW_AnimInstance_Audience::NativeUpdateAnimation ( float DeltaSeconds )
 
 	IsInAir = Me->GetCharacterMovement ( )->IsFalling ( );
 }
+
+void UHSW_AnimInstance_Audience::PlayThrowMontage ( )
+{
+	if (ThrowMontage)
+	{	
+		Montage_Play( ThrowMontage );
+		Montage_JumpToSection(FName("Start") , ThrowMontage );
+	}
+}

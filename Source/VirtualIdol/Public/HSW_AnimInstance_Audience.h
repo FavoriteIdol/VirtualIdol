@@ -30,5 +30,10 @@ public:
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite)
 	bool IsInAir;
 
+	UPROPERTY(EditDefaultsOnly, Category = Anim)
+	class UAnimMontage* ThrowMontage;
+
+	// 재장전 애니메이션 재생
+	void PlayThrowMontage ( );
 
 };
