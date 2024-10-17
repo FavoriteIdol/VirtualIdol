@@ -43,8 +43,8 @@ AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
 	GetCharacterMovement ( )->bOrientRotationToMovement = false; // Character moves in the direction of input...	
 	GetCharacterMovement ( )->RotationRate = FRotator ( 0.0f , 500.0f , 0.0f ); // ...at this rotation rate
 	GetCharacterMovement()->bUseControllerDesiredRotation=true;
-	//GetCharacterMovement()->UCharacterMovementComponent::SetMovementMode ( EMovementMode::MOVE_Flying);
-	GetCharacterMovement ( )->DefaultLandMovementMode = EMovementMode::MOVE_Flying;
+	// GetCharacterMovement()->UCharacterMovementComponent::SetMovementMode ( EMovementMode::MOVE_Flying);
+	// GetCharacterMovement ( )->DefaultLandMovementMode = EMovementMode::MOVE_Flying;
 	// Note: For faster iteration times these variables, and many more, can be tweaked in the Character Blueprint
 	// instead of recompiling to adjust them
 	GetCharacterMovement ( )->JumpZVelocity = 700.f;
@@ -116,6 +116,11 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 	InitMainUI();
 	ImojiComp->SetVisibility(false);
 	imojiWidget = Cast<UHSW_ImogiWidget> ( ImojiComp->GetWidget ( ) );
+
+	FInputModeGameAndUI a;
+	GetWorld()->GetFirstPlayerController()->SetInputMode(a);
+	GetWorld ( )->GetFirstPlayerController ( )->bShowMouseCursor=true;
+
 	
 }
 
@@ -241,7 +246,7 @@ void AHSW_ThirdPersonCharacter::Move ( const FInputActionValue& Value )
 // 			CurrentLocation += FVector ( 0 , 0 , 1 ) * 200.f * GetWorld()->GetDeltaSeconds();
 // 			SetActorLocation(CurrentLocation);
 // 			UE_LOG ( LogTemp , Warning , TEXT ( "MovementVector: %s" ) , *MovementVector.ToString ( ) );
-			AddMovementInput ( UpDirection , MovementVector.Y );
+			//AddMovementInput ( UpDirection , MovementVector.Y );
 		}
 	}
 }
