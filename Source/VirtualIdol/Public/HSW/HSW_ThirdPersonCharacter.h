@@ -67,7 +67,7 @@ protected:
 	void Look ( const FInputActionValue& Value );
 
 	void OnMyFeverGauge ( const FInputActionValue& value );
-
+	
 	void OnMyThorwHold ( const FInputActionValue& value );
 
 	void OnMyThorwPitch ( const FInputActionValue& value );
@@ -151,5 +151,18 @@ public:
 
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite )
 	float ThrowingSpeed = 8000000.0f;
+
+	UPROPERTY(Replicated, EditDefaultsOnly,BlueprintReadWrite )
+	bool bThrowing;
+
+	// 멀티플레이 --------------------------------------
+
+	virtual void GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
+
+	UFUNCTION(Server, Reliable )
+	void ServerRPCThrowHold( );
+
+	UFUNCTION(NetMulticast, Reliable )
+	void MulticastRPCThrowHold( FTransform t );
 
 };

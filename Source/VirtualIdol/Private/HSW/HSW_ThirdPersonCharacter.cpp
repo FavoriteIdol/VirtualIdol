@@ -25,6 +25,7 @@
 #include "../../../../Plugins/FX/Niagara/Source/Niagara/Public/NiagaraComponent.h"
 #include "../../../../Plugins/FX/Niagara/Source/Niagara/Classes/NiagaraSystem.h"
 #include "HSW_AnimInstance_Audience.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
@@ -108,6 +109,8 @@ AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
 // 			ImojiMesh->SetMaterial ( 0 , OpacityMaterial );
 // 		}
 // 	}
+	bReplicates = true;
+	SetReplicateMovement ( true );
 }
 
 // Called when the game starts or when spawned
@@ -178,6 +181,35 @@ void AHSW_ThirdPersonCharacter::DisappearImoji ( )
 	imojiWidget->PlayFadeOutImoji ( );
 }
 
+void AHSW_ThirdPersonCharacter::GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& OutLifetimeProps ) const
+{
+	Super::GetLifetimeReplicatedProps ( OutLifetimeProps );
+
+	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , bThrowing );
+}
+
+void AHSW_ThirdPersonCharacter::ServerRPCThrowHold_Implementation ( )
+{
+	FTransform t = ThrowingArrow->GetComponentTransform ( );
+	
+	MulticastRPCThrowHold( t );
+
+}
+
+void AHSW_ThirdPersonCharacter::MulticastRPCThrowHold_Implementation ( FTransform t )
+{
+// 	FTransform t = ThrowingArrow->GetComponentTransform ( );
+ 	ThrowingObject = GetWorld ( )->SpawnActor<AHSW_ThrowingObject> ( ThrowingObjectFactory , t );
+	if (ThrowingObject)
+	{
+		ThrowingObject->AttachToComponent ( ThrowingArrow , FAttachmentTransformRules::KeepWorldTransform );
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Object did not spawn" ) );
+	}
+}
+
 // Called to bind functionality to input
 void AHSW_ThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -211,9 +243,7 @@ void AHSW_ThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* Playe
 		//Throwing
 		EnhancedInputComponent->BindAction ( ThrowAction , ETriggerEvent::Started , this , &AHSW_ThirdPersonCharacter::OnMyThorwHold );
 		EnhancedInputComponent->BindAction ( ThrowAction , ETriggerEvent::Completed , this , &AHSW_ThirdPersonCharacter::OnMyThorwPitch );
-
 	}
-
 }
 
 void AHSW_ThirdPersonCharacter::Move ( const FInputActionValue& Value )
@@ -285,14 +315,7 @@ void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value 
 
 void AHSW_ThirdPersonCharacter::OnMyThorwHold ( const FInputActionValue& value )
 {
-	FTransform t = ThrowingArrow->GetComponentTransform();
-	ThrowingObject= GetWorld()->SpawnActor<AHSW_ThrowingObject>(ThrowingObjectFactory, t);
-	if (ThrowingObject)
-	{
-		ThrowingObject->AttachToComponent( ThrowingArrow, FAttachmentTransformRules::KeepWorldTransform );
-	}
-
-
+	ServerRPCThrowHold( );
 }
 
 void AHSW_ThirdPersonCharacter::OnMyThorwPitch ( const FInputActionValue& value )
@@ -311,4 +334,3 @@ void AHSW_ThirdPersonCharacter::OnMyThorwPitch ( const FInputActionValue& value 
 	auto* anim = Cast<UHSW_AnimInstance_Audience> ( GetMesh ( )->GetAnimInstance ( ) );
 	anim->PlayThrowMontage ( );
 }
-
