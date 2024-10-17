@@ -165,4 +165,10 @@ public:
 	UFUNCTION(NetMulticast, Reliable )
 	void MulticastRPCThrowHold( FTransform t );
 
+	UFUNCTION(Server, Reliable )
+	void ServerRPCThrowPitch ( );
+
+	UFUNCTION(NetMulticast, Reliable )
+	void MulticastRPCThrowPitch();
+
 };

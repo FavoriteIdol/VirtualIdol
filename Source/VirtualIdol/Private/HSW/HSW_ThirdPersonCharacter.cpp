@@ -210,6 +210,34 @@ void AHSW_ThirdPersonCharacter::MulticastRPCThrowHold_Implementation ( FTransfor
 	}
 }
 
+void AHSW_ThirdPersonCharacter::ServerRPCThrowPitch_Implementation ( )
+{
+	MulticastRPCThrowPitch();
+}
+
+void AHSW_ThirdPersonCharacter::MulticastRPCThrowPitch_Implementation ( )
+{
+
+	ThrowingObject->DetachFromActor ( FDetachmentTransformRules::KeepWorldTransform );
+	ThrowingObject->MeshComp->SetSimulatePhysics ( true );
+
+	FVector ThrowingForce = ThrowingArrow->GetForwardVector ( ) * ThrowingSpeed;
+	ThrowingObject->MeshComp->AddForce ( ThrowingForce );
+	ThrowingObject = nullptr;
+	
+
+	// 재장전 애니메이션 재생
+	auto* anim = Cast<UHSW_AnimInstance_Audience> ( GetMesh ( )->GetAnimInstance ( ) );
+	if (anim)
+	{
+		anim->PlayThrowMontage ( );
+	}
+	else
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "Throw Montage is null" ) );
+	}
+}
+
 // Called to bind functionality to input
 void AHSW_ThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -320,17 +348,5 @@ void AHSW_ThirdPersonCharacter::OnMyThorwHold ( const FInputActionValue& value )
 
 void AHSW_ThirdPersonCharacter::OnMyThorwPitch ( const FInputActionValue& value )
 {
-	if (ThrowingObject)
-	{
-		ThrowingObject->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-		ThrowingObject->MeshComp->SetSimulatePhysics(true);
-
-		FVector ThrowingForce = ThrowingArrow->GetForwardVector() * ThrowingSpeed;
-		ThrowingObject->MeshComp->AddForce( ThrowingForce );
-		ThrowingObject = nullptr;
-	}
-
-	// 재장전 애니메이션 재생
-	auto* anim = Cast<UHSW_AnimInstance_Audience> ( GetMesh ( )->GetAnimInstance ( ) );
-	anim->PlayThrowMontage ( );
+	ServerRPCThrowPitch( );
 }
