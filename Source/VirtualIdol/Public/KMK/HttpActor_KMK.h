@@ -34,6 +34,20 @@ struct FConcertInfo
 	UPROPERTY(BlueprintReadOnly)
 	int32 peopleScale;
 
+	void Clear ( )
+	{
+		name.Empty ( );
+		img.Empty ( );
+		concertDate.Empty ( );
+		startTime.Empty ( );
+		endTime.Empty ( );
+		appearedVFX = 0;
+		feverVFX = 0;
+		stageId = 0;
+		ticketPrice = 0;
+		peopleScale = 0;
+	}
+
 };
 // 개인정보
 USTRUCT ( BlueprintType )
@@ -78,6 +92,7 @@ public:
 	void OnResLogin( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
 #pragma endregion
 #pragma region with BE for SettingStage
+	int32 count = 0;
 	// 요청
 	void ReqSetConcert(const FConcertInfo& concert );
 	// 응답

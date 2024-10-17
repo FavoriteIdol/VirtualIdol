@@ -250,11 +250,12 @@ void UVirtualGameInstance_KMK::VisibleStartWidget (bool bVisible)
 void UVirtualGameInstance_KMK::SwitchWidget ( int32 num )
 {
     widget->StartSwitcher->SetActiveWidgetIndex ( num );
+
 }
 
 void UVirtualGameInstance_KMK::PopUpVisible ( )
 {
-    widget->PayPopUpPanel->SetVisibility(ESlateVisibility::Hidden);
+    widget->PayPopUpPanel->SetVisibility(ESlateVisibility::Visible);
 }
 
 void UVirtualGameInstance_KMK::LoginPanel ( )
@@ -275,6 +276,11 @@ void UVirtualGameInstance_KMK::SetMyInfo (const struct FLoginInfo& info )
 FLoginInfo UVirtualGameInstance_KMK::GetMyInfo ( )
 {
     return loginInfo;
+}
+
+void UVirtualGameInstance_KMK::SetConcertInfo ( const struct FConcertInfo& info )
+{
+    concerInfo = info;
 }
 
 #pragma endregion

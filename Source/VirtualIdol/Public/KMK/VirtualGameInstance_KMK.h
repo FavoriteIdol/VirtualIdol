@@ -119,6 +119,10 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 	void SetMyInfo(const struct FLoginInfo& info  );
 	UFUNCTION( )
 	FLoginInfo GetMyInfo( );
+	UPROPERTY( )
+	FConcertInfo concerInfo;
+	UFUNCTION( )
+	void SetConcertInfo( const struct FConcertInfo& info );
 #pragma endregion
 
 

@@ -35,17 +35,11 @@ FLoginInfo UJsonParseLib_KMK::ParsecMyInfo ( const FString& json )
 
     if (FJsonSerializer::Deserialize ( reader , response ))
     {
-         FString token = response->GetStringField ( TEXT ( "token" ) );
-         if (response->TryGetStringField ( TEXT ( "token" ) , token ) && !token.IsEmpty ( ))
+         if (response->TryGetStringField ( TEXT ( "token" ) , result.token ))
          {
-            FString email = response->GetStringField ( TEXT ( "email" ) );
-            FString pw = response->GetStringField ( TEXT ( "password" ) );
-            FString nick = response->GetStringField ( TEXT ( "userName" ) );
-
-            result.email = email;
-            result.token = token;
-            result.password = pw;
-            result.userName = nick;
+            response->TryGetStringField ( TEXT ( "email" ), result.email );
+            response->TryGetStringField ( TEXT ( "password" ), result.password );
+            response->TryGetStringField ( TEXT ( "userName" ), result.userName );
          }
     }
     UE_LOG(LogTemp, Log, TEXT ("%s" ) , *result.token );
@@ -64,23 +58,31 @@ FString UJsonParseLib_KMK::MakeConcertJson (const struct FConcertInfo& concert )
     // 2024-10-24
     FString json;
 
-    jsonObject->SetStringField("name" , *concert.name);
-	jsonObject->SetStringField("img" , *concert.img);
-	jsonObject->SetStringField("concertDate" , *concert.concertDate);
-	jsonObject->SetStringField("startTime" , *concert.startTime);
-	jsonObject->SetStringField("endTime" , *concert.endTime);
-	jsonObject->SetNumberField("appearedVFX" , concert.appearedVFX);
-	jsonObject->SetNumberField("feverVFX" , concert.feverVFX);
-	jsonObject->SetNumberField("stageId" , concert.stageId);
-	jsonObject->SetNumberField("ticketPrice" , concert.ticketPrice);
-	jsonObject->SetNumberField("peopleScale" , concert.peopleScale);
+    jsonObject->SetStringField(TEXT("name") , concert.name);
+	jsonObject->SetStringField( TEXT ( "img") , concert.img);
+	jsonObject->SetStringField( TEXT ( "concertDate") , concert.concertDate);
+	jsonObject->SetStringField( TEXT ( "startTime") , concert.startTime);
+	jsonObject->SetStringField( TEXT ( "endTime") , concert.endTime);
+	jsonObject->SetNumberField( TEXT ( "appearedVFX") , concert.appearedVFX);
+	jsonObject->SetNumberField( TEXT ( "feverVFX") , concert.feverVFX);
+	jsonObject->SetNumberField( TEXT ( "stageId") , concert.stageId);
+	jsonObject->SetNumberField( TEXT ( "ticketPrice") , concert.ticketPrice);
+	jsonObject->SetNumberField( TEXT ( "peopleScale") , concert.peopleScale);
   
 	// writer를 만들어서 JsonObject를 인코딩해서 
 	
-	TSharedRef<TJsonWriter<TCHAR>> writer = TJsonWriterFactory<TCHAR>::Create ( &json );
-	FJsonSerializer::Serialize ( jsonObject.ToSharedRef ( ) , writer );
-	// 반환한다.
-	return json;
+    // JsonWriter를 사용해 직렬화
+    TSharedRef<TJsonWriter<TCHAR>> writer = TJsonWriterFactory<TCHAR>::Create ( &json );
+    if (FJsonSerializer::Serialize ( jsonObject.ToSharedRef ( ) , writer ))
+    {
+        UE_LOG ( LogTemp , Log , TEXT ( "생성된 JSON: %s" ) , *json );
+        return json;
+    }
+    else
+    {
+        UE_LOG ( LogTemp , Error , TEXT ( "JSON 직렬화 실패" ) );
+        return TEXT ( "" );
+    }
 }
 
 #pragma endregion

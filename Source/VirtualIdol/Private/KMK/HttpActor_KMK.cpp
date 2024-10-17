@@ -83,12 +83,13 @@ void AHttpActor_KMK::ReqSetConcert ( const FConcertInfo& concert )
 	// HTTP 모듈 생성
 	FHttpModule& httpModule = FHttpModule::Get ( );
 	TSharedRef<IHttpRequest> req = httpModule.CreateRequest ( );
-    req->SetHeader(TEXT("Authorization"), *(TEXT("Bearer " ) + loginInfo.token));
+	FString authHeader = FString::Printf ( TEXT ( "Bearer %s" ) , *gi->loginInfo.token );
+    req->SetHeader(TEXT("Authorization"), *( authHeader ));
 	req->SetURL(TEXT("http://master-of-prediction.shop:8123/api/v1/concerts") );
 	req->SetVerb(TEXT("POST"));
 	req->SetHeader(TEXT("content-type") , TEXT("application/json"));
     req->SetContentAsString ( UJsonParseLib_KMK::MakeConcertJson(concert)  );
-	UE_LOG ( LogTemp , Log , TEXT ( "%s" ) ,  *(TEXT("Bearer  " ) + loginInfo.token) );
+	UE_LOG ( LogTemp , Log , TEXT ( "%s" ) ,  *(TEXT("Bearer " ) + loginInfo.token) );
 	req->OnProcessRequestComplete().BindUObject(this , &AHttpActor_KMK::OnResSetConcert);
 
 	req->ProcessRequest();
@@ -108,12 +109,17 @@ void AHttpActor_KMK::OnResSetConcert ( FHttpRequestPtr Request , FHttpResponsePt
 
         if (StatusCode == 403)
         {
+			if(count > 1)  return;
             UE_LOG ( LogTemp , Error , TEXT ( "403 Forbidden: 인증 문제 또는 권한 부족 - 응답 내용: %s" ) , *ResponseBody );
+			FPlatformProcess::Sleep ( 1.0f ); // 1초 대기
+			ReqSetConcert (gi->concerInfo);
+			count++;
         }
         else
         {
             UE_LOG ( LogTemp , Warning , TEXT ( "응답 코드: %d - %s" ) , StatusCode , *ResponseBody );
             gi->PopUpVisible ( );
+			//gi->concerInfo.Clear( );
         }
 	}
 }

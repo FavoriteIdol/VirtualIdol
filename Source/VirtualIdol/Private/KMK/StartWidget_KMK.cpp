@@ -362,6 +362,7 @@ bool UStartWidget_KMK::BEditTextEmpty ( )
 
 		sH = ChangeString(FString::FromInt(h));
 		sM = ChangeString(FString::FromInt(m));
+
 		concertInfo.endTime = sH + TEXT ( ":" ) + sM + TEXT ( ":" ) + TEXT ( "00" );
 
 		return true;
@@ -508,6 +509,7 @@ void UStartWidget_KMK::PressNextButt ( )
 }
 void UStartWidget_KMK::PressPayMoney ( )
 {
+	gi->SetConcertInfo(concertInfo);
 	httpActor->ReqSetConcert(concertInfo);
 }
 
