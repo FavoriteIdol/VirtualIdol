@@ -23,6 +23,9 @@
 #include "Components/VerticalBoxSlot.h"
 #include "KMK/SingWidget_KMK.h"
 #include "Components/VerticalBox.h"
+#include "Sound/SoundEffectSource.h"
+#include <chrono>
+#include "Components/WidgetSwitcher.h"
 
 void UAudience_KMK::NativeConstruct ( )
 {
@@ -97,6 +100,7 @@ void UAudience_KMK::NativeConstruct ( )
 #pragma endregion
 
 }
+
 
 #pragma region PopUp
 
@@ -356,9 +360,9 @@ void UAudience_KMK::PressObject2Butt ( )
     UE_LOG ( LogTemp , Warning , TEXT ( "33333" ) );
 }
 
-void UAudience_KMK::CountDownText ( int32 time )
+void UAudience_KMK::CountDownText (const FString& time )
 {
-    Text_CoutDown->SetText(FText::AsNumber(time));
+    Text_CoutDown->SetText(FText::FromString(time));
 }
 
 void UAudience_KMK::CountDownPanelVisible ( ESlateVisibility visiblePanel )
@@ -450,64 +454,100 @@ USoundWaveProcedural* UAudience_KMK::LoadWavFromFile(const FString& FilePath)
     TArray<uint8> RawFileData;
 
     // 파일 데이터를 메모리로 로드
-    if (!FFileHelper::LoadFileToArray(RawFileData, *FilePath))
+    if (!FFileHelper::LoadFileToArray ( RawFileData , *FilePath ))
     {
-        UE_LOG(LogTemp, Error, TEXT("Failed to load file: %s"), *FilePath);
+        UE_LOG ( LogTemp , Error , TEXT ( "Failed to load file: %s" ) , *FilePath );
         return nullptr;
     }
 
     // WAV 파일 헤더 정보 추출
     FWaveModInfo WaveInfo;
-    if (!WaveInfo.ReadWaveInfo(RawFileData.GetData(), RawFileData.Num()))
+    if (!WaveInfo.ReadWaveInfo ( RawFileData.GetData ( ) , RawFileData.Num ( ) ))
     {
-        UE_LOG(LogTemp, Error, TEXT("Invalid WAV format: %s"), *FilePath);
+        UE_LOG ( LogTemp , Error , TEXT ( "Invalid WAV format: %s" ) , *FilePath );
         return nullptr;
     }
 
     int32 BitsPerSample = *WaveInfo.pBitsPerSample;
-    if (BitsPerSample != 16 && BitsPerSample != 32)
-    {
-        UE_LOG(LogTemp, Error, TEXT("Unsupported bit depth: %d bits per sample"), BitsPerSample);
-        return nullptr;
-    }
-    // USoundWaveProcedural 객체 생성 및 설정
-    USoundWaveProcedural* SoundWave = NewObject<USoundWaveProcedural>();
+    int32 SampleRate = *WaveInfo.pSamplesPerSec;
+
+    USoundWaveProcedural* SoundWave = NewObject<USoundWaveProcedural> ( );
     if (!SoundWave)
     {
-        UE_LOG(LogTemp, Error, TEXT("Failed to create SoundWave object."));
+        UE_LOG ( LogTemp , Error , TEXT ( "Failed to create SoundWave object." ) );
         return nullptr;
     }
 
- // 샘플레이트와 채널 수 설정
     SoundWave->NumChannels = *WaveInfo.pChannels;
-    int32 SampleRate = *WaveInfo.pSamplesPerSec;
-    SoundWave->SetSampleRate(SampleRate);
+    SoundWave->SetSampleRate ( SampleRate );
 
-    // 총 샘플 수 계산
-    uint32 BytesPerSample = (*WaveInfo.pChannels) * (BitsPerSample / 8);
+    uint32 BytesPerSample = ( *WaveInfo.pChannels ) * ( BitsPerSample / 8 );
     uint32 TotalSamples = WaveInfo.SampleDataSize / BytesPerSample;
-    float Duration = static_cast<float>(TotalSamples) / static_cast<float>(SampleRate);
-    SoundWave->Duration = Duration;
+    SoundWave->Duration = static_cast<float>( TotalSamples ) / static_cast<float>( SampleRate );
 
-    // PCM 데이터를 비트 깊이에 따라 변환하여 큐에 추가
+    // 비트 깊이에 따른 필터 적용
+
+    // 비트 깊이에 따른 필터 적용 및 증폭
     if (BitsPerSample == 16)
     {
-        // 16비트 PCM 데이터 처리
-        const int16* PCMData = reinterpret_cast<const int16*>(WaveInfo.SampleDataStart);
-        int32 PCMDataSize = WaveInfo.SampleDataSize / sizeof(int16);
-        SoundWave->QueueAudio(reinterpret_cast<const uint8*>(PCMData), PCMDataSize * sizeof(int16));
+        const int16* PCMDataStart = reinterpret_cast<const int16*>( WaveInfo.SampleDataStart );
+        TArray<int16> PCMData;
+        PCMData.Append ( PCMDataStart , WaveInfo.SampleDataSize / sizeof ( int16 ) );
+
+        AmplifyPCM16 ( PCMData , soundGain );  // 16비트 데이터 증폭
+        ApplyHighPassFilter16 ( PCMData , 100.0f , SampleRate );
+        ApplyLowPassFilter16 ( PCMData , 5000.0f , SampleRate );
+
+        SoundWave->QueueAudio ( reinterpret_cast<const uint8*>( PCMData.GetData ( ) ) , PCMData.Num ( ) * sizeof ( int16 ) );
+    }
+    else if (BitsPerSample == 24)
+    {
+        const uint8* PCMDataStart = reinterpret_cast<const uint8*>( WaveInfo.SampleDataStart );
+        if (!PCMDataStart)
+        {
+            UE_LOG ( LogTemp , Error , TEXT ( "Failed to cast SampleDataStart to uint8 for file: %s" ) , *FilePath );
+            return nullptr;
+        }
+
+        TArray<int32> PCMData;
+        PCMData.Reserve ( WaveInfo.SampleDataSize / 3 );
+
+        // 24비트 PCM 데이터를 32비트로 변환
+        for (uint32 i = 0; i < WaveInfo.SampleDataSize; i += 3)
+        {
+            int32 Sample = ( PCMDataStart[i] << 16 ) | ( PCMDataStart[i + 1] << 8 ) | PCMDataStart[i + 2];
+            PCMData.Add ( Sample );
+        }
+
+        AmplifyPCM24 ( PCMData , soundGain );  // 24비트 데이터 증폭
+        ApplyHighPassFilter24 ( PCMData , 100.0f , SampleRate );
+        ApplyLowPassFilter24 ( PCMData , 5000.0f , SampleRate );
+
+        // 다시 24비트로 저장 (필터링된 데이터를 3바이트로 다시 압축)
+        TArray<uint8> FilteredPCMData;
+        FilteredPCMData.Reserve ( PCMData.Num ( ) * 3 );
+        for (int32 Sample : PCMData)
+        {
+            FilteredPCMData.Add ( ( Sample >> 16 ) & 0xFF );
+            FilteredPCMData.Add ( ( Sample >> 8 ) & 0xFF );
+            FilteredPCMData.Add ( Sample & 0xFF );
+        }
+
+        // SoundWave에 24비트 데이터를 다시 3바이트 단위로 큐잉
+        SoundWave->QueueAudio ( FilteredPCMData.GetData ( ) , FilteredPCMData.Num ( ) );
     }
     else if (BitsPerSample == 32)
     {
-        // 32비트 부동소수점 데이터 처리
-        const float* PCMData = reinterpret_cast<const float*>(WaveInfo.SampleDataStart);
-        int32 PCMDataSize = WaveInfo.SampleDataSize / sizeof(float);
-        
-        // 부동소수점 데이터를 큐에 추가
-        SoundWave->QueueAudio(reinterpret_cast<const uint8*>(PCMData), PCMDataSize * sizeof(float));
-    }
+        const float* PCMDataStart = reinterpret_cast<const float*>( WaveInfo.SampleDataStart );
+        TArray<float> PCMData;
+        PCMData.Append ( PCMDataStart , WaveInfo.SampleDataSize / sizeof ( float ) );
 
-    // 추가적인 설정
+        AmplifyPCM32 ( PCMData , soundGain );  // 32비트 데이터 증폭
+        ApplyHighPassFilter32 ( PCMData , 100.0f , SampleRate );
+        ApplyLowPassFilter32 ( PCMData , 5000.0f , SampleRate );
+
+        SoundWave->QueueAudio ( reinterpret_cast<const uint8*>( PCMData.GetData ( ) ) , PCMData.Num ( ) * sizeof ( float ) );
+    }
     SoundWave->bLooping = false;
     SoundWave->bProcedural = true;
     SoundWave->SoundGroup = SOUNDGROUP_Default;
@@ -515,6 +555,147 @@ USoundWaveProcedural* UAudience_KMK::LoadWavFromFile(const FString& FilePath)
 
     return SoundWave;
 }
-#pragma endregion
 
+void UAudience_KMK::ChangeVirtualWidget ( )
+{
+    WS_Concert->SetActiveWidgetIndex(1);
+}
+
+#pragma endregion
+#pragma region Filter
+void ApplyHighPassFilter16 ( TArray<int16>& PCMData , float CutoffFrequency , int32 SampleRate )
+{
+    const float RC = 1.0f / ( CutoffFrequency * 2.0f * PI );
+    const float dt = 1.0f / static_cast<float>( SampleRate );
+    const float alpha = dt / ( RC + dt );
+
+    float previousSample = 0.0f;
+
+    for (int32 i = 0; i < PCMData.Num ( ); ++i)
+    {
+        float currentSample = static_cast<float>( PCMData[i] );
+        float filteredSample = alpha * ( previousSample + currentSample - previousSample );
+        PCMData[i] = static_cast<int16>( filteredSample );
+        previousSample = currentSample;
+    }
+}
+
+void ApplyLowPassFilter16 ( TArray<int16>& PCMData , float CutoffFrequency , int32 SampleRate )
+{
+    const float RC = 1.0f / ( CutoffFrequency * 2.0f * PI );
+    const float dt = 1.0f / static_cast<float>( SampleRate );
+    const float alpha = dt / ( RC + dt );
+
+    float previousSample = 0.0f;
+
+    for (int32 i = 0; i < PCMData.Num ( ); ++i)
+    {
+        float currentSample = static_cast<float>( PCMData[i] );
+        previousSample = previousSample + alpha * ( currentSample - previousSample );
+        PCMData[i] = static_cast<int16>( previousSample );
+    }
+}
+
+void ApplyHighPassFilter24 ( TArray<int32>& PCMData , float CutoffFrequency , int32 SampleRate )
+{
+    const float RC = 1.0f / ( CutoffFrequency * 2.0f * PI );
+    const float dt = 1.0f / static_cast<float>( SampleRate );
+    const float alpha = dt / ( RC + dt );
+
+    float previousSample = 0.0f;
+
+    for (int32 i = 0; i < PCMData.Num ( ); ++i)
+    {
+        float currentSample = static_cast<float>( PCMData[i] >> 8 );  // 24비트를 32비트로 변환 시 상위 바이트 제거
+        float filteredSample = alpha * ( previousSample + currentSample - previousSample );
+        PCMData[i] = static_cast<int32>( filteredSample ) << 8;  // 다시 24비트로 변환
+        previousSample = currentSample;
+    }
+}
+
+void ApplyLowPassFilter24 ( TArray<int32>& PCMData , float CutoffFrequency , int32 SampleRate )
+{
+    const float RC = 1.0f / ( CutoffFrequency * 2.0f * PI );
+    const float dt = 1.0f / static_cast<float>( SampleRate );
+    const float alpha = dt / ( RC + dt );
+
+    float previousSample = 0.0f;
+
+    for (int32 i = 0; i < PCMData.Num ( ); ++i)
+    {
+        float currentSample = static_cast<float>( PCMData[i] >> 8 );  // 24비트를 32비트로 변환
+        previousSample = previousSample + alpha * ( currentSample - previousSample );
+        PCMData[i] = static_cast<int32>( previousSample ) << 8;  // 다시 24비트로 변환
+    }
+}
+
+void ApplyHighPassFilter32 ( TArray<float>& PCMData , float CutoffFrequency , int32 SampleRate )
+{
+    const float RC = 1.0f / ( CutoffFrequency * 2.0f * PI );
+    const float dt = 1.0f / static_cast<float>( SampleRate );
+    const float alpha = dt / ( RC + dt );
+
+    float previousSample = 0.0f;
+
+    for (int32 i = 0; i < PCMData.Num ( ); ++i)
+    {
+        float currentSample = PCMData[i];
+        float filteredSample = alpha * ( previousSample + currentSample - previousSample );
+        PCMData[i] = filteredSample;
+        previousSample = currentSample;
+    }
+}
+
+void ApplyLowPassFilter32 ( TArray<float>& PCMData , float CutoffFrequency , int32 SampleRate )
+{
+    const float RC = 1.0f / ( CutoffFrequency * 2.0f * PI );
+    const float dt = 1.0f / static_cast<float>( SampleRate );
+    const float alpha = dt / ( RC + dt );
+
+    float previousSample = 0.0f;
+
+    for (int32 i = 0; i < PCMData.Num ( ); ++i)
+    {
+        float currentSample = PCMData[i];
+        previousSample = previousSample + alpha * ( currentSample - previousSample );
+        PCMData[i] = previousSample;
+    }
+}
+void AmplifyPCM16 ( TArray<int16>& PCMData , float Gain )
+{
+    for (int32 i = 0; i < PCMData.Num ( ); ++i)
+    {
+        // 샘플 증폭
+        int32 AmplifiedSample = static_cast<int32>( PCMData[i] * Gain );
+
+        // 클리핑 방지
+        PCMData[i] = FMath::Clamp ( AmplifiedSample , -32768 , 32767 );
+    }
+}
+void AmplifyPCM24 ( TArray<int32>& PCMData , float Gain )
+{
+    for (int32 i = 0; i < PCMData.Num ( ); ++i)
+    {
+        // 24비트 샘플 증폭
+        int64 AmplifiedSample = static_cast<int64>( ( PCMData[i] >> 8 ) * Gain );  // 24비트를 32비트로 확장한 후 증폭
+
+        // 클리핑 방지 (24비트에서 최대 최소 값은 23비트로 결정됨)
+        AmplifiedSample = FMath::Clamp ( AmplifiedSample , -8388608 , 8388607 );  // 24비트 한계
+
+        PCMData[i] = static_cast<int32>( AmplifiedSample ) << 8;  // 다시 24비트로 변환
+    }
+}
+void AmplifyPCM32 ( TArray<float>& PCMData , float Gain )
+{
+    for (int32 i = 0; i < PCMData.Num ( ); ++i)
+    {
+        // 샘플 증폭
+        PCMData[i] *= Gain;
+
+        // 클리핑 방지
+        PCMData[i] = FMath::Clamp ( PCMData[i] , -1.0f , 1.0f );
+    }
+}
+
+#pragma endregion
 

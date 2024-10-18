@@ -218,7 +218,7 @@ public :
     class UTextBlock* Text_CoutDown;
 
 	UFUNCTION( )
-	void CountDownText(int32 time );
+	void CountDownText( const FString& time );
 	UFUNCTION( )
 	void CountDownPanelVisible( ESlateVisibility visiblePanel );
 #pragma endregion
@@ -246,7 +246,22 @@ public :
 
 	UFUNCTION( )
 	USoundWaveProcedural* LoadWavFromFile ( const FString& FilePath );
+
+	UPROPERTY( )
+	float soundGain = 2;
+	UFUNCTION( )
+	void ChangeVirtualWidget( );
+
 #pragma endregion
 
 
 };
+void ApplyHighPassFilter16 ( TArray<int16>& PCMData , float CutoffFrequency , int32 SampleRate );
+void ApplyLowPassFilter16 ( TArray<int16>& PCMData , float CutoffFrequency , int32 SampleRate );
+void ApplyHighPassFilter24 ( TArray<int32>& PCMData , float CutoffFrequency , int32 SampleRate );
+void ApplyLowPassFilter24 ( TArray<int32>& PCMData , float CutoffFrequency , int32 SampleRate );
+void ApplyHighPassFilter32 ( TArray<float>& PCMData , float CutoffFrequency , int32 SampleRate );
+void ApplyLowPassFilter32 ( TArray<float>& PCMData , float CutoffFrequency , int32 SampleRate );
+void AmplifyPCM16 ( TArray<int16>& PCMData , float Gain );
+void AmplifyPCM24 ( TArray<int32>& PCMData , float Gain );
+void AmplifyPCM32 ( TArray<float>& PCMData , float Gain );

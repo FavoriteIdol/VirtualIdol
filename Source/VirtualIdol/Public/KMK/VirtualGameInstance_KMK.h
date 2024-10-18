@@ -19,9 +19,9 @@ struct FRoomInfo
 	UPROPERTY(BlueprintReadOnly)
 	FString hostName;
 	UPROPERTY(BlueprintReadOnly)
-	int32 MaxPlayer;
+	int32 MaxPlayer = 0;
 	UPROPERTY(BlueprintReadOnly)
-	int32 CurrentPlayer;
+	int32 CurrentPlayer = 0;
 	UPROPERTY(BlueprintReadOnly)
 	int32 pingMS;
 	UPROPERTY(BlueprintReadOnly )
@@ -114,7 +114,7 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 
 #pragma region Token
 	UPROPERTY( )
-	 FLoginInfo loginInfo;
+	FLoginInfo loginInfo;
 	UFUNCTION( )
 	void SetMyInfo(const struct FLoginInfo& info  );
 	UFUNCTION( )

@@ -51,27 +51,34 @@ public:
 	void ServerRPC_ChangeMyMesh(int32 num );
 
 	UFUNCTION(NetMulticast, Reliable )
-	void MultiRPC_ChangeMyMesh(int32 num );
+	void MultiRPC_ChangeMyMesh(int32 num, class ATP_ThirdPersonCharacter* TargetMesh );
 	UFUNCTION( )
 	void OnRep_ChangePlayerMesh ( );
 
 	UFUNCTION( )
 	void SetVirtualVisible(class ATP_ThirdPersonCharacter* mesh, bool bVisible );
 
+	bool bCount = false;
+	bool bVis = false;
 #pragma endregion
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	UFUNCTION(Server, Reliable )
 	void ServerRPC_StartConcert( );
 	UFUNCTION(NetMulticast, Reliable )
 	void MultiRPC_StartConcert( float CountdownTime );
-	
+	UFUNCTION(NetMulticast, Unreliable )
+	void MultiRPC_UpdateCount( const FString& TimeText );
 	FTimerHandle startCountDownHandle;
 	UPROPERTY(EditAnywhere )
 	float durationTime = 6;
 	float remainTime = 0.f;
 	UPROPERTY()
 	bool bTime = false;
-
+	FString s;
 	UFUNCTION( )
 	void StartCountDown( );
+	UFUNCTION ( )
+	FString GetTimeDifference ( const FString& SetTime );
+	UPROPERTY( EditAnywhere)
+	FString setConcertTime = "22:10:00";
 };

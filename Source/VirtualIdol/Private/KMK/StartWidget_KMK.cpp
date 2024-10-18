@@ -187,8 +187,8 @@ void UStartWidget_KMK::OnMyLogin ( )
 	if (!EditText_ID->GetText ( ).IsEmpty ( ) && !EditText_PW->GetText ( ).IsEmpty ( ))
 	{
 		// 서버에 정보값 보내기
-		httpActor->ReqLogin(EditText_ID->GetText().ToString(), EditText_PW->GetText().ToString());
-		//StartSwitcher->SetActiveWidgetIndex ( 1 );
+		//httpActor->ReqLogin(EditText_ID->GetText().ToString(), EditText_PW->GetText().ToString());
+		StartSwitcher->SetActiveWidgetIndex ( 1 );
 	}
 }
 
