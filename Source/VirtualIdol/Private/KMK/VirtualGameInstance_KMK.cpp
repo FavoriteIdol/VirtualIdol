@@ -243,7 +243,7 @@ void UVirtualGameInstance_KMK::VisibleStartWidget (bool bVisible)
     if (!bVisible)
     {
         widget->ClearSB();
-        SwitchWidget ( 2 );
+        SwitchWidget ( 5 );
     }
 }
 

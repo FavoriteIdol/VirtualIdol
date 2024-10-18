@@ -58,6 +58,7 @@ FString UJsonParseLib_KMK::MakeConcertJson (const struct FConcertInfo& concert )
     // 2024-10-24
     FString json;
 
+    if(concert.concertDate.IsEmpty()) return "0";
     jsonObject->SetStringField(TEXT("name") , concert.name);
 	jsonObject->SetStringField( TEXT ( "img") , concert.img);
 	jsonObject->SetStringField( TEXT ( "concertDate") , concert.concertDate);

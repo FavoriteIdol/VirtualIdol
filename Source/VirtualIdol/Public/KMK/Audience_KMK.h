@@ -171,14 +171,20 @@ public :
 	UPROPERTY ( meta = ( BindWidget ) )
     class UCanvasPanel* ExitPanel;
 	UPROPERTY ( meta = ( BindWidget ) )
+    class UCanvasPanel* ExitPanel1;
+	UPROPERTY ( meta = ( BindWidget ) )
     class UButton* Butt_Exit;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UButton* Butt_Exit1;
 	UPROPERTY ( meta = ( BindWidget ) )
     class UButton* Butt_Out;
 	UPROPERTY ( meta = ( BindWidget ) )
     class UButton* Butt_Cancel;
 	
 	UFUNCTION( )
-	void PressExitButt( );
+    void PressExitButt ( );
+	UFUNCTION ( )
+    void PressExit1Butt ( );
 	UFUNCTION( )
 	void PressOutButt( );
 	UFUNCTION( )
@@ -215,6 +221,31 @@ public :
 	void CountDownText(int32 time );
 	UFUNCTION( )
 	void CountDownPanelVisible( ESlateVisibility visiblePanel );
+#pragma endregion
+#pragma region Virtual
+
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UWidgetSwitcher* WS_Concert;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UButton* Butt_Model;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UButton* Butt_MP3;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UVerticalBox* VB_SingList;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UVerticalBox* VB_SingList1;
+	UPROPERTY(EditAnywhere )
+	TSubclassOf<class USingWidget_KMK> singWidget;
+
+	UFUNCTION( )
+	void PressButtMp3( );
+	UFUNCTION( )
+	void PressButtModel( );
+	UFUNCTION( )
+	bool OpenFileExample(TArray<FString>& FileNames, FString DialogueTitle, FString FileTypes, bool multiselect);
+
+	UFUNCTION( )
+	USoundWaveProcedural* LoadWavFromFile ( const FString& FilePath );
 #pragma endregion
 
 

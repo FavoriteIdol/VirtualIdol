@@ -72,41 +72,36 @@ void UStartWidget_KMK::NativeConstruct ( )
 #pragma endregion
 
 #pragma region  Setting StagePanel
-	if (Image_Particle && Image_Fever)
-	{
-		Image_Particle->SetBrushFromMaterial ( EffectParticles[0] );
-		Image_Fever->SetBrushFromMaterial ( FeversParticles[0] );
-	}
+
 #pragma region Create Ticket
-	if (Butt_CreateTicket)
+	if (Butt_CreateTicket && Butt_CreateTicket1)
 	{
 		Butt_CreateTicket->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressCreateTicket );
+		Butt_CreateTicket1->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressCreateTicket );
 	}
 #pragma endregion
 #pragma region Set Particle
-	if (Butt_Right && Butt_FRight)
+	if (Butt_AppearEffect && Butt_FeverEffect)
 	{
-		Butt_Right->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressRightButt );
-		Butt_FRight->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressFRightButt );
+		Butt_AppearEffect->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressAppearEffect );
+		Butt_FeverEffect->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressFeverEffect );
 	}
-	if (Butt_Left && Butt_FLeft)
-	{
-		Butt_Left->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressLeftButt );
-		Butt_FLeft->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressFLeftButt );
-	}
-	if (Butt_Select)
+	if (Butt_Select &&Butt_Select1)
 	{
 		Butt_Select->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressSelectButt );
+		Butt_Select1->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressSelect1Butt );
     }	
-	if (SetDayPanel && SetTicketPanel && SetEffectPanel && StageChargePanel)
+	if (SetDayPanel && SetTicketPanel && StageChargePanel)
 	{
 		SetTitleText(TEXT("공연 설정" ) );
-		SetPanelVisible ( SetDayPanel , SetTicketPanel , SetEffectPanel , StageChargePanel );
+
+		SetPanelVisible ( SetDayPanel , SetTicketPanel  , StageChargePanel );
 	}
 #pragma endregion
 #pragma region Pay Moneny
 	if (Butt_PayMoney)
 	{
+		Butt_PayMoney->OnClicked.Clear();
 		Butt_PayMoney->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressPayMoney );
 	}
 	if (Butt_Next)
@@ -140,11 +135,12 @@ void UStartWidget_KMK::NativeConstruct ( )
 		Butt_NormalEntry->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressNormalEntry );
 		Butt_No->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressNoButt );
 	}	
-	if (Butt_Back1 && Butt_Back2 && Butt_Back)
+	if (Butt_Back1 && Butt_Back2 && Butt_Back && Butt_Back3)
 	{
 		Butt_Back->OnClicked.AddDynamic ( this , &UStartWidget_KMK::GoBack );
 		Butt_Back1->OnClicked.AddDynamic ( this , &UStartWidget_KMK::GoBack );
 		Butt_Back2->OnClicked.AddDynamic ( this , &UStartWidget_KMK::GoBack );
+		Butt_Back3->OnClicked.AddDynamic ( this , &UStartWidget_KMK::GoBack );
 	}
 #pragma endregion
 #pragma region Session
@@ -288,19 +284,19 @@ void UStartWidget_KMK::PressSelectButt ( )
 		if(!bNext) return;
 		SetTitleText ( TEXT ( "티켓" ) );
 		
-		SetPanelVisible( SetTicketPanel , SetDayPanel, SetEffectPanel, StageChargePanel );
+		SetPanelVisible( SetTicketPanel , SetDayPanel, StageChargePanel );
 		selectNum++;
 	}
 	else if (selectNum == 1)
 	{
 		if(EditText_Price->GetText().IsEmpty()) return;
 		SetTitleText ( TEXT ( "이펙트 설정" ) );
-		SetPanelVisible ( SetEffectPanel , SetTicketPanel , SetDayPanel , StageChargePanel );
+		SetPanelVisible ( StageChargePanel , SetTicketPanel , SetDayPanel );
 		selectNum++;
 	}
 	else
 	{
-		SetPanelVisible ( StageChargePanel , SetDayPanel , SetTicketPanel , SetEffectPanel );
+		SetPanelVisible ( StageChargePanel , SetDayPanel , SetTicketPanel  );
 		ClearAllText( );
 		StageChargePanel->SetVisibility(ESlateVisibility::Visible);
 		selectNum = 0;
@@ -424,9 +420,6 @@ void UStartWidget_KMK::ClearAllText ( )
 	EditText_Price->SetText( FText::GetEmpty ( ) );
 	EditMultiText_Ticket->SetText( FText::GetEmpty ( ) );
 
-	Image_Particle->SetBrushFromMaterial ( EffectParticles[0] );
-	Image_Fever->SetBrushFromMaterial ( FeversParticles[0] );
-
 	concertInfo.appearedVFX = particleNum;
 	concertInfo.feverVFX = feverNum;
 
@@ -435,44 +428,30 @@ void UStartWidget_KMK::ClearAllText ( )
 	
 }
 
-void UStartWidget_KMK::PressRightButt ( )
-{
-	if (EffectParticles.IsEmpty ( )) return;
-	particleNum++;
-	if (particleNum > EffectParticles.Num ( ) - 1) particleNum = 0;
-	Image_Particle->SetBrushFromMaterial ( EffectParticles[particleNum] );
-}
 
-void UStartWidget_KMK::PressLeftButt ( )
-{
-	if (EffectParticles.IsEmpty ( )) return;
-	particleNum--;
-	if (particleNum < 0) particleNum = EffectParticles.Num ( ) - 1;
-	Image_Particle->SetBrushFromMaterial ( EffectParticles[particleNum] );
-}
-
-void UStartWidget_KMK::PressFRightButt ( )
-{
-	if (FeversParticles.IsEmpty ( )) return;
-	feverNum++;
-	if (feverNum > FeversParticles.Num ( ) - 1) feverNum = 0;
-	Image_Fever->SetBrushFromMaterial ( FeversParticles[feverNum] );
-}
-
-void UStartWidget_KMK::PressFLeftButt ( )
-{
-	if (FeversParticles.IsEmpty ( )) return;
-	feverNum--;
-	if (feverNum < 0) feverNum = FeversParticles.Num ( ) - 1;
-	Image_Fever->SetBrushFromMaterial ( FeversParticles[feverNum] );
-}
-
-void UStartWidget_KMK::SetPanelVisible ( class UCanvasPanel* visiblePanel , class UCanvasPanel* hiddenPanel0 , class UCanvasPanel* hiddenPanel1 , class UCanvasPanel* hiddenPanel2 )
+void UStartWidget_KMK::SetPanelVisible ( class UCanvasPanel* visiblePanel , class UCanvasPanel* hiddenPanel0 , class UCanvasPanel* hiddenPanel1  )
 {
 	hiddenPanel0->SetVisibility ( ESlateVisibility::Hidden );
 	hiddenPanel1->SetVisibility ( ESlateVisibility::Hidden );
-	hiddenPanel2->SetVisibility ( ESlateVisibility::Hidden );
 	visiblePanel->SetVisibility ( ESlateVisibility::Visible );
+}
+
+void UStartWidget_KMK::PressAppearEffect ( )
+{
+	bFever = false;
+}
+
+void UStartWidget_KMK::PressFeverEffect ( )
+{
+	bFever = true;
+}
+
+void UStartWidget_KMK::PressSelect1Butt ( )
+{
+	if(particleNum < 0 || feverNum < 0) return;
+	concertInfo.appearedVFX = particleNum;
+	concertInfo.feverVFX = feverNum;
+	StartSwitcher->SetActiveWidgetIndex(2);
 }
 
 void UStartWidget_KMK::AddIndex ( int32 num , TArray<class UMaterial*>  meshArray , UImage* image )
@@ -504,6 +483,7 @@ void UStartWidget_KMK::PressNextButt ( )
 	Text_FinalCount->SetText ( EditText_ScaleNum->GetText() );
 	Text_FinalPay->SetText ( Text_Price->GetText() );
 	Butt_Next->SetVisibility ( ESlateVisibility::Hidden );
+	Butt_CreateTicket1->SetVisibility(ESlateVisibility::Visible);
 	Text_Price->SetText(FText::GetEmpty ( ) );
 	EditText_ScaleNum->SetText ( FText::GetEmpty ( ) );
 }
@@ -523,7 +503,7 @@ void UStartWidget_KMK::PressOkayButt ( )
 void UStartWidget_KMK::ResetWidget ( )
 {
 	SetTitleText ( TEXT ( "공연 설정" ) );
-	SetPanelVisible ( SetDayPanel , SetTicketPanel , SetEffectPanel , StageChargePanel );
+	SetPanelVisible ( SetDayPanel , SetTicketPanel , StageChargePanel );
 
 	StageChargePanel->SetVisibility(ESlateVisibility::Hidden);
 	StageScalePanel->SetVisibility ( ESlateVisibility::Visible );
@@ -531,6 +511,8 @@ void UStartWidget_KMK::ResetWidget ( )
 	Text_Pay->SetVisibility ( ESlateVisibility::Hidden );
 	Butt_PayMoney->SetVisibility ( ESlateVisibility::Hidden );
 	PayPopUpPanel->SetVisibility ( ESlateVisibility::Hidden );
+	Butt_Next->SetVisibility ( ESlateVisibility::Visible );
+	Butt_CreateTicket1->SetVisibility(ESlateVisibility::Hidden);
 }
 
 #pragma endregion

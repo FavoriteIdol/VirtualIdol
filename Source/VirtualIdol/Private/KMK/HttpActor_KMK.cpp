@@ -88,7 +88,8 @@ void AHttpActor_KMK::ReqSetConcert ( const FConcertInfo& concert )
 	req->SetURL(TEXT("http://master-of-prediction.shop:8123/api/v1/concerts") );
 	req->SetVerb(TEXT("POST"));
 	req->SetHeader(TEXT("content-type") , TEXT("application/json"));
-    req->SetContentAsString ( UJsonParseLib_KMK::MakeConcertJson(concert)  );
+	FString s = UJsonParseLib_KMK::MakeConcertJson(concert) ;
+    req->SetContentAsString ( s);
 	UE_LOG ( LogTemp , Log , TEXT ( "%s" ) ,  *(TEXT("Bearer " ) + loginInfo.token) );
 	req->OnProcessRequestComplete().BindUObject(this , &AHttpActor_KMK::OnResSetConcert);
 

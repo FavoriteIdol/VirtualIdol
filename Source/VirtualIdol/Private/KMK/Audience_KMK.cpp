@@ -14,6 +14,15 @@
 #include "KMK/VirtualGameInstance_KMK.h"
 #include "Components/Image.h"
 #include "Components/GridPanel.h"
+#include "DesktopPlatformModule.h"
+#include "Sound/SoundWaveProcedural.h"
+#include "Sound/SoundWave.h"
+#include "Kismet/GameplayStatics.h"
+#include "Audio.h"
+#include "Components/AudioComponent.h"
+#include "Components/VerticalBoxSlot.h"
+#include "KMK/SingWidget_KMK.h"
+#include "Components/VerticalBox.h"
 
 void UAudience_KMK::NativeConstruct ( )
 {
@@ -44,13 +53,15 @@ void UAudience_KMK::NativeConstruct ( )
     }
 #pragma endregion
 #pragma region Exit
-    if (Butt_Exit)
+    if (Butt_Exit && Butt_Exit1)
     {
         Butt_Exit->OnClicked.AddDynamic ( this , &UAudience_KMK::PressExitButt);
+        Butt_Exit1->OnClicked.AddDynamic ( this , &UAudience_KMK::PressExit1Butt);
     }
-    if (ExitPanel && Butt_Cancel && Butt_Out)
+    if (ExitPanel && ExitPanel1 && Butt_Cancel && Butt_Out)
     {
         ExitPanel->SetVisibility(ESlateVisibility::Hidden);
+        ExitPanel1->SetVisibility(ESlateVisibility::Hidden);
         Butt_Cancel->OnClicked.AddDynamic ( this , &UAudience_KMK::PressCancelButt);
         Butt_Out->OnClicked.AddDynamic ( this , &UAudience_KMK::PressOutButt);
     }
@@ -75,6 +86,13 @@ void UAudience_KMK::NativeConstruct ( )
     if (CountDownPanel)
     {
         CountDownPanel->SetVisibility ( ESlateVisibility::Hidden );
+    }
+#pragma endregion
+#pragma region BeforeConcerForVirtual
+    if (Butt_MP3 && Butt_Model)
+    {
+        Butt_MP3->OnClicked.AddDynamic ( this , &UAudience_KMK::PressButtMp3);
+        Butt_Model->OnClicked.AddDynamic ( this , &UAudience_KMK::PressButtModel);
     }
 #pragma endregion
 
@@ -307,6 +325,11 @@ void UAudience_KMK::PressExitButt ( )
     ExitPanel->SetVisibility(ESlateVisibility::Visible);
 }
 
+void UAudience_KMK::PressExit1Butt ( )
+{
+    ExitPanel1->SetVisibility(ESlateVisibility::Visible);
+}
+
 void UAudience_KMK::PressOutButt ( )
 {
     gi->ExitRoom ( );
@@ -315,6 +338,7 @@ void UAudience_KMK::PressOutButt ( )
 void UAudience_KMK::PressCancelButt ( )
 {
     ExitPanel->SetVisibility(ESlateVisibility::Hidden);
+    ExitPanel1->SetVisibility(ESlateVisibility::Hidden);
 }
 
 #pragma region Cash
@@ -342,6 +366,155 @@ void UAudience_KMK::CountDownPanelVisible ( ESlateVisibility visiblePanel )
     if(CountDownPanel)CountDownPanel->SetVisibility(visiblePanel);
 }
 
+#pragma endregion
+#pragma region Before Concert
+void UAudience_KMK::PressButtMp3 ( )
+{
+    TArray<FString> SelectedFiles;
+    FString FileTypes = TEXT("Audio Files (*.mp3;*.wav)|*.mp3;*.wav|All Files (*.*)|*.*");
+
+    // 파일 탐색기를 열고 사용자에게 파일 선택을 요청
+    bool bFileSelected = OpenFileExample(SelectedFiles, TEXT("Select an Image to Upload"), FileTypes, true);
+
+    if (bFileSelected && SelectedFiles.Num() > 0)
+    {
+        for (const FString& FilePath : SelectedFiles)
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Selected File: %s"), *FilePath);
+            FString FileName = FPaths::GetCleanFilename(FilePath);  // "Example.wav"
+            USoundWave* SoundWave = LoadWavFromFile(FilePath);
+            if (SoundWave)
+            {
+                UAudioComponent* AudioComponent = NewObject<UAudioComponent>(GetWorld(), UAudioComponent::StaticClass());
+                AudioComponent->bAutoActivate = false; 
+                auto* musicWidget = Cast<USingWidget_KMK>(CreateWidget(GetWorld(), singWidget));
+                auto* musicWidget1 = Cast<USingWidget_KMK>(CreateWidget(GetWorld(), singWidget));
+                if (AudioComponent && SoundWave && musicWidget)
+                {
+                    AudioComponent->SetSound(SoundWave);
+                    musicWidget->SetTextMusic(FileName);
+                    musicWidget1->SetTextMusic(FileName);
+                    musicWidget->SetMusic(AudioComponent);
+                    musicWidget1->SetMusic(AudioComponent);
+                    if (VB_SingList && VB_SingList1)
+                    {
+                        VB_SingList->AddChild(musicWidget);
+                        VB_SingList1->AddChild(musicWidget1);
+                    }
+                }
+            }
+            else
+            {
+                UE_LOG(LogTemp, Error, TEXT("Failed to load audio: %s"), *FilePath);
+            }
+        }
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("File Selected Failed!!!"))
+    }
+
+}
+
+
+void UAudience_KMK::PressButtModel ( )
+{
+
+}
+// 파일 열기
+bool UAudience_KMK::OpenFileExample(TArray<FString>& FileNames, FString DialogueTitle, FString FileTypes, bool multiselect)
+{
+
+   IDesktopPlatform* DesktopPlatform = FDesktopPlatformModule::Get();
+   bool bOpened = false;
+   FString DefaultPath = FPaths::ProjectContentDir(); // 기본 경로를 프로젝트 콘텐츠 폴더로 설정
+
+   if (DesktopPlatform)
+   {
+      uint32 SelectionFlag = multiselect ? EFileDialogFlags::Multiple : EFileDialogFlags::None;
+      bOpened = DesktopPlatform->OpenFileDialog(
+         NULL,
+         DialogueTitle,
+         DefaultPath,
+         TEXT(""),
+         FileTypes,
+         SelectionFlag,
+         FileNames
+      );
+   }
+   return bOpened;
+}
+// 오디오 파일을 불러와 USoundWave로 변환
+USoundWaveProcedural* UAudience_KMK::LoadWavFromFile(const FString& FilePath)
+{
+    TArray<uint8> RawFileData;
+
+    // 파일 데이터를 메모리로 로드
+    if (!FFileHelper::LoadFileToArray(RawFileData, *FilePath))
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to load file: %s"), *FilePath);
+        return nullptr;
+    }
+
+    // WAV 파일 헤더 정보 추출
+    FWaveModInfo WaveInfo;
+    if (!WaveInfo.ReadWaveInfo(RawFileData.GetData(), RawFileData.Num()))
+    {
+        UE_LOG(LogTemp, Error, TEXT("Invalid WAV format: %s"), *FilePath);
+        return nullptr;
+    }
+
+    int32 BitsPerSample = *WaveInfo.pBitsPerSample;
+    if (BitsPerSample != 16 && BitsPerSample != 32)
+    {
+        UE_LOG(LogTemp, Error, TEXT("Unsupported bit depth: %d bits per sample"), BitsPerSample);
+        return nullptr;
+    }
+    // USoundWaveProcedural 객체 생성 및 설정
+    USoundWaveProcedural* SoundWave = NewObject<USoundWaveProcedural>();
+    if (!SoundWave)
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to create SoundWave object."));
+        return nullptr;
+    }
+
+ // 샘플레이트와 채널 수 설정
+    SoundWave->NumChannels = *WaveInfo.pChannels;
+    int32 SampleRate = *WaveInfo.pSamplesPerSec;
+    SoundWave->SetSampleRate(SampleRate);
+
+    // 총 샘플 수 계산
+    uint32 BytesPerSample = (*WaveInfo.pChannels) * (BitsPerSample / 8);
+    uint32 TotalSamples = WaveInfo.SampleDataSize / BytesPerSample;
+    float Duration = static_cast<float>(TotalSamples) / static_cast<float>(SampleRate);
+    SoundWave->Duration = Duration;
+
+    // PCM 데이터를 비트 깊이에 따라 변환하여 큐에 추가
+    if (BitsPerSample == 16)
+    {
+        // 16비트 PCM 데이터 처리
+        const int16* PCMData = reinterpret_cast<const int16*>(WaveInfo.SampleDataStart);
+        int32 PCMDataSize = WaveInfo.SampleDataSize / sizeof(int16);
+        SoundWave->QueueAudio(reinterpret_cast<const uint8*>(PCMData), PCMDataSize * sizeof(int16));
+    }
+    else if (BitsPerSample == 32)
+    {
+        // 32비트 부동소수점 데이터 처리
+        const float* PCMData = reinterpret_cast<const float*>(WaveInfo.SampleDataStart);
+        int32 PCMDataSize = WaveInfo.SampleDataSize / sizeof(float);
+        
+        // 부동소수점 데이터를 큐에 추가
+        SoundWave->QueueAudio(reinterpret_cast<const uint8*>(PCMData), PCMDataSize * sizeof(float));
+    }
+
+    // 추가적인 설정
+    SoundWave->bLooping = false;
+    SoundWave->bProcedural = true;
+    SoundWave->SoundGroup = SOUNDGROUP_Default;
+    SoundWave->bStreaming = false;
+
+    return SoundWave;
+}
 #pragma endregion
 
 
