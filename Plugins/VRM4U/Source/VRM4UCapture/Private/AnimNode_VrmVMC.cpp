@@ -120,11 +120,15 @@ void FAnimNode_VrmVMC::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCont
 	FVMCData VMCData;
 	if (subsystem->CopyVMCData(VMCData, ServerAddress, Port) == false) {
 		return;
+		
 	}
 
 	if (VMCData.BoneData.Num() == 0 && VMCData.CurveData.Num() == 0) {
 		return;
 	}
+	//본이랑 커브데이터 멀티캐스트하기
+	
+
 	if (bApplyPerfectSync) {
 		for (auto& c : VMCData.CurveData) {
 			if (c.Key.Contains(TEXT("BlendShape.")) == false) continue;

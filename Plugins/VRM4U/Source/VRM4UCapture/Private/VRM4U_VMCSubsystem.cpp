@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "VRM4U_VMCSubsystem.h"
@@ -9,6 +9,8 @@
 #include "Misc/ScopeLock.h"
 #include "OSCManager.h"
 #include "OSCServer.h"
+#include "Kismet/GameplayStatics.h"
+#include "JJH/JJH_IdolGameModeBase.h"
 
 bool UVRM4U_VMCSubsystem::CopyVMCData(FVMCData &data, FString ServerAddress, int port) {
 	for (int i = 0; i < VMCObjectList.Num(); ++i) {
@@ -17,10 +19,16 @@ bool UVRM4U_VMCSubsystem::CopyVMCData(FVMCData &data, FString ServerAddress, int
 
 		if (a->ServerName == ServerAddress && a->port == port) {
 			a->CopyVMCData(data);
+			AJJH_IdolGameModeBase* IdolGMB = Cast<AJJH_IdolGameModeBase> ( UGameplayStatics::GetGameMode ( GetWorld ( ) ) );
+			if (IdolGMB)
+			{
+				UE_LOG ( LogTemp , Warning , TEXT ( "3333" ) );
+			}
 			return true;
 		}
 	}
 	return false;
+
 }
 
 bool UVRM4U_VMCSubsystem::GetVMCData(TMap<FString, FTransform>& BoneData, TMap<FString, float>& CurveData, FString ServerAddress, int port) {
@@ -79,7 +87,6 @@ void UVRM4U_VMCSubsystem::DestroyVMCServerAll() {
 		VMCObjectList.RemoveAt(0);
 	}
 }
-
 
 bool UVRM4U_VMCSubsystem::CreateVMCServer(const FString ServerAddress, int port) {
 	return FindOrAddServer(ServerAddress, port);

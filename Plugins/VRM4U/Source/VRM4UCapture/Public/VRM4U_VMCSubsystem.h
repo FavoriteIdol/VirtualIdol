@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -27,7 +27,7 @@ class VRM4UCAPTURE_API UVRM4U_VMCSubsystem : public UEngineSubsystem
 	GENERATED_BODY()
 
 public:
-
+	
 	UFUNCTION(BlueprintCallable, Category = VRM4U)
 	bool CreateVMCServer(const FString ServerAddress, int port);
 
