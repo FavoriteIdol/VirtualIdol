@@ -130,7 +130,6 @@ void FAnimNode_VrmVMC::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCont
 
 	if (subsystem->CopyVMCData ( VMCData , ServerAddress , Port ) == false) {
 		return;
-		UE_LOG ( LogTemp , Warning , TEXT ( "1111" ) );
 	}
 	//FVMCData VMCData;
 	if(bCanSendData == true)
@@ -158,12 +157,17 @@ void FAnimNode_VrmVMC::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCont
 						bCanSendData = false;
 						bCanReceiveData = false;
 						UE_LOG ( LogTemp , Warning , TEXT ( "222" ) );
+						UE_LOG ( LogTemp , Error , TEXT ( "%d" ) , PC->bIsReceived );
 					}
 				} );
 			}
+			
 		}
+		
+		
 	}
 	if(PC == nullptr || PC->bIsReceived == false) return;
+
 	USkeletalMeshComponent* SMC = CachedAnimInstance->GetSkelMeshComponent ( );
 	if (SMC)
 	{		
@@ -198,7 +202,10 @@ void FAnimNode_VrmVMC::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCont
 	TMap<FString, FTransform>& BoneTrans = VMCData.BoneData;
 
 	const auto &MorphList = Output.AnimInstanceProxy->GetSkelMeshComponent()->GetSkinnedAsset()->GetMorphTargets();
-	for (auto& c : VMCData.CurveData) {
+	TMap<FString , float> CurveDataCopy = VMCData.CurveData;
+	UE_LOG ( LogTemp , Warning , TEXT ( "555" ) );
+	for (auto& c : CurveDataCopy){
+	//for (auto& c : VMCData.CurveData) {
 #if	UE_VERSION_OLDER_THAN(5,3,0)
 		{
 			SmartName::UID_Type NewUID;
@@ -219,6 +226,7 @@ void FAnimNode_VrmVMC::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCont
 				return;
 			}
 
+			//에러자주남
 			FString morphTargetName = morphTarget->GetName ( );
 			FString curveKeyName = c.Key;
 
@@ -239,23 +247,9 @@ void FAnimNode_VrmVMC::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCont
 		else {
 			Output.Curve.Set ( *c.Key , c.Value );
 		}
-
-		//auto m = MorphList.FindByPredicate([&c](const TObjectPtr<UMorphTarget> &m) {
-		//	FString s = c.Key;
-
-		//	if (m->GetName().Compare(s, ESearchCase::IgnoreCase)) {
-		//		return false;
-		//	}
-		//	return true;
-		//});
-		//if (m) {
-		//	Output.Curve.Set(*m->GetName(), c.Value);
-		//} else {
-		//	Output.Curve.Set(*c.Key, c.Value);
-		//}
 #endif
 	}
-
+	UE_LOG ( LogTemp , Warning , TEXT ( "6666" ) );
 	{
 		bool bFirstBone = true;
 
@@ -266,81 +260,21 @@ void FAnimNode_VrmVMC::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCont
 
 			auto modelBone = *tmpVal;
 #else
-			/*	auto filterList= BoneTrans.FilterByPredicate([&t](TPair<FString, FTransform> a) {
-					return a.Key.Compare(t.Key, ESearchCase::IgnoreCase) == 0;
-				}
-				);
-				if (filterList.Num() != 1) continue;
-				auto modelBone = filterList.begin()->Value;*/
 			TArray<TPair<FString , FTransform>> filterList;
 			for (const auto& a : BoneTrans) {
-				if (&t == nullptr || &a == nullptr) {
+				// 로그 추가: a.Key와 t.Key 출력
+				UE_LOG ( LogTemp , Warning , TEXT ( "Comparing keys: a.Key = %s, t.Key = %s" ) , *a.Key , *t.Key );
+
 				if (a.Key.Compare ( t.Key , ESearchCase::IgnoreCase ) == 0) {
 					filterList.Add ( a );
 				}
-				}
 			}
+				
 
 			if (filterList.Num ( ) != 1) continue;
 			auto modelBone = filterList[0].Value;
 #endif
 
-
-		//	int index = RefSkeleton.FindBoneIndex(*t.Value);
-		//	if (index < 0) continue;
-
-		//	FBoneTransform f(FCompactPoseBoneIndex(index), modelBone);
-		//	//f.Transform.SetRotation(FQuat::Identity);
-
-		//	if (bFirstBone) {
-		//		bFirstBone = false;
-
-		//		if (bUseRemoteCenterPos) {
-		//			auto v = f.Transform.GetLocation() * ModelRelativeScale;
-		//			f.Transform.SetTranslation(v);
-		//		} else {
-		//			auto v = RefSkeletonTransform[index].GetLocation();
-		//			f.Transform.SetTranslation(v);
-		//		}
-
-
-		//		// root bone
-		//		FTransform RootTrans;
-		//		for (auto& a : BoneTrans) {
-		//			if (a.Key.Compare(TEXT("root"), ESearchCase::IgnoreCase)) {
-		//				continue;
-		//			}
-		//			RootTrans = a.Value;
-		//			break;
-		//		}
-		//		if (index == 0) {
-		//			// hip == root
-		//			f.Transform.SetTranslation(f.Transform.GetLocation() + RootTrans.GetLocation());
-		//		} else {
-		//			// orig root
-		//			FBoneTransform bt(FCompactPoseBoneIndex(0), RootTrans);
-		//			tmpOutTransform.Add(bt);
-		//			boneIndexTable.Add(0);
-		//		}
-
-		//	} else {
-		//		FVector v = RefSkeletonTransform[index].GetLocation();
-		//		f.Transform.SetTranslation(v);
-		//	}
-
-		//	if (bIgnoreLocalRotation){
-		//		auto r_refg = RefSkeletonTransform_global[index].GetRotation();
-		//		auto r_ref = RefSkeletonTransform[index].GetRotation();
-		//		auto r_vmc = f.Transform.GetRotation();
-
-		//		auto r_dif = r_refg.Inverse() * r_vmc * r_refg;
-		//		
-		//		f.Transform.SetRotation(r_ref * r_dif);
-		//	}
-		//	//f.Transform.SetTranslation(RefSkeletonTransform[index].GetLocation());
-		//	tmpOutTransform.Add(f);
-		//	boneIndexTable.Add(index);
-		//}
 			int index = RefSkeleton.FindBoneIndex ( *t.Value );
 			if (index < 0) continue;
 
@@ -394,6 +328,7 @@ void FAnimNode_VrmVMC::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCont
 			tmpOutTransform.Add ( f );
 			boneIndexTable.Add ( index );
 		}
+		UE_LOG ( LogTemp , Warning , TEXT ( "7777" ) );
 		// bone hierarchy
 		for (int i = 1; i < tmpOutTransform.Num(); ++i) {
 			int parentBoneIndex = RefSkeleton.GetParentIndex(boneIndexTable[i]);
@@ -419,7 +354,7 @@ void FAnimNode_VrmVMC::EvaluateSkeletalControl_AnyThread(FComponentSpacePoseCont
 		tmpOutTransform.Sort(FCompareBoneTransformIndex());
 		boneIndexTable.Sort();
 	}
-
+	UE_LOG ( LogTemp , Warning , TEXT ( "8888" ) );
 	for (int i = 0; i < tmpOutTransform.Num(); ++i) {
 		auto& a = tmpOutTransform[i];
 
