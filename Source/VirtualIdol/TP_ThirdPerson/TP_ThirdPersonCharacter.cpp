@@ -16,6 +16,7 @@
 #include "KMK/VirtualGameInstance_KMK.h"
 #include "Components/GridPanel.h"
 #include "GameFramework/PlayerController.h"
+#include "VrmVMCObject.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -99,7 +100,6 @@ void ATP_ThirdPersonCharacter::BeginPlay()
 		FInputModeGameAndUI inputMode;
 		GetController<APlayerController> ( )->SetInputMode(inputMode );
 	}
-
 }
 
 void ATP_ThirdPersonCharacter::Tick ( float DeltaTime)

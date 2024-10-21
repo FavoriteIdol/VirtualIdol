@@ -19,11 +19,11 @@ bool UVRM4U_VMCSubsystem::CopyVMCData(FVMCData &data, FString ServerAddress, int
 
 		if (a->ServerName == ServerAddress && a->port == port) {
 			a->CopyVMCData(data);
-			AJJH_IdolGameModeBase* IdolGMB = Cast<AJJH_IdolGameModeBase> ( UGameplayStatics::GetGameMode ( GetWorld ( ) ) );
-			if (IdolGMB)
-			{
-				UE_LOG ( LogTemp , Warning , TEXT ( "3333" ) );
-			}
+			//AJJH_IdolGameModeBase* IdolGMB = Cast<AJJH_IdolGameModeBase> ( UGameplayStatics::GetGameMode ( GetWorld ( ) ) );
+			//if (IdolGMB)
+			//{
+			//	UE_LOG ( LogTemp , Warning , TEXT ( "3333" ) );
+			//}
 			return true;
 		}
 	}

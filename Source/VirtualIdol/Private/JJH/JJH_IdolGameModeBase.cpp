@@ -62,4 +62,10 @@ void AJJH_IdolGameModeBase::BeginPlay ( )
 {
     Super::BeginPlay ( );
     auto MyObj = NewObject<UVrmVMCObject> ( this , UVrmVMCObject::StaticClass ( ) );
+    FindVrmVMCObject ( );
+}
+
+void AJJH_IdolGameModeBase::Tick ( float DeltaSeconds )
+{
+  
 }

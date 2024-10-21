@@ -1,4 +1,4 @@
-// VRM4U Copyright (c) 2021-2024 Haruyoshi Yamamoto. This software is released under the MIT License.
+﻿// VRM4U Copyright (c) 2021-2024 Haruyoshi Yamamoto. This software is released under the MIT License.
 
 #pragma once
 
@@ -8,6 +8,7 @@
 #include "BonePose.h"
 #include "BoneControllers/AnimNode_ModifyBone.h"
 #include "Misc/EngineVersionComparison.h"
+#include "VrmVMCObject.h"
 
 #include "AnimNode_VrmVMC.generated.h"
 
@@ -82,6 +83,15 @@ struct VRM4UCAPTURE_API FAnimNode_VrmVMC : public FAnimNode_SkeletalControlBase
 
 	virtual void ConditionalDebugDraw(FPrimitiveDrawInterface* PDI, USkeletalMeshComponent* PreviewSkelMeshComp, bool bPreviewForeground = false) const;
 
+	void CacheAnimInstanceData ( FComponentSpacePoseContext& Output );
+	class UAnimInstance* CachedAnimInstance;
+
+	FVMCData VMCData;
+	bool bCanSendData = true;
+	bool bCanReceiveData = true;
+	class AJJH_IdolPlayerController* PC;
+	void SetVMCData ( FVMCData& Data1 , FVMCData Data2  );
+	//void SetVMCData (FVMCData& Data1 , const FVMCData& Data2 );
 private:
 	// FAnimNode_SkeletalControlBase interface
 	virtual void InitializeBoneReferences(const FBoneContainer& RequiredBones) override;

@@ -38,7 +38,6 @@ void UVrmVMCObject::CreateServer(FString inName, uint16 inPort) {
 	OSCServer->SetTickInEditor(true);
 #endif // WITH_EDITOR
 #endif
-
 }
 
 void UVrmVMCObject::OSCReceivedMessageEvent(const FOSCMessage& Message, const FString& IPAddress, uint16 Port) {
@@ -88,26 +87,7 @@ void UVrmVMCObject::OSCReceivedMessageEvent(const FOSCMessage& Message, const FS
 bool UVrmVMCObject::CopyVMCData(FVMCData& dst) {
 	
 	FScopeLock lock ( &cs );  // 멀티스레드 안전성을 보장하기 위한 락
-	
-	World = GetOuter()->GetWorld ( );
-	if (World)
-	{
-		UE_LOG ( LogTemp , Warning , TEXT ( "1111" ) );
-		IdolGMB = Cast<AJJH_IdolGameModeBase> ( World );
-		if (IdolGMB)
-		{
-			UE_LOG ( LogTemp , Warning , TEXT ( "2222" ) );
-			IdolGMB->ServerGetVMCData ( VMCData );
-			VMCData = IdolGMB->MyData;
-		}
-	}
-	dst = VMCData;
-	//if (UGameplayStatics::GetGameMode ( this ))
-	//{
-	//	IdolGMB = Cast<AJJH_IdolGameModeBase> ( UGameplayStatics::GetGameMode ( this ) );
-	//	IdolGMB->ServerGetVMCData ( VMCData );
-	//	VMCData = IdolGMB->MyData;
-	//}
+
 	dst = VMCData;  // 서버는 최신 데이터를 그대로 사용
 
 
@@ -117,14 +97,16 @@ bool UVrmVMCObject::CopyVMCData(FVMCData& dst) {
 	//}
 	//UE_LOG ( LogTemp , Warning , TEXT ( "multicast12" ) );
 	//SetVMCData ( );  // 최신 데이터를 클라이언트로 전송
-
+	
+	//아우터가 Engine/Transient
 	//// GetOuter()를 사용하여 월드 가져오기
 	//UWorld* World = GetWorld ( );
 	//if (!World) {
 	//	UE_LOG ( LogTemp , Warning , TEXT ( "NoWorld" ) );
 	//	return false; // 월드를 가져올 수 없는 경우 오류 처리
 	//}
-
+	
+	//넷모드 못 얻어옴
 	//// 현재 NetMode에 따라 처리
 	//switch (World->GetNetMode ( )) {
 	//case ENetMode::NM_Client:
@@ -145,7 +127,11 @@ bool UVrmVMCObject::CopyVMCData(FVMCData& dst) {
 
 class UWorld* UVrmVMCObject::GetWorld ( ) const
 {
-	return World;
+//	if (AActor* OuterActor = Cast<AActor> ( GetOuter ( ) ))
+//	{
+//		return OuterActor->GetWorld ( );
+//	}
+	return nullptr;
 }
 
 void UVrmVMCObject::SetVMCData ( )
@@ -174,6 +160,8 @@ void UVrmVMCObject::SetVMCData ( )
 	// 클라이언트로 배열 데이터를 전송
 	MulticastSetVMCData ( BoneNames , BoneTransforms , CurveNames , CurveValues );
 }
+
+
 
 void UVrmVMCObject::FindVrmVMCObject ( )
 {

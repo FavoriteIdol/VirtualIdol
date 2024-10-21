@@ -79,11 +79,12 @@ struct FVMCData
         CurveData.Empty ( );
     }
 
-    bool operator==( const FVMCData& Other ) const {
+    bool operator== ( const FVMCData& Other ) const {
         if (Port != Other.Port) return false;
         if (ServerAddress != Other.ServerAddress) return false;
         return true;
     }
+
 };
 
 // FVMCData 구조체에 대한 직렬화 지원 추가 (네트워크 전송을 위한 직렬화 기능)
@@ -109,6 +110,7 @@ private:
 
 public:
 
+    class ATP_ThirdPersonCharacter* MyCharacter;
     // Begin UObject interface
 	virtual class UWorld* GetWorld() const override;
 	// End UObject interface
