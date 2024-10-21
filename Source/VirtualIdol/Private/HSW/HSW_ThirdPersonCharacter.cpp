@@ -59,6 +59,9 @@ AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
 	GetCharacterMovement ( )->BrakingDecelerationFalling = 1500.0f;
 	GetCharacterMovement( )->GravityScale=15.0f;
 
+	GetMesh()->SetRelativeLocation(FVector(0,0,-90));
+	GetMesh()->SetRelativeRotation(FRotator(0,-90,0));
+
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent> ( TEXT ( "CameraBoom" ) );
 	CameraBoom->SetupAttachment ( RootComponent );
@@ -93,7 +96,7 @@ AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
 	if (loadedImojiWidget.Succeeded ( ))
 	{
 		ImojiComp->SetWidgetClass( loadedImojiWidget.Class);
-		ImojiComp->SetDrawSize (FVector2D(100,20 ) );
+		ImojiComp->SetDrawSize (FVector2D(100,100 ) );
 		ImojiComp->SetRelativeLocation(FVector(0,0,150));
 	}
 
@@ -130,7 +133,6 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 	FInputModeGameAndUI a;
 	GetWorld()->GetFirstPlayerController()->SetInputMode(a);
 	GetWorld ( )->GetFirstPlayerController ( )->bShowMouseCursor=true;
-
 
 	gm = Cast<AHSW_AuditoriumGameMode>(GetWorld()->GetAuthGameMode() );
 }
@@ -353,11 +355,12 @@ void AHSW_ThirdPersonCharacter::Look ( const FInputActionValue& Value )
 
 void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value )
 {
-	if (!HasAuthority ( ) && MainUI)
+	if (!HasAuthority ( ) && IsLocallyControlled())
 	{
 		UE_LOG ( LogTemp , Warning , TEXT ( "The Fever Gauge is being stacked...Send ===========" ) );
 		ServerRPCFeverGauge ( );
 		PrintFeverGaugeLogOnHead ( );
+		ShakeBodyBlueprint( );
 		//MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
 	}
 	//OnRep_FeverGauge( );
