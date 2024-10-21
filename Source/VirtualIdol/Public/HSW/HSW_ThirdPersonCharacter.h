@@ -83,15 +83,17 @@ public:
 	FORCEINLINE class UCameraComponent* GetFollowCamera ( ) const { return FollowCamera; }
 
 public:
-
-	UPROPERTY(EditDefaultsOnly , Category = FeverGauge )
-	class UHSW_FeverGaugeWidget* FeverGauge;
+	UPROPERTY(EditDefaultsOnly )
+	class AHSW_GameState_Auditorium* gs;
 
 	UPROPERTY(EditDefaultsOnly )
 	class AHSW_AuditoriumGameMode* gm;
 
 	// 피버게이지 --------------------------------------------------------------
-	UPROPERTY(ReplicatedUsing = OnRep_FeverGauge, EditDefaultsOnly, BlueprintReadWrite, Category = FeverGauge )
+	UPROPERTY(EditDefaultsOnly , Category = FeverGauge )
+	class UHSW_FeverGaugeWidget* FeverGauge;
+
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadWrite, Category = FeverGauge )
 	float CurrentGauge = 0.0f;
 
 	UFUNCTION( )
@@ -103,7 +105,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = FeverGauge )
 	float FeverPoint = 0.02f;
 
-	void SetFeverGauge( );
+	void SetFeverGaugeMulti(float feverValue);
 
 	UFUNCTION(BlueprintImplementableEvent, Category= Imogi )
 	void ShakeBodyBlueprint( );
@@ -190,7 +192,7 @@ public:
 	void MulticastRPCThrowPitch();
 
 	UFUNCTION(Server, Reliable )
-	void ServerRPCFeverGauge( );
+	void ServerRPCFeverGauge( float feverValue );
 
 	UFUNCTION(NetMulticast, Reliable )
 	void MulticastRPCFeverGauge (float AddGauge);

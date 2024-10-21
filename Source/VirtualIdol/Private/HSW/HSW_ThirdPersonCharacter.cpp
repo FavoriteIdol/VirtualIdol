@@ -27,6 +27,7 @@
 #include "HSW_AnimInstance_Audience.h"
 #include "Net/UnrealNetwork.h"
 #include "HSW/HSW_PlayerController.h"
+#include "HSW/HSW_GameState_Auditorium.h"
 
 // Sets default values
 AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
@@ -135,6 +136,12 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 	GetWorld ( )->GetFirstPlayerController ( )->bShowMouseCursor=true;
 
 	gm = Cast<AHSW_AuditoriumGameMode>(GetWorld()->GetAuthGameMode() );
+	gs = GetWorld()->GetGameState<AHSW_GameState_Auditorium>();
+	if (gs == nullptr)
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "GameState is null!" ) );
+		return;
+	}
 }
 
 // Called every frame
@@ -162,7 +169,7 @@ void AHSW_ThirdPersonCharacter::PrintFeverGaugeLogOnHead ( )
 	DrawDebugString ( GetWorld ( ) , GetActorLocation ( ) +FVector(0,0,90 ) , TEXT ( "GO!!" ) , nullptr , FColor::Red , 0.5f , true , 1 );
 }
 
-void AHSW_ThirdPersonCharacter::SetFeverGauge ( )
+void AHSW_ThirdPersonCharacter::SetFeverGaugeMulti ( float feverValue )
 {
 // 	auto* widget = Cast<AHSW_ThirdPersonCharacter>(GetOwner() );
 // 	if(widget) auto* wid = widget->MainUI;
@@ -170,17 +177,21 @@ void AHSW_ThirdPersonCharacter::SetFeverGauge ( )
 	// 로컬 컨트롤을 하는 캐릭터가 나 자신이라 MainUI도 가지고 있으니 그대로 갱신
 	if (IsLocallyControlled ( ) && MainUI)
 	{		
+		CurrentGauge = feverValue;
 		MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
-		UE_LOG ( LogTemp , Warning , TEXT ( "In" ) );
+		UE_LOG ( LogTemp , Error , TEXT ( "LocalPlayer Gauge: %f" ), CurrentGauge );
+		//UE_LOG ( LogTemp , Warning , TEXT ( "In" ) );
 	}
-	// 로컬 컨트롤을 하는 캐릭터가 내가 아닌 상황이라 나는 MainUI가 없다. 그러니 로컬 컨트롤을 하는 캐릭터의 MainUI를 갱신해주자
+	// 로컬 컨트롤을 하는 캐릭터가 내가 아닌 상황이라 나는 MainUI가 없다. 그러니 나의 MainUI를 갱신해주자
 	else if (!IsLocallyControlled ( ) && MainUI == nullptr)
 	{
 		AHSW_ThirdPersonCharacter* localPlayer = Cast<AHSW_ThirdPersonCharacter>(GetWorld( )->GetFirstPlayerController()->GetCharacter());
 		if (localPlayer != nullptr)
 		{
-			localPlayer->MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
-			UE_LOG ( LogTemp , Warning , TEXT ( "In2" ) );
+			localPlayer->CurrentGauge = feverValue;
+			localPlayer->MainUI->FeverGauge->SetFeverGauge ( localPlayer->CurrentGauge );
+			UE_LOG ( LogTemp , Error , TEXT ( "Not LocalPlayer Gauge: %f" ) , localPlayer->CurrentGauge );
+			//UE_LOG ( LogTemp , Warning , TEXT ( "In2" ) );
 		}
 	}
 	
@@ -189,7 +200,7 @@ void AHSW_ThirdPersonCharacter::SetFeverGauge ( )
 	//	MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
 	//	UE_LOG ( LogTemp , Warning , TEXT ( "In" ) );
 	//}
-	UE_LOG ( LogTemp , Warning , TEXT ( "out" ) );
+	//UE_LOG ( LogTemp , Warning , TEXT ( "out" ) );
 // 	auto* widget = Cast<AHSW_ThirdPersonCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn())->MainUI;
 // 	if(widget) 
 // 	{
@@ -217,11 +228,11 @@ void AHSW_ThirdPersonCharacter::InitMainUI ( )
 				pc->MainUI = CastChecked<UHSW_MainWidget> ( CreateWidget ( GetWorld ( ) , pc->mainUIWidget ) );
 				if (pc->MainUI == nullptr)
 				{
-					UE_LOG ( LogTemp , Error , TEXT ( "Failed to create MainUI widget." ) );
+					//UE_LOG ( LogTemp , Error , TEXT ( "Failed to create MainUI widget." ) );
 				}
 				else
 				{
-					UE_LOG ( LogTemp , Error , TEXT ( "Succeed to create MainUI widget." ) );
+					//UE_LOG ( LogTemp , Error , TEXT ( "Succeed to create MainUI widget." ) );
 				}
 			}
 
@@ -357,60 +368,57 @@ void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value 
 {
 	if (!HasAuthority ( ) && IsLocallyControlled())
 	{
-		UE_LOG ( LogTemp , Warning , TEXT ( "The Fever Gauge is being stacked...Send ===========" ) );
-		ServerRPCFeverGauge ( );
+		//UE_LOG ( LogTemp , Warning , TEXT ( "The Fever Gauge is being stacked...Send ===========" ) );
+		ServerRPCFeverGauge (CurrentGauge);
 		PrintFeverGaugeLogOnHead ( );
-		ShakeBodyBlueprint( );
 		PersonalGauge++;
 		//MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
 	}
 	//OnRep_FeverGauge( );
-	UE_LOG(LogTemp, Warning, TEXT("The Fever Gauge is being stacked..." ) );
+	//UE_LOG(LogTemp, Warning, TEXT("The Fever Gauge is being stacked..." ) );
 }
 
-void AHSW_ThirdPersonCharacter::ServerRPCFeverGauge_Implementation ( )
+void AHSW_ThirdPersonCharacter::ServerRPCFeverGauge_Implementation ( float feverValue )
 {
-	if (CurrentGauge < 1)
+	if (feverValue < 1)
 	{
-		CurrentGauge += FeverPoint;
+		feverValue += FeverPoint;
 	}
 
-	if (CurrentGauge >= 0.3 && CurrentGauge < 0.65)
+	if (feverValue >= 0.3 && feverValue < 0.65)
 	{
-		if (gm)
+		if (gs)
 		{
-			gm->bFever30 = true;
+			gs->bFever30 = true;
 		}
 	}
-	else if (CurrentGauge >= 0.65 && CurrentGauge < 1)
+	else if (feverValue >= 0.65 && feverValue < 1)
 	{
-		if (gm)
+		if (gs)
 		{
-			gm->bFever30 = false;
-			gm->bFever65 = true;
+			gs->bFever30 = false;
+			gs->bFever65 = true;
 		}
 	}
-	else if (CurrentGauge >= 1)
+	else if (feverValue >= 1)
 	{
-		if (gm)
+		if (gs)
 		{
-			gm->bFever30 = false;
-			gm->bFever65 = false;
-			gm->bFever100 = true;
+			gs->bFever30 = false;
+			gs->bFever65 = false;
+			gs->bFever100 = true;
 		}
 	}
 
-	MulticastRPCFeverGauge( CurrentGauge );
+	MulticastRPCFeverGauge( feverValue );
 	//MulticastRPCFeverGauge_Implementation ( CurrentGauge );
 }
 
 void AHSW_ThirdPersonCharacter::MulticastRPCFeverGauge_Implementation (float AddGauge )
 {
-
-	UE_LOG(LogTemp, Warning, TEXT("=========================================" ) );
-	CurrentGauge = AddGauge;
-
-	SetFeverGauge ( );
+	ShakeBodyBlueprint ( );
+	//UE_LOG(LogTemp, Warning, TEXT("=========================================" ) );
+	SetFeverGaugeMulti ( AddGauge );
 
 }
 void AHSW_ThirdPersonCharacter::PossessedBy ( AController* NewController )
