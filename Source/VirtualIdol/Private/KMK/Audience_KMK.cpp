@@ -82,10 +82,6 @@ void UAudience_KMK::NativeConstruct ( )
     }
 #pragma endregion
 #pragma region StartConcert
-    if (Butt_StartConcert)
-    {
-        Butt_StartConcert->OnClicked.AddDynamic ( this , &UAudience_KMK::PressStartConcertButt );
-    }
     if (CountDownPanel)
     {
         CountDownPanel->SetVisibility ( ESlateVisibility::Hidden );
@@ -270,7 +266,7 @@ void UAudience_KMK::VipAuthority ( )
 void UAudience_KMK::PressStartConcertButt ( )
 {
     gi->playerMeshNum = 2;
-    Butt_StartConcert->SetVisibility(ESlateVisibility::Hidden);
+    // Butt_StartConcert->SetVisibility(ESlateVisibility::Hidden);
     pc->FindComponentByClass<UAudienceServerComponent_KMK> ( )->ServerRPC_StartConcert( );
 }
 
@@ -372,6 +368,13 @@ void UAudience_KMK::CountDownPanelVisible ( ESlateVisibility visiblePanel )
 
 #pragma endregion
 #pragma region Before Concert
+
+void UAudience_KMK::ChangeTextClock ( const FString& text )
+{
+    TEXT_Min->SetText(FText::FromString(text));
+    TEXT_Min1->SetText(FText::FromString(text));
+}
+
 void UAudience_KMK::PressButtMp3 ( )
 {
     TArray<FString> SelectedFiles;

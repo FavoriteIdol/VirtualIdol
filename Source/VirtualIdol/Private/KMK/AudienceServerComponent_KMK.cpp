@@ -238,6 +238,7 @@ FString UAudienceServerComponent_KMK::GetTimeDifference ( const FString& SetTime
 	int32 hours = FMath::Abs ( static_cast<int32>( secondsDifference / 3600 ) );
 	int32 minutes = FMath::Abs ( static_cast<int32>( ( secondsDifference % 3600 ) / 60 ) );
 	int32 seconds = FMath::Abs ( static_cast<int32>( secondsDifference % 60 ) );
+	ATP_ThirdPersonCharacter* playerCharacter = Cast<ATP_ThirdPersonCharacter> ( GetWorld ( )->GetFirstPlayerController ( )->GetPawn ( ) );
 	if (secondsDifference == 0)  // 시간이 같을 때
 	{
         if (!bVis)
@@ -253,7 +254,7 @@ FString UAudienceServerComponent_KMK::GetTimeDifference ( const FString& SetTime
 	}
 	else if (minutes == 0 && seconds > 58)
 	{
-		ATP_ThirdPersonCharacter* playerCharacter = Cast<ATP_ThirdPersonCharacter> ( GetWorld ( )->GetFirstPlayerController ( )->GetPawn ( ) );
+		
 		if (playerCharacter && playerCharacter->HasAuthority ( ))
 		{
 			playerCharacter->audienceWidget->ChangeVirtualWidget ( );
@@ -261,6 +262,6 @@ FString UAudienceServerComponent_KMK::GetTimeDifference ( const FString& SetTime
 	}
 	// FString으로 변환
     FString TimeDifference = FString::Printf ( TEXT ( "%02d:%02d" ) , minutes , seconds );
-
+	if(playerCharacter && playerCharacter->HasAuthority()) playerCharacter->audienceWidget->ChangeTextClock(TimeDifference );
 	return TimeDifference;
 }

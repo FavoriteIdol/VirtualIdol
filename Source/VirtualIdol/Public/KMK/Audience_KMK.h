@@ -19,7 +19,8 @@ struct FButtonInfo
 	UPROPERTY(meta = (BindWidget ) )
 	class UImage* image;
 	UPROPERTY(meta = (BindWidget ) )
-	class UTextBlock* text;
+    class UTextBlock* text;
+
 };
 UCLASS()
 class VIRTUALIDOL_API UAudience_KMK : public UUserWidget
@@ -112,8 +113,6 @@ public :
 	void VipAuthority( );
 
 	// 콘서트 시작 5초전
-	UPROPERTY ( meta = ( BindWidget ) )
-	class UButton* Butt_StartConcert;
 
 	UFUNCTION( )
 	void PressStartConcertButt( );
@@ -234,9 +233,14 @@ public :
 	class UVerticalBox* VB_SingList;
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UVerticalBox* VB_SingList1;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UTextBlock* TEXT_Min;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UTextBlock* TEXT_Min1;
 	UPROPERTY(EditAnywhere )
 	TSubclassOf<class USingWidget_KMK> singWidget;
-
+	UFUNCTION( )
+	void ChangeTextClock(const FString& text );
 	UFUNCTION( )
 	void PressButtMp3( );
 	UFUNCTION( )
