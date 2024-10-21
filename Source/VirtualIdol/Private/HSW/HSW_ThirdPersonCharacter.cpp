@@ -361,6 +361,7 @@ void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value 
 		ServerRPCFeverGauge ( );
 		PrintFeverGaugeLogOnHead ( );
 		ShakeBodyBlueprint( );
+		PersonalGauge++;
 		//MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
 	}
 	//OnRep_FeverGauge( );
@@ -373,11 +374,29 @@ void AHSW_ThirdPersonCharacter::ServerRPCFeverGauge_Implementation ( )
 	{
 		CurrentGauge += FeverPoint;
 	}
+
+	if (CurrentGauge >= 0.3 && CurrentGauge < 0.65)
+	{
+		if (gm)
+		{
+			gm->bFever30 = true;
+		}
+	}
+	else if (CurrentGauge >= 0.65 && CurrentGauge < 1)
+	{
+		if (gm)
+		{
+			gm->bFever30 = false;
+			gm->bFever65 = true;
+		}
+	}
 	else if (CurrentGauge >= 1)
 	{
 		if (gm)
 		{
-			gm->bFevered = true;
+			gm->bFever30 = false;
+			gm->bFever65 = false;
+			gm->bFever100 = true;
 		}
 	}
 

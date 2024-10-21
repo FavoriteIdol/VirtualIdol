@@ -19,9 +19,17 @@ AHSW_AuditoriumGameMode::AHSW_AuditoriumGameMode ( )
 
 void AHSW_AuditoriumGameMode::Tick ( float DeltaTime )
 {
-	if (bFevered)
+	if (bFever30)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Fever!!"));
+		UE_LOG ( LogTemp , Warning , TEXT ( "Fever 30%% !!!!!!! " ) );
+	}
+	else if (bFever65)
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "Fever 65%% !!!!!!! " ) );
+	}
+	else if (bFever100)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Fever 100%% !!!!!!! "));
 	}
 }
 

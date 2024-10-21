@@ -108,6 +108,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category= Imogi )
 	void ShakeBodyBlueprint( );
 
+	int32 PersonalGauge = 0;
+
+
 	// MainWidget을 생성해서 기억하고싶다.
 // 	UPROPERTY(EditDefaultsOnly, Category = MainUI)
 // 	TSubclassOf<class UUserWidget> MainUIFactory;

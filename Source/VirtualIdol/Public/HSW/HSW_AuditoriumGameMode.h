@@ -31,7 +31,13 @@ public:
 	class AHSW_ThirdPersonCharacter* Player;
 
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="GameState" )
-	bool bFevered;
+	bool bFever30;
+
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="GameState" )
+	bool bFever65;
+
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="GameState" )
+	bool bFever100;
 
 	virtual void GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
 };
