@@ -23,10 +23,15 @@ protected:
 	virtual void BeginPlay () override;
 
 public:
+	// 피버게이지
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = FeverGauge )
+	float CurrentGauge = 0.0f;
+
 	UPROPERTY (EditDefaultsOnly)
 	class AHSW_ThirdPersonCharacter* Player;
 
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="GameState" )
 	bool bFevered;
 
+	virtual void GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
 };

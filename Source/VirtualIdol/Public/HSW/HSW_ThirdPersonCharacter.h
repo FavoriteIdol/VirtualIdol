@@ -87,15 +87,27 @@ public:
 	UPROPERTY(EditDefaultsOnly , Category = FeverGauge )
 	class UHSW_FeverGaugeWidget* FeverGauge;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = FeverGauge )
+	UPROPERTY(EditDefaultsOnly )
+	class AHSW_AuditoriumGameMode* gm;
+
+	// 피버게이지 --------------------------------------------------------------
+	UPROPERTY(ReplicatedUsing = OnRep_FeverGauge, EditDefaultsOnly, BlueprintReadWrite, Category = FeverGauge )
 	float CurrentGauge = 0.0f;
+
+	UFUNCTION( )
+	void OnRep_FeverGauge ();
+
+	UFUNCTION( )
+	void PrintFeverGaugeLogOnHead( );
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = FeverGauge )
 	float FeverPoint = 0.02f;
 
+	void SetFeverGauge( );
+
 	// MainWidget을 생성해서 기억하고싶다.
-	UPROPERTY(EditDefaultsOnly, Category = MainUI)
-	TSubclassOf<class UUserWidget> MainUIFactory;
+// 	UPROPERTY(EditDefaultsOnly, Category = MainUI)
+// 	TSubclassOf<class UUserWidget> MainUIFactory;
 
 	UPROPERTY(EditDefaultsOnly )
 	class UHSW_MainWidget* MainUI;
@@ -170,5 +182,13 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable )
 	void MulticastRPCThrowPitch();
+
+	UFUNCTION(Server, Reliable )
+	void ServerRPCFeverGauge( );
+
+	UFUNCTION(NetMulticast, Reliable )
+	void MulticastRPCFeverGauge (float AddGauge);
+
+	virtual void PossessedBy ( AController* NewController ) override;
 
 };

@@ -32,3 +32,8 @@ void AHSW_AuditoriumGameMode::BeginPlay ( )
 	Player = Cast<AHSW_ThirdPersonCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
 
 }
+
+void AHSW_AuditoriumGameMode::GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& OutLifetimeProps ) const
+{
+
+}

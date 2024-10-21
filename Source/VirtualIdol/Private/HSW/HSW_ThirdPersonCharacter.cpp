@@ -26,6 +26,7 @@
 #include "../../../../Plugins/FX/Niagara/Source/Niagara/Classes/NiagaraSystem.h"
 #include "HSW_AnimInstance_Audience.h"
 #include "Net/UnrealNetwork.h"
+#include "HSW/HSW_PlayerController.h"
 
 // Sets default values
 AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
@@ -49,13 +50,14 @@ AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
 	// GetCharacterMovement ( )->DefaultLandMovementMode = EMovementMode::MOVE_Flying;
 	// Note: For faster iteration times these variables, and many more, can be tweaked in the Character Blueprint
 	// instead of recompiling to adjust them
-	GetCharacterMovement ( )->JumpZVelocity = 500.f;
-	GetCharacterMovement ( )->AirControl = 0.35f;
+	GetCharacterMovement ( )->JumpZVelocity = 3500.f;
+	GetCharacterMovement ( )->BrakingDecelerationFalling = 1500.f;
+	GetCharacterMovement ( )->AirControl = 5.0f;
 	GetCharacterMovement ( )->MaxWalkSpeed = 500.f;
 	GetCharacterMovement ( )->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement ( )->BrakingDecelerationWalking = 2000.f;
 	GetCharacterMovement ( )->BrakingDecelerationFalling = 1500.0f;
-	GetCharacterMovement( )->GravityScale=0.8f;
+	GetCharacterMovement( )->GravityScale=15.0f;
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent> ( TEXT ( "CameraBoom" ) );
@@ -118,7 +120,10 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	InitMainUI();
+	if (IsLocallyControlled ( ) && HasAuthority() == false)
+	{
+		InitMainUI();
+	}
 	ImojiComp->SetVisibility(false);
 	imojiWidget = Cast<UHSW_ImogiWidget> ( ImojiComp->GetWidget ( ) );
 
@@ -126,7 +131,8 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 	GetWorld()->GetFirstPlayerController()->SetInputMode(a);
 	GetWorld ( )->GetFirstPlayerController ( )->bShowMouseCursor=true;
 
-	
+
+	gm = Cast<AHSW_AuditoriumGameMode>(GetWorld()->GetAuthGameMode() );
 }
 
 // Called every frame
@@ -144,13 +150,82 @@ void AHSW_ThirdPersonCharacter::Tick(float DeltaTime)
 	}
 }
 
-void AHSW_ThirdPersonCharacter::InitMainUI ( )
+void AHSW_ThirdPersonCharacter::OnRep_FeverGauge ( )
 {
 	
-	MainUI = Cast<UHSW_MainWidget> ( CreateWidget ( GetWorld ( ) , MainUIFactory ) );
-	if (MainUI)
+}
+
+void AHSW_ThirdPersonCharacter::PrintFeverGaugeLogOnHead ( )
+{
+	DrawDebugString ( GetWorld ( ) , GetActorLocation ( ) +FVector(0,0,90 ) , TEXT ( "GO!!" ) , nullptr , FColor::Red , 0.5f , true , 1 );
+}
+
+void AHSW_ThirdPersonCharacter::SetFeverGauge ( )
+{
+// 	auto* widget = Cast<AHSW_ThirdPersonCharacter>(GetOwner() );
+// 	if(widget) auto* wid = widget->MainUI;
+// 
+	// 로컬 컨트롤을 하는 캐릭터가 나 자신이라 MainUI도 가지고 있으니 그대로 갱신
+	if (IsLocallyControlled ( ) && MainUI)
+	{		
+		MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
+		UE_LOG ( LogTemp , Warning , TEXT ( "In" ) );
+	}
+	// 로컬 컨트롤을 하는 캐릭터가 내가 아닌 상황이라 나는 MainUI가 없다. 그러니 로컬 컨트롤을 하는 캐릭터의 MainUI를 갱신해주자
+	else if (!IsLocallyControlled ( ) && MainUI == nullptr)
 	{
-		MainUI->AddToViewport ( );
+		AHSW_ThirdPersonCharacter* localPlayer = Cast<AHSW_ThirdPersonCharacter>(GetWorld( )->GetFirstPlayerController()->GetCharacter());
+		if (localPlayer != nullptr)
+		{
+			localPlayer->MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
+			UE_LOG ( LogTemp , Warning , TEXT ( "In2" ) );
+		}
+	}
+	
+	//if (MainUI)
+	//{
+	//	MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
+	//	UE_LOG ( LogTemp , Warning , TEXT ( "In" ) );
+	//}
+	UE_LOG ( LogTemp , Warning , TEXT ( "out" ) );
+// 	auto* widget = Cast<AHSW_ThirdPersonCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn())->MainUI;
+// 	if(widget) 
+// 	{
+// 	widget->FeverGauge->SetFeverGauge ( CurrentGauge );
+// 	UE_LOG ( LogTemp , Error , TEXT ( "%f" ) , CurrentGauge );
+// 	}
+	
+}
+
+void AHSW_ThirdPersonCharacter::InitMainUI ( )
+{
+
+	auto* pc = Cast<AHSW_PlayerController> ( Controller );
+	if (pc == nullptr)
+	{
+		return;
+	}
+
+	if (IsLocallyControlled ( ))
+	{
+		if (pc->mainUIWidget)
+		{
+			if (pc->MainUI == nullptr)
+			{
+				pc->MainUI = CastChecked<UHSW_MainWidget> ( CreateWidget ( GetWorld ( ) , pc->mainUIWidget ) );
+				if (pc->MainUI == nullptr)
+				{
+					UE_LOG ( LogTemp , Error , TEXT ( "Failed to create MainUI widget." ) );
+				}
+				else
+				{
+					UE_LOG ( LogTemp , Error , TEXT ( "Succeed to create MainUI widget." ) );
+				}
+			}
+
+			this->MainUI = pc->MainUI;
+			MainUI->AddToViewport ( );
+		}
 	}
 }
 
@@ -169,9 +244,9 @@ void AHSW_ThirdPersonCharacter::AppearImoji ( )
 	ImojiComp->SetVisibility(true);
 
 	
-	UNiagaraComponent* AppearComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation ( GetWorld ( ) , EmojiEffect , ImojiComp->GetComponentLocation ( ) );
-	AppearComponent->AttachToComponent( ImojiComp, FAttachmentTransformRules::KeepRelativeTransform);
-	AppearComponent->SetAutoDestroy(true );
+	UNiagaraComponent* AppearEffect = UNiagaraFunctionLibrary::SpawnSystemAtLocation ( GetWorld ( ) , EmojiEffect , ImojiComp->GetComponentLocation ( ) );
+	AppearEffect->AttachToComponent( ImojiComp, FAttachmentTransformRules::KeepRelativeTransform);
+	AppearEffect->SetAutoDestroy(true );
 
 	imojiWidget->PlayFadeInImoji();
 }
@@ -185,58 +260,10 @@ void AHSW_ThirdPersonCharacter::GetLifetimeReplicatedProps ( TArray<FLifetimePro
 {
 	Super::GetLifetimeReplicatedProps ( OutLifetimeProps );
 
-	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , bThrowing );
+	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , bThrowing ); 
+	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , CurrentGauge );
 }
 
-void AHSW_ThirdPersonCharacter::ServerRPCThrowHold_Implementation ( )
-{
-	FTransform t = ThrowingArrow->GetComponentTransform ( );
-	
-	MulticastRPCThrowHold( t );
-
-}
-
-void AHSW_ThirdPersonCharacter::MulticastRPCThrowHold_Implementation ( FTransform t )
-{
-// 	FTransform t = ThrowingArrow->GetComponentTransform ( );
- 	ThrowingObject = GetWorld ( )->SpawnActor<AHSW_ThrowingObject> ( ThrowingObjectFactory , t );
-	if (ThrowingObject)
-	{
-		ThrowingObject->AttachToComponent ( ThrowingArrow , FAttachmentTransformRules::KeepWorldTransform );
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Object did not spawn" ) );
-	}
-}
-
-void AHSW_ThirdPersonCharacter::ServerRPCThrowPitch_Implementation ( )
-{
-	MulticastRPCThrowPitch();
-}
-
-void AHSW_ThirdPersonCharacter::MulticastRPCThrowPitch_Implementation ( )
-{
-
-	ThrowingObject->DetachFromActor ( FDetachmentTransformRules::KeepWorldTransform );
-	ThrowingObject->MeshComp->SetSimulatePhysics ( true );
-
-	FVector ThrowingForce = ThrowingArrow->GetForwardVector ( ) * ThrowingSpeed;
-	ThrowingObject->MeshComp->AddForce ( ThrowingForce );
-	ThrowingObject = nullptr;
-	
-
-	// 재장전 애니메이션 재생
-	auto* anim = Cast<UHSW_AnimInstance_Audience> ( GetMesh ( )->GetAnimInstance ( ) );
-	if (anim)
-	{
-		anim->PlayThrowMontage ( );
-	}
-	else
-	{
-		UE_LOG ( LogTemp , Warning , TEXT ( "Throw Montage is null" ) );
-	}
-}
 
 // Called to bind functionality to input
 void AHSW_ThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -326,19 +353,53 @@ void AHSW_ThirdPersonCharacter::Look ( const FInputActionValue& Value )
 
 void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value )
 {
-	if (CurrentGauge <= 1)
+	if (!HasAuthority ( ) && MainUI)
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "The Fever Gauge is being stacked...Send ===========" ) );
+		ServerRPCFeverGauge ( );
+		PrintFeverGaugeLogOnHead ( );
+		//MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
+	}
+	//OnRep_FeverGauge( );
+	UE_LOG(LogTemp, Warning, TEXT("The Fever Gauge is being stacked..." ) );
+}
+
+void AHSW_ThirdPersonCharacter::ServerRPCFeverGauge_Implementation ( )
+{
+	if (CurrentGauge < 1)
 	{
 		CurrentGauge += FeverPoint;
-		MainUI->FeverGauge->SetFeverGauge( CurrentGauge );
 	}
-	else if (CurrentGauge > 1)
+	else if (CurrentGauge >= 1)
 	{
-		AHSW_AuditoriumGameMode* gameMode = Cast<AHSW_AuditoriumGameMode>(GetWorld()->GetAuthGameMode());
-		if (gameMode)
+		if (gm)
 		{
-			gameMode->bFevered = true;
+			gm->bFevered = true;
 		}
 	}
+
+	MulticastRPCFeverGauge( CurrentGauge );
+	//MulticastRPCFeverGauge_Implementation ( CurrentGauge );
+}
+
+void AHSW_ThirdPersonCharacter::MulticastRPCFeverGauge_Implementation (float AddGauge )
+{
+
+	UE_LOG(LogTemp, Warning, TEXT("=========================================" ) );
+	CurrentGauge = AddGauge;
+
+	SetFeverGauge ( );
+
+}
+void AHSW_ThirdPersonCharacter::PossessedBy ( AController* NewController )
+{
+	Super::PossessedBy ( NewController );
+
+	if (IsLocallyControlled ( ))
+	{
+		InitMainUI ( );
+	}
+
 }
 
 void AHSW_ThirdPersonCharacter::OnMyThorwHold ( const FInputActionValue& value )
@@ -346,7 +407,58 @@ void AHSW_ThirdPersonCharacter::OnMyThorwHold ( const FInputActionValue& value )
 	ServerRPCThrowHold( );
 }
 
+
+void AHSW_ThirdPersonCharacter::ServerRPCThrowHold_Implementation ( )
+{
+	FTransform t = ThrowingArrow->GetComponentTransform ( );
+
+	MulticastRPCThrowHold ( t );
+
+}
+
+void AHSW_ThirdPersonCharacter::MulticastRPCThrowHold_Implementation ( FTransform t )
+{
+	// 	FTransform t = ThrowingArrow->GetComponentTransform ( );
+	ThrowingObject = GetWorld ( )->SpawnActor<AHSW_ThrowingObject> ( ThrowingObjectFactory , t );
+	if (ThrowingObject)
+	{
+		ThrowingObject->AttachToComponent ( ThrowingArrow , FAttachmentTransformRules::KeepWorldTransform );
+	}
+	else
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "Object did not spawn" ) );
+	}
+}
+
 void AHSW_ThirdPersonCharacter::OnMyThorwPitch ( const FInputActionValue& value )
 {
 	ServerRPCThrowPitch( );
+}
+
+void AHSW_ThirdPersonCharacter::ServerRPCThrowPitch_Implementation ( )
+{
+	MulticastRPCThrowPitch ( );
+}
+
+void AHSW_ThirdPersonCharacter::MulticastRPCThrowPitch_Implementation ( )
+{
+
+	ThrowingObject->DetachFromActor ( FDetachmentTransformRules::KeepWorldTransform );
+	ThrowingObject->MeshComp->SetSimulatePhysics ( true );
+
+	FVector ThrowingForce = ThrowingArrow->GetForwardVector ( ) * ThrowingSpeed;
+	ThrowingObject->MeshComp->AddForce ( ThrowingForce );
+	ThrowingObject = nullptr;
+
+
+	// 재장전 애니메이션 재생
+	auto* anim = Cast<UHSW_AnimInstance_Audience> ( GetMesh ( )->GetAnimInstance ( ) );
+	if (anim)
+	{
+		anim->PlayThrowMontage ( );
+	}
+	else
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "Throw Montage is null" ) );
+	}
 }
