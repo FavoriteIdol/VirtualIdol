@@ -47,6 +47,9 @@ class VIRTUALIDOL_API AHSW_ThirdPersonCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* ThrowAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* InterviewAction;
+
 public:
 	// Sets default values for this character's properties
 	AHSW_ThirdPersonCharacter();
@@ -71,6 +74,9 @@ protected:
 	void OnMyThorwHold ( const FInputActionValue& value );
 
 	void OnMyThorwPitch ( const FInputActionValue& value );
+
+	void OnMyInterview ( const FInputActionValue& value );
+
 
 public:	
 	// Called every frame
@@ -175,6 +181,12 @@ public:
 	UPROPERTY(Replicated, EditDefaultsOnly,BlueprintReadWrite )
 	bool bThrowing;
 
+	// 인터뷰 ----------------------------------------
+
+	UPROPERTY(Replicated, EditDefaultsOnly,BlueprintReadWrite )
+	bool bIsInterviewing;
+
+
 	// 멀티플레이 --------------------------------------
 
 	virtual void GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
@@ -198,5 +210,13 @@ public:
 	void MulticastRPCFeverGauge (float AddGauge);
 
 	virtual void PossessedBy ( AController* NewController ) override;
+
+	UFUNCTION(Server, Reliable )
+	void ServerRPCInterview();
+
+	UFUNCTION(NetMulticast, Reliable )
+	void MulticastRPCInterview (float bInterview   );
+
+
 
 };

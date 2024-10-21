@@ -179,8 +179,8 @@ void AHSW_ThirdPersonCharacter::SetFeverGaugeMulti ( float feverValue )
 	{		
 		CurrentGauge = feverValue;
 		MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
-		UE_LOG ( LogTemp , Error , TEXT ( "LocalPlayer Gauge: %f" ), CurrentGauge );
-		//UE_LOG ( LogTemp , Warning , TEXT ( "In" ) );
+		// UE_LOG ( LogTemp , Error , TEXT ( "LocalPlayer Gauge: %f" ), CurrentGauge );
+		// UE_LOG ( LogTemp , Warning , TEXT ( "In" ) );
 	}
 	// 로컬 컨트롤을 하는 캐릭터가 내가 아닌 상황이라 나는 MainUI가 없다. 그러니 나의 MainUI를 갱신해주자
 	else if (!IsLocallyControlled ( ) && MainUI == nullptr)
@@ -275,6 +275,7 @@ void AHSW_ThirdPersonCharacter::GetLifetimeReplicatedProps ( TArray<FLifetimePro
 
 	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , bThrowing ); 
 	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , CurrentGauge );
+	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , bIsInterviewing );
 }
 
 
@@ -311,6 +312,10 @@ void AHSW_ThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* Playe
 		//Throwing
 		EnhancedInputComponent->BindAction ( ThrowAction , ETriggerEvent::Started , this , &AHSW_ThirdPersonCharacter::OnMyThorwHold );
 		EnhancedInputComponent->BindAction ( ThrowAction , ETriggerEvent::Completed , this , &AHSW_ThirdPersonCharacter::OnMyThorwPitch );
+
+		//Interview
+		EnhancedInputComponent->BindAction ( InterviewAction , ETriggerEvent::Started , this , &AHSW_ThirdPersonCharacter::OnMyInterview );
+		
 	}
 }
 
@@ -432,6 +437,34 @@ void AHSW_ThirdPersonCharacter::PossessedBy ( AController* NewController )
 
 }
 
+// 인터뷰 =================================================================================================
+
+void AHSW_ThirdPersonCharacter::OnMyInterview ( const FInputActionValue& value )
+{
+	if(HasAuthority())	ServerRPCInterview(  );
+}
+void AHSW_ThirdPersonCharacter::ServerRPCInterview_Implementation (  )
+{
+	bIsInterviewing = !bIsInterviewing;
+	MulticastRPCInterview( bIsInterviewing );
+}
+
+void AHSW_ThirdPersonCharacter::MulticastRPCInterview_Implementation ( float bInterview )
+{
+	if (bInterview)
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "Interview is in progress." ) );
+		ShakeBodyBlueprint ( );
+	}
+	else
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "Interview is over." ) );
+	}
+
+}
+
+// 오브젝트 생성하기 ==========================================================================================
+
 void AHSW_ThirdPersonCharacter::OnMyThorwHold ( const FInputActionValue& value )
 {
 	ServerRPCThrowHold( );
@@ -459,6 +492,8 @@ void AHSW_ThirdPersonCharacter::MulticastRPCThrowHold_Implementation ( FTransfor
 		UE_LOG ( LogTemp , Warning , TEXT ( "Object did not spawn" ) );
 	}
 }
+
+// 오브젝트 던지기 ====================================================================================================
 
 void AHSW_ThirdPersonCharacter::OnMyThorwPitch ( const FInputActionValue& value )
 {
