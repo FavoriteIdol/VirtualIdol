@@ -2,6 +2,10 @@
 
 #include "KMK/HttpActor_KMK.h"
 #include "HttpModule.h"
+#include "KMK/JsonParseLib_KMK.h"
+#include "GameFramework/Actor.h"
+#include "KMK/VirtualGameInstance_KMK.h"
+#include "KMK/StartWidget_KMK.h"
 
 // Sets default values
 AHttpActor_KMK::AHttpActor_KMK()
@@ -15,7 +19,11 @@ AHttpActor_KMK::AHttpActor_KMK()
 void AHttpActor_KMK::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	 gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance() );
+	 if (gi && !gi->GetMyInfo().token.IsEmpty())
+	 {
+		 loginInfo = gi->GetMyInfo();
+	 }
 }
 
 // Called every frame
@@ -24,10 +32,75 @@ void AHttpActor_KMK::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
+#pragma region Login
+void AHttpActor_KMK::ReqLogin ( const FString& id , const FString& pw )
+{
+	// HTTP 모듈 생성
+	FHttpModule& httpModule = FHttpModule::Get ( );
+	TSharedRef<IHttpRequest> req = httpModule.CreateRequest ( );
+
+	req->SetURL(TEXT("http://master-of-prediction.shop:8123/api/v1/auth/login") );
+	req->SetVerb(TEXT("POST"));
+	req->SetHeader(TEXT("content-type") , TEXT("application/json"));
+	req->SetContentAsString(UJsonParseLib_KMK::MakeLoginJson(id , pw));
+
+	req->OnProcessRequestComplete().BindUObject(this , &AHttpActor_KMK::OnResLogin);
+
+	req->ProcessRequest();
+
+}
+
+void AHttpActor_KMK::OnResLogin ( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully )
+{
+	if (bConnectedSuccessfully)
+	{
+		loginInfo = UJsonParseLib_KMK::ParsecMyInfo(Response->GetContentAsString());
+		// 토큰이 존재한다면 => 모든 정보값이 존재함
+		if ( gi && !loginInfo.email.IsEmpty()) 
+		{
+			gi->SetMyInfo(loginInfo);
+			gi->SwitchWidget(1);
+		}
+		else
+		{
+			gi->SwitchWidget(0);
+		}
+	}
+	else 
+	{
+		// 실패
+		UE_LOG ( LogTemp , Warning , TEXT ( "OnResLogin Failed..." ) );
+	}
+}
+#pragma endregion
+#pragma region Concert
+
+void AHttpActor_KMK::ReqSetConcert ( const FConcertInfo& concert )
+{
+	// HTTP 모듈 생성
+	FHttpModule& httpModule = FHttpModule::Get ( );
+	TSharedRef<IHttpRequest> req = httpModule.CreateRequest ( );
+
+	req->SetHeader(TEXT("accessToken") , FString::Printf(TEXT("%s") , *loginInfo.token));
+	req->SetURL(TEXT("http://master-of-prediction.shop:8123/api/v1/concerts") );
+	req->SetVerb(TEXT("POST"));
+	req->SetHeader(TEXT("content-type") , TEXT("application/json"));
+	//req->SetContentAsString(UJsonParseLib_KMK::MakeLoginJson(id , pw));
+
+	req->OnProcessRequestComplete().BindUObject(this , &AHttpActor_KMK::OnResSetConcert);
+
+	req->ProcessRequest();
+}
+
+void AHttpActor_KMK::OnResSetConcert ( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully )
+{
+
+}
+#pragma endregion
 
 #pragma region with Ai for Ticket
 
-void AHttpActor_KMK::ReqTicket ( FString json )
+void AHttpActor_KMK::ReqTicket ( const TMap<FString , FString> data )
 {
 	// HTTP 모듈 생성
 	FHttpModule& httpModule = FHttpModule::Get ( );
@@ -36,10 +109,12 @@ void AHttpActor_KMK::ReqTicket ( FString json )
 	//TMap<FString , FString> data;
 	//data.Add ( TEXT ( "key" ) , json );
 
-	req->SetURL ( "https://singular-swine-deeply.ngrok-free.app/posttest" );
+	req->SetURL(TEXT("https://singular-swine-deeply.ngrok-free.app/generate-image") );
 	req->SetVerb ( TEXT ( "POST" ) );
+	// TEXT ( "application/json" )  ->TEXT("image/jpeg")
 	req->SetHeader ( TEXT ( "content-type" ) , TEXT ( "application/json" ) );
-	//req->SetContentAsString ( UKMK_JsonParseLib::MakeJson ( data ) );
+	req->SetTimeout(60000000.0f);
+	req->SetContentAsString ( UJsonParseLib_KMK::CreateTicketJson ( data ) );
 	// 응답받을 함수를 연결
 	req->OnProcessRequestComplete ( ).BindUObject ( this , &AHttpActor_KMK::OnResTicket );
 	// 서버에 요청
@@ -49,14 +124,51 @@ void AHttpActor_KMK::ReqTicket ( FString json )
 
 void AHttpActor_KMK::OnResTicket ( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully )
 {
-	if (bConnectedSuccessfully)
-	{
-		// 성공
-		FString respon = Response->GetContentAsString ( );
-	}
-	else {
-		// 실패
-		UE_LOG ( LogTemp , Warning , TEXT ( "OnResPostTest Failed..." ) );
-	}
+ 	if (bConnectedSuccessfully && Response.IsValid() && Response->GetResponseCode() == 200)
+    {
+        // 다운로드 받은 PNG 데이터를 파일로 저장
+        TArray<uint8> ImageData = Response->GetContent();
+
+        FString RequestUrl = Request->GetURL();
+
+        FString Nickname;
+        FParse::Value(*RequestUrl, TEXT("filename="), Nickname);
+        FString FullPath = FPaths::ProjectSavedDir() / TEXT("Pictures/") / Nickname + TEXT(".png");
+
+        if (FFileHelper::SaveArrayToFile(ImageData, *FullPath))
+        {
+            UTexture2D* Texture = UJsonParseLib_KMK::MakeTexture(ImageData);
+            if (Texture)
+            {
+                UE_LOG(LogTemp, Log, TEXT("Texture successfully created from downloaded image"));
+
+                // Use the texture as needed, e.g., apply it to a material or widget
+                OnTextureCreated(Texture);  // Custom method to handle the texture
+            }
+            else
+            {
+                UE_LOG(LogTemp, Error, TEXT("Failed to decode the image data."));
+            }
+        }
+        
+    }
+   else
+   {
+       if (Response.IsValid())
+       {
+           UE_LOG(LogTemp, Error, TEXT("Failed to download image. Response code: %d"), Response->GetResponseCode());
+       }
+       else
+       {
+           UE_LOG(LogTemp, Error, TEXT("Response is invalid"));
+       }
+   }
+
 }
+void AHttpActor_KMK::OnTextureCreated(UTexture2D* texture)
+{
+	 gi->widget->CreateTicketMaterial(texture );
+}
+
+
 #pragma endregion

@@ -11,22 +11,6 @@
 #include "Components/WidgetSwitcher.h"
 #include "Components/CanvasPanel.h"
 
-void UJJH_MapSelectWidget::OnEffectButton1Clicked ( )
-{
-	if (SM)
-	{
-		SM->ChangeEffect(1);
-	}
-}
-
-void UJJH_MapSelectWidget::OnEffectButton2Clicked ( )
-{
-	if (SM)
-	{
-		SM->ChangeEffect(2);
-	}
-}
-
 void UJJH_MapSelectWidget::NativeConstruct ( )
 {
 	Super::NativeConstruct ( );
@@ -41,6 +25,8 @@ void UJJH_MapSelectWidget::NativeConstruct ( )
 	//뒤로가기
 	BackButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnBackButtonClicked );
 	ReturnButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnReturnButtonClicked );
+	ReturnToMenuButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnReturnToMenuButtonClicked );
+
 
 	
 	//낮밤 바꾸기
@@ -59,6 +45,7 @@ void UJJH_MapSelectWidget::NativeConstruct ( )
 
 	//지면 바꾸기
 	FogButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnFogButtonClicked );
+	GroundButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnGroundButtonClicked );
 
 	DayHorizontal->SetVisibility ( ESlateVisibility::Hidden );
 	ThemeHorizontal->SetVisibility ( ESlateVisibility::Hidden );
@@ -68,6 +55,7 @@ void UJJH_MapSelectWidget::NativeConstruct ( )
 	CaptureButton->OnClicked.AddDynamic( this , &UJJH_MapSelectWidget::OnCaptureButtonClicked );
 	SetThumbnailButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnSetThumbnailButtonClicked );
 	ReCaptureButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnReCaptureButtonClicked );
+	
 
 }
 void UJJH_MapSelectWidget::OnWeatherButtonClicked ( )
@@ -140,24 +128,17 @@ void UJJH_MapSelectWidget::OnAfternoonButtonClicked ( )
 	if (SM) SM->UpdateSunNightPosition ( false );
 }
 
-
-void UJJH_MapSelectWidget::OnNaturalButtonClicked ( )
-{
-	if (SM)
-	{
-		SM->ChangeMap ( 1 );
-	}
-}
-
-void UJJH_MapSelectWidget::OnSpaceButtonClicked ( )
-{
-	if (SM)
-	{
-		SM->ChangeMap(1);
-	}
-}
+//테마
 
 void UJJH_MapSelectWidget::OnCyberpunkButtonClicked ( )
+{
+	if (SM)
+	{
+		SM->ChangeMap (0);
+	}
+}
+
+void UJJH_MapSelectWidget::OnNaturalButtonClicked ( )
 {
 	if (SM)
 	{
@@ -165,11 +146,45 @@ void UJJH_MapSelectWidget::OnCyberpunkButtonClicked ( )
 	}
 }
 
+void UJJH_MapSelectWidget::OnSpaceButtonClicked ( )
+{
+	if (SM)
+	{
+		SM->ChangeMap(2);
+	}
+}
 
+
+//지면 바꾸기
 void UJJH_MapSelectWidget::OnFogButtonClicked ( )
 {
-	if (SM) SM->ChangeFloor(1);
+	if (SM) SM->ChangeFloor(0);
 }
+
+void UJJH_MapSelectWidget::OnGroundButtonClicked ( )
+{
+	if (SM) SM->ChangeFloor (1);
+}
+
+//이펙트 바꾸기
+void UJJH_MapSelectWidget::OnEffectButton1Clicked ( )
+{
+	if (SM)
+	{
+		SM->ChangeEffect (0);
+	}
+}
+
+void UJJH_MapSelectWidget::OnEffectButton2Clicked ( )
+{
+	if (SM)
+	{
+		SM->ChangeEffect (1);
+	}
+}
+
+
+
 
 void UJJH_MapSelectWidget::OnCaptureButtonClicked ( )
 {
@@ -179,6 +194,7 @@ void UJJH_MapSelectWidget::OnCaptureButtonClicked ( )
 		SPC->TakeScreenshot ( );
 		CaptureButton->SetVisibility(ESlateVisibility::Hidden);
 		ReturnButton->SetVisibility ( ESlateVisibility::Hidden );
+		ReturnToMenuButton->SetVisibility ( ESlateVisibility::Hidden );
 	}
 
 	// 0.3초 후에 SetImageWithCapturedImage 함수 호출
@@ -197,15 +213,18 @@ void UJJH_MapSelectWidget::OnReCaptureButtonClicked ( )
 	SetupWidgetSwitcher->SetActiveWidgetIndex ( 0 );
 	CaptureButton->SetVisibility ( ESlateVisibility::Visible);
 	ReturnButton->SetVisibility ( ESlateVisibility::Visible );
+	
 }
 void UJJH_MapSelectWidget::OnSetThumbnailButtonClicked ( )
 {
-	
+	//촬영한 사진 백엔드로 보내기
+
 }
 void UJJH_MapSelectWidget::SetImageWithCapturedImage ( )
 {
 	SetupWidgetSwitcher->SetActiveWidgetIndex ( 1 );
 	PlayAnimation ( ShutterAnimation );
+	ReturnToMenuButton->SetVisibility ( ESlateVisibility::Visible );
 }
 
 void UJJH_MapSelectWidget::OnBackButtonClicked ( )
@@ -216,6 +235,9 @@ void UJJH_MapSelectWidget::OnBackButtonClicked ( )
 void UJJH_MapSelectWidget::OnReturnButtonClicked ( )
 {
 	PlayAnimation ( BackButtonAnimation, 1.0f, 1, EUMGSequencePlayMode::PingPong);
-	UE_LOG(LogTemp, Error, TEXT("!@#$"));
+}
+void UJJH_MapSelectWidget::OnReturnToMenuButtonClicked ( )
+{
+	UGameplayStatics::OpenLevel(this, TEXT("/Game/Project/Personal/KMK/Maps/KMK_Maps"));
 }
 
