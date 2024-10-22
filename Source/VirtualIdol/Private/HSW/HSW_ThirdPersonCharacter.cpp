@@ -29,6 +29,8 @@
 #include "HSW/HSW_PlayerController.h"
 #include "HSW/HSW_GameState_Auditorium.h"
 #include "GameFramework/PlayerState.h"
+#include "Engine/StaticMeshActor.h"
+#include "EngineUtils.h"
 
 // Sets default values
 AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
@@ -142,6 +144,16 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 	{
 		UE_LOG ( LogTemp , Warning , TEXT ( "GameState is null!" ) );
 		return;
+	}
+
+	FName tag = TEXT ( "InterviewLocation" );
+	for (TActorIterator<AActor> It ( GetWorld ( ) , AStaticMeshActor::StaticClass ( ) ); It; ++It)
+	{
+		AActor* Actor = *It;
+		if (IsValid ( Actor ) && Actor->ActorHasTag ( tag ))
+		{
+			InterviewLocation = Actor->GetTransform ( );
+		}
 	}
 }
 
@@ -450,10 +462,13 @@ void AHSW_ThirdPersonCharacter::ServerRPCInterview_Implementation (  )
 
 
 	PlayerStates = gs->PlayerArray;
-	if (PlayerStates.Num ( ) > 0)
+	if (PlayerStates.Num ( ) > 0 && bIsInterviewing)
 	{
 		IntervieweeIndex = FMath::RandRange ( 1 , PlayerStates.Num ( ) - 1 );
 		IntervieweePlayerState = PlayerStates[IntervieweeIndex];
+
+		PreLocation = IntervieweePlayerState->GetPawn ( )->GetActorTransform ( );
+
 	}
 	else
 	{
@@ -465,30 +480,41 @@ void AHSW_ThirdPersonCharacter::ServerRPCInterview_Implementation (  )
 
 void AHSW_ThirdPersonCharacter::MulticastRPCInterview_Implementation ( float bInterview )
 {
+	
+
 	if (bInterview)
 	{
 		UE_LOG ( LogTemp , Warning , TEXT ( "Interview is in progress." ) );
-
 		// 멀티캐스트 확인용 임시로 사용할 쉐이크바뤼
 		ShakeBodyBlueprint ( );
-		ChooseInterviwee( );
 	}
 	else
 	{
 		UE_LOG ( LogTemp , Warning , TEXT ( "Interview is over." ) );
 	}
+	ChooseInterviwee( );
 
 }
 
 void AHSW_ThirdPersonCharacter::ChooseInterviwee ( )
 {
-	
+
 	if (IntervieweeIndex && IntervieweePlayerState)
 	{
-		DrawDebugString ( GetWorld ( ) , IntervieweePlayerState->GetPawn()->GetActorLocation() + FVector ( 0 , 0 , 90 ) , TEXT ( "Interviewee~" ) , nullptr , FColor::Red , 5, true , 1 );
-		UE_LOG ( LogTemp , Warning , TEXT ( "플레이어 수: %d" ) , PlayerStates.Num ( ) );
-		UE_LOG ( LogTemp , Warning , TEXT ( "선택된 수: %d" ) , IntervieweeIndex );
-		UE_LOG ( LogTemp , Warning , TEXT ( "선택된 플레이어: %s" ) , *IntervieweePlayerState->GetPlayerName ( ) );
+		if (bIsInterviewing)
+		{
+			UE_LOG ( LogTemp , Warning , TEXT ( "플레이어 수: %d" ) , PlayerStates.Num ( ) );
+			UE_LOG ( LogTemp , Warning , TEXT ( "선택된 수: %d" ) , IntervieweeIndex );
+			UE_LOG ( LogTemp , Warning , TEXT ( "선택된 플레이어: %s" ) , *IntervieweePlayerState->GetPlayerName ( ) );
+
+			IntervieweePlayerState->GetPawn ( )->SetActorTransform( InterviewLocation );
+
+			DrawDebugString ( GetWorld ( ) , IntervieweePlayerState->GetPawn ( )->GetActorLocation ( ) + FVector ( 0 , 0 , 90 ) , TEXT ( "Interviewee~" ) , nullptr , FColor::Red , 5 , true , 1 );
+		}
+		else
+		{
+			IntervieweePlayerState->GetPawn ( )->SetActorTransform ( PreLocation );
+		}
 
 	}
 }

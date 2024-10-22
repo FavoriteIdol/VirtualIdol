@@ -197,6 +197,9 @@ public:
 	UPROPERTY( )
 	TArray<class APlayerState*> PlayerStates;
 
+	FTransform PreLocation;
+	FTransform InterviewLocation;
+
 	// 멀티플레이 --------------------------------------
 
 	virtual void GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
