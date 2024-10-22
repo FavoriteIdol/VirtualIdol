@@ -28,6 +28,7 @@
 #include "Net/UnrealNetwork.h"
 #include "HSW/HSW_PlayerController.h"
 #include "HSW/HSW_GameState_Auditorium.h"
+#include "GameFramework/PlayerState.h"
 
 // Sets default values
 AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
@@ -441,11 +442,24 @@ void AHSW_ThirdPersonCharacter::PossessedBy ( AController* NewController )
 
 void AHSW_ThirdPersonCharacter::OnMyInterview ( const FInputActionValue& value )
 {
-	if(HasAuthority())	ServerRPCInterview(  );
+	if(HasAuthority())	ServerRPCInterview( );
 }
 void AHSW_ThirdPersonCharacter::ServerRPCInterview_Implementation (  )
 {
 	bIsInterviewing = !bIsInterviewing;
+
+
+	PlayerStates = gs->PlayerArray;
+	if (PlayerStates.Num ( ) > 0)
+	{
+		IntervieweeIndex = FMath::RandRange ( 1 , PlayerStates.Num ( ) - 1 );
+		IntervieweePlayerState = PlayerStates[IntervieweeIndex];
+	}
+	else
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "플레이어가 없습니다." ) );
+	}
+
 	MulticastRPCInterview( bIsInterviewing );
 }
 
@@ -454,7 +468,10 @@ void AHSW_ThirdPersonCharacter::MulticastRPCInterview_Implementation ( float bIn
 	if (bInterview)
 	{
 		UE_LOG ( LogTemp , Warning , TEXT ( "Interview is in progress." ) );
+
+		// 멀티캐스트 확인용 임시로 사용할 쉐이크바뤼
 		ShakeBodyBlueprint ( );
+		ChooseInterviwee( );
 	}
 	else
 	{
@@ -463,13 +480,25 @@ void AHSW_ThirdPersonCharacter::MulticastRPCInterview_Implementation ( float bIn
 
 }
 
+void AHSW_ThirdPersonCharacter::ChooseInterviwee ( )
+{
+	
+	if (IntervieweeIndex && IntervieweePlayerState)
+	{
+		DrawDebugString ( GetWorld ( ) , IntervieweePlayerState->GetPawn()->GetActorLocation() + FVector ( 0 , 0 , 90 ) , TEXT ( "Interviewee~" ) , nullptr , FColor::Red , 5, true , 1 );
+		UE_LOG ( LogTemp , Warning , TEXT ( "플레이어 수: %d" ) , PlayerStates.Num ( ) );
+		UE_LOG ( LogTemp , Warning , TEXT ( "선택된 수: %d" ) , IntervieweeIndex );
+		UE_LOG ( LogTemp , Warning , TEXT ( "선택된 플레이어: %s" ) , *IntervieweePlayerState->GetPlayerName ( ) );
+
+	}
+}
+
 // 오브젝트 생성하기 ==========================================================================================
 
 void AHSW_ThirdPersonCharacter::OnMyThorwHold ( const FInputActionValue& value )
 {
 	ServerRPCThrowHold( );
 }
-
 
 void AHSW_ThirdPersonCharacter::ServerRPCThrowHold_Implementation ( )
 {

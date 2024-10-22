@@ -19,6 +19,9 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 
+	UPROPERTY(EditDefaultsOnly )
+	TArray<class APlayerState *> PlayerList;
+
 	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="GameState" )
 	bool bFever30;
 

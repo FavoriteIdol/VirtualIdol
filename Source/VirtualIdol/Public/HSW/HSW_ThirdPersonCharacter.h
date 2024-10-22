@@ -186,6 +186,16 @@ public:
 	UPROPERTY(Replicated, EditDefaultsOnly,BlueprintReadWrite )
 	bool bIsInterviewing;
 
+	UFUNCTION( )
+	void ChooseInterviwee( );
+
+	int32 IntervieweeIndex;
+	
+	UPROPERTY( )
+	class APlayerState* IntervieweePlayerState;
+
+	UPROPERTY( )
+	TArray<class APlayerState*> PlayerStates;
 
 	// 멀티플레이 --------------------------------------
 

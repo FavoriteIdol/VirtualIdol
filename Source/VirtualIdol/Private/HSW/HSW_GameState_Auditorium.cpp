@@ -5,10 +5,10 @@
 
 void AHSW_GameState_Auditorium::BeginPlay ( )
 {
-
+	PlayerList = PlayerArray;
 }
 
-void AHSW_GameState_Auditorium::Tick ( float DeltaSeconds )
+ void AHSW_GameState_Auditorium::Tick ( float DeltaSeconds )
 {
 	UE_LOG ( LogTemp , Warning , TEXT ( "GameState Tick" ) );
 	if (bFever30)
