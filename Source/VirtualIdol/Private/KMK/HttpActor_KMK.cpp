@@ -141,7 +141,7 @@ void AHttpActor_KMK::ReqTicket ( const TMap<FString , FString> data )
 	req->SetVerb ( TEXT ( "POST" ) );
 	// TEXT ( "application/json" )  ->TEXT("image/jpeg")
 	req->SetHeader ( TEXT ( "content-type" ) , TEXT ( "application/json" ) );
-	req->SetTimeout(1000.0f);
+	req->SetTimeout(180.f);
 	req->SetContentAsString ( UJsonParseLib_KMK::CreateTicketJson ( data ) );
 	// 응답받을 함수를 연결
 	req->OnProcessRequestComplete ( ).BindUObject ( this , &AHttpActor_KMK::OnResTicket );
