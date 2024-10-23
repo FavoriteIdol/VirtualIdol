@@ -27,6 +27,7 @@ public :
 #pragma endregion
 #pragma region CreateTicket
 	static FString CreateTicketJson( const TMap<FString , FString> ticketSetText);
+	static FString ParsecTicketJson( const FString& json);
 #pragma endregion
 
 

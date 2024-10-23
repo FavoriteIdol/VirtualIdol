@@ -50,10 +50,15 @@ public:
 	class UEditableText* EditText_ID;
 	UPROPERTY(meta = (BindWidget))
 	class UEditableText* EditText_PW;
-
+	UPROPERTY(meta = (BindWidget))
+    class UButton* Butt_FailLogin;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UCanvasPanel* FailLoginPanel;
 	// 버튼 연동 함수
 	UFUNCTION ()
 	void OnMyLogin();
+	UFUNCTION ()
+	void OnFailLogin();
 #pragma endregion
 #pragma region  Four Button Widget Panel
 // ================================================================
@@ -90,10 +95,6 @@ public:
 	TArray<class UMaterial*> EffectParticles;
 	UPROPERTY(EditAnywhere, Category = "Particle")
 	TArray<class UMaterial*> FeversParticles;
-	UPROPERTY(EditAnywhere, Category = "Particle")
-	TArray<class UMaterial*> HighParticles;
-	UPROPERTY(EditAnywhere, Category = "Particle" )
-	TArray<FVector> ParticlePositions;
 	// 텍스트
 	UPROPERTY(meta = (BindWidget))
     class UTextBlock* Text_Title;	
@@ -148,7 +149,9 @@ public:
 	UPROPERTY ( meta = ( BindWidget ) )
     class UImage* Image_SetStage;
 	UPROPERTY ( meta = ( BindWidget ) )
-	class UButton* Butt_CreateTicket;
+    class UButton* Butt_CreateTicket;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UButton* Butt_CreateTicket1;
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UMultiLineEditableText* EditMultiText_Ticket;
 
@@ -161,34 +164,31 @@ public:
 #pragma endregion
 #pragma region Set Effect
 	// 이펙트 결정 패널
-	UPROPERTY ( meta = ( BindWidget ) )
+    UPROPERTY ( meta = ( BindWidget ) )
     class UCanvasPanel* SetEffectPanel;
 	UPROPERTY ( meta = ( BindWidget ) )
-    class UImage* Image_Particle;
+	class UButton* Butt_AppearEffect;
 	UPROPERTY ( meta = ( BindWidget ) )
-    class UImage* Image_Fever;
+    class UButton* Butt_FeverEffect;	
 	UPROPERTY ( meta = ( BindWidget ) )
-	class UButton* Butt_Right;
-	UPROPERTY ( meta = ( BindWidget ) )
-	class UButton* Butt_Left;
-	UPROPERTY ( meta = ( BindWidget ) )
-	class UButton* Butt_FRight;
-	UPROPERTY ( meta = ( BindWidget ) )
-	class UButton* Butt_FLeft;
+    class UButton* Butt_Select1;
 
-	int32 particleNum = 0;
-	int32 feverNum = 0;
+	UPROPERTY(BlueprintReadWrite )
+	int32 particleNum = -1;
+	UPROPERTY(BlueprintReadWrite )
+	int32 feverNum = -1;
+	UPROPERTY(BlueprintReadWrite )
+	bool bFever = false;
 
 	UFUNCTION( )
-	void PressRightButt( );
+	void SetPanelVisible( class UCanvasPanel* visiblePanel, class UCanvasPanel* hiddenPanel0 , class UCanvasPanel* hiddenPanel1  );
+
 	UFUNCTION( )
-	void PressLeftButt( );
+	void PressAppearEffect( );
 	UFUNCTION( )
-	void PressFRightButt( );
+	void PressFeverEffect( );
 	UFUNCTION( )
-	void PressFLeftButt( );
-	UFUNCTION( )
-	void SetPanelVisible( class UCanvasPanel* visiblePanel, class UCanvasPanel* hiddenPanel0 , class UCanvasPanel* hiddenPanel1 , class UCanvasPanel* hiddenPanel2 );
+	void PressSelect1Butt( );
 
 	void AddIndex( int32 num , TArray<class UMaterial*> meshArray , class UImage* image );
 	void MinusIndex( int32 num , TArray<class UMaterial*>  meshArray , class UImage* image );
@@ -305,6 +305,8 @@ public:
     class UButton* Butt_Back1;
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UButton* Butt_Back2;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* Butt_Back3;
 
 	// 버튼 연동 함수
     UFUNCTION ( )

@@ -14,23 +14,40 @@ struct FConcertInfo
 	GENERATED_BODY ( )
 
 	UPROPERTY(BlueprintReadOnly)
-	FString concertName;
+	FString name;
 	UPROPERTY(BlueprintReadOnly)
-	FString concertDay;
+	FString img;
 	UPROPERTY(BlueprintReadOnly)
-	FString concertTime;
+	FString concertDate;
+	UPROPERTY(BlueprintReadOnly)
+	FString startTime;
 	UPROPERTY(BlueprintReadOnly)
 	FString endTime;
 	UPROPERTY(BlueprintReadOnly)
-	int32 tickePrice;
+	int32 appearedVFX;
 	UPROPERTY(BlueprintReadOnly)
-	FString ticketInfo;
+	int32 feverVFX;
+	UPROPERTY ( BlueprintReadOnly )
+    int32 stageId;
 	UPROPERTY(BlueprintReadOnly)
-	int32 appearEffectNum;
+    int32 ticketPrice;
 	UPROPERTY(BlueprintReadOnly)
-	int32 feverEffectNum;
-	UPROPERTY(BlueprintReadOnly)
-	int32 personNum;
+	int32 peopleScale;
+
+	void Clear ( )
+	{
+		name.Empty ( );
+		img.Empty ( );
+		concertDate.Empty ( );
+		startTime.Empty ( );
+		endTime.Empty ( );
+		appearedVFX = 0;
+		feverVFX = 0;
+		stageId = 0;
+		ticketPrice = 0;
+		peopleScale = 0;
+	}
+
 };
 // 개인정보
 USTRUCT ( BlueprintType )
@@ -41,11 +58,11 @@ struct FLoginInfo
 	UPROPERTY(BlueprintReadOnly)
 	FString email;
 	UPROPERTY(BlueprintReadOnly)
-	FString pw;
+	FString password;
 	UPROPERTY(BlueprintReadOnly)
 	FString token;
 	UPROPERTY(BlueprintReadOnly)
-	FString nickName;
+	FString userName;
 };
 UCLASS()
 class VIRTUALIDOL_API AHttpActor_KMK : public AActor
@@ -75,6 +92,7 @@ public:
 	void OnResLogin( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
 #pragma endregion
 #pragma region with BE for SettingStage
+	int32 count = 0;
 	// 요청
 	void ReqSetConcert(const FConcertInfo& concert );
 	// 응답

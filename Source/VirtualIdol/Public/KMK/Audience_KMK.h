@@ -19,7 +19,8 @@ struct FButtonInfo
 	UPROPERTY(meta = (BindWidget ) )
 	class UImage* image;
 	UPROPERTY(meta = (BindWidget ) )
-	class UTextBlock* text;
+    class UTextBlock* text;
+
 };
 UCLASS()
 class VIRTUALIDOL_API UAudience_KMK : public UUserWidget
@@ -112,8 +113,6 @@ public :
 	void VipAuthority( );
 
 	// 콘서트 시작 5초전
-	UPROPERTY ( meta = ( BindWidget ) )
-	class UButton* Butt_StartConcert;
 
 	UFUNCTION( )
 	void PressStartConcertButt( );
@@ -171,14 +170,20 @@ public :
 	UPROPERTY ( meta = ( BindWidget ) )
     class UCanvasPanel* ExitPanel;
 	UPROPERTY ( meta = ( BindWidget ) )
+    class UCanvasPanel* ExitPanel1;
+	UPROPERTY ( meta = ( BindWidget ) )
     class UButton* Butt_Exit;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UButton* Butt_Exit1;
 	UPROPERTY ( meta = ( BindWidget ) )
     class UButton* Butt_Out;
 	UPROPERTY ( meta = ( BindWidget ) )
     class UButton* Butt_Cancel;
 	
 	UFUNCTION( )
-	void PressExitButt( );
+    void PressExitButt ( );
+	UFUNCTION ( )
+    void PressExit1Butt ( );
 	UFUNCTION( )
 	void PressOutButt( );
 	UFUNCTION( )
@@ -212,10 +217,55 @@ public :
     class UTextBlock* Text_CoutDown;
 
 	UFUNCTION( )
-	void CountDownText(int32 time );
+	void CountDownText( const FString& time );
 	UFUNCTION( )
 	void CountDownPanelVisible( ESlateVisibility visiblePanel );
+#pragma endregion
+#pragma region Virtual
+
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UWidgetSwitcher* WS_Concert;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UButton* Butt_Model;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UButton* Butt_MP3;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UVerticalBox* VB_SingList;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UVerticalBox* VB_SingList1;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UTextBlock* TEXT_Min;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UTextBlock* TEXT_Min1;
+	UPROPERTY(EditAnywhere )
+	TSubclassOf<class USingWidget_KMK> singWidget;
+	UFUNCTION( )
+	void ChangeTextClock(const FString& text );
+	UFUNCTION( )
+	void PressButtMp3( );
+	UFUNCTION( )
+	void PressButtModel( );
+	UFUNCTION( )
+	bool OpenFileExample(TArray<FString>& FileNames, FString DialogueTitle, FString FileTypes, bool multiselect);
+
+	UFUNCTION( )
+	USoundWaveProcedural* LoadWavFromFile ( const FString& FilePath );
+
+	UPROPERTY( )
+	float soundGain = 2;
+	UFUNCTION( )
+	void ChangeVirtualWidget( );
+
 #pragma endregion
 
 
 };
+void ApplyHighPassFilter16 ( TArray<int16>& PCMData , float CutoffFrequency , int32 SampleRate );
+void ApplyLowPassFilter16 ( TArray<int16>& PCMData , float CutoffFrequency , int32 SampleRate );
+void ApplyHighPassFilter24 ( TArray<int32>& PCMData , float CutoffFrequency , int32 SampleRate );
+void ApplyLowPassFilter24 ( TArray<int32>& PCMData , float CutoffFrequency , int32 SampleRate );
+void ApplyHighPassFilter32 ( TArray<float>& PCMData , float CutoffFrequency , int32 SampleRate );
+void ApplyLowPassFilter32 ( TArray<float>& PCMData , float CutoffFrequency , int32 SampleRate );
+void AmplifyPCM16 ( TArray<int16>& PCMData , float Gain );
+void AmplifyPCM24 ( TArray<int32>& PCMData , float Gain );
+void AmplifyPCM32 ( TArray<float>& PCMData , float Gain );
