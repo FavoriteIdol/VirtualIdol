@@ -26,6 +26,9 @@
 #include "Sound/SoundEffectSource.h"
 #include <chrono>
 #include "Components/WidgetSwitcher.h"
+#include "GameFramework/PlayerController.h"
+#include "HSW/HSW_PlayerController.h"
+#include "HSW/HSW_ThirdPersonCharacter.h"
 
 void UAudience_KMK::NativeConstruct ( )
 {
@@ -139,13 +142,13 @@ void UAudience_KMK::PressModeButt ( )
 void UAudience_KMK::StartVoiceChat ( )
 {
     UE_LOG(LogTemp, Warning, TEXT("StartTalk" ) );
-    pc->GetController<APlayerController> ( )->StartTalking ( );
+    pc->GetController<AHSW_PlayerController>( )->StartTalking ( );
 }
 
 void UAudience_KMK::StopVoiceChat ( )
 {
     UE_LOG ( LogTemp , Warning , TEXT ( "StopTalk" ) );
-    pc->GetController<APlayerController> ( )->StopTalking ( );
+    pc->GetController<AHSW_PlayerController>( )->StopTalking ( );
 }
 
 void UAudience_KMK::PressMikeButt ( )

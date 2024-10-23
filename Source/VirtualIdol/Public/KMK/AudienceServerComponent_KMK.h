@@ -26,9 +26,9 @@ public:
 
 	// 플레이어 컨트롤러 들고오기
 	UPROPERTY( )
-    class ATP_ThirdPersonCharacter* player;
+    class AHSW_ThirdPersonCharacter* player;
 	UPROPERTY ( )
-    class ATP_ThirdPersonCharacter* playerMesh;
+    class AHSW_ThirdPersonCharacter* playerMesh;
 
 #pragma region Chatting
 	// 서버에게 채팅 요청
@@ -51,12 +51,12 @@ public:
 	void ServerRPC_ChangeMyMesh(int32 num );
 
 	UFUNCTION(NetMulticast, Reliable )
-	void MultiRPC_ChangeMyMesh(int32 num, class ATP_ThirdPersonCharacter* TargetMesh );
+	void MultiRPC_ChangeMyMesh(int32 num, class AHSW_ThirdPersonCharacter* TargetMesh );
 	UFUNCTION( )
 	void OnRep_ChangePlayerMesh ( );
 
 	UFUNCTION( )
-	void SetVirtualVisible(class ATP_ThirdPersonCharacter* mesh, bool bVisible );
+	void SetVirtualVisible(class AHSW_ThirdPersonCharacter* mesh, bool bVisible );
 
 	bool bCount = false;
 	bool bVis = false;
