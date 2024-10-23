@@ -189,14 +189,16 @@ public:
 	UFUNCTION( )
 	void ChooseInterviwee( );
 
+	UPROPERTY(Replicated, EditDefaultsOnly,BlueprintReadWrite )
 	int32 IntervieweeIndex;
 	
-	UPROPERTY( )
+	UPROPERTY(Replicated, EditDefaultsOnly,BlueprintReadWrite )
 	class APlayerState* IntervieweePlayerState;
 
 	UPROPERTY( )
 	TArray<class APlayerState*> PlayerStates;
 
+	UPROPERTY(Replicated, EditDefaultsOnly,BlueprintReadWrite )
 	FTransform PreLocation;
 	FTransform InterviewLocation;
 
@@ -228,7 +230,7 @@ public:
 	void ServerRPCInterview();
 
 	UFUNCTION(NetMulticast, Reliable )
-	void MulticastRPCInterview (float bInterview   );
+	void MulticastRPCInterview ( );
 
 
 
