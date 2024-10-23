@@ -33,7 +33,6 @@ void UAudienceServerComponent_KMK::BeginPlay()
 		// 플레이어가 로컬 플레이어 일때
 		if (!playerMesh->IsLocallyControlled())
         {
-			
 			// 로컬이 아닌 경우에 플레이어의 playerMeshNum에 따라 
 			if (playerMeshNum < 0)
 			{
@@ -51,6 +50,7 @@ void UAudienceServerComponent_KMK::BeginPlay()
 		else
 		{
 			if(gi->playerMeshNum >=0 )playerMesh->GetMesh()->SetSkeletalMesh(audienceMesh[gi->playerMeshNum]);
+			else SetVirtualVisible ( playerMesh , true );
 			// 클라이언트에서 서버로 RPC 호출
 			ServerRPC_ChangeMyMesh ( gi->playerMeshNum );
 		}
@@ -108,12 +108,32 @@ void UAudienceServerComponent_KMK::MultiRPCChat_Implementation ( const FString& 
 void UAudienceServerComponent_KMK::ServerRPC_ChangeMyMesh_Implementation ( int32 num)
 {
 	playerMeshNum = num;
-	UE_LOG(LogTemp, Warning, TEXT("ServerRPC_ChangeMyMesh called. playerMeshNum: %d"), playerMeshNum);
-	MultiRPC_ChangeMyMesh ( playerMeshNum, playerMesh ); // 클라이언트에게 RPC 호출
+	if (playerMesh->IsLocallyControlled ( ))
+	{
+		// 서버 로컬 플레이어의 메쉬는 항상 보이도록 강제 설정
+		SetVirtualVisible ( playerMesh , true );
+
+		if (audienceMesh.IsValidIndex ( num ))
+		{
+			playerMesh->GetMesh ( )->SetSkeletalMesh ( audienceMesh[num] );
+			UE_LOG ( LogTemp , Warning , TEXT ( "Server local player mesh set to index: %d" ) , num );
+		}
+		return;
+	}
+	// 클라이언트에게 RPC 호출
+	MultiRPC_ChangeMyMesh ( playerMeshNum , playerMesh );
 }
 
 void UAudienceServerComponent_KMK::MultiRPC_ChangeMyMesh_Implementation ( int32 num, class AHSW_ThirdPersonCharacter* TargetMesh )
 {
+	
+	if (TargetMesh->HasAuthority ( ) && TargetMesh->IsLocallyControlled ( ))
+	{
+		SetVirtualVisible ( TargetMesh , true );
+		// 서버 로컬 플레이어일 때 메쉬 숨김 방지
+		UE_LOG ( LogTemp , Warning , TEXT ( "Server local player, keeping mesh visible" ) );
+		return;  // 서버 로컬 플레이어는 메쉬 변경 로직에서 제외
+	}
     // 로컬 플레이어도 포함하여 모든 클라이언트에서 메쉬 동기화
     if (num < 0)
     {
@@ -123,19 +143,31 @@ void UAudienceServerComponent_KMK::MultiRPC_ChangeMyMesh_Implementation ( int32 
     {
         SetVirtualVisible(TargetMesh, true);
     }
-    else
-    {
-        TargetMesh->GetMesh()->SetSkeletalMesh(audienceMesh[num]);
-    }
+	else if (audienceMesh.IsValidIndex ( num ))
+	{
+		TargetMesh->GetMesh ( )->SetSkeletalMesh ( audienceMesh[num] );
+		SetVirtualVisible ( TargetMesh , true );
+		UE_LOG ( LogTemp , Warning , TEXT ( "Mesh set for %s at index %d" ) , *TargetMesh->GetName ( ) , num );
+	}
+	else
+	{
+		UE_LOG ( LogTemp , Error , TEXT ( "Invalid mesh index: %d" ) , num );
+	}
 
 }
 
 void UAudienceServerComponent_KMK::OnRep_ChangePlayerMesh()
 {
     UE_LOG(LogTemp, Warning, TEXT("OnRep_ChangePlayerMesh: %s의 playerMeshNum: %d"), *GetOwner()->GetName(), playerMeshNum);
-    
+
     if (playerMesh)
 	{
+		if (playerMesh->HasAuthority ( ) && playerMesh->IsLocallyControlled ( ))
+		{
+			// 서버 로컬 플레이어일 때 메쉬 숨김 방지
+			UE_LOG ( LogTemp , Warning , TEXT ( "Server local player, keeping mesh visible" ) );
+			return;  // 서버 로컬 플레이어는 메쉬 변경 로직에서 제외
+		}
 		if (playerMeshNum < 0)
 		{
 			SetVirtualVisible ( playerMesh , false );
@@ -153,8 +185,12 @@ void UAudienceServerComponent_KMK::OnRep_ChangePlayerMesh()
 
 void UAudienceServerComponent_KMK::SetVirtualVisible ( class AHSW_ThirdPersonCharacter* mesh , bool bVisible )
 {
-	mesh->GetMesh ( )->SetRenderInMainPass ( bVisible );
-	mesh->GetMesh ( )->SetRenderInDepthPass ( bVisible );
+	if (mesh)
+	{
+		mesh->GetMesh ( )->SetRenderInMainPass ( bVisible );
+		mesh->GetMesh ( )->SetRenderInDepthPass ( bVisible );
+		UE_LOG ( LogTemp , Warning , TEXT ( "SetVirtualVisible: %s visibility: %s" ) , *mesh->GetName ( ) , bVisible ? TEXT ( "Visible" ) : TEXT ( "Hidden" ) );
+	}
 }
 
 void UAudienceServerComponent_KMK::StartCountDown ( )
@@ -177,7 +213,7 @@ void UAudienceServerComponent_KMK::ServerRPC_StartConcert_Implementation ( )
 
 void UAudienceServerComponent_KMK::MultiRPC_StartConcert_Implementation ( float CountdownTime )
 {
-	ATP_ThirdPersonCharacter* playerCharacter = Cast<ATP_ThirdPersonCharacter> ( GetWorld ( )->GetFirstPlayerController ( )->GetPawn ( ) );
+	AHSW_ThirdPersonCharacter* playerCharacter = Cast<AHSW_ThirdPersonCharacter> ( GetWorld ( )->GetFirstPlayerController ( )->GetPawn ( ) );
 	// 카운트다운 UI 패널 표시
 	if (playerCharacter && playerCharacter->audienceWidget)
 	{

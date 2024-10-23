@@ -178,7 +178,11 @@ public :
 	UPROPERTY ( meta = ( BindWidget ) )
     class UButton* Butt_Out;
 	UPROPERTY ( meta = ( BindWidget ) )
+    class UButton* Butt_Out1;
+	UPROPERTY ( meta = ( BindWidget ) )
     class UButton* Butt_Cancel;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* Butt_Cancel1;
 	
 	UFUNCTION( )
     void PressExitButt ( );

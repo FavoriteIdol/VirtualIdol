@@ -38,12 +38,13 @@ void UAudience_KMK::NativeConstruct ( )
     Super::NativeConstruct( );
     SetUpButtonInfo();
     gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance());
-    if (Butt_Vip && Butt_Yes && Butt_No && PopUpPanel)
+    if (Butt_Vip && Butt_Yes && Butt_No && PopUpPanel && FeverGauge)
     {
         VisiblePanel(ESlateVisibility::Hidden);
         Butt_Vip->OnClicked.AddDynamic ( this , &UAudience_KMK::PressVipButt );
         Butt_Yes->OnClicked.AddDynamic ( this , &UAudience_KMK::PressYesButt );
         Butt_No->OnClicked.AddDynamic ( this , &UAudience_KMK::PressNoButt );
+        FeverGauge->SetVisibility(ESlateVisibility::Hidden);
     }
 #pragma region Chat
     if (Butt_Send)
@@ -67,12 +68,14 @@ void UAudience_KMK::NativeConstruct ( )
         Butt_Exit->OnClicked.AddDynamic ( this , &UAudience_KMK::PressExitButt);
         Butt_Exit1->OnClicked.AddDynamic ( this , &UAudience_KMK::PressExit1Butt);
     }
-    if (ExitPanel && ExitPanel1 && Butt_Cancel && Butt_Out)
+    if (ExitPanel && ExitPanel1 && Butt_Cancel && Butt_Cancel1 && Butt_Out && Butt_Out1)
     {
         ExitPanel->SetVisibility(ESlateVisibility::Hidden);
         ExitPanel1->SetVisibility(ESlateVisibility::Hidden);
         Butt_Cancel->OnClicked.AddDynamic ( this , &UAudience_KMK::PressCancelButt);
+        Butt_Cancel1->OnClicked.AddDynamic ( this , &UAudience_KMK::PressCancelButt);
         Butt_Out->OnClicked.AddDynamic ( this , &UAudience_KMK::PressOutButt);
+        Butt_Out1->OnClicked.AddDynamic ( this , &UAudience_KMK::PressOutButt);
     }
     if (ChatGridPanel)
     {
@@ -394,6 +397,7 @@ void UAudience_KMK::CountDownPanelVisible ( ESlateVisibility visiblePanel )
 void UAudience_KMK::SetCountDownTextVisible ( )
 {
     if(TEXT_Min1) TEXT_Min1->SetVisibility(ESlateVisibility::Hidden);
+    if(FeverGauge) FeverGauge->SetVisibility(ESlateVisibility::Visible);
 }
 
 #pragma endregion
