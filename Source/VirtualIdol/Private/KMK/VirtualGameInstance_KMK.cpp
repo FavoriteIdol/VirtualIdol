@@ -13,6 +13,7 @@
 #include "../TP_ThirdPerson/TP_ThirdPersonCharacter.h"
 #include "KMK/AudienceServerComponent_KMK.h"
 #include "KMK/HttpActor_KMK.h"
+#include "Components/CanvasPanel.h"
 
 void UVirtualGameInstance_KMK::Init ( )
 {
@@ -242,13 +243,24 @@ void UVirtualGameInstance_KMK::VisibleStartWidget (bool bVisible)
     if (!bVisible)
     {
         widget->ClearSB();
-        SwitchWidget ( 2 );
+        SwitchWidget ( 5 );
     }
 }
 
 void UVirtualGameInstance_KMK::SwitchWidget ( int32 num )
 {
     widget->StartSwitcher->SetActiveWidgetIndex ( num );
+
+}
+
+void UVirtualGameInstance_KMK::PopUpVisible ( )
+{
+    widget->PayPopUpPanel->SetVisibility(ESlateVisibility::Visible);
+}
+
+void UVirtualGameInstance_KMK::LoginPanel ( )
+{
+    widget->FailLoginPanel->SetVisibility(ESlateVisibility::Visible);
 }
 
 #pragma endregion
@@ -256,14 +268,19 @@ void UVirtualGameInstance_KMK::SwitchWidget ( int32 num )
 void UVirtualGameInstance_KMK::SetMyInfo (const struct FLoginInfo& info )
 {
     loginInfo.email = info.email;
-    loginInfo.pw = info.pw;
+    loginInfo.password = info.password;
     loginInfo.token = info.token;
-    loginInfo.nickName = info.nickName;
+    loginInfo.userName = info.userName;
 }
 
 FLoginInfo UVirtualGameInstance_KMK::GetMyInfo ( )
 {
     return loginInfo;
+}
+
+void UVirtualGameInstance_KMK::SetConcertInfo ( const struct FConcertInfo& info )
+{
+    concerInfo = info;
 }
 
 #pragma endregion

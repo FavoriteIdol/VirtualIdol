@@ -19,9 +19,9 @@ struct FRoomInfo
 	UPROPERTY(BlueprintReadOnly)
 	FString hostName;
 	UPROPERTY(BlueprintReadOnly)
-	int32 MaxPlayer;
+	int32 MaxPlayer = 0;
 	UPROPERTY(BlueprintReadOnly)
-	int32 CurrentPlayer;
+	int32 CurrentPlayer = 0;
 	UPROPERTY(BlueprintReadOnly)
 	int32 pingMS;
 	UPROPERTY(BlueprintReadOnly )
@@ -49,7 +49,7 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 	IOnlineSessionPtr sessionInterface;
 
 	// 호스트 이름은 서버에서 닉네임 받아올 예정
-	FString HostName ="!!!!";
+	FString HostName ="AirJet";
 
 	UPROPERTY( )
 	bool bLogin = false;
@@ -103,18 +103,26 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 	UFUNCTION( )
 	void VisibleStartWidget ( bool bVisible );
 	UFUNCTION( )
-	void SwitchWidget(int32 num );
+    void SwitchWidget ( int32 num );
+	UFUNCTION ( )
+    void PopUpVisible ( );
+	UFUNCTION ( )
+    void LoginPanel ( );
 
     UPROPERTY ( )
     int32 playerMeshNum = -1;
 
 #pragma region Token
 	UPROPERTY( )
-	 FLoginInfo loginInfo;
+	FLoginInfo loginInfo;
 	UFUNCTION( )
 	void SetMyInfo(const struct FLoginInfo& info  );
 	UFUNCTION( )
 	FLoginInfo GetMyInfo( );
+	UPROPERTY( )
+	FConcertInfo concerInfo;
+	UFUNCTION( )
+	void SetConcertInfo( const struct FConcertInfo& info );
 #pragma endregion
 
 

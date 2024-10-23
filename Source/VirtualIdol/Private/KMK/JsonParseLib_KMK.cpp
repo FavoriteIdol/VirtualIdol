@@ -4,6 +4,7 @@
 #include "KMK/JsonParseLib_KMK.h"
 #include "KMK/HttpActor_KMK.h"
 #include "IImageWrapperModule.h"
+#include "JsonObjectConverter.h"
 
 #pragma region Login
 FString UJsonParseLib_KMK::MakeLoginJson ( const FString& id , const FString& pw )
@@ -31,21 +32,17 @@ FLoginInfo UJsonParseLib_KMK::ParsecMyInfo ( const FString& json )
     TSharedPtr<FJsonObject> response = MakeShareable ( new FJsonObject ( ) );
     // 역직렬화 : josn 문자열을 FJsonObject로 변경하기
     FLoginInfo result;
+
     if (FJsonSerializer::Deserialize ( reader , response ))
     {
-         FString token = response->GetStringField ( TEXT ( "token" ) );
-         if (response->TryGetStringField ( TEXT ( "token" ) , token ) && !token.IsEmpty ( ))
+         if (response->TryGetStringField ( TEXT ( "token" ) , result.token ))
          {
-            FString email = response->GetStringField ( TEXT ( "email" ) );
-            FString pw = response->GetStringField ( TEXT ( "password" ) );
-            FString nick = response->GetStringField ( TEXT ( "userName" ) );
-
-            result.email = email;
-            result.token = token;
-            result.pw = pw;
-            result.nickName = nick;
+            response->TryGetStringField ( TEXT ( "email" ), result.email );
+            response->TryGetStringField ( TEXT ( "password" ), result.password );
+            response->TryGetStringField ( TEXT ( "userName" ), result.userName );
          }
     }
+    UE_LOG(LogTemp, Log, TEXT ("%s" ) , *result.token );
     return result;
 }
 
@@ -58,17 +55,35 @@ FString UJsonParseLib_KMK::MakeConcertJson (const struct FConcertInfo& concert )
 
     // 로그인 데이터를 JsonObject 형식으로 만든다.
 	TSharedPtr<FJsonObject> jsonObject = MakeShareable ( new FJsonObject ( ) );
-
-    jsonObject->SetStringField("name" , concert.concertName);
     // 2024-10-24
+    FString json;
 
-
+    if(concert.concertDate.IsEmpty()) return "0";
+    jsonObject->SetStringField(TEXT("name") , concert.name);
+	jsonObject->SetStringField( TEXT ( "img") , concert.img);
+	jsonObject->SetStringField( TEXT ( "concertDate") , concert.concertDate);
+	jsonObject->SetStringField( TEXT ( "startTime") , concert.startTime);
+	jsonObject->SetStringField( TEXT ( "endTime") , concert.endTime);
+	jsonObject->SetNumberField( TEXT ( "appearedVFX") , concert.appearedVFX);
+	jsonObject->SetNumberField( TEXT ( "feverVFX") , concert.feverVFX);
+	jsonObject->SetNumberField( TEXT ( "stageId") , concert.stageId);
+	jsonObject->SetNumberField( TEXT ( "ticketPrice") , concert.ticketPrice);
+	jsonObject->SetNumberField( TEXT ( "peopleScale") , concert.peopleScale);
+  
 	// writer를 만들어서 JsonObject를 인코딩해서 
-	FString json;
-	TSharedRef<TJsonWriter<TCHAR>> writer = TJsonWriterFactory<TCHAR>::Create ( &json );
-	FJsonSerializer::Serialize ( jsonObject.ToSharedRef ( ) , writer );
-	// 반환한다.
-	return json;
+	
+    // JsonWriter를 사용해 직렬화
+    TSharedRef<TJsonWriter<TCHAR>> writer = TJsonWriterFactory<TCHAR>::Create ( &json );
+    if (FJsonSerializer::Serialize ( jsonObject.ToSharedRef ( ) , writer ))
+    {
+        UE_LOG ( LogTemp , Log , TEXT ( "생성된 JSON: %s" ) , *json );
+        return json;
+    }
+    else
+    {
+        UE_LOG ( LogTemp , Error , TEXT ( "JSON 직렬화 실패" ) );
+        return TEXT ( "" );
+    }
 }
 
 #pragma endregion
@@ -88,6 +103,23 @@ FString UJsonParseLib_KMK::CreateTicketJson ( const TMap<FString , FString> tick
 	FJsonSerializer::Serialize ( jsonObject.ToSharedRef ( ) , writer );
 	// 반환한다.
 	return json;
+}
+
+FString UJsonParseLib_KMK::ParsecTicketJson ( const FString& json )
+{
+
+    // 서버에서 가져온 json 파일 읽기
+    TSharedRef<TJsonReader<TCHAR>> reader = TJsonReaderFactory<TCHAR>::Create ( json );
+    // FJsonObject 형식으로 읽어온 json 데이터를 저장함 => 공유 포인터 형태로 객체 감싸기
+    TSharedPtr<FJsonObject> response = MakeShareable ( new FJsonObject ( ) );
+    FString image;
+    if (FJsonSerializer::Deserialize ( reader , response ))
+    {
+        // sonObject 형식으로 만든다.
+	   image  = response->GetStringField ( TEXT ( "image" ) );
+    }
+	// 반환한다.
+	return image;
 }
 
 #pragma endregion
