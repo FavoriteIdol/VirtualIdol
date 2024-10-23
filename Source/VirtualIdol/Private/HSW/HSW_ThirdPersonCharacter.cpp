@@ -69,8 +69,8 @@ AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent> ( TEXT ( "CameraBoom" ) );
 	CameraBoom->SetupAttachment ( RootComponent );
-	CameraBoom->SetRelativeLocation(FVector(0.0f,0.0f,120.f));
-	CameraBoom->TargetArmLength = 250; // The camera follows at this distance behind the character	
+	CameraBoom->SetRelativeLocation(FVector(0.0f,0.0f,30.f));
+	CameraBoom->TargetArmLength = 450; // The camera follows at this distance behind the character	
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 
 	// Create a follow camera
@@ -203,10 +203,24 @@ void AHSW_ThirdPersonCharacter::SetFeverGaugeMulti ( float feverValue )
 		{
 			localPlayer->CurrentGauge = feverValue;
 			localPlayer->MainUI->FeverGauge->SetFeverGauge ( localPlayer->CurrentGauge );
-			UE_LOG ( LogTemp , Warning , TEXT ( "Not LocalPlayer Gauge: %f" ) , localPlayer->CurrentGauge );
+			UE_LOG ( LogTemp , Error , TEXT ( "Not LocalPlayer Gauge: %f" ) , localPlayer->CurrentGauge );
 			//UE_LOG ( LogTemp , Warning , TEXT ( "In2" ) );
 		}
 	}
+	
+	//if (MainUI)
+	//{
+	//	MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
+	//	UE_LOG ( LogTemp , Warning , TEXT ( "In" ) );
+	//}
+	//UE_LOG ( LogTemp , Warning , TEXT ( "out" ) );
+// 	auto* widget = Cast<AHSW_ThirdPersonCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn())->MainUI;
+// 	if(widget) 
+// 	{
+// 	widget->FeverGauge->SetFeverGauge ( CurrentGauge );
+// 	UE_LOG ( LogTemp , Error , TEXT ( "%f" ) , CurrentGauge );
+// 	}
+	
 }
 
 void AHSW_ThirdPersonCharacter::InitMainUI ( )
@@ -275,9 +289,6 @@ void AHSW_ThirdPersonCharacter::GetLifetimeReplicatedProps ( TArray<FLifetimePro
 	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , bThrowing ); 
 	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , CurrentGauge );
 	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , bIsInterviewing );
-	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , IntervieweeIndex );
-	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , IntervieweePlayerState );
-	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , PreLocation );
 }
 
 
@@ -443,19 +454,17 @@ void AHSW_ThirdPersonCharacter::PossessedBy ( AController* NewController )
 
 void AHSW_ThirdPersonCharacter::OnMyInterview ( const FInputActionValue& value )
 {
-	ServerRPCInterview( );
+	if(HasAuthority())	ServerRPCInterview( );
 }
-
 void AHSW_ThirdPersonCharacter::ServerRPCInterview_Implementation (  )
 {
-	// 인터뷰 끝 조건 나중에 바꾸기
 	bIsInterviewing = !bIsInterviewing;
+
 
 	PlayerStates = gs->PlayerArray;
 	if (PlayerStates.Num ( ) > 0 && bIsInterviewing)
 	{
 		IntervieweeIndex = FMath::RandRange ( 1 , PlayerStates.Num ( ) - 1 );
-		UE_LOG ( LogTemp , Warning , TEXT ( "%d" ), IntervieweeIndex );
 		IntervieweePlayerState = PlayerStates[IntervieweeIndex];
 
 		PreLocation = IntervieweePlayerState->GetPawn ( )->GetActorTransform ( );
@@ -466,16 +475,16 @@ void AHSW_ThirdPersonCharacter::ServerRPCInterview_Implementation (  )
 		UE_LOG ( LogTemp , Warning , TEXT ( "플레이어가 없습니다." ) );
 	}
 
-	MulticastRPCInterview( );
-
+	MulticastRPCInterview( bIsInterviewing );
 }
 
-void AHSW_ThirdPersonCharacter::MulticastRPCInterview_Implementation ( )
+void AHSW_ThirdPersonCharacter::MulticastRPCInterview_Implementation ( float bInterview )
 {
-	if (bIsInterviewing)
+	
+
+	if (bInterview)
 	{
 		UE_LOG ( LogTemp , Warning , TEXT ( "Interview is in progress." ) );
-
 		// 멀티캐스트 확인용 임시로 사용할 쉐이크바뤼
 		ShakeBodyBlueprint ( );
 	}
@@ -490,7 +499,7 @@ void AHSW_ThirdPersonCharacter::MulticastRPCInterview_Implementation ( )
 void AHSW_ThirdPersonCharacter::ChooseInterviwee ( )
 {
 
-	if (IsLocallyControlled())
+	if (IntervieweeIndex && IntervieweePlayerState)
 	{
 		if (bIsInterviewing)
 		{
@@ -507,25 +516,6 @@ void AHSW_ThirdPersonCharacter::ChooseInterviwee ( )
 			IntervieweePlayerState->GetPawn ( )->SetActorTransform ( PreLocation );
 		}
 
-	}
-	else if (!IsLocallyControlled())
-	{
-		AHSW_ThirdPersonCharacter* localPlayer = Cast<AHSW_ThirdPersonCharacter> ( GetWorld ( )->GetFirstPlayerController ( )->GetCharacter ( ) );
-		if (localPlayer )//&& localPlayer->GetName() == IntervieweePlayerState->GetPlayerName())
-		{
-			// 인터뷰 아닐 때
-			if (bIsInterviewing)
-			{
-				UE_LOG ( LogTemp , Warning , TEXT ( "TargetArmLength = 250" ) );
-				localPlayer->CameraBoom->TargetArmLength = 250;
-			}
-			// 인터뷰 중일때 실행
-			else
-			{
-				UE_LOG ( LogTemp , Warning , TEXT ( "TargetArmLength = 0" ) );
-				localPlayer->CameraBoom->TargetArmLength = 0;
-			}
-		}
 	}
 }
 
