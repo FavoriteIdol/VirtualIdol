@@ -8,7 +8,11 @@ public class VirtualIdol : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
+<<<<<<< HEAD
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "OnlineSubsystemSteam", "OnlineSubsystem", "UMG", "Json", "JsonUtilities", "HTTP", "SlateCore", "PhysicsCore", "Niagara" });
+=======
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "OnlineSubsystemSteam", "OnlineSubsystem", "UMG", "Json", "JsonUtilities", "HTTP", "SlateCore", });
+>>>>>>> parent of 03c4198 (Merge branch 'KMK_Proto_241017')
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
