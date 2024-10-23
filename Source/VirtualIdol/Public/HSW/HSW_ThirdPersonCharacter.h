@@ -149,7 +149,7 @@ public:
 	UFUNCTION ( )
 	void Imoji ( int index );
 
-	void AppearImoji ();
+	void AppearImoji ( );
 
 	void DisappearImoji ();
 
@@ -229,6 +229,13 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable )
 	void MulticastRPCInterview (float bInterview   );
+
+	UFUNCTION(Server, Reliable )
+	void ServerRPCImoji( );
+
+	UFUNCTION(NetMulticast, Reliable )
+	void MulticastRPCImoji ( );
+
 
 #pragma region KMK
 

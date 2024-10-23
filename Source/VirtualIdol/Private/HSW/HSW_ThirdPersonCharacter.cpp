@@ -170,7 +170,7 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
             if (virtualWidgetFact && !audienceWidget)
             {
 				audienceWidget = CreateWidget<UAudience_KMK> ( GetWorld ( ) , virtualWidgetFact );
-				audienceWidget->AddToViewport ( );
+				//audienceWidget->AddToViewport ( );
 				audienceWidget->pc = this;
 				audienceWidget->SetVirtualWBP();
             }
@@ -179,7 +179,7 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
         else
         {
 			audienceWidget = CreateWidget<UAudience_KMK> ( GetWorld ( ) , audienceWidgetFact );
-			audienceWidget->AddToViewport ( );
+			//audienceWidget->AddToViewport ( );
 			audienceWidget->pc = this;
         }
 		if (gi)
@@ -223,46 +223,6 @@ void AHSW_ThirdPersonCharacter::PrintFeverGaugeLogOnHead ( )
 	DrawDebugString ( GetWorld ( ) , GetActorLocation ( ) +FVector(0,0,90 ) , TEXT ( "GO!!" ) , nullptr , FColor::Red , 0.5f , true , 1 );
 }
 
-void AHSW_ThirdPersonCharacter::SetFeverGaugeMulti ( float feverValue )
-{
-// 	auto* widget = Cast<AHSW_ThirdPersonCharacter>(GetOwner() );
-// 	if(widget) auto* wid = widget->MainUI;
-// 
-	// 로컬 컨트롤을 하는 캐릭터가 나 자신이라 MainUI도 가지고 있으니 그대로 갱신
-	if (IsLocallyControlled ( ) && MainUI)
-	{		
-		CurrentGauge = feverValue;
-		MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
-		// UE_LOG ( LogTemp , Error , TEXT ( "LocalPlayer Gauge: %f" ), CurrentGauge );
-		// UE_LOG ( LogTemp , Warning , TEXT ( "In" ) );
-	}
-	// 로컬 컨트롤을 하는 캐릭터가 내가 아닌 상황이라 나는 MainUI가 없다. 그러니 나의 MainUI를 갱신해주자
-	else if (!IsLocallyControlled ( ) && MainUI == nullptr)
-	{
-		AHSW_ThirdPersonCharacter* localPlayer = Cast<AHSW_ThirdPersonCharacter>(GetWorld( )->GetFirstPlayerController()->GetCharacter());
-		if (localPlayer != nullptr)
-		{
-			localPlayer->CurrentGauge = feverValue;
-			localPlayer->MainUI->FeverGauge->SetFeverGauge ( localPlayer->CurrentGauge );
-			UE_LOG ( LogTemp , Error , TEXT ( "Not LocalPlayer Gauge: %f" ) , localPlayer->CurrentGauge );
-			//UE_LOG ( LogTemp , Warning , TEXT ( "In2" ) );
-		}
-	}
-	
-	//if (MainUI)
-	//{
-	//	MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
-	//	UE_LOG ( LogTemp , Warning , TEXT ( "In" ) );
-	//}
-	//UE_LOG ( LogTemp , Warning , TEXT ( "out" ) );
-// 	auto* widget = Cast<AHSW_ThirdPersonCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn())->MainUI;
-// 	if(widget) 
-// 	{
-// 	widget->FeverGauge->SetFeverGauge ( CurrentGauge );
-// 	UE_LOG ( LogTemp , Error , TEXT ( "%f" ) , CurrentGauge );
-// 	}
-	
-}
 
 void AHSW_ThirdPersonCharacter::InitMainUI ( )
 {
@@ -296,32 +256,6 @@ void AHSW_ThirdPersonCharacter::InitMainUI ( )
 	}
 }
 
-void AHSW_ThirdPersonCharacter::Imoji ( int index )
-{
-	imojiWidget->ImogiImage->SetBrushFromTexture( ImojiImageArray[index] ) ;
-
-	AppearImoji( );
-
-	GetWorld ( )->GetTimerManager ( ).ClearTimer ( TimerHandleImoji );
-	GetWorld ( )->GetTimerManager ( ).SetTimer ( TimerHandleImoji , this , &AHSW_ThirdPersonCharacter::DisappearImoji , 2.0f );
-}
-
-void AHSW_ThirdPersonCharacter::AppearImoji ( )
-{
-	ImojiComp->SetVisibility(true);
-
-	
-	UNiagaraComponent* AppearEffect = UNiagaraFunctionLibrary::SpawnSystemAtLocation ( GetWorld ( ) , EmojiEffect , ImojiComp->GetComponentLocation ( ) );
-	AppearEffect->AttachToComponent( ImojiComp, FAttachmentTransformRules::KeepRelativeTransform);
-	AppearEffect->SetAutoDestroy(true );
-
-	imojiWidget->PlayFadeInImoji();
-}
-
-void AHSW_ThirdPersonCharacter::DisappearImoji ( )
-{
-	imojiWidget->PlayFadeOutImoji ( );
-}
 
 void AHSW_ThirdPersonCharacter::GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& OutLifetimeProps ) const
 {
@@ -423,6 +357,45 @@ void AHSW_ThirdPersonCharacter::Look ( const FInputActionValue& Value )
 	}
 }
 
+// Imoji ==============================================================================================
+
+void AHSW_ThirdPersonCharacter::Imoji ( int index )
+{
+	imojiWidget->ImogiImage->SetBrushFromTexture ( ImojiImageArray[index] );
+
+	ServerRPCImoji(  );
+}
+
+void AHSW_ThirdPersonCharacter::ServerRPCImoji_Implementation ( )
+{
+	MulticastRPCImoji(  );
+}
+
+void AHSW_ThirdPersonCharacter::MulticastRPCImoji_Implementation ( )
+{
+
+	AppearImoji (  );
+
+	GetWorld ( )->GetTimerManager ( ).ClearTimer ( TimerHandleImoji );
+	GetWorld ( )->GetTimerManager ( ).SetTimer ( TimerHandleImoji , this , &AHSW_ThirdPersonCharacter::DisappearImoji , 2.0f );
+}
+
+void AHSW_ThirdPersonCharacter::AppearImoji (  )
+{
+	UNiagaraComponent* AppearEffect = UNiagaraFunctionLibrary::SpawnSystemAtLocation ( GetWorld ( ) , EmojiEffect , ImojiComp->GetComponentLocation ( ) );
+	AppearEffect->SetAutoDestroy ( true );
+	AppearEffect->AttachToComponent ( ImojiComp , FAttachmentTransformRules::KeepWorldTransform );
+
+	ImojiComp->SetVisibility(true);
+	imojiWidget->PlayFadeInImoji();
+}
+
+void AHSW_ThirdPersonCharacter::DisappearImoji ( )
+{
+	imojiWidget->PlayFadeOutImoji ( );
+}
+
+// FeverGauge ======================================================================================
 void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value )
 {
 	if (!HasAuthority ( ) && IsLocallyControlled())
@@ -480,6 +453,7 @@ void AHSW_ThirdPersonCharacter::MulticastRPCFeverGauge_Implementation (float Add
 	SetFeverGaugeMulti ( AddGauge );
 
 }
+
 void AHSW_ThirdPersonCharacter::PossessedBy ( AController* NewController )
 {
 	Super::PossessedBy ( NewController );
@@ -488,6 +462,47 @@ void AHSW_ThirdPersonCharacter::PossessedBy ( AController* NewController )
 	{
 		InitMainUI ( );
 	}
+
+}
+
+void AHSW_ThirdPersonCharacter::SetFeverGaugeMulti ( float feverValue )
+{
+	// 	auto* widget = Cast<AHSW_ThirdPersonCharacter>(GetOwner() );
+	// 	if(widget) auto* wid = widget->MainUI;
+	// 
+		// 로컬 컨트롤을 하는 캐릭터가 나 자신이라 MainUI도 가지고 있으니 그대로 갱신
+	if (IsLocallyControlled ( ) && MainUI)
+	{
+		CurrentGauge = feverValue;
+		MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
+		// UE_LOG ( LogTemp , Error , TEXT ( "LocalPlayer Gauge: %f" ), CurrentGauge );
+		// UE_LOG ( LogTemp , Warning , TEXT ( "In" ) );
+	}
+	// 로컬 컨트롤을 하는 캐릭터가 내가 아닌 상황이라 나는 MainUI가 없다. 그러니 나의 MainUI를 갱신해주자
+	else if (!IsLocallyControlled ( ) && MainUI == nullptr)
+	{
+		AHSW_ThirdPersonCharacter* localPlayer = Cast<AHSW_ThirdPersonCharacter> ( GetWorld ( )->GetFirstPlayerController ( )->GetCharacter ( ) );
+		if (localPlayer != nullptr)
+		{
+			localPlayer->CurrentGauge = feverValue;
+			localPlayer->MainUI->FeverGauge->SetFeverGauge ( localPlayer->CurrentGauge );
+			UE_LOG ( LogTemp , Error , TEXT ( "Not LocalPlayer Gauge: %f" ) , localPlayer->CurrentGauge );
+			//UE_LOG ( LogTemp , Warning , TEXT ( "In2" ) );
+		}
+	}
+
+	//if (MainUI)
+	//{
+	//	MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
+	//	UE_LOG ( LogTemp , Warning , TEXT ( "In" ) );
+	//}
+	//UE_LOG ( LogTemp , Warning , TEXT ( "out" ) );
+// 	auto* widget = Cast<AHSW_ThirdPersonCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn())->MainUI;
+// 	if(widget) 
+// 	{
+// 	widget->FeverGauge->SetFeverGauge ( CurrentGauge );
+// 	UE_LOG ( LogTemp , Error , TEXT ( "%f" ) , CurrentGauge );
+// 	}
 
 }
 
