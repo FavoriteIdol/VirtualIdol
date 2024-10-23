@@ -69,12 +69,20 @@
 			"Enabled": true
 		},
 		{
-			"Name": "ReMoCapp",
-			"Enabled": true,
-			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/product/fa02402072ab4d928728daf6ce565ec7",
-			"SupportedTargetPlatforms": [
-				"Win64"
-			]
+			"Name": "PCG",
+			"Enabled": true
+		},
+		{
+			"Name": "PCGExternalDataInterop",
+			"Enabled": true
+		},
+		{
+			"Name": "PCGGeometryScriptInterop",
+			"Enabled": true
+		},
+		{
+			"Name": "PCGWaterInterop",
+			"Enabled": true
 		}
 	]
 }
