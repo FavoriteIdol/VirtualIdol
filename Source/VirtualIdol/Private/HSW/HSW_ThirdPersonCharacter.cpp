@@ -31,6 +31,8 @@
 #include "GameFramework/PlayerState.h"
 #include "Engine/StaticMeshActor.h"
 #include "EngineUtils.h"
+#include "KMK/VirtualGameInstance_KMK.h"
+#include "KMK/Audience_KMK.h"
 
 // Sets default values
 AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
@@ -155,6 +157,45 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 			InterviewLocation = Actor->GetTransform ( );
 		}
 	}
+
+#pragma region KMK
+	pc = GetWorld()->GetFirstPlayerController();
+	UVirtualGameInstance_KMK* gi = Cast<UVirtualGameInstance_KMK> ( GetWorld ( )->GetGameInstance ( ) );
+	if (IsLocallyControlled ( ))
+	{
+        if (HasAuthority ( ))
+        {
+			GetMesh ( )->bRenderInMainPass = false;
+			GetMesh ( )->bRenderInDepthPass = false;
+            if (virtualWidgetFact && !audienceWidget)
+            {
+				audienceWidget = CreateWidget<UAudience_KMK> ( GetWorld ( ) , virtualWidgetFact );
+				audienceWidget->AddToViewport ( );
+				audienceWidget->pc = this;
+				audienceWidget->SetVirtualWBP();
+            }
+			
+        }
+        else
+        {
+			audienceWidget = CreateWidget<UAudience_KMK> ( GetWorld ( ) , audienceWidgetFact );
+			audienceWidget->AddToViewport ( );
+			audienceWidget->pc = this;
+        }
+		if (gi)
+		{
+			if (audienceWidget && gi->playerMeshNum == 1)
+			{
+				audienceWidget->VipAuthority ( );
+			}
+		}
+		UE_LOG ( LogTemp , Warning , TEXT ( "StartTalk" ) );
+		GetController<APlayerController> ( )->StartTalking ( );
+		FInputModeGameAndUI inputMode;
+		GetController<APlayerController> ( )->SetInputMode(inputMode );
+	}
+#pragma endregion
+
 }
 
 // Called every frame
@@ -226,20 +267,20 @@ void AHSW_ThirdPersonCharacter::SetFeverGaugeMulti ( float feverValue )
 void AHSW_ThirdPersonCharacter::InitMainUI ( )
 {
 
-	auto* pc = Cast<AHSW_PlayerController> ( Controller );
-	if (pc == nullptr)
+	auto* pc_h = Cast<AHSW_PlayerController> ( Controller );
+	if (pc_h == nullptr)
 	{
 		return;
 	}
 
 	if (IsLocallyControlled ( ))
 	{
-		if (pc->mainUIWidget)
+		if (pc_h->mainUIWidget)
 		{
-			if (pc->MainUI == nullptr)
+			if (pc_h->MainUI == nullptr)
 			{
-				pc->MainUI = CastChecked<UHSW_MainWidget> ( CreateWidget ( GetWorld ( ) , pc->mainUIWidget ) );
-				if (pc->MainUI == nullptr)
+				pc_h->MainUI = CastChecked<UHSW_MainWidget> ( CreateWidget ( GetWorld ( ) , pc_h->mainUIWidget ) );
+				if (pc_h->MainUI == nullptr)
 				{
 					//UE_LOG ( LogTemp , Error , TEXT ( "Failed to create MainUI widget." ) );
 				}
@@ -249,7 +290,7 @@ void AHSW_ThirdPersonCharacter::InitMainUI ( )
 				}
 			}
 
-			this->MainUI = pc->MainUI;
+			this->MainUI = pc_h->MainUI;
 			MainUI->AddToViewport ( );
 		}
 	}
@@ -582,3 +623,21 @@ void AHSW_ThirdPersonCharacter::MulticastRPCThrowPitch_Implementation ( )
 		UE_LOG ( LogTemp , Warning , TEXT ( "Throw Montage is null" ) );
 	}
 }
+#pragma region KMK
+void AHSW_ThirdPersonCharacter::InitializeAudienceWidget ( TSubclassOf<class UAudience_KMK>  widgetFact )
+{
+	if (!widgetFact) // 위젯이 nullptr인 경우에만 생성
+	{
+		if (widgetFact)
+		{
+			audienceWidget = CreateWidget<UAudience_KMK> ( GetWorld ( ) , widgetFact );
+			audienceWidget->AddToViewport ( );
+			audienceWidget->pc = this;
+		}
+		else
+		{
+			UE_LOG ( LogTemp , Error , TEXT ( "AudienceWidgetClass is not set." ) );
+		}
+	}
+}
+#pragma endregion

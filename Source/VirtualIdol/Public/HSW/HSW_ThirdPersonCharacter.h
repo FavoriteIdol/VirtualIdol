@@ -230,6 +230,29 @@ public:
 	UFUNCTION(NetMulticast, Reliable )
 	void MulticastRPCInterview (float bInterview   );
 
+#pragma region KMK
+
+	UPROPERTY( )
+	class APlayerController* pc;
+
+	UPROPERTY(EditAnywhere )
+	TSubclassOf<class UAudience_KMK> audienceWidgetFact;
+	UPROPERTY(EditAnywhere )
+	TSubclassOf<class UAudience_KMK> virtualWidgetFact;
+
+	UPROPERTY( )
+	class UAudience_KMK* audienceWidget;
+
+	UPROPERTY( )
+	class UAudience_KMK* virtualWidget;
+	
+	
+	UPROPERTY(VisibleAnywhere)
+	class UAudienceServerComponent_KMK* serverComp;
+
+	UFUNCTION( )
+	void InitializeAudienceWidget( TSubclassOf<class UAudience_KMK>  widgetFact );
+#pragma endregion
 
 
 };

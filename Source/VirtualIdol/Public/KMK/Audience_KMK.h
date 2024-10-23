@@ -32,7 +32,7 @@ public :
 	UPROPERTY( )
 	class UVirtualGameInstance_KMK* gi;
 	UPROPERTY( )
-	class ATP_ThirdPersonCharacter* pc;
+	class AHSW_ThirdPersonCharacter* pc;
 
 	void OnOffFunction(class UTextBlock* textBlocks, int32 num, bool bAllVisib = false );
 	void ChangeTextAndImage ( FLinearColor color , int32 num , TArray<FString> textArray , bool bMyAuth = false );

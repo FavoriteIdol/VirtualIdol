@@ -64,7 +64,7 @@ void ATP_ThirdPersonCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
-	pc = GetWorld()->GetFirstPlayerController();
+	/*pc = GetWorld()->GetFirstPlayerController();
 	UVirtualGameInstance_KMK* gi = Cast<UVirtualGameInstance_KMK> ( GetWorld ( )->GetGameInstance ( ) );
 	if (IsLocallyControlled ( ))
 	{
@@ -98,7 +98,7 @@ void ATP_ThirdPersonCharacter::BeginPlay()
 		GetController<APlayerController> ( )->StartTalking ( );
 		FInputModeGameAndUI inputMode;
 		GetController<APlayerController> ( )->SetInputMode(inputMode );
-	}
+	}*/
 
 }
 
@@ -177,17 +177,17 @@ void ATP_ThirdPersonCharacter::Look(const FInputActionValue& Value)
 }
 void ATP_ThirdPersonCharacter::InitializeAudienceWidget ( TSubclassOf<class UAudience_KMK>  widgetFact )
 {
-	if (!widgetFact) // 위젯이 nullptr인 경우에만 생성
-	{
-		if (widgetFact)
-		{
-			audienceWidget = CreateWidget<UAudience_KMK> ( GetWorld ( ) , widgetFact );
-			audienceWidget->AddToViewport ( );
-			audienceWidget->pc = this;
-		}
-		else
-		{
-			UE_LOG ( LogTemp , Error , TEXT ( "AudienceWidgetClass is not set." ) );
-		}
-	}
+	//if (!widgetFact) // 위젯이 nullptr인 경우에만 생성
+	//{
+	//	if (widgetFact)
+	//	{
+	//		audienceWidget = CreateWidget<UAudience_KMK> ( GetWorld ( ) , widgetFact );
+	//		audienceWidget->AddToViewport ( );
+	//		audienceWidget->pc = this;
+	//	}
+	//	else
+	//	{
+	//		UE_LOG ( LogTemp , Error , TEXT ( "AudienceWidgetClass is not set." ) );
+	//	}
+	//}
 }

@@ -7,6 +7,7 @@
 #include "Net/UnrealNetwork.h"
 #include "KMK/VirtualGameInstance_KMK.h"
 #include "chrono"
+#include "HSW/HSW_ThirdPersonCharacter.h"
 
 // Sets default values for this component's properties
 UAudienceServerComponent_KMK::UAudienceServerComponent_KMK()
@@ -24,8 +25,8 @@ void UAudienceServerComponent_KMK::BeginPlay()
 	Super::BeginPlay();
 	UVirtualGameInstance_KMK* gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance());
 
-	player = Cast<ATP_ThirdPersonCharacter> (GetWorld()->GetFirstPlayerController()->GetPawn());
-	playerMesh = Cast<ATP_ThirdPersonCharacter> (GetOwner());
+	player = Cast<AHSW_ThirdPersonCharacter> (GetWorld()->GetFirstPlayerController()->GetPawn());
+	playerMesh = Cast<AHSW_ThirdPersonCharacter> (GetOwner());
 	if (playerMesh->HasAuthority ( ))
 	{
 		UE_LOG ( LogTemp , Warning , TEXT ( "Server playerMeshNum: %d" ) , gi->playerMeshNum );
@@ -71,7 +72,7 @@ void UAudienceServerComponent_KMK::TickComponent(float DeltaTime, ELevelTick Tic
 	{
 		s = GetTimeDifference ( setConcertTime );
 		// 서버에서 시간을 계산하고 클라이언트에게 전파
-		ATP_ThirdPersonCharacter* playerCharacter = Cast<ATP_ThirdPersonCharacter> ( GetOwner ( ) );
+		AHSW_ThirdPersonCharacter* playerCharacter = Cast<AHSW_ThirdPersonCharacter> ( GetOwner ( ) );
 		if (playerCharacter && playerCharacter->audienceWidget && playerCharacter->IsLocallyControlled())
 		{
 			// 남은 시간을 위젯에 표시
@@ -81,7 +82,7 @@ void UAudienceServerComponent_KMK::TickComponent(float DeltaTime, ELevelTick Tic
 	}
 	else
 	{
-		ATP_ThirdPersonCharacter* playerCharacter = Cast<ATP_ThirdPersonCharacter> ( GetOwner ( ) );
+		AHSW_ThirdPersonCharacter* playerCharacter = Cast<AHSW_ThirdPersonCharacter> ( GetOwner ( ) );
 		// 카운트다운 UI 패널 표시
 		if (playerCharacter && playerCharacter->audienceWidget)
 		{
@@ -97,7 +98,7 @@ void UAudienceServerComponent_KMK::ServerRPCChat_Implementation ( const FString&
 
 void UAudienceServerComponent_KMK::MultiRPCChat_Implementation ( const FString& chat )
 {
-	auto* p = Cast<ATP_ThirdPersonCharacter> ( GetWorld ( )->GetFirstPlayerController ( )->GetPawn ( ) );
+	auto* p = Cast<AHSW_ThirdPersonCharacter> ( GetWorld ( )->GetFirstPlayerController ( )->GetPawn ( ) );
 	if (p->audienceWidget)
 	{
 		p->audienceWidget->CreateChatWidget(chat );
@@ -112,7 +113,7 @@ void UAudienceServerComponent_KMK::ServerRPC_ChangeMyMesh_Implementation ( int32
 	MultiRPC_ChangeMyMesh ( playerMeshNum, playerMesh ); // 클라이언트에게 RPC 호출
 }
 
-void UAudienceServerComponent_KMK::MultiRPC_ChangeMyMesh_Implementation ( int32 num, class ATP_ThirdPersonCharacter* TargetMesh )
+void UAudienceServerComponent_KMK::MultiRPC_ChangeMyMesh_Implementation ( int32 num, class AHSW_ThirdPersonCharacter* TargetMesh )
 {
 	UVirtualGameInstance_KMK* gi = Cast<UVirtualGameInstance_KMK> ( GetWorld ( )->GetGameInstance ( ) );
 	if (gi)
@@ -156,7 +157,7 @@ void UAudienceServerComponent_KMK::OnRep_ChangePlayerMesh ( )
 	}
 }
 
-void UAudienceServerComponent_KMK::SetVirtualVisible ( class ATP_ThirdPersonCharacter* mesh , bool bVisible )
+void UAudienceServerComponent_KMK::SetVirtualVisible ( class AHSW_ThirdPersonCharacter* mesh , bool bVisible )
 {
 	mesh->GetMesh ( )->SetRenderInMainPass ( bVisible );
 	mesh->GetMesh ( )->SetRenderInDepthPass ( bVisible );
@@ -192,7 +193,7 @@ void UAudienceServerComponent_KMK::MultiRPC_StartConcert_Implementation ( float 
 
 void UAudienceServerComponent_KMK::MultiRPC_UpdateCount_Implementation ( const FString& TimeText )
 {
-	ATP_ThirdPersonCharacter* playerCharacter = Cast<ATP_ThirdPersonCharacter> ( GetOwner() );
+	AHSW_ThirdPersonCharacter* playerCharacter = Cast<AHSW_ThirdPersonCharacter> ( GetOwner() );
 	if (playerCharacter && playerCharacter->audienceWidget)
 	{
 		// 남은 시간을 위젯에 표시
@@ -238,7 +239,7 @@ FString UAudienceServerComponent_KMK::GetTimeDifference ( const FString& SetTime
 	int32 hours = FMath::Abs ( static_cast<int32>( secondsDifference / 3600 ) );
 	int32 minutes = FMath::Abs ( static_cast<int32>( ( secondsDifference % 3600 ) / 60 ) );
 	int32 seconds = FMath::Abs ( static_cast<int32>( secondsDifference % 60 ) );
-	ATP_ThirdPersonCharacter* playerCharacter = Cast<ATP_ThirdPersonCharacter> ( GetWorld ( )->GetFirstPlayerController ( )->GetPawn ( ) );
+	AHSW_ThirdPersonCharacter* playerCharacter = Cast<AHSW_ThirdPersonCharacter> ( GetWorld ( )->GetFirstPlayerController ( )->GetPawn ( ) );
 	if (secondsDifference == 0)  // 시간이 같을 때
 	{
         if (!bVis)
