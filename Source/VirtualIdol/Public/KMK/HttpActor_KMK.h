@@ -8,43 +8,6 @@
 #include "Interfaces/IHttpResponse.h"
 #include "HttpActor_KMK.generated.h"
 
-<<<<<<< HEAD
-=======
-	UPROPERTY(BlueprintReadOnly)
-	FString concertName;
-	UPROPERTY(BlueprintReadOnly)
-	FString concertDay;
-	UPROPERTY(BlueprintReadOnly)
-	FString concertTime;
-	UPROPERTY(BlueprintReadOnly)
-	FString endTime;
-	UPROPERTY(BlueprintReadOnly)
-	int32 tickePrice;
-	UPROPERTY(BlueprintReadOnly)
-	FString ticketInfo;
-	UPROPERTY(BlueprintReadOnly)
-	int32 appearEffectNum;
-	UPROPERTY(BlueprintReadOnly)
-	int32 feverEffectNum;
-	UPROPERTY(BlueprintReadOnly)
-	int32 personNum;
-};
-// 개인정보
-USTRUCT ( BlueprintType )
-struct FLoginInfo
-{
-	GENERATED_BODY ( )
-
-	UPROPERTY(BlueprintReadOnly)
-	FString email;
-	UPROPERTY(BlueprintReadOnly)
-	FString pw;
-	UPROPERTY(BlueprintReadOnly)
-	FString token;
-	UPROPERTY(BlueprintReadOnly)
-	FString nickName;
-};
->>>>>>> parent of 03c4198 (Merge branch 'KMK_Proto_241017')
 UCLASS()
 class VIRTUALIDOL_API AHttpActor_KMK : public AActor
 {
@@ -61,27 +24,7 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-<<<<<<< HEAD
 
-=======
-#pragma region with BE for Login
-	UPROPERTY( )
-	class UVirtualGameInstance_KMK* gi;
-	UPROPERTY( )
-	struct FLoginInfo loginInfo;
-	TMap<FString, FString> myInfo;
-	// 요청
-	void ReqLogin(const FString& id, const FString& pw );
-	// 응답
-	void OnResLogin( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
-#pragma endregion
-#pragma region with BE for SettingStage
-	// 요청
-	void ReqSetConcert(const FConcertInfo& concert );
-	// 응답
-	void OnResSetConcert( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
-#pragma endregion
->>>>>>> parent of 03c4198 (Merge branch 'KMK_Proto_241017')
 #pragma region with Ai for Ticket
 	// 요청
 	void ReqTicket( FString json );
