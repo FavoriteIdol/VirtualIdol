@@ -95,6 +95,8 @@ public:
 	UPROPERTY(EditDefaultsOnly )
 	class AHSW_AuditoriumGameMode* gm;
 
+	FTransform StageLocation;
+
 	// 피버게이지 --------------------------------------------------------------
 	UPROPERTY(EditDefaultsOnly , Category = FeverGauge )
 	class UHSW_FeverGaugeWidget* FeverGauge;
@@ -181,6 +183,9 @@ public:
 	UPROPERTY(Replicated, EditDefaultsOnly,BlueprintReadWrite )
 	bool bThrowing;
 
+	UPROPERTY(Replicated, EditDefaultsOnly,BlueprintReadWrite )
+	FRotator ThrowingRotator;
+
 	// 인터뷰 ----------------------------------------
 
 	UPROPERTY(Replicated, EditDefaultsOnly,BlueprintReadWrite )
@@ -198,14 +203,13 @@ public:
 	TArray<class APlayerState*> PlayerStates;
 
 	FTransform PreLocation;
-	FTransform InterviewLocation;
 
 	// 멀티플레이 --------------------------------------
 
 	virtual void GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
 
 	UFUNCTION(Server, Reliable )
-	void ServerRPCThrowHold( );
+	void ServerRPCThrowHold( FTransform t );
 
 	UFUNCTION(NetMulticast, Reliable )
 	void MulticastRPCThrowHold( FTransform t );

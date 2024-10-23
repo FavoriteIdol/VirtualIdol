@@ -154,7 +154,7 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 		AActor* Actor = *It;
 		if (IsValid ( Actor ) && Actor->ActorHasTag ( tag ))
 		{
-			InterviewLocation = Actor->GetTransform ( );
+			StageLocation = Actor->GetTransform ( );
 		}
 	}
 
@@ -211,6 +211,22 @@ void AHSW_ThirdPersonCharacter::Tick(float DeltaTime)
 
 		ImojiComp->SetWorldRotation(Direction.GetSafeNormal().ToOrientationRotator());
 	}
+
+	if (bThrowing)
+	{
+		if(HasAuthority())
+		{
+			FVector Direction = StageLocation.GetLocation ( ) - GetActorLocation ( );
+			FRotator NewRotation = FRotationMatrix::MakeFromX ( Direction ).Rotator ( );
+			ThrowingRotator = FRotator ( 0 , NewRotation.Yaw , 0 );
+
+			SetActorRotation ( ThrowingRotator );
+		}
+		else
+		{
+			SetActorRotation ( ThrowingRotator );
+		}
+	}
 }
 
 void AHSW_ThirdPersonCharacter::OnRep_FeverGauge ( )
@@ -264,6 +280,7 @@ void AHSW_ThirdPersonCharacter::GetLifetimeReplicatedProps ( TArray<FLifetimePro
 	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , bThrowing ); 
 	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , CurrentGauge );
 	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , bIsInterviewing );
+	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , ThrowingRotator );
 }
 
 
@@ -417,19 +434,11 @@ void AHSW_ThirdPersonCharacter::ServerRPCFeverGauge_Implementation ( float fever
 		feverValue += FeverPoint;
 	}
 
-	if (feverValue >= 0.3 && feverValue < 0.65)
+	if (feverValue >= 0.5 && feverValue < 1)
 	{
 		if (gs)
 		{
 			gs->bFever30 = true;
-		}
-	}
-	else if (feverValue >= 0.65 && feverValue < 1)
-	{
-		if (gs)
-		{
-			gs->bFever30 = false;
-			gs->bFever65 = true;
 		}
 	}
 	else if (feverValue >= 1)
@@ -437,8 +446,7 @@ void AHSW_ThirdPersonCharacter::ServerRPCFeverGauge_Implementation ( float fever
 		if (gs)
 		{
 			gs->bFever30 = false;
-			gs->bFever65 = false;
-			gs->bFever100 = true;
+			gs->bFever65 = true;
 		}
 	}
 
@@ -563,7 +571,7 @@ void AHSW_ThirdPersonCharacter::ChooseInterviwee ( )
 			UE_LOG ( LogTemp , Warning , TEXT ( "선택된 수: %d" ) , IntervieweeIndex );
 			UE_LOG ( LogTemp , Warning , TEXT ( "선택된 플레이어: %s" ) , *IntervieweePlayerState->GetPlayerName ( ) );
 
-			IntervieweePlayerState->GetPawn ( )->SetActorTransform( InterviewLocation );
+			IntervieweePlayerState->GetPawn ( )->SetActorTransform( StageLocation );
 
 			DrawDebugString ( GetWorld ( ) , IntervieweePlayerState->GetPawn ( )->GetActorLocation ( ) + FVector ( 0 , 0 , 90 ) , TEXT ( "Interviewee~" ) , nullptr , FColor::Red , 5 , true , 1 );
 		}
@@ -579,19 +587,22 @@ void AHSW_ThirdPersonCharacter::ChooseInterviwee ( )
 
 void AHSW_ThirdPersonCharacter::OnMyThorwHold ( const FInputActionValue& value )
 {
-	ServerRPCThrowHold( );
+	if (!( HasAuthority ( ) && IsLocallyControlled ( ) ))
+	{
+		FTransform t = ThrowingArrow->GetComponentTransform ( );
+		ServerRPCThrowHold(t);
+	}
 }
 
-void AHSW_ThirdPersonCharacter::ServerRPCThrowHold_Implementation ( )
+void AHSW_ThirdPersonCharacter::ServerRPCThrowHold_Implementation ( FTransform t )
 {
-	FTransform t = ThrowingArrow->GetComponentTransform ( );
-
+	
 	MulticastRPCThrowHold ( t );
-
 }
 
 void AHSW_ThirdPersonCharacter::MulticastRPCThrowHold_Implementation ( FTransform t )
 {
+	bThrowing = true;
 	// 	FTransform t = ThrowingArrow->GetComponentTransform ( );
 	ThrowingObject = GetWorld ( )->SpawnActor<AHSW_ThrowingObject> ( ThrowingObjectFactory , t );
 	if (ThrowingObject)
@@ -608,17 +619,21 @@ void AHSW_ThirdPersonCharacter::MulticastRPCThrowHold_Implementation ( FTransfor
 
 void AHSW_ThirdPersonCharacter::OnMyThorwPitch ( const FInputActionValue& value )
 {
-	ServerRPCThrowPitch( );
+	if (!( HasAuthority ( ) && IsLocallyControlled ( ) ))
+	{
+		ServerRPCThrowPitch( );
+	}
 }
 
 void AHSW_ThirdPersonCharacter::ServerRPCThrowPitch_Implementation ( )
 {
+	
 	MulticastRPCThrowPitch ( );
 }
 
 void AHSW_ThirdPersonCharacter::MulticastRPCThrowPitch_Implementation ( )
 {
-
+	bThrowing = false;
 	ThrowingObject->DetachFromActor ( FDetachmentTransformRules::KeepWorldTransform );
 	ThrowingObject->MeshComp->SetSimulatePhysics ( true );
 
@@ -638,6 +653,7 @@ void AHSW_ThirdPersonCharacter::MulticastRPCThrowPitch_Implementation ( )
 		UE_LOG ( LogTemp , Warning , TEXT ( "Throw Montage is null" ) );
 	}
 }
+
 #pragma region KMK
 void AHSW_ThirdPersonCharacter::InitializeAudienceWidget ( TSubclassOf<class UAudience_KMK>  widgetFact )
 {
