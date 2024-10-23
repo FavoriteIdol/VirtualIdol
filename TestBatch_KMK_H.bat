@@ -1,1 +1,0 @@
-"C:\UE_5.4\Engine\Binaries\Win64\UnrealEditor.exe" "C:\UnrealProject\VirtualIdol\VirtualIdol.uproject" -game -log

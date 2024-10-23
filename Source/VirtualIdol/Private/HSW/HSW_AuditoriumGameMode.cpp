@@ -19,10 +19,7 @@ AHSW_AuditoriumGameMode::AHSW_AuditoriumGameMode ( )
 
 void AHSW_AuditoriumGameMode::Tick ( float DeltaTime )
 {
-	if (bFevered)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Fever!!"));
-	}
+
 }
 
 void AHSW_AuditoriumGameMode::BeginPlay ( )
@@ -30,5 +27,10 @@ void AHSW_AuditoriumGameMode::BeginPlay ( )
 	Super::BeginPlay();
 
 	Player = Cast<AHSW_ThirdPersonCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
+
+}
+
+void AHSW_AuditoriumGameMode::GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& OutLifetimeProps ) const
+{
 
 }
