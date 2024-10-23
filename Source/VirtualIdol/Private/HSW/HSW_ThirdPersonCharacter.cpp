@@ -129,12 +129,12 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (IsLocallyControlled ( ) && HasAuthority() == false)
-	{
-		InitMainUI();
-	}
-	ImojiComp->SetVisibility(false);
-	imojiWidget = Cast<UHSW_ImogiWidget> ( ImojiComp->GetWidget ( ) );
+    //if (IsLocallyControlled ( ) && HasAuthority ( ) == false)
+    //{
+    //    InitMainUI ( );
+    //}
+    ImojiComp->SetVisibility ( false );
+    imojiWidget = Cast<UHSW_ImogiWidget> ( ImojiComp->GetWidget ( ) );
 
 	FInputModeGameAndUI a;
 	GetWorld()->GetFirstPlayerController()->SetInputMode(a);
@@ -229,21 +229,21 @@ void AHSW_ThirdPersonCharacter::SetFeverGaugeMulti ( float feverValue )
 // 	if(widget) auto* wid = widget->MainUI;
 // 
 	// 로컬 컨트롤을 하는 캐릭터가 나 자신이라 MainUI도 가지고 있으니 그대로 갱신
-	if (IsLocallyControlled ( ) && MainUI)
+	if (IsLocallyControlled ( ) && audienceWidget)
 	{		
 		CurrentGauge = feverValue;
-		MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
+		audienceWidget->FeverGauge->SetFeverGauge ( CurrentGauge );
 		// UE_LOG ( LogTemp , Error , TEXT ( "LocalPlayer Gauge: %f" ), CurrentGauge );
 		// UE_LOG ( LogTemp , Warning , TEXT ( "In" ) );
 	}
 	// 로컬 컨트롤을 하는 캐릭터가 내가 아닌 상황이라 나는 MainUI가 없다. 그러니 나의 MainUI를 갱신해주자
-	else if (!IsLocallyControlled ( ) && MainUI == nullptr)
+	else if (!IsLocallyControlled ( ) && audienceWidget == nullptr)
 	{
 		AHSW_ThirdPersonCharacter* localPlayer = Cast<AHSW_ThirdPersonCharacter>(GetWorld( )->GetFirstPlayerController()->GetCharacter());
 		if (localPlayer != nullptr)
 		{
 			localPlayer->CurrentGauge = feverValue;
-			localPlayer->MainUI->FeverGauge->SetFeverGauge ( localPlayer->CurrentGauge );
+			localPlayer->audienceWidget->FeverGauge->SetFeverGauge ( localPlayer->CurrentGauge );
 			UE_LOG ( LogTemp , Error , TEXT ( "Not LocalPlayer Gauge: %f" ) , localPlayer->CurrentGauge );
 			//UE_LOG ( LogTemp , Warning , TEXT ( "In2" ) );
 		}
@@ -484,10 +484,10 @@ void AHSW_ThirdPersonCharacter::PossessedBy ( AController* NewController )
 {
 	Super::PossessedBy ( NewController );
 
-	if (IsLocallyControlled ( ))
-	{
-		InitMainUI ( );
-	}
+	//if (IsLocallyControlled ( ))
+	//{
+	//	InitMainUI ( );
+	//}
 
 }
 

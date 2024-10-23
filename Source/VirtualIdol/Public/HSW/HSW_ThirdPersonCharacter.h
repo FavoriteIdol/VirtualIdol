@@ -126,8 +126,8 @@ public:
 	UPROPERTY(EditDefaultsOnly )
 	class UHSW_MainWidget* MainUI;
 
-	UFUNCTION( )
-	void InitMainUI();
+    UFUNCTION ( )
+    void InitMainUI ( );
 
 	// 이모지 ------------------------------------
 // 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Imoji )
