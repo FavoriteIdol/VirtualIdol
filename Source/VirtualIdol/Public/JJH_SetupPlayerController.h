@@ -26,9 +26,21 @@ public:
 
     virtual void BeginPlay() override;
 
-    UPROPERTY(EditAnywhere)
+    void TakeScreenshot2 ( );
+   
+   UTexture2D* RenderTargetToTexture2D ( UTextureRenderTarget2D* InRenderTarget );
+   
+   void SaveImage ( UTextureRenderTarget2D* RenderTarget );
+
+    UPROPERTY ( EditAnywhere )
     TSubclassOf<class UJJH_MapSelectWidget> MapSelectWidgetFactory;
     class UJJH_MapSelectWidget* MapSelectWidget;
+
+    
+    class USceneCaptureComponent2D* CaptureComponent2D;
+
+    // 렌더 타겟 생성
+    class UTextureRenderTarget2D * RenderTarget;
 private:
     void OnScreenshotCaptured(int32 Width, int32 Height, const TArray<FColor>& Colors);
 
