@@ -74,17 +74,32 @@ public:
 	UPROPERTY(EditAnywhere, Category="Particle" )
 	TArray<class UParticleSystem*> EffectParticles;
 	UPROPERTY(EditAnywhere, Category = "Particle")
+<<<<<<< HEAD
 	TArray<class UParticleSystem*> FeversParticles;
 	UPROPERTY(EditAnywhere, Category = "Particle" )
 	TArray<FVector> ParticlePositions;
 
 	// 버튼
+=======
+	TArray<class UMaterial*> FeversParticles;
+	UPROPERTY(EditAnywhere, Category = "Particle")
+	TArray<class UMaterial*> HighParticles;
+	UPROPERTY(EditAnywhere, Category = "Particle" )
+	TArray<FVector> ParticlePositions;
+	// 텍스트
+>>>>>>> parent of 03c4198 (Merge branch 'KMK_Proto_241017')
 	UPROPERTY(meta = (BindWidget))
     class UButton* Butt_Back;
 	UPROPERTY ( meta = ( BindWidget ) )
+<<<<<<< HEAD
     class UButton* Butt_CreateTicket;
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UButton* Butt_Complete;
+=======
+	class UButton* Butt_CreateTicket;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UMultiLineEditableText* EditMultiText_Ticket;
+>>>>>>> parent of 03c4198 (Merge branch 'KMK_Proto_241017')
 
 	UPROPERTY(meta = (BindWidget))
 	class UButton* Butt_Right;
@@ -95,6 +110,7 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* Butt_FLeft;
 
+<<<<<<< HEAD
 	// 이미지
 	UPROPERTY(meta = (BindWidget))
 	class UImage* Image_Ticket;
@@ -106,6 +122,47 @@ public:
     UPROPERTY ( meta = ( BindWidget ) )
     class UCanvasPanel* CompletePopUp;
 	// 텍스트 블럭
+=======
+	void ClearAllText( );
+#pragma endregion
+#pragma region Set Effect
+	// 이펙트 결정 패널
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UCanvasPanel* SetEffectPanel;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UImage* Image_Particle;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UImage* Image_Fever;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* Butt_Right;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* Butt_Left;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* Butt_FRight;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* Butt_FLeft;
+
+	int32 particleNum = 0;
+	int32 feverNum = 0;
+
+	UFUNCTION( )
+	void PressRightButt( );
+	UFUNCTION( )
+	void PressLeftButt( );
+	UFUNCTION( )
+	void PressFRightButt( );
+	UFUNCTION( )
+	void PressFLeftButt( );
+	UFUNCTION( )
+	void SetPanelVisible( class UCanvasPanel* visiblePanel, class UCanvasPanel* hiddenPanel0 , class UCanvasPanel* hiddenPanel1 , class UCanvasPanel* hiddenPanel2 );
+
+	void AddIndex( int32 num , TArray<class UMaterial*> meshArray , class UImage* image );
+	void MinusIndex( int32 num , TArray<class UMaterial*>  meshArray , class UImage* image );
+#pragma endregion
+
+#pragma region Final Set Stage
+	// 최종 결제 페널
+>>>>>>> parent of 03c4198 (Merge branch 'KMK_Proto_241017')
 	UPROPERTY(meta = (BindWidget))
 	class UEditableText* EditText_Day;
 	UPROPERTY(meta = (BindWidget))
