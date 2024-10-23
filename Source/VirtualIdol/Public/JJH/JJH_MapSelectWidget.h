@@ -52,15 +52,23 @@ public:
 	class UButton* AfternoonButton;
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UButton* NightButton;		
-	UPROPERTY ( meta = ( BindWidget ) )
-	class UButton* FloorButton;
 
 	UFUNCTION ()
 	void OnAfternoonButtonClicked ( );	
 	UFUNCTION ( )
+	void OnNightButtonClicked ( );
+
+	//지면
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* FloorButton;	
+	
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* GroundButton;
+
+	UFUNCTION ( )
 	void OnFogButtonClicked ( );
 	UFUNCTION ( )
-	void OnNightButtonClicked ( );
+	void OnGroundButtonClicked ( );
 
 	//캡쳐
 	UPROPERTY(meta = (BindWidget))
@@ -90,13 +98,15 @@ public:
 	class UButton* BackButton;
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UButton* ReturnButton;
-
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* ReturnToMenuButton;
 	UFUNCTION ( )
 	void OnBackButtonClicked ( );	
 	UFUNCTION ( )
 	void OnReturnButtonClicked ( );
-
-	UPROPERTY(Transient, meta = (BindWidgetAnim))
+	UFUNCTION ( )
+	void OnReturnToMenuButtonClicked ( );
+	UPROPERTY ( Transient , meta = ( BindWidgetAnim ) )
 	class UWidgetAnimation* BackButtonAnimation;
 
 	//테마 바꾸기
@@ -144,6 +154,8 @@ public:
 	//선택버튼 뒤에 배경
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UBorder* ChooseBackground;
+
+	//3팝업
 
 	virtual void NativeConstruct() override;
 };

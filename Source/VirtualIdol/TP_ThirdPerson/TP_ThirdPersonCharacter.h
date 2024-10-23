@@ -1,4 +1,4 @@
-// Copyright Epic Games, Inc. All Rights Reserved.
+﻿// Copyright Epic Games, Inc. All Rights Reserved.
 
 #pragma once
 
@@ -63,11 +63,33 @@ protected:
 	
 	// To add mapping context
 	virtual void BeginPlay();
+	virtual void Tick(float DeltaTime );
 
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	UPROPERTY( )
+	class APlayerController* pc;
+
+	UPROPERTY(EditAnywhere )
+	TSubclassOf<class UAudience_KMK> audienceWidgetFact;
+	UPROPERTY(EditAnywhere )
+	TSubclassOf<class UAudience_KMK> virtualWidgetFact;
+
+	UPROPERTY( )
+	class UAudience_KMK* audienceWidget;
+
+	UPROPERTY( )
+	class UAudience_KMK* virtualWidget;
+	
+	
+	UPROPERTY(VisibleAnywhere)
+	class UAudienceServerComponent_KMK* serverComp;
+
+	UFUNCTION( )
+	void InitializeAudienceWidget( TSubclassOf<class UAudience_KMK>  widgetFact );
 };
 
