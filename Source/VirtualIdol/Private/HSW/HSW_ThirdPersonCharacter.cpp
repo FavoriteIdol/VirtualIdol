@@ -631,7 +631,6 @@ void AHSW_ThirdPersonCharacter::OnMyThorwHold ( const FInputActionValue& value )
 
 void AHSW_ThirdPersonCharacter::ServerRPCThrowHold_Implementation ( FTransform t )
 {
-
 	MulticastRPCThrowHold ( t );
 }
 
