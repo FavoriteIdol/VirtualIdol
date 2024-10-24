@@ -248,10 +248,10 @@ public:
 	void MulticastRPCInterview (float bInterview   );
 
 	UFUNCTION(Server, Reliable )
-	void ServerRPCImoji( );
+	void ServerRPCImoji( int index );
 
 	UFUNCTION(NetMulticast, Reliable )
-	void MulticastRPCImoji ( );
+	void MulticastRPCImoji ( int index );
 
 
 #pragma region KMK
