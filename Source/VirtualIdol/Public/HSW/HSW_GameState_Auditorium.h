@@ -15,7 +15,7 @@ class VIRTUALIDOL_API AHSW_GameState_Auditorium : public AGameStateBase
 	GENERATED_BODY()
 	
 public:
-	virtual void BeginPlay ( ) override;
+	// virtual void BeginPlay ( ) override;
 
 	UPROPERTY(EditDefaultsOnly )
 	TArray<class APlayerState *> PlayerList;
