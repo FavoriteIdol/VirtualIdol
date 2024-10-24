@@ -130,6 +130,12 @@ public:
 	UPROPERTY ( EditDefaultsOnly , Category = Fever )
 	class UNiagaraSystem* FeverEffect_Niagara;
 
+	UPROPERTY ( EditDefaultsOnly , Category = Fever )
+	class AActor* FeverEffect_Actor;
+
+	UPROPERTY ( EditDefaultsOnly , Category = Fever )
+	TSubclassOf<class AActor> FeverEffectFactory;
+
 	FTransform FeverEffectLocation;
 
 	UPROPERTY( Replicated, EditDefaultsOnly , BlueprintReadWrite , Category = FeverGauge )

@@ -557,9 +557,10 @@ void AHSW_ThirdPersonCharacter::PossessedBy ( AController* NewController )
 void AHSW_ThirdPersonCharacter::MulticastFeverEffect_Implementation ( )
 {
 	//UGameplayStatics::SpawnEmitterAtLocation ( GetWorld ( ) , FeverEffect_Particle , FeverEffectLocation );
-	UNiagaraComponent* DamagedEffect = UNiagaraFunctionLibrary::SpawnSystemAtLocation ( this->GetWorld ( ) , this->FeverEffect_Niagara , FeverEffectLocation.GetLocation() , FRotator::ZeroRotator );
-	DamagedEffect->SetAutoDestroy ( true );
+// 	UNiagaraComponent* DamagedEffect = UNiagaraFunctionLibrary::SpawnSystemAtLocation ( this->GetWorld ( ) , this->FeverEffect_Niagara , FeverEffectLocation.GetLocation() , FRotator::ZeroRotator );
+// 	DamagedEffect->SetAutoDestroy ( true );
 
+	FeverEffect_Actor = GetWorld ( )->SpawnActor<AActor> ( FeverEffectFactory , FeverEffectLocation );
 }
 
 // 인터뷰 =================================================================================================
