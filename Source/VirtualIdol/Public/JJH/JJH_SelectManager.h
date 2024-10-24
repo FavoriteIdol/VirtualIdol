@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "KMK/HttpActor_KMK.h"
 #include "JJH_SelectManager.generated.h"
 
 UCLASS()
@@ -52,4 +53,27 @@ public:
 
 	void ChangeFloor (int32 index );
 
+
+	//스크린샷
+	UPROPERTY ( EditAnywhere )
+	TSubclassOf<class UJJH_MapSelectWidget> MapSelectWidgetFactory;
+	class UJJH_MapSelectWidget* MapSelectWidget;
+
+	class USceneCaptureComponent2D* CaptureComponent2D;
+
+	void SetName ( const FString Text );
+
+	void TakeScreenshot ( );
+
+	UTexture2D* RenderTargetToTexture2D ( UTextureRenderTarget2D* InRenderTarget );
+
+	void SaveImage ( UTextureRenderTarget2D* RenderTarget2 );
+
+	// 렌더 타겟 생성
+	class UTextureRenderTarget2D* RenderTarget;
+
+	//백엔드 보내기 위한 구조체
+	FStageInfo Stage;
+	//파일 경로
+	FString FullFileName;
 };

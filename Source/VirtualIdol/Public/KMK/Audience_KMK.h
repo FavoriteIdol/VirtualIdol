@@ -32,7 +32,7 @@ public :
 	UPROPERTY( )
 	class UVirtualGameInstance_KMK* gi;
 	UPROPERTY( )
-	class ATP_ThirdPersonCharacter* pc;
+	class AHSW_ThirdPersonCharacter* pc;
 
 	void OnOffFunction(class UTextBlock* textBlocks, int32 num, bool bAllVisib = false );
 	void ChangeTextAndImage ( FLinearColor color , int32 num , TArray<FString> textArray , bool bMyAuth = false );
@@ -178,7 +178,11 @@ public :
 	UPROPERTY ( meta = ( BindWidget ) )
     class UButton* Butt_Out;
 	UPROPERTY ( meta = ( BindWidget ) )
+    class UButton* Butt_Out1;
+	UPROPERTY ( meta = ( BindWidget ) )
     class UButton* Butt_Cancel;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* Butt_Cancel1;
 	
 	UFUNCTION( )
     void PressExitButt ( );
@@ -209,7 +213,6 @@ public :
 	void PressObject2Butt( );
 
 #pragma endregion
-
 #pragma region CountDow
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UCanvasPanel* CountDownPanel;
@@ -220,6 +223,8 @@ public :
 	void CountDownText( const FString& time );
 	UFUNCTION( )
 	void CountDownPanelVisible( ESlateVisibility visiblePanel );
+	UFUNCTION( )
+	void SetCountDownTextVisible( );
 #pragma endregion
 #pragma region Virtual
 
@@ -255,6 +260,36 @@ public :
 	float soundGain = 2;
 	UFUNCTION( )
 	void ChangeVirtualWidget( );
+
+#pragma endregion
+#pragma region Audience
+	UPROPERTY(meta = (BindWidget))
+    class UHorizontalBox* ImojiBox;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UHSW_FeverGaugeWidget* FeverGauge;
+
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* Btn_Imoji_1;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* Btn_Imoji_2;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* Btn_Imoji_3;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* Btn_Imoji_4;
+
+	UFUNCTION( )
+	void OnMyImoji01( );
+	UFUNCTION( )
+	void OnMyImoji02( );
+	UFUNCTION( )
+	void OnMyImoji03( );
+	UFUNCTION( )
+	void OnMyImoji04( );
+
+	UPROPERTY( )
+	class AHSW_ThirdPersonCharacter* Player;
+	UPROPERTY( )
+	class UHSW_ImojiConponent* ImojiComponent;
 
 #pragma endregion
 

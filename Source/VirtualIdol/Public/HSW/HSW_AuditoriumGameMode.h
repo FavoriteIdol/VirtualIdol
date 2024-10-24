@@ -23,10 +23,27 @@ protected:
 	virtual void BeginPlay () override;
 
 public:
+	// 피버게이지
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = FeverGauge )
+	float CurrentGauge = 0.0f;
+
 	UPROPERTY (EditDefaultsOnly)
 	class AHSW_ThirdPersonCharacter* Player;
 
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="GameState" )
-	bool bFevered;
+	virtual void GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
 
+	UPROPERTY( Replicated )
+	bool bFever;
+	
+	UPROPERTY ( Replicated, EditDefaultsOnly , Category = Fever )
+	class UParticleSystem* FeverEffect_Particle;
+
+	UPROPERTY ( Replicated, EditDefaultsOnly , Category = Fever )
+	class UNiagaraSystem* FeverEffect_Niagara;
+
+	UPROPERTY ( Replicated , EditDefaultsOnly , Category = Fever )
+	FTransform FeverEffectLocation;
+
+	UFUNCTION(NetMulticast, Reliable )
+	void Multicast_FeverEffect( );
 };
