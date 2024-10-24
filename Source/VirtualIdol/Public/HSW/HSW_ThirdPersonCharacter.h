@@ -184,7 +184,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite )
 	class UArrowComponent* ThrowingArrow;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite )
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadWrite )
 	class AHSW_ThrowingObject* ThrowingObject;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite )

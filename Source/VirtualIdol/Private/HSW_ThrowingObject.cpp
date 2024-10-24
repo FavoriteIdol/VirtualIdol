@@ -5,6 +5,8 @@
 #include "Engine/StaticMesh.h"
 #include "Materials/Material.h"
 #include "Components/SphereComponent.h"
+#include "TimerManager.h"
+#include "HSW/HSW_ThirdPersonCharacter.h"
 
 
 // Sets default values
@@ -15,6 +17,7 @@ AHSW_ThrowingObject::AHSW_ThrowingObject()
 
 	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	SetRootComponent( SphereComp );
+	SphereComp->SetGenerateOverlapEvents(true);
 
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp" ) );
 	MeshComp->SetupAttachment(RootComponent);
@@ -50,7 +53,14 @@ AHSW_ThrowingObject::AHSW_ThrowingObject()
 void AHSW_ThrowingObject::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	SphereComp->OnComponentBeginOverlap.AddDynamic ( this , &AHSW_ThrowingObject::OnMyObjectBeginverlap );
+
+	GetWorldTimerManager ( ).SetTimer ( TimerHandleDestroy , FTimerDelegate::CreateLambda ( [&]
+		{
+			UE_LOG ( LogTemp , Warning , TEXT ( "TimeOver Destroyed" ) );
+			this->Destroy ( );
+		} ) , 15.f , false );
 }
 
 // Called every frame
@@ -58,4 +68,30 @@ void AHSW_ThrowingObject::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AHSW_ThrowingObject::ChangeMesh ( int32 meshIndex )
+{
+	MeshComp->SetStaticMesh( MeshArray[meshIndex] );
+}
+
+void AHSW_ThrowingObject::DestroyObject ( )
+{
+	//GetWorld ( )->GetTimerManager ( ).SetTimer ( TimerHandleDestroy	, this , &AHSW_ThrowingObject::Destroy, DisappearTime );
+
+	//GetWorld ( )->GetTimerManager ( ).SetTimer ( TimerHandleDestroy , this , this->Destroy() , DisappearTime );
+
+	GetWorldTimerManager ( ).SetTimer ( TimerHandleDestroy , FTimerDelegate::CreateLambda ( [&]
+		{
+			this->Destroy ( );
+		} ) , DisappearTime , false );
+}
+
+void AHSW_ThrowingObject::OnMyObjectBeginverlap ( UPrimitiveComponent* OverlappedComponent , AActor* OtherActor , UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep , const FHitResult& SweepResult )
+{
+	if (!( OtherActor->IsA<AHSW_ThrowingObject> ( ) )) 
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%s" ), *OtherActor->GetName() );
+		DestroyObject( );
+	}
 }
