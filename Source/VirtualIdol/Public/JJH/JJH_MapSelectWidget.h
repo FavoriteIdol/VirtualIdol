@@ -106,6 +106,7 @@ public:
 	void OnReturnButtonClicked ( );
 	UFUNCTION ( )
 	void OnReturnToMenuButtonClicked ( );
+
 	UPROPERTY ( Transient , meta = ( BindWidgetAnim ) )
 	class UWidgetAnimation* BackButtonAnimation;
 
@@ -155,7 +156,34 @@ public:
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UBorder* ChooseBackground;
 
-	//3팝업
+	//3팝업(무대제작완료)
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UBorder* SetUpFinishBorder;
+
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* MakeStageCompleteButton;
+
+	UFUNCTION ( )
+	void OnMakeStageCompleteButtonClicked ( );
+
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UEditableText* StageName;
+
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UTextBlock* StageNameText;
+
+	//4팝업
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UImage* CapturedImage_1;
+	
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* ReturnToMenuButton_1;
+
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UBorder* SetUpFinishBorder_1;
+
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UTextBlock* StageNameText_1;
 
 	virtual void NativeConstruct() override;
 };

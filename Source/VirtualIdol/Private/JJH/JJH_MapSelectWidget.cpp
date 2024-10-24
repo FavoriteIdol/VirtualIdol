@@ -10,6 +10,8 @@
 #include "JJH_SetupPlayerController.h"
 #include "Components/WidgetSwitcher.h"
 #include "Components/CanvasPanel.h"
+#include "Components/EditableText.h"
+#include "Components/TextBlock.h"
 
 void UJJH_MapSelectWidget::NativeConstruct ( )
 {
@@ -27,8 +29,6 @@ void UJJH_MapSelectWidget::NativeConstruct ( )
 	ReturnButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnReturnButtonClicked );
 	ReturnToMenuButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnReturnToMenuButtonClicked );
 
-
-	
 	//낮밤 바꾸기
 	NightButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnNightButtonClicked );
 	AfternoonButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnAfternoonButtonClicked );
@@ -55,7 +55,13 @@ void UJJH_MapSelectWidget::NativeConstruct ( )
 	CaptureButton->OnClicked.AddDynamic( this , &UJJH_MapSelectWidget::OnCaptureButtonClicked );
 	SetThumbnailButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnSetThumbnailButtonClicked );
 	ReCaptureButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnReCaptureButtonClicked );
-	
+
+	//3팝업 숨기기
+	SetUpFinishBorder->SetVisibility ( ESlateVisibility::Hidden );
+	MakeStageCompleteButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnMakeStageCompleteButtonClicked );
+	SetUpFinishBorder_1->SetVisibility ( ESlateVisibility::Hidden );
+	//4팝업
+	ReturnToMenuButton_1->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnReturnToMenuButtonClicked );
 
 }
 void UJJH_MapSelectWidget::OnWeatherButtonClicked ( )
@@ -191,7 +197,7 @@ void UJJH_MapSelectWidget::OnCaptureButtonClicked ( )
 	AJJH_SetupPlayerController* SPC = Cast<AJJH_SetupPlayerController> ( GetWorld ( )->GetFirstPlayerController ( ) );
 	if (SPC)
 	{
-		SPC->TakeScreenshot ( );
+		SPC->TakeScreenshot2( );
 		CaptureButton->SetVisibility(ESlateVisibility::Hidden);
 		ReturnButton->SetVisibility ( ESlateVisibility::Hidden );
 		ReturnToMenuButton->SetVisibility ( ESlateVisibility::Hidden );
@@ -217,11 +223,13 @@ void UJJH_MapSelectWidget::OnReCaptureButtonClicked ( )
 }
 void UJJH_MapSelectWidget::OnSetThumbnailButtonClicked ( )
 {
-	//촬영한 사진 백엔드로 보내기
-
+	SetUpFinishBorder->SetVisibility(ESlateVisibility::Visible);
+	StageNameText->SetText( StageName->GetText ( ) );
+	SetupWidgetSwitcher->SetActiveWidgetIndex(2);
 }
 void UJJH_MapSelectWidget::SetImageWithCapturedImage ( )
 {
+
 	SetupWidgetSwitcher->SetActiveWidgetIndex ( 1 );
 	PlayAnimation ( ShutterAnimation );
 	ReturnToMenuButton->SetVisibility ( ESlateVisibility::Visible );
@@ -239,5 +247,14 @@ void UJJH_MapSelectWidget::OnReturnButtonClicked ( )
 void UJJH_MapSelectWidget::OnReturnToMenuButtonClicked ( )
 {
 	UGameplayStatics::OpenLevel(this, TEXT("/Game/Project/Personal/KMK/Maps/KMK_Maps"));
+}
+
+void UJJH_MapSelectWidget::OnMakeStageCompleteButtonClicked ( )
+{
+	StageNameText_1->SetText( StageNameText->GetText());
+	//이미지 저장
+	//작업 마무리
+	SetUpFinishBorder->SetVisibility(ESlateVisibility::Hidden);
+	SetUpFinishBorder_1->SetVisibility(ESlateVisibility::Visible);
 }
 
