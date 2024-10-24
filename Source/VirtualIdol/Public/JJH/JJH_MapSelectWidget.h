@@ -16,6 +16,10 @@ class VIRTUALIDOL_API UJJH_MapSelectWidget : public UUserWidget
 	
 
 public:
+	// httpactor
+	UPROPERTY( )
+	class AHttpActor_KMK* HttpActor;
+
 	class AJJH_SelectManager* SM;
 	
 	UPROPERTY(meta = (BindWidget))
