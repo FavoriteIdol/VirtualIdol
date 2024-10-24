@@ -270,6 +270,10 @@ FString UAudienceServerComponent_KMK::GetTimeDifference ( const FString& SetTime
 
 void UAudienceServerComponent_KMK::CheatStartConcert ( )
 {
-	ServerRPC_StartConcert();
+	AHSW_ThirdPersonCharacter* playerCharacter = Cast<AHSW_ThirdPersonCharacter> ( GetOwner() );
+	if (playerCharacter && playerCharacter->HasAuthority ( ))
+	{
+		playerCharacter->audienceWidget->ChangeVirtualWidget ( );
+	}
 	ServerRPC_ChangeMyMesh ( 2 );
 }
