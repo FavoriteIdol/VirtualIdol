@@ -121,18 +121,15 @@ public:
 	UFUNCTION(NetMulticast, Reliable )
 	void MulticastFeverEffect( );
 
-
-
 	UPROPERTY(Replicated )
 	bool bFever;
-
 
 	UPROPERTY ( EditDefaultsOnly , Category = Fever )
 	class UParticleSystem* FeverEffect_Particle;
 
 	FTransform FeverEffectLocation;
 
-	UPROPERTY( EditDefaultsOnly , BlueprintReadWrite , Category = FeverGauge )
+	UPROPERTY( Replicated, EditDefaultsOnly , BlueprintReadWrite , Category = FeverGauge )
 	float FeverBright = 1.0f;
 
 	int32 PersonalGauge = 0;

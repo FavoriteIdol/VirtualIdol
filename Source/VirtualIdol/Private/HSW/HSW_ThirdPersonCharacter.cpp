@@ -265,9 +265,7 @@ void AHSW_ThirdPersonCharacter::SetFeverGaugeMulti ( float feverValue )
 	{
 		CurrentGauge = feverValue;
 		audienceWidget->FeverGauge->SetFeverGauge ( CurrentGauge );
-		FeverDynamicMat->SetScalarParameterValue ( TEXT ( "jswEmissivePower-A" ) , FeverBright );
-		// UE_LOG ( LogTemp , Error , TEXT ( "LocalPlayer Gauge: %f" ), CurrentGauge );
-		// UE_LOG ( LogTemp , Warning , TEXT ( "In" ) );
+
 	}
 	// 로컬 컨트롤을 하는 캐릭터가 내가 아닌 상황이라 나는 MainUI가 없다. 그러니 나의 MainUI를 갱신해주자
 	else if (!IsLocallyControlled ( ) && audienceWidget == nullptr)
@@ -275,11 +273,10 @@ void AHSW_ThirdPersonCharacter::SetFeverGaugeMulti ( float feverValue )
 		AHSW_ThirdPersonCharacter* localPlayer = Cast<AHSW_ThirdPersonCharacter>(GetWorld( )->GetFirstPlayerController()->GetCharacter());
 		if (localPlayer != nullptr)
 		{
-			localPlayer->FeverDynamicMat->SetScalarParameterValue ( TEXT ( "jswEmissivePower-A" ) , FeverBright );
 			localPlayer->CurrentGauge = feverValue;
 			localPlayer->audienceWidget->FeverGauge->SetFeverGauge ( localPlayer->CurrentGauge );
-			UE_LOG ( LogTemp , Error , TEXT ( "Not LocalPlayer Gauge: %f" ) , localPlayer->CurrentGauge );
-			//UE_LOG ( LogTemp , Warning , TEXT ( "In2" ) );
+			//UE_LOG ( LogTemp , Error , TEXT ( "Not LocalPlayer Gauge: %f" ) , localPlayer->CurrentGauge );
+
 		}
 	}
 
@@ -328,6 +325,7 @@ void AHSW_ThirdPersonCharacter::GetLifetimeReplicatedProps ( TArray<FLifetimePro
 	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , ThrowingRotator );
 	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , bFever );
 	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , ThrowingObjectIndex );
+	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , FeverBright );
 }
 
 
@@ -477,7 +475,6 @@ void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value 
 
 void AHSW_ThirdPersonCharacter::ServerRPCFeverGauge_Implementation ( float feverValue, float brightValue )
 {
-
 	if (feverValue < 1)
 	{
 		feverValue += 0.15;
@@ -491,19 +488,19 @@ void AHSW_ThirdPersonCharacter::ServerRPCFeverGauge_Implementation ( float fever
 			MulticastFeverEffect( );
 			bFever = false;
 		}
-
 	}
 
+	if (FeverBright <= 10)
+	{
+		FeverBright += brightValue;
+		MulticastRPCBrightness(1 );
+	}
 	MulticastRPCFeverGauge( feverValue, brightValue );
 	//MulticastRPCFeverGauge_Implementation ( CurrentGauge );
 }
 
 void AHSW_ThirdPersonCharacter::MulticastRPCFeverGauge_Implementation (float AddGauge, float brightValue )
 {
-	FeverBright += brightValue;
-	FeverDynamicMat->SetScalarParameterValue ( TEXT ( "jswEmissivePower-A" ) , FeverBright );
-
-	UE_LOG ( LogTemp , Warning , TEXT ( "%f" ), FeverBright );
 	ShakeBodyBlueprint ( );
 	//UE_LOG(LogTemp, Warning, TEXT("=========================================" ) );
 	SetFeverGaugeMulti ( AddGauge );
@@ -511,7 +508,8 @@ void AHSW_ThirdPersonCharacter::MulticastRPCFeverGauge_Implementation (float Add
 
 void AHSW_ThirdPersonCharacter::MulticastRPCBrightness_Implementation ( int index )
 {
-
+	UE_LOG ( LogTemp , Warning , TEXT ( "%f" ) , FeverBright );
+	FeverDynamicMat->SetScalarParameterValue ( TEXT ( "jswEmissivePower-A" ) , FeverBright );
 }
 
 void AHSW_ThirdPersonCharacter::PossessedBy ( AController* NewController )
