@@ -31,7 +31,7 @@ void UAudienceServerComponent_KMK::BeginPlay()
 	{
 		if (playerMesh->IsLocallyControlled())
         {
-            playerMesh->SetActorLocation ( FVector ( 0 ) );
+            playerMesh->SetActorLocation ( FVector ( 0, 0, 100 ) );
         }
         else
         {
