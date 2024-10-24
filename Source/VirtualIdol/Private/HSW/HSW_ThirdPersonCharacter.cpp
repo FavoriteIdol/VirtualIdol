@@ -165,8 +165,6 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 	{
         if (HasAuthority ( ))
         {
-			GetMesh ( )->bRenderInMainPass = false;
-			GetMesh ( )->bRenderInDepthPass = false;
             if (virtualWidgetFact && !audienceWidget)
             {
 				audienceWidget = CreateWidget<UAudience_KMK> ( GetWorld ( ) , virtualWidgetFact );
