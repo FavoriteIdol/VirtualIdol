@@ -127,6 +127,9 @@ public:
 	UPROPERTY ( EditDefaultsOnly , Category = Fever )
 	class UParticleSystem* FeverEffect_Particle;
 
+	UPROPERTY ( EditDefaultsOnly , Category = Fever )
+	class UNiagaraSystem* FeverEffect_Niagara;
+
 	FTransform FeverEffectLocation;
 
 	UPROPERTY( Replicated, EditDefaultsOnly , BlueprintReadWrite , Category = FeverGauge )
