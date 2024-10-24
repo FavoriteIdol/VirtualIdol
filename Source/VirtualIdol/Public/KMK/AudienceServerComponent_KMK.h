@@ -79,7 +79,7 @@ public:
 	void StartCountDown( );
 	UFUNCTION ( )
 	FString GetTimeDifference ( const FString& SetTime );
-	UFUNCTION( )
+	UFUNCTION(BlueprintCallable )
 	void CheatStartConcert( );
 	UPROPERTY( EditAnywhere)
 	FString setConcertTime = "22:10:00";

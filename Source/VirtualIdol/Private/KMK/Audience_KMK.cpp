@@ -44,7 +44,7 @@ void UAudience_KMK::NativeConstruct ( )
         Butt_Vip->OnClicked.AddDynamic ( this , &UAudience_KMK::PressVipButt );
         Butt_Yes->OnClicked.AddDynamic ( this , &UAudience_KMK::PressYesButt );
         Butt_No->OnClicked.AddDynamic ( this , &UAudience_KMK::PressNoButt );
-        FeverGauge->SetVisibility(ESlateVisibility::Hidden);
+       
     }
 #pragma region Chat
     if (Butt_Send)

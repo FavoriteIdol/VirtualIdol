@@ -27,7 +27,6 @@ void UAudienceServerComponent_KMK::BeginPlay()
 
 	player = Cast<AHSW_ThirdPersonCharacter> (GetWorld()->GetFirstPlayerController()->GetPawn());
 	playerMesh = Cast<AHSW_ThirdPersonCharacter> (GetOwner());
-
 	if (gi)
 	{
 		// 플레이어가 로컬 플레이어 일때
@@ -203,7 +202,6 @@ void UAudienceServerComponent_KMK::MultiRPC_UpdateCount_Implementation ( const F
 
 FString UAudienceServerComponent_KMK::GetTimeDifference ( const FString& SetTime )
 {
-	return " ";
 	// 현재 시스템 시간을 가져오기
 	auto now = std::chrono::system_clock::now ( );
 	std::time_t currentTime = std::chrono::system_clock::to_time_t ( now );
@@ -274,6 +272,8 @@ void UAudienceServerComponent_KMK::CheatStartConcert ( )
 	if (playerCharacter && playerCharacter->HasAuthority ( ))
 	{
 		playerCharacter->audienceWidget->ChangeVirtualWidget ( );
+		playerCharacter->audienceWidget->SetCountDownTextVisible ( );
 	}
+
 	ServerRPC_ChangeMyMesh ( 2 );
 }
