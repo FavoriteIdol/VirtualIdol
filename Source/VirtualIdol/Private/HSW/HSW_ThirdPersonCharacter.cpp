@@ -424,18 +424,18 @@ void AHSW_ThirdPersonCharacter::Look ( const FInputActionValue& Value )
 
 void AHSW_ThirdPersonCharacter::Imoji ( int index )
 {
+
+	ServerRPCImoji( index );
+}
+
+void AHSW_ThirdPersonCharacter::ServerRPCImoji_Implementation ( int index )
+{
+	MulticastRPCImoji( index );
+}
+
+void AHSW_ThirdPersonCharacter::MulticastRPCImoji_Implementation ( int index )
+{
 	imojiWidget->ImogiImage->SetBrushFromTexture ( ImojiImageArray[index] );
-
-	ServerRPCImoji(  );
-}
-
-void AHSW_ThirdPersonCharacter::ServerRPCImoji_Implementation ( )
-{
-	MulticastRPCImoji(  );
-}
-
-void AHSW_ThirdPersonCharacter::MulticastRPCImoji_Implementation ( )
-{
 
 	AppearImoji (  );
 
@@ -445,9 +445,9 @@ void AHSW_ThirdPersonCharacter::MulticastRPCImoji_Implementation ( )
 
 void AHSW_ThirdPersonCharacter::AppearImoji (  )
 {
-	UNiagaraComponent* AppearEffect = UNiagaraFunctionLibrary::SpawnSystemAtLocation ( GetWorld ( ) , EmojiEffect , ImojiComp->GetComponentLocation ( ) );
-	AppearEffect->SetAutoDestroy ( true );
-	AppearEffect->AttachToComponent ( ImojiComp , FAttachmentTransformRules::KeepWorldTransform );
+	//UNiagaraComponent* AppearEffect = UNiagaraFunctionLibrary::SpawnSystemAtLocation ( GetWorld ( ) , EmojiEffect , ImojiComp->GetComponentLocation ( ) );
+	//AppearEffect->SetAutoDestroy ( true );
+	//AppearEffect->AttachToComponent ( ImojiComp , FAttachmentTransformRules::KeepWorldTransform );
 
 	ImojiComp->SetVisibility(true);
 	imojiWidget->PlayFadeInImoji();
