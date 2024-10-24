@@ -118,7 +118,20 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category= Imogi )
 	void ShakeBodyBlueprint( );
 
+	UFUNCTION(NetMulticast, Reliable )
+	void MulticastFeverEffect( );
+
+	UPROPERTY(Replicated )
+	bool bFever;
+
+
+
 	int32 PersonalGauge = 0;
+
+	UPROPERTY ( EditDefaultsOnly , Category = Fever )
+	class UParticleSystem* FeverEffect_Particle;
+
+	FTransform FeverEffectLocation;
 
 
 	// MainWidget을 생성해서 기억하고싶다.

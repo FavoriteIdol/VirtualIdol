@@ -7,20 +7,3 @@ void AHSW_GameState_Auditorium::BeginPlay ( )
 {
 	PlayerList = PlayerArray;
 }
-
- void AHSW_GameState_Auditorium::Tick ( float DeltaSeconds )
-{
-	UE_LOG ( LogTemp , Warning , TEXT ( "GameState Tick" ) );
-	if (bFever30)
-	{
-		UE_LOG ( LogTemp , Warning , TEXT ( "Fever 30%% !!!!!!! " ) );
-	}
-	else if (bFever65)
-	{
-		UE_LOG ( LogTemp , Warning , TEXT ( "Fever 65%% !!!!!!! " ) );
-	}
-	else if (bFever100)
-	{
-		UE_LOG ( LogTemp , Warning , TEXT ( "Fever 100%% !!!!!!! " ) );
-	}
-}

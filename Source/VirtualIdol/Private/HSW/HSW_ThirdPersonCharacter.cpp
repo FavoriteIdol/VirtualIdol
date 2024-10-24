@@ -140,21 +140,28 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 	GetWorld()->GetFirstPlayerController()->SetInputMode(a);
 	GetWorld ( )->GetFirstPlayerController ( )->bShowMouseCursor=true;
 
-	gm = Cast<AHSW_AuditoriumGameMode>(GetWorld()->GetAuthGameMode() );
 	gs = GetWorld()->GetGameState<AHSW_GameState_Auditorium>();
 	if (gs == nullptr)
 	{
 		UE_LOG ( LogTemp , Warning , TEXT ( "GameState is null!" ) );
-		return;
+		
 	}
 
+	gm = Cast<AHSW_AuditoriumGameMode> ( GetWorld ( )->GetAuthGameMode ( ) );
+
+
 	FName tag = TEXT ( "InterviewLocation" );
+	FName tag2 = TEXT ( "FeverGaugeLocation" );
 	for (TActorIterator<AActor> It ( GetWorld ( ) , AStaticMeshActor::StaticClass ( ) ); It; ++It)
 	{
 		AActor* Actor = *It;
 		if (IsValid ( Actor ) && Actor->ActorHasTag ( tag ))
 		{
 			StageLocation = Actor->GetTransform ( );
+		}
+		if (IsValid ( Actor ) && Actor->ActorHasTag ( tag2 ))
+		{
+			FeverEffectLocation = Actor->GetTransform ( );
 		}
 	}
 
@@ -281,6 +288,7 @@ void AHSW_ThirdPersonCharacter::GetLifetimeReplicatedProps ( TArray<FLifetimePro
 	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , CurrentGauge );
 	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , bIsInterviewing );
 	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , ThrowingRotator );
+	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , bFever );
 }
 
 
@@ -417,11 +425,11 @@ void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value 
 {
 	if (!HasAuthority ( ) && IsLocallyControlled())
 	{
-		//UE_LOG ( LogTemp , Warning , TEXT ( "The Fever Gauge is being stacked...Send ===========" ) );
 		ServerRPCFeverGauge (CurrentGauge);
 		PrintFeverGaugeLogOnHead ( );
 		PersonalGauge++;
 		//MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
+		//UGameplayStatics::SpawnEmitterAtLocation ( GetWorld ( ) , FeverEffect_Particle , FeverEffectLocation );
 	}
 	//OnRep_FeverGauge( );
 	//UE_LOG(LogTemp, Warning, TEXT("The Fever Gauge is being stacked..." ) );
@@ -431,23 +439,18 @@ void AHSW_ThirdPersonCharacter::ServerRPCFeverGauge_Implementation ( float fever
 {
 	if (feverValue < 1)
 	{
-		feverValue += FeverPoint;
+		feverValue += 0.3;
 	}
 
-	if (feverValue >= 0.5 && feverValue < 1)
+	else if (feverValue >=1)
 	{
-		if (gs)
+		bFever = true;
+		if (bFever)
 		{
-			gs->bFever30 = true;
+			MulticastFeverEffect( );
+			bFever = false;
 		}
-	}
-	else if (feverValue >= 1)
-	{
-		if (gs)
-		{
-			gs->bFever30 = false;
-			gs->bFever65 = true;
-		}
+		
 	}
 
 	MulticastRPCFeverGauge( feverValue );
@@ -459,6 +462,7 @@ void AHSW_ThirdPersonCharacter::MulticastRPCFeverGauge_Implementation (float Add
 	ShakeBodyBlueprint ( );
 	//UE_LOG(LogTemp, Warning, TEXT("=========================================" ) );
 	SetFeverGaugeMulti ( AddGauge );
+
 
 }
 
@@ -484,7 +488,7 @@ void AHSW_ThirdPersonCharacter::SetFeverGaugeMulti ( float feverValue )
 		CurrentGauge = feverValue;
 		MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
 		// UE_LOG ( LogTemp , Error , TEXT ( "LocalPlayer Gauge: %f" ), CurrentGauge );
-		// UE_LOG ( LogTemp , Warning , TEXT ( "In" ) );
+
 	}
 	// 로컬 컨트롤을 하는 캐릭터가 내가 아닌 상황이라 나는 MainUI가 없다. 그러니 나의 MainUI를 갱신해주자
 	else if (!IsLocallyControlled ( ) && MainUI == nullptr)
@@ -495,23 +499,17 @@ void AHSW_ThirdPersonCharacter::SetFeverGaugeMulti ( float feverValue )
 			localPlayer->CurrentGauge = feverValue;
 			localPlayer->MainUI->FeverGauge->SetFeverGauge ( localPlayer->CurrentGauge );
 			UE_LOG ( LogTemp , Error , TEXT ( "Not LocalPlayer Gauge: %f" ) , localPlayer->CurrentGauge );
-			//UE_LOG ( LogTemp , Warning , TEXT ( "In2" ) );
+
 		}
 	}
 
-	//if (MainUI)
-	//{
-	//	MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
-	//	UE_LOG ( LogTemp , Warning , TEXT ( "In" ) );
-	//}
-	//UE_LOG ( LogTemp , Warning , TEXT ( "out" ) );
-// 	auto* widget = Cast<AHSW_ThirdPersonCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn())->MainUI;
-// 	if(widget) 
-// 	{
-// 	widget->FeverGauge->SetFeverGauge ( CurrentGauge );
-// 	UE_LOG ( LogTemp , Error , TEXT ( "%f" ) , CurrentGauge );
-// 	}
 
+
+}
+
+void AHSW_ThirdPersonCharacter::MulticastFeverEffect_Implementation ( )
+{
+	UGameplayStatics::SpawnEmitterAtLocation ( GetWorld ( ) , FeverEffect_Particle , FeverEffectLocation );
 }
 
 // 인터뷰 =================================================================================================
@@ -544,8 +542,6 @@ void AHSW_ThirdPersonCharacter::ServerRPCInterview_Implementation (  )
 
 void AHSW_ThirdPersonCharacter::MulticastRPCInterview_Implementation ( float bInterview )
 {
-	
-
 	if (bInterview)
 	{
 		UE_LOG ( LogTemp , Warning , TEXT ( "Interview is in progress." ) );
@@ -641,7 +637,7 @@ void AHSW_ThirdPersonCharacter::MulticastRPCThrowPitch_Implementation ( )
 	ThrowingObject->MeshComp->AddForce ( ThrowingForce );
 	ThrowingObject = nullptr;
 
-
+	ShakeBodyBlueprint ( );
 	// 재장전 애니메이션 재생
 	auto* anim = Cast<UHSW_AnimInstance_Audience> ( GetMesh ( )->GetAnimInstance ( ) );
 	if (anim)
