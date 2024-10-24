@@ -3,7 +3,7 @@
 
 #include "HSW/HSW_GameState_Auditorium.h"
 
-void AHSW_GameState_Auditorium::BeginPlay ( )
-{
-	PlayerList = PlayerArray;
-}
+//void AHSW_GameState_Auditorium::BeginPlay ( )
+//{
+//	// PlayerList = PlayerArray;
+//}
