@@ -32,6 +32,7 @@
 #include "Components/HorizontalBox.h"
 #include "HSW/HSW_ImojiConponent.h"
 #include "HSW/HSW_FeverGaugeWidget.h"
+#include "HSW_ThrowingObject.h"
 
 void UAudience_KMK::NativeConstruct ( )
 {
@@ -373,15 +374,18 @@ void UAudience_KMK::PressCancelButt ( )
 void UAudience_KMK::PressObjectButt ( )
 {
     // 오브젝트 생성
-    UE_LOG(LogTemp, Warning, TEXT("111111" ));
+    Player->ThrowingObjectIndex = 0;
+    UE_LOG(LogTemp,Warning,TEXT("ObjectButton_0" ) );
 }
 void UAudience_KMK::PressObject1Butt ( )
 {
-    UE_LOG ( LogTemp , Warning , TEXT ( "22222" ) );
+    Player->ThrowingObjectIndex = 1;
+    UE_LOG ( LogTemp , Warning , TEXT ( "ObjectButton_1" ) );
 }
 void UAudience_KMK::PressObject2Butt ( )
 {
-    UE_LOG ( LogTemp , Warning , TEXT ( "33333" ) );
+    Player->ThrowingObjectIndex = 2;
+    UE_LOG ( LogTemp , Warning , TEXT ( "ObjectButton_2" ) );
 }
 
 void UAudience_KMK::CountDownText (const FString& time )

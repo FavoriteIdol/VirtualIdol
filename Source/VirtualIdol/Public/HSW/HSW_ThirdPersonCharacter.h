@@ -111,7 +111,7 @@ public:
 	void PrintFeverGaugeLogOnHead( );
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = FeverGauge )
-	float FeverPoint = 0.02f;
+	float FeverPoint = 0.005f;
 
 	void SetFeverGaugeMulti(float feverValue);
 
@@ -124,25 +124,31 @@ public:
 	UPROPERTY(Replicated )
 	bool bFever;
 
-
-
-	int32 PersonalGauge = 0;
-
 	UPROPERTY ( EditDefaultsOnly , Category = Fever )
 	class UParticleSystem* FeverEffect_Particle;
 
 	FTransform FeverEffectLocation;
 
+	UPROPERTY( Replicated, EditDefaultsOnly , BlueprintReadWrite , Category = FeverGauge )
+	float FeverBright = 1.0f;
+
+	int32 PersonalGauge = 0;
+
+	UPROPERTY( EditDefaultsOnly , BlueprintReadWrite , Category = FeverGauge )
+	UMaterialInstance* FeverCharactMat;
+
+	UPROPERTY( EditAnywhere , BlueprintReadWrite , Category = FeverGauge )
+	UMaterialInstanceDynamic* FeverDynamicMat;
 
 	// MainWidget을 생성해서 기억하고싶다.
 // 	UPROPERTY(EditDefaultsOnly, Category = MainUI)
 // 	TSubclassOf<class UUserWidget> MainUIFactory;
 
-	UPROPERTY(EditDefaultsOnly )
-	class UHSW_MainWidget* MainUI;
-
-    UFUNCTION ( )
-    void InitMainUI ( );
+// 	UPROPERTY(EditDefaultsOnly )
+// 	class UHSW_MainWidget* MainUI;
+// 
+//     UFUNCTION ( )
+//     void InitMainUI ( );
 
 	// 이모지 ------------------------------------
 // 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Imoji )
@@ -199,6 +205,9 @@ public:
 	UPROPERTY(Replicated, EditDefaultsOnly,BlueprintReadWrite )
 	FRotator ThrowingRotator;
 
+	UPROPERTY( Replicated, EditDefaultsOnly , BlueprintReadWrite )
+	int32 ThrowingObjectIndex = 0;
+
 	// 인터뷰 ----------------------------------------
 
 	UPROPERTY(Replicated, EditDefaultsOnly,BlueprintReadWrite )
@@ -234,10 +243,13 @@ public:
 	void MulticastRPCThrowPitch();
 
 	UFUNCTION(Server, Reliable )
-	void ServerRPCFeverGauge( float feverValue );
+	void ServerRPCFeverGauge( float feverValue, float brightValue );
 
 	UFUNCTION(NetMulticast, Reliable )
-	void MulticastRPCFeverGauge (float AddGauge);
+	void MulticastRPCFeverGauge (float AddGauge, float brightValue );
+
+	UFUNCTION(NetMulticast, Reliable )
+	void MulticastRPCBrightness ( int index );
 
 	virtual void PossessedBy ( AController* NewController ) override;
 
@@ -252,6 +264,7 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable )
 	void MulticastRPCImoji ( int index );
+
 
 
 #pragma region KMK
