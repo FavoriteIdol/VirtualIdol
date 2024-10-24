@@ -18,6 +18,8 @@ void UJJH_MapSelectWidget::NativeConstruct ( )
 	Super::NativeConstruct ( );
 
 	SM = Cast<AJJH_SelectManager>(UGameplayStatics::GetActorOfClass ( GetWorld ( ) , AJJH_SelectManager::StaticClass ( ) ) );
+	HttpActor = Cast<AHttpActor_KMK> ( UGameplayStatics::GetActorOfClass ( GetWorld ( ) , AHttpActor_KMK::StaticClass() ) );
+
 
 	WeatherButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnWeatherButtonClicked );
 	ThemeButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnThemeButtonClicked );
@@ -191,13 +193,13 @@ void UJJH_MapSelectWidget::OnEffectButton2Clicked ( )
 
 
 
-
 void UJJH_MapSelectWidget::OnCaptureButtonClicked ( )
 {
 	AJJH_SetupPlayerController* SPC = Cast<AJJH_SetupPlayerController> ( GetWorld ( )->GetFirstPlayerController ( ) );
-	if (SPC)
+
+	if (SM)
 	{
-		SPC->TakeScreenshot2( );
+		SM->TakeScreenshot();
 		CaptureButton->SetVisibility(ESlateVisibility::Hidden);
 		ReturnButton->SetVisibility ( ESlateVisibility::Hidden );
 		ReturnToMenuButton->SetVisibility ( ESlateVisibility::Hidden );
@@ -226,6 +228,7 @@ void UJJH_MapSelectWidget::OnSetThumbnailButtonClicked ( )
 	SetUpFinishBorder->SetVisibility(ESlateVisibility::Visible);
 	StageNameText->SetText( StageName->GetText ( ) );
 	SetupWidgetSwitcher->SetActiveWidgetIndex(2);
+
 }
 void UJJH_MapSelectWidget::SetImageWithCapturedImage ( )
 {
@@ -252,9 +255,23 @@ void UJJH_MapSelectWidget::OnReturnToMenuButtonClicked ( )
 void UJJH_MapSelectWidget::OnMakeStageCompleteButtonClicked ( )
 {
 	StageNameText_1->SetText( StageNameText->GetText());
+	//맵 이름 저장
+	if (SM)
+	{
+		SM->SetName(StageNameText->GetText().ToString());
+	}
+	else
+	{
+		return;
+	}
 	//이미지 저장
 	//작업 마무리
 	SetUpFinishBorder->SetVisibility(ESlateVisibility::Hidden);
 	SetUpFinishBorder_1->SetVisibility(ESlateVisibility::Visible);
+
+	if (HttpActor)
+	{
+		HttpActor->ReqMultipartCapturedURL (SM->Stage, SM->FullFileName);
+	}
 }
 

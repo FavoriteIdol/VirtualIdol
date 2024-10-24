@@ -64,6 +64,29 @@ struct FLoginInfo
 	UPROPERTY(BlueprintReadOnly)
 	FString userName;
 };
+
+//무대 정보
+USTRUCT(BlueprintType )
+struct FStageInfo
+{
+
+	GENERATED_BODY( )
+
+	UPROPERTY(BlueprintReadOnly)
+	FString name;
+	UPROPERTY(BlueprintReadOnly)
+	int32 terrain;
+	UPROPERTY(BlueprintReadOnly)
+	int32 sky;
+	UPROPERTY(BlueprintReadOnly)
+	int32 theme;
+	UPROPERTY(BlueprintReadOnly)
+	int32 specialEffect;
+	UPROPERTY(BlueprintReadOnly)
+	FString img;
+
+};
+
 UCLASS()
 class VIRTUALIDOL_API AHttpActor_KMK : public AActor
 {
@@ -110,6 +133,17 @@ public:
 
 #pragma endregion
 
+
+#pragma region with BE for StageSettings
+	//요청
+	void ReqMultipartCapturedURL( FStageInfo& Stage , const FString& ImagePath );
+	//응답
+	void OnReqMultipartCapturedURL( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully , FStageInfo* Stage );
+	//요청
+	void ReqStageInfo( const FStageInfo& Stage);
+	//응답
+	void OnReqStageInfo( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
+#pragma endregion
 
 
 };

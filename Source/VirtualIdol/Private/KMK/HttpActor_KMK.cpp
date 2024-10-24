@@ -8,6 +8,7 @@
 #include "KMK/StartWidget_KMK.h"
 #include "Components/CanvasPanel.h"
 #include "GenericPlatform/GenericPlatformHttp.h"
+#include "JsonObjectConverter.h"
 
 // Sets default values
 AHttpActor_KMK::AHttpActor_KMK()
@@ -26,6 +27,7 @@ void AHttpActor_KMK::BeginPlay()
 	 {
 		 loginInfo = gi->GetMyInfo();
 	 }
+
 }
 
 // Called every frame
@@ -74,6 +76,7 @@ void AHttpActor_KMK::OnResLogin ( FHttpRequestPtr Request , FHttpResponsePtr Res
 		// 실패
 		UE_LOG ( LogTemp , Warning , TEXT ( "OnResLogin Failed..." ) );
 	}
+	FString authHeader = FString::Printf ( TEXT ( "Bearer %s" ) , *gi->loginInfo.token );
 }
 #pragma endregion
 #pragma region Concert
@@ -113,7 +116,7 @@ void AHttpActor_KMK::OnResSetConcert ( FHttpRequestPtr Request , FHttpResponsePt
 			if(count > 1)  return;
             UE_LOG ( LogTemp , Error , TEXT ( "403 Forbidden: 인증 문제 또는 권한 부족 - 응답 내용: %s" ) , *ResponseBody );
 			FPlatformProcess::Sleep ( 1.0f ); // 1초 대기
-			ReqSetConcert (gi->concerInfo);
+			 ReqSetConcert (gi->concerInfo);
 			count++;
         }
         else
@@ -143,11 +146,11 @@ void AHttpActor_KMK::ReqTicket ( const TMap<FString , FString> data )
 	req->SetHeader ( TEXT ( "content-type" ) , TEXT ( "application/json" ) );
 	req->SetTimeout(180.f);
 	req->SetContentAsString ( UJsonParseLib_KMK::CreateTicketJson ( data ) );
+	req->ProcessRequest ( );
 	// 응답받을 함수를 연결
 	req->OnProcessRequestComplete ( ).BindUObject ( this , &AHttpActor_KMK::OnResTicket );
 	// 서버에 요청
 
-	req->ProcessRequest ( );
 }
 
 void AHttpActor_KMK::OnResTicket ( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully )
@@ -197,6 +200,133 @@ void AHttpActor_KMK::OnTextureCreated(UTexture2D* texture)
 {
 	 gi->widget->CreateTicketMaterial(texture );
 }
+
+
+#pragma endregion
+
+#pragma region with BE for StageSettings
+
+
+
+void AHttpActor_KMK::ReqMultipartCapturedURL ( FStageInfo& Stage , const FString& ImagePath )
+{   
+	UE_LOG ( LogTemp , Warning , TEXT ( "Image upload start." ) );
+
+	// Create an HTTP request for the multipart upload
+	TSharedRef<IHttpRequest> ImageUploadRequest = FHttpModule::Get ( ).CreateRequest ( );
+	ImageUploadRequest->OnProcessRequestComplete ( ).BindUObject ( this , &AHttpActor_KMK::OnReqMultipartCapturedURL , &Stage );
+
+	// Set the URL and verb for the image upload request
+	ImageUploadRequest->SetURL ( TEXT ( "http://master-of-prediction.shop:8123/api/v1/files/upload" ) );
+	ImageUploadRequest->SetVerb ( TEXT ( "POST" ) );
+
+	UE_LOG ( LogTemp , Warning , TEXT ( "ImagePath: %s" ) , *ImagePath );
+
+	// Prepare multipart form data for image upload
+	TArray<uint8> FileData;
+	bool bSuccess = FFileHelper::LoadFileToArray ( FileData , *ImagePath );
+	if (!bSuccess)
+	{
+		UE_LOG ( LogTemp , Error , TEXT ( "Failed to load file: %s" ) , *ImagePath );
+		return; // Exit if file loading fails
+	}
+
+	FString FileName = FPaths::GetCleanFilename ( ImagePath );
+	FString Boundary = "---------------------------boundary_string";
+	FString BeginBoundary = FString ( "--" ) + Boundary + TEXT ( "\r\n" );
+	FString EndBoundary = FString ( "\r\n--" ) + Boundary + TEXT ( "--\r\n" );
+
+	FString FileHeader = FString ( "Content-Disposition: form-data; name=\"file\"; filename=\"" ) + FileName + TEXT ( "\"\r\nContent-Type: image/png\r\n\r\n" );
+
+	TArray<uint8> PostData;
+	PostData.Append ( (uint8*)TCHAR_TO_ANSI ( *BeginBoundary ) , BeginBoundary.Len ( ) );
+	PostData.Append ( (uint8*)TCHAR_TO_ANSI ( *FileHeader ) , FileHeader.Len ( ) );
+	PostData.Append ( FileData );
+	PostData.Append ( (uint8*)TCHAR_TO_ANSI ( *EndBoundary ) , EndBoundary.Len ( ) );
+
+	// Add Authorization header
+	FString AuthHeader = FString::Printf ( TEXT ( "Bearer %s" ) , *gi->loginInfo.token );
+	ImageUploadRequest->SetHeader ( TEXT ( "Authorization" ) , AuthHeader );
+
+	// Set multipart header
+	FString ContentType = FString::Printf ( TEXT ( "multipart/form-data; boundary=%s" ) , *Boundary );
+	ImageUploadRequest->SetHeader ( TEXT ( "Content-Type" ) , *ContentType );
+
+	ImageUploadRequest->SetTimeout ( 180.f );
+	// Set the content to send
+	ImageUploadRequest->SetContent ( PostData );
+
+	// Process the request
+	ImageUploadRequest->ProcessRequest ( );
+}
+
+void AHttpActor_KMK::OnReqMultipartCapturedURL ( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully , FStageInfo* Stage )
+{
+	if (bConnectedSuccessfully && Response.IsValid ( ))
+	{
+		int32 ResponseCode = Response->GetResponseCode ( );
+		if (ResponseCode == 200) // 성공적으로 응답받은 경우
+		{
+			// 응답 바디를 가져와 Stage의 img에 설정합니다.
+			FString ImageURL = Response->GetContentAsString ( );
+			Stage->img = ImageURL;
+
+			ReqStageInfo(*Stage);
+			UE_LOG ( LogTemp , Warning , TEXT ( "Image URL set to: %s" ) , *Stage->img );
+		}
+	}
+	else
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "Image upload failed." ) );
+	}
+}
+
+void AHttpActor_KMK::ReqStageInfo ( const FStageInfo& Stage)
+{
+
+	// JSON으로 변환
+	FString JsonString;
+	if (!FJsonObjectConverter::UStructToJsonObjectString ( Stage , JsonString ))
+	{
+		UE_LOG ( LogTemp , Error , TEXT ( "Failed to convert Stage to JSON." ) );
+		return;
+	}
+	UE_LOG ( LogTemp , Warning , TEXT ( "Sending Request: %s" ) , *JsonString );
+	
+	FJsonObjectConverter::UStructToJsonObjectString (Stage, JsonString);
+
+	TSharedRef<IHttpRequest> Request = FHttpModule::Get ( ).CreateRequest ( );
+	Request->OnProcessRequestComplete ( ).BindUObject ( this , &AHttpActor_KMK::OnReqStageInfo );
+	Request->SetURL ( TEXT ( "http://master-of-prediction.shop:8123/api/v1/stages" ) );
+	Request->SetVerb ( TEXT ( "POST" ) );
+
+	// Add Authorization header
+	FString AuthHeader = FString::Printf ( TEXT ( "Bearer %s" ) , *gi->loginInfo.token );
+	Request->SetHeader ( TEXT ( "Authorization" ) , AuthHeader );
+
+	// JSON 데이터 전송
+	Request->SetHeader ( TEXT ( "Content-Type" ) , TEXT ( "application/json" ) );
+	Request->SetContentAsString ( JsonString ); // JSON 문자열 설정
+
+	// 요청 전송
+	Request->ProcessRequest ( );
+}
+
+void AHttpActor_KMK::OnReqStageInfo ( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully )
+{
+
+	if (Response->GetResponseCode ( ) == 201)
+	{
+		UE_LOG ( LogTemp , Error , TEXT ( "Uploaded" ));
+
+	}
+	else
+	{
+		UE_LOG ( LogTemp , Error , TEXT ( "failed" ) );
+	}
+
+}
+
 
 
 #pragma endregion

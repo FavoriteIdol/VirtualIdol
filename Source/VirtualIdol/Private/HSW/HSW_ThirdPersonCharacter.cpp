@@ -47,9 +47,9 @@ AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
-	
+
 	// Configure character movement
-	GetCharacterMovement ( )->bOrientRotationToMovement = false; // Character moves in the direction of input...	
+	GetCharacterMovement ( )->bOrientRotationToMovement = false; // Character moves in the direction of input...
 	GetCharacterMovement ( )->RotationRate = FRotator ( 0.0f , 500.0f , 0.0f ); // ...at this rotation rate
 	GetCharacterMovement()->bUseControllerDesiredRotation=true;
 	// GetCharacterMovement()->UCharacterMovementComponent::SetMovementMode ( EMovementMode::MOVE_Flying);
@@ -72,7 +72,7 @@ AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent> ( TEXT ( "CameraBoom" ) );
 	CameraBoom->SetupAttachment ( RootComponent );
 	CameraBoom->SetRelativeLocation(FVector(0.0f,0.0f,30.f));
-	CameraBoom->TargetArmLength = 450; // The camera follows at this distance behind the character	
+	CameraBoom->TargetArmLength = 450; // The camera follows at this distance behind the character
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 
 	// Create a follow camera
@@ -80,7 +80,7 @@ AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
 	FollowCamera->SetupAttachment ( CameraBoom , USpringArmComponent::SocketName ); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
+	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character)
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 
 	// Imoji Component
@@ -114,7 +114,7 @@ AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
 // 	if (LoadedOpacityMaterial.Succeeded ( ))
 // 	{
 // 		OpacityMaterial = LoadedOpacityMaterial.Object;
-// 
+//
 // 		if (OpacityMaterial)
 // 		{
 // 			ImojiMesh->SetMaterial ( 0 , OpacityMaterial );
@@ -140,21 +140,28 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 	GetWorld()->GetFirstPlayerController()->SetInputMode(a);
 	GetWorld ( )->GetFirstPlayerController ( )->bShowMouseCursor=true;
 
-	gm = Cast<AHSW_AuditoriumGameMode>(GetWorld()->GetAuthGameMode() );
 	gs = GetWorld()->GetGameState<AHSW_GameState_Auditorium>();
 	if (gs == nullptr)
 	{
 		UE_LOG ( LogTemp , Warning , TEXT ( "GameState is null!" ) );
-		return;
+
 	}
 
+	gm = Cast<AHSW_AuditoriumGameMode> ( GetWorld ( )->GetAuthGameMode ( ) );
+
+
 	FName tag = TEXT ( "InterviewLocation" );
+	FName tag2 = TEXT ( "FeverGaugeLocation" );
 	for (TActorIterator<AActor> It ( GetWorld ( ) , AStaticMeshActor::StaticClass ( ) ); It; ++It)
 	{
 		AActor* Actor = *It;
 		if (IsValid ( Actor ) && Actor->ActorHasTag ( tag ))
 		{
-			InterviewLocation = Actor->GetTransform ( );
+			StageLocation = Actor->GetTransform ( );
+		}
+		if (IsValid ( Actor ) && Actor->ActorHasTag ( tag2 ))
+		{
+			FeverEffectLocation = Actor->GetTransform ( );
 		}
 	}
 
@@ -168,16 +175,16 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
             if (virtualWidgetFact && !audienceWidget)
             {
 				audienceWidget = CreateWidget<UAudience_KMK> ( GetWorld ( ) , virtualWidgetFact );
-				audienceWidget->AddToViewport ( );
+				//audienceWidget->AddToViewport ( );
 				audienceWidget->pc = this;
 				audienceWidget->SetVirtualWBP();
             }
-			
+
         }
         else
         {
 			audienceWidget = CreateWidget<UAudience_KMK> ( GetWorld ( ) , audienceWidgetFact );
-			audienceWidget->AddToViewport ( );
+			//audienceWidget->AddToViewport ( );
 			audienceWidget->pc = this;
         }
 		if (gi)
@@ -202,18 +209,34 @@ void AHSW_ThirdPersonCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	if (ImojiComp && ImojiComp->GetVisibleFlag ( ))
 	{
-		// 카메라 위치 
+		// 카메라 위치
 		FVector CamLoc = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0 )->GetCameraLocation();
 		FVector Direction = CamLoc - ImojiComp->GetComponentLocation();
 		Direction.Z=0;
 
 		ImojiComp->SetWorldRotation(Direction.GetSafeNormal().ToOrientationRotator());
 	}
+
+	if (bThrowing)
+	{
+		if(HasAuthority())
+		{
+			FVector Direction = StageLocation.GetLocation ( ) - GetActorLocation ( );
+			FRotator NewRotation = FRotationMatrix::MakeFromX ( Direction ).Rotator ( );
+			ThrowingRotator = FRotator ( 0 , NewRotation.Yaw , 0 );
+
+			SetActorRotation ( ThrowingRotator );
+		}
+		else
+		{
+			SetActorRotation ( ThrowingRotator );
+		}
+	}
 }
 
 void AHSW_ThirdPersonCharacter::OnRep_FeverGauge ( )
 {
-	
+
 }
 
 void AHSW_ThirdPersonCharacter::PrintFeverGaugeLogOnHead ( )
@@ -225,10 +248,10 @@ void AHSW_ThirdPersonCharacter::SetFeverGaugeMulti ( float feverValue )
 {
 // 	auto* widget = Cast<AHSW_ThirdPersonCharacter>(GetOwner() );
 // 	if(widget) auto* wid = widget->MainUI;
-// 
+//
 	// 로컬 컨트롤을 하는 캐릭터가 나 자신이라 MainUI도 가지고 있으니 그대로 갱신
 	if (IsLocallyControlled ( ) && audienceWidget)
-	{		
+	{
 		CurrentGauge = feverValue;
 		audienceWidget->FeverGauge->SetFeverGauge ( CurrentGauge );
 		// UE_LOG ( LogTemp , Error , TEXT ( "LocalPlayer Gauge: %f" ), CurrentGauge );
@@ -246,7 +269,7 @@ void AHSW_ThirdPersonCharacter::SetFeverGaugeMulti ( float feverValue )
 			//UE_LOG ( LogTemp , Warning , TEXT ( "In2" ) );
 		}
 	}
-	
+
 	//if (MainUI)
 	//{
 	//	MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
@@ -254,12 +277,12 @@ void AHSW_ThirdPersonCharacter::SetFeverGaugeMulti ( float feverValue )
 	//}
 	//UE_LOG ( LogTemp , Warning , TEXT ( "out" ) );
 // 	auto* widget = Cast<AHSW_ThirdPersonCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn())->MainUI;
-// 	if(widget) 
+// 	if(widget)
 // 	{
 // 	widget->FeverGauge->SetFeverGauge ( CurrentGauge );
 // 	UE_LOG ( LogTemp , Error , TEXT ( "%f" ) , CurrentGauge );
 // 	}
-	
+
 }
 
 void AHSW_ThirdPersonCharacter::InitMainUI ( )
@@ -294,40 +317,16 @@ void AHSW_ThirdPersonCharacter::InitMainUI ( )
 	}
 }
 
-void AHSW_ThirdPersonCharacter::Imoji ( int index )
-{
-	imojiWidget->ImogiImage->SetBrushFromTexture( ImojiImageArray[index] ) ;
-
-	AppearImoji( );
-
-	GetWorld ( )->GetTimerManager ( ).ClearTimer ( TimerHandleImoji );
-	GetWorld ( )->GetTimerManager ( ).SetTimer ( TimerHandleImoji , this , &AHSW_ThirdPersonCharacter::DisappearImoji , 2.0f );
-}
-
-void AHSW_ThirdPersonCharacter::AppearImoji ( )
-{
-	ImojiComp->SetVisibility(true);
-
-	
-	UNiagaraComponent* AppearEffect = UNiagaraFunctionLibrary::SpawnSystemAtLocation ( GetWorld ( ) , EmojiEffect , ImojiComp->GetComponentLocation ( ) );
-	AppearEffect->AttachToComponent( ImojiComp, FAttachmentTransformRules::KeepRelativeTransform);
-	AppearEffect->SetAutoDestroy(true );
-
-	imojiWidget->PlayFadeInImoji();
-}
-
-void AHSW_ThirdPersonCharacter::DisappearImoji ( )
-{
-	imojiWidget->PlayFadeOutImoji ( );
-}
 
 void AHSW_ThirdPersonCharacter::GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& OutLifetimeProps ) const
 {
 	Super::GetLifetimeReplicatedProps ( OutLifetimeProps );
 
-	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , bThrowing ); 
+	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , bThrowing );
 	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , CurrentGauge );
 	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , bIsInterviewing );
+	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , ThrowingRotator );
+	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , bFever );
 }
 
 
@@ -367,7 +366,7 @@ void AHSW_ThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* Playe
 
 		//Interview
 		EnhancedInputComponent->BindAction ( InterviewAction , ETriggerEvent::Started , this , &AHSW_ThirdPersonCharacter::OnMyInterview );
-		
+
 	}
 }
 
@@ -387,13 +386,13 @@ void AHSW_ThirdPersonCharacter::Move ( const FInputActionValue& Value )
 		// get forward vector
 		const FVector ForwardDirection = FRotationMatrix ( YawRotation ).GetUnitAxis ( EAxis::X );
 
-		// get right vector 
+		// get right vector
 		const FVector RightDirection = FRotationMatrix ( YawRotation ).GetUnitAxis ( EAxis::Y );
 
 		// get up vector
 		const FVector UpDirection = FRotationMatrix ( PitchRotation ).GetUnitAxis ( EAxis::X );
-		
-		// add movement 
+
+		// add movement
 		AddMovementInput ( ForwardDirection , MovementVector.Y );
 		AddMovementInput ( RightDirection , MovementVector.X );
 
@@ -421,15 +420,54 @@ void AHSW_ThirdPersonCharacter::Look ( const FInputActionValue& Value )
 	}
 }
 
+// Imoji ==============================================================================================
+
+void AHSW_ThirdPersonCharacter::Imoji ( int index )
+{
+	imojiWidget->ImogiImage->SetBrushFromTexture ( ImojiImageArray[index] );
+
+	ServerRPCImoji(  );
+}
+
+void AHSW_ThirdPersonCharacter::ServerRPCImoji_Implementation ( )
+{
+	MulticastRPCImoji(  );
+}
+
+void AHSW_ThirdPersonCharacter::MulticastRPCImoji_Implementation ( )
+{
+
+	AppearImoji (  );
+
+	GetWorld ( )->GetTimerManager ( ).ClearTimer ( TimerHandleImoji );
+	GetWorld ( )->GetTimerManager ( ).SetTimer ( TimerHandleImoji , this , &AHSW_ThirdPersonCharacter::DisappearImoji , 2.0f );
+}
+
+void AHSW_ThirdPersonCharacter::AppearImoji (  )
+{
+	UNiagaraComponent* AppearEffect = UNiagaraFunctionLibrary::SpawnSystemAtLocation ( GetWorld ( ) , EmojiEffect , ImojiComp->GetComponentLocation ( ) );
+	AppearEffect->SetAutoDestroy ( true );
+	AppearEffect->AttachToComponent ( ImojiComp , FAttachmentTransformRules::KeepWorldTransform );
+
+	ImojiComp->SetVisibility(true);
+	imojiWidget->PlayFadeInImoji();
+}
+
+void AHSW_ThirdPersonCharacter::DisappearImoji ( )
+{
+	imojiWidget->PlayFadeOutImoji ( );
+}
+
+// FeverGauge ======================================================================================
 void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value )
 {
 	if (!HasAuthority ( ) && IsLocallyControlled())
 	{
-		//UE_LOG ( LogTemp , Warning , TEXT ( "The Fever Gauge is being stacked...Send ===========" ) );
 		ServerRPCFeverGauge (CurrentGauge);
 		PrintFeverGaugeLogOnHead ( );
 		PersonalGauge++;
 		//MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
+		//UGameplayStatics::SpawnEmitterAtLocation ( GetWorld ( ) , FeverEffect_Particle , FeverEffectLocation );
 	}
 	//OnRep_FeverGauge( );
 	//UE_LOG(LogTemp, Warning, TEXT("The Fever Gauge is being stacked..." ) );
@@ -439,32 +477,18 @@ void AHSW_ThirdPersonCharacter::ServerRPCFeverGauge_Implementation ( float fever
 {
 	if (feverValue < 1)
 	{
-		feverValue += FeverPoint;
+		feverValue += 0.3;
 	}
 
-	if (feverValue >= 0.3 && feverValue < 0.65)
+	else if (feverValue >=1)
 	{
-		if (gs)
+		bFever = true;
+		if (bFever)
 		{
-			gs->bFever30 = true;
+			MulticastFeverEffect( );
+			bFever = false;
 		}
-	}
-	else if (feverValue >= 0.65 && feverValue < 1)
-	{
-		if (gs)
-		{
-			gs->bFever30 = false;
-			gs->bFever65 = true;
-		}
-	}
-	else if (feverValue >= 1)
-	{
-		if (gs)
-		{
-			gs->bFever30 = false;
-			gs->bFever65 = false;
-			gs->bFever100 = true;
-		}
+
 	}
 
 	MulticastRPCFeverGauge( feverValue );
@@ -477,7 +501,9 @@ void AHSW_ThirdPersonCharacter::MulticastRPCFeverGauge_Implementation (float Add
 	//UE_LOG(LogTemp, Warning, TEXT("=========================================" ) );
 	SetFeverGaugeMulti ( AddGauge );
 
+
 }
+
 void AHSW_ThirdPersonCharacter::PossessedBy ( AController* NewController )
 {
 	Super::PossessedBy ( NewController );
@@ -487,6 +513,41 @@ void AHSW_ThirdPersonCharacter::PossessedBy ( AController* NewController )
 	//	InitMainUI ( );
 	//}
 
+}
+
+void AHSW_ThirdPersonCharacter::SetFeverGaugeMulti ( float feverValue )
+{
+	// 	auto* widget = Cast<AHSW_ThirdPersonCharacter>(GetOwner() );
+	// 	if(widget) auto* wid = widget->MainUI;
+	//
+		// 로컬 컨트롤을 하는 캐릭터가 나 자신이라 MainUI도 가지고 있으니 그대로 갱신
+	if (IsLocallyControlled ( ) && MainUI)
+	{
+		CurrentGauge = feverValue;
+		MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
+		// UE_LOG ( LogTemp , Error , TEXT ( "LocalPlayer Gauge: %f" ), CurrentGauge );
+
+	}
+	// 로컬 컨트롤을 하는 캐릭터가 내가 아닌 상황이라 나는 MainUI가 없다. 그러니 나의 MainUI를 갱신해주자
+	else if (!IsLocallyControlled ( ) && MainUI == nullptr)
+	{
+		AHSW_ThirdPersonCharacter* localPlayer = Cast<AHSW_ThirdPersonCharacter> ( GetWorld ( )->GetFirstPlayerController ( )->GetCharacter ( ) );
+		if (localPlayer != nullptr)
+		{
+			localPlayer->CurrentGauge = feverValue;
+			localPlayer->MainUI->FeverGauge->SetFeverGauge ( localPlayer->CurrentGauge );
+			UE_LOG ( LogTemp , Error , TEXT ( "Not LocalPlayer Gauge: %f" ) , localPlayer->CurrentGauge );
+
+		}
+	}
+
+
+
+}
+
+void AHSW_ThirdPersonCharacter::MulticastFeverEffect_Implementation ( )
+{
+	UGameplayStatics::SpawnEmitterAtLocation ( GetWorld ( ) , FeverEffect_Particle , FeverEffectLocation );
 }
 
 // 인터뷰 =================================================================================================
@@ -519,8 +580,6 @@ void AHSW_ThirdPersonCharacter::ServerRPCInterview_Implementation (  )
 
 void AHSW_ThirdPersonCharacter::MulticastRPCInterview_Implementation ( float bInterview )
 {
-	
-
 	if (bInterview)
 	{
 		UE_LOG ( LogTemp , Warning , TEXT ( "Interview is in progress." ) );
@@ -546,7 +605,7 @@ void AHSW_ThirdPersonCharacter::ChooseInterviwee ( )
 			UE_LOG ( LogTemp , Warning , TEXT ( "선택된 수: %d" ) , IntervieweeIndex );
 			UE_LOG ( LogTemp , Warning , TEXT ( "선택된 플레이어: %s" ) , *IntervieweePlayerState->GetPlayerName ( ) );
 
-			IntervieweePlayerState->GetPawn ( )->SetActorTransform( InterviewLocation );
+			IntervieweePlayerState->GetPawn ( )->SetActorTransform( StageLocation );
 
 			DrawDebugString ( GetWorld ( ) , IntervieweePlayerState->GetPawn ( )->GetActorLocation ( ) + FVector ( 0 , 0 , 90 ) , TEXT ( "Interviewee~" ) , nullptr , FColor::Red , 5 , true , 1 );
 		}
@@ -562,19 +621,22 @@ void AHSW_ThirdPersonCharacter::ChooseInterviwee ( )
 
 void AHSW_ThirdPersonCharacter::OnMyThorwHold ( const FInputActionValue& value )
 {
-	ServerRPCThrowHold( );
+	if (!( HasAuthority ( ) && IsLocallyControlled ( ) ))
+	{
+		FTransform t = ThrowingArrow->GetComponentTransform ( );
+		ServerRPCThrowHold(t);
+	}
 }
 
-void AHSW_ThirdPersonCharacter::ServerRPCThrowHold_Implementation ( )
+void AHSW_ThirdPersonCharacter::ServerRPCThrowHold_Implementation ( FTransform t )
 {
-	FTransform t = ThrowingArrow->GetComponentTransform ( );
 
 	MulticastRPCThrowHold ( t );
-
 }
 
 void AHSW_ThirdPersonCharacter::MulticastRPCThrowHold_Implementation ( FTransform t )
 {
+	bThrowing = true;
 	// 	FTransform t = ThrowingArrow->GetComponentTransform ( );
 	ThrowingObject = GetWorld ( )->SpawnActor<AHSW_ThrowingObject> ( ThrowingObjectFactory , t );
 	if (ThrowingObject)
@@ -591,17 +653,21 @@ void AHSW_ThirdPersonCharacter::MulticastRPCThrowHold_Implementation ( FTransfor
 
 void AHSW_ThirdPersonCharacter::OnMyThorwPitch ( const FInputActionValue& value )
 {
-	ServerRPCThrowPitch( );
+	if (!( HasAuthority ( ) && IsLocallyControlled ( ) ))
+	{
+		ServerRPCThrowPitch( );
+	}
 }
 
 void AHSW_ThirdPersonCharacter::ServerRPCThrowPitch_Implementation ( )
 {
+
 	MulticastRPCThrowPitch ( );
 }
 
 void AHSW_ThirdPersonCharacter::MulticastRPCThrowPitch_Implementation ( )
 {
-
+	bThrowing = false;
 	ThrowingObject->DetachFromActor ( FDetachmentTransformRules::KeepWorldTransform );
 	ThrowingObject->MeshComp->SetSimulatePhysics ( true );
 
@@ -609,7 +675,7 @@ void AHSW_ThirdPersonCharacter::MulticastRPCThrowPitch_Implementation ( )
 	ThrowingObject->MeshComp->AddForce ( ThrowingForce );
 	ThrowingObject = nullptr;
 
-
+	ShakeBodyBlueprint ( );
 	// 재장전 애니메이션 재생
 	auto* anim = Cast<UHSW_AnimInstance_Audience> ( GetMesh ( )->GetAnimInstance ( ) );
 	if (anim)
@@ -621,6 +687,7 @@ void AHSW_ThirdPersonCharacter::MulticastRPCThrowPitch_Implementation ( )
 		UE_LOG ( LogTemp , Warning , TEXT ( "Throw Montage is null" ) );
 	}
 }
+
 #pragma region KMK
 void AHSW_ThirdPersonCharacter::InitializeAudienceWidget ( TSubclassOf<class UAudience_KMK>  widgetFact )
 {
