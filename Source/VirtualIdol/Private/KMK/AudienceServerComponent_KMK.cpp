@@ -203,6 +203,7 @@ void UAudienceServerComponent_KMK::MultiRPC_UpdateCount_Implementation ( const F
 
 FString UAudienceServerComponent_KMK::GetTimeDifference ( const FString& SetTime )
 {
+	return " ";
 	// 현재 시스템 시간을 가져오기
 	auto now = std::chrono::system_clock::now ( );
 	std::time_t currentTime = std::chrono::system_clock::to_time_t ( now );
@@ -265,4 +266,10 @@ FString UAudienceServerComponent_KMK::GetTimeDifference ( const FString& SetTime
     FString TimeDifference = FString::Printf ( TEXT ( "%02d:%02d" ) , minutes , seconds );
 	if(playerCharacter && playerCharacter->HasAuthority()) playerCharacter->audienceWidget->ChangeTextClock(TimeDifference );
 	return TimeDifference;
+}
+
+void UAudienceServerComponent_KMK::CheatStartConcert ( )
+{
+	ServerRPC_StartConcert();
+	ServerRPC_ChangeMyMesh ( 2 );
 }
