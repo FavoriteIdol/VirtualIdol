@@ -29,18 +29,22 @@
 #include "GameFramework/PlayerController.h"
 #include "HSW/HSW_PlayerController.h"
 #include "HSW/HSW_ThirdPersonCharacter.h"
+#include "Components/HorizontalBox.h"
+#include "HSW/HSW_ImojiConponent.h"
+#include "HSW/HSW_FeverGaugeWidget.h"
 
 void UAudience_KMK::NativeConstruct ( )
 {
     Super::NativeConstruct( );
     SetUpButtonInfo();
     gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance());
-    if (Butt_Vip && Butt_Yes && Butt_No && PopUpPanel)
+    if (Butt_Vip && Butt_Yes && Butt_No && PopUpPanel && FeverGauge)
     {
         VisiblePanel(ESlateVisibility::Hidden);
         Butt_Vip->OnClicked.AddDynamic ( this , &UAudience_KMK::PressVipButt );
         Butt_Yes->OnClicked.AddDynamic ( this , &UAudience_KMK::PressYesButt );
         Butt_No->OnClicked.AddDynamic ( this , &UAudience_KMK::PressNoButt );
+       
     }
 #pragma region Chat
     if (Butt_Send)
@@ -64,12 +68,14 @@ void UAudience_KMK::NativeConstruct ( )
         Butt_Exit->OnClicked.AddDynamic ( this , &UAudience_KMK::PressExitButt);
         Butt_Exit1->OnClicked.AddDynamic ( this , &UAudience_KMK::PressExit1Butt);
     }
-    if (ExitPanel && ExitPanel1 && Butt_Cancel && Butt_Out)
+    if (ExitPanel && ExitPanel1 && Butt_Cancel && Butt_Cancel1 && Butt_Out && Butt_Out1)
     {
         ExitPanel->SetVisibility(ESlateVisibility::Hidden);
         ExitPanel1->SetVisibility(ESlateVisibility::Hidden);
         Butt_Cancel->OnClicked.AddDynamic ( this , &UAudience_KMK::PressCancelButt);
+        Butt_Cancel1->OnClicked.AddDynamic ( this , &UAudience_KMK::PressCancelButt);
         Butt_Out->OnClicked.AddDynamic ( this , &UAudience_KMK::PressOutButt);
+        Butt_Out1->OnClicked.AddDynamic ( this , &UAudience_KMK::PressOutButt);
     }
     if (ChatGridPanel)
     {
@@ -96,6 +102,23 @@ void UAudience_KMK::NativeConstruct ( )
         Butt_MP3->OnClicked.AddDynamic ( this , &UAudience_KMK::PressButtMp3);
         Butt_Model->OnClicked.AddDynamic ( this , &UAudience_KMK::PressButtModel);
     }
+#pragma endregion
+#pragma region Imoji
+    if (ImojiBox)
+    {
+        ImojiBox->SetVisibility(ESlateVisibility::Hidden);
+    }
+    if(Btn_Imoji_1 && Btn_Imoji_2 && Btn_Imoji_3 && Btn_Imoji_4)
+    {
+        Btn_Imoji_1->OnClicked.AddDynamic ( this, &UAudience_KMK::OnMyImoji01 );
+        Btn_Imoji_2->OnClicked.AddDynamic ( this , &UAudience_KMK::OnMyImoji02 );
+	    Btn_Imoji_3->OnClicked.AddDynamic ( this , &UAudience_KMK::OnMyImoji03 );
+	    Btn_Imoji_4->OnClicked.AddDynamic ( this , &UAudience_KMK::OnMyImoji04 );
+    }
+
+
+	Player = Cast<AHSW_ThirdPersonCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn() );
+	ImojiComponent = Player->GetComponentByClass<UHSW_ImojiConponent>();
 #pragma endregion
 
 }
@@ -218,11 +241,13 @@ void UAudience_KMK::PressEmotionButt ( )
     {
         bEmotion = true;
         ChangeTextAndImage ( FLinearColor::Yellow , 4 , changeText );
+        ImojiBox->SetVisibility(ESlateVisibility::Visible);
     }
     else
     {
         bEmotion = false;
         ChangeTextAndImage ( FLinearColor::White , 4 , currentText );
+        ImojiBox->SetVisibility(ESlateVisibility::Hidden);
     }
 }
 
@@ -298,7 +323,7 @@ void UAudience_KMK::VisiblePanel ( ESlateVisibility visible )
 // 플레이어에 서버에 보내는 RPC 함수 작성해야함
 void UAudience_KMK::PressSendButt ( )
 {
-    auto* player = Cast<ATP_ThirdPersonCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
+    auto* player = Cast<AHSW_ThirdPersonCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
     if (player)
     {
         auto* server = player->GetComponentByClass<UAudienceServerComponent_KMK> ( );
@@ -369,7 +394,35 @@ void UAudience_KMK::CountDownPanelVisible ( ESlateVisibility visiblePanel )
     if(CountDownPanel)CountDownPanel->SetVisibility(visiblePanel);
 }
 
+void UAudience_KMK::SetCountDownTextVisible ( )
+{
+    if(TEXT_Min1) TEXT_Min1->SetVisibility(ESlateVisibility::Hidden);
+    if(FeverGauge) FeverGauge->SetVisibility(ESlateVisibility::Visible);
+}
+
 #pragma endregion
+#pragma region Audience
+void UAudience_KMK::OnMyImoji01 ( )
+{
+	Player->Imoji (0);
+}
+
+void UAudience_KMK::OnMyImoji02 ( )
+{
+	Player->Imoji ( 1 );
+}
+
+void UAudience_KMK::OnMyImoji03 ( )
+{
+	Player->Imoji ( 2 );
+}
+
+void UAudience_KMK::OnMyImoji04 ( )
+{
+	Player->Imoji ( 3 );
+}
+#pragma endregion
+
 #pragma region Before Concert
 
 void UAudience_KMK::ChangeTextClock ( const FString& text )

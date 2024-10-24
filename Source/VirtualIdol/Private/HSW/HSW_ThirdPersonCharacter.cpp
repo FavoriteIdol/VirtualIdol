@@ -47,9 +47,9 @@ AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
-	
+
 	// Configure character movement
-	GetCharacterMovement ( )->bOrientRotationToMovement = false; // Character moves in the direction of input...	
+	GetCharacterMovement ( )->bOrientRotationToMovement = false; // Character moves in the direction of input...
 	GetCharacterMovement ( )->RotationRate = FRotator ( 0.0f , 500.0f , 0.0f ); // ...at this rotation rate
 	GetCharacterMovement()->bUseControllerDesiredRotation=true;
 	// GetCharacterMovement()->UCharacterMovementComponent::SetMovementMode ( EMovementMode::MOVE_Flying);
@@ -72,7 +72,7 @@ AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent> ( TEXT ( "CameraBoom" ) );
 	CameraBoom->SetupAttachment ( RootComponent );
 	CameraBoom->SetRelativeLocation(FVector(0.0f,0.0f,30.f));
-	CameraBoom->TargetArmLength = 450; // The camera follows at this distance behind the character	
+	CameraBoom->TargetArmLength = 450; // The camera follows at this distance behind the character
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 
 	// Create a follow camera
@@ -80,7 +80,7 @@ AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
 	FollowCamera->SetupAttachment ( CameraBoom , USpringArmComponent::SocketName ); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
+	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character)
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 
 	// Imoji Component
@@ -114,7 +114,7 @@ AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
 // 	if (LoadedOpacityMaterial.Succeeded ( ))
 // 	{
 // 		OpacityMaterial = LoadedOpacityMaterial.Object;
-// 
+//
 // 		if (OpacityMaterial)
 // 		{
 // 			ImojiMesh->SetMaterial ( 0 , OpacityMaterial );
@@ -129,12 +129,12 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (IsLocallyControlled ( ) && HasAuthority() == false)
-	{
-		InitMainUI();
-	}
-	ImojiComp->SetVisibility(false);
-	imojiWidget = Cast<UHSW_ImogiWidget> ( ImojiComp->GetWidget ( ) );
+    //if (IsLocallyControlled ( ) && HasAuthority ( ) == false)
+    //{
+    //    InitMainUI ( );
+    //}
+    ImojiComp->SetVisibility ( false );
+    imojiWidget = Cast<UHSW_ImogiWidget> ( ImojiComp->GetWidget ( ) );
 
 	FInputModeGameAndUI a;
 	GetWorld()->GetFirstPlayerController()->SetInputMode(a);
@@ -144,7 +144,7 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 	if (gs == nullptr)
 	{
 		UE_LOG ( LogTemp , Warning , TEXT ( "GameState is null!" ) );
-		
+
 	}
 
 	gm = Cast<AHSW_AuditoriumGameMode> ( GetWorld ( )->GetAuthGameMode ( ) );
@@ -172,21 +172,19 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 	{
         if (HasAuthority ( ))
         {
-			GetMesh ( )->bRenderInMainPass = false;
-			GetMesh ( )->bRenderInDepthPass = false;
             if (virtualWidgetFact && !audienceWidget)
             {
 				audienceWidget = CreateWidget<UAudience_KMK> ( GetWorld ( ) , virtualWidgetFact );
-				//audienceWidget->AddToViewport ( );
+				audienceWidget->AddToViewport ( );
 				audienceWidget->pc = this;
 				audienceWidget->SetVirtualWBP();
             }
-			
+
         }
         else
         {
 			audienceWidget = CreateWidget<UAudience_KMK> ( GetWorld ( ) , audienceWidgetFact );
-			//audienceWidget->AddToViewport ( );
+			audienceWidget->AddToViewport ( );
 			audienceWidget->pc = this;
         }
 		if (gi)
@@ -211,7 +209,7 @@ void AHSW_ThirdPersonCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	if (ImojiComp && ImojiComp->GetVisibleFlag ( ))
 	{
-		// 카메라 위치 
+		// 카메라 위치
 		FVector CamLoc = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0 )->GetCameraLocation();
 		FVector Direction = CamLoc - ImojiComp->GetComponentLocation();
 		Direction.Z=0;
@@ -238,7 +236,7 @@ void AHSW_ThirdPersonCharacter::Tick(float DeltaTime)
 
 void AHSW_ThirdPersonCharacter::OnRep_FeverGauge ( )
 {
-	
+
 }
 
 void AHSW_ThirdPersonCharacter::PrintFeverGaugeLogOnHead ( )
@@ -246,6 +244,46 @@ void AHSW_ThirdPersonCharacter::PrintFeverGaugeLogOnHead ( )
 	DrawDebugString ( GetWorld ( ) , GetActorLocation ( ) +FVector(0,0,90 ) , TEXT ( "GO!!" ) , nullptr , FColor::Red , 0.5f , true , 1 );
 }
 
+void AHSW_ThirdPersonCharacter::SetFeverGaugeMulti ( float feverValue )
+{
+// 	auto* widget = Cast<AHSW_ThirdPersonCharacter>(GetOwner() );
+// 	if(widget) auto* wid = widget->MainUI;
+//
+	// 로컬 컨트롤을 하는 캐릭터가 나 자신이라 MainUI도 가지고 있으니 그대로 갱신
+	if (IsLocallyControlled ( ) && audienceWidget)
+	{
+		CurrentGauge = feverValue;
+		audienceWidget->FeverGauge->SetFeverGauge ( CurrentGauge );
+		// UE_LOG ( LogTemp , Error , TEXT ( "LocalPlayer Gauge: %f" ), CurrentGauge );
+		// UE_LOG ( LogTemp , Warning , TEXT ( "In" ) );
+	}
+	// 로컬 컨트롤을 하는 캐릭터가 내가 아닌 상황이라 나는 MainUI가 없다. 그러니 나의 MainUI를 갱신해주자
+	else if (!IsLocallyControlled ( ) && audienceWidget == nullptr)
+	{
+		AHSW_ThirdPersonCharacter* localPlayer = Cast<AHSW_ThirdPersonCharacter>(GetWorld( )->GetFirstPlayerController()->GetCharacter());
+		if (localPlayer != nullptr)
+		{
+			localPlayer->CurrentGauge = feverValue;
+			localPlayer->audienceWidget->FeverGauge->SetFeverGauge ( localPlayer->CurrentGauge );
+			UE_LOG ( LogTemp , Error , TEXT ( "Not LocalPlayer Gauge: %f" ) , localPlayer->CurrentGauge );
+			//UE_LOG ( LogTemp , Warning , TEXT ( "In2" ) );
+		}
+	}
+
+	//if (MainUI)
+	//{
+	//	MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
+	//	UE_LOG ( LogTemp , Warning , TEXT ( "In" ) );
+	//}
+	//UE_LOG ( LogTemp , Warning , TEXT ( "out" ) );
+// 	auto* widget = Cast<AHSW_ThirdPersonCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn())->MainUI;
+// 	if(widget)
+// 	{
+// 	widget->FeverGauge->SetFeverGauge ( CurrentGauge );
+// 	UE_LOG ( LogTemp , Error , TEXT ( "%f" ) , CurrentGauge );
+// 	}
+
+}
 
 void AHSW_ThirdPersonCharacter::InitMainUI ( )
 {
@@ -284,7 +322,7 @@ void AHSW_ThirdPersonCharacter::GetLifetimeReplicatedProps ( TArray<FLifetimePro
 {
 	Super::GetLifetimeReplicatedProps ( OutLifetimeProps );
 
-	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , bThrowing ); 
+	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , bThrowing );
 	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , CurrentGauge );
 	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , bIsInterviewing );
 	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , ThrowingRotator );
@@ -328,7 +366,7 @@ void AHSW_ThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* Playe
 
 		//Interview
 		EnhancedInputComponent->BindAction ( InterviewAction , ETriggerEvent::Started , this , &AHSW_ThirdPersonCharacter::OnMyInterview );
-		
+
 	}
 }
 
@@ -348,13 +386,13 @@ void AHSW_ThirdPersonCharacter::Move ( const FInputActionValue& Value )
 		// get forward vector
 		const FVector ForwardDirection = FRotationMatrix ( YawRotation ).GetUnitAxis ( EAxis::X );
 
-		// get right vector 
+		// get right vector
 		const FVector RightDirection = FRotationMatrix ( YawRotation ).GetUnitAxis ( EAxis::Y );
 
 		// get up vector
 		const FVector UpDirection = FRotationMatrix ( PitchRotation ).GetUnitAxis ( EAxis::X );
-		
-		// add movement 
+
+		// add movement
 		AddMovementInput ( ForwardDirection , MovementVector.Y );
 		AddMovementInput ( RightDirection , MovementVector.X );
 
@@ -450,7 +488,7 @@ void AHSW_ThirdPersonCharacter::ServerRPCFeverGauge_Implementation ( float fever
 			MulticastFeverEffect( );
 			bFever = false;
 		}
-		
+
 	}
 
 	MulticastRPCFeverGauge( feverValue );
@@ -470,42 +508,43 @@ void AHSW_ThirdPersonCharacter::PossessedBy ( AController* NewController )
 {
 	Super::PossessedBy ( NewController );
 
-	if (IsLocallyControlled ( ))
-	{
-		InitMainUI ( );
-	}
+	//if (IsLocallyControlled ( ))
+	//{
+	//	InitMainUI ( );
+	//}
 
 }
+#pragma region HSW
 
-void AHSW_ThirdPersonCharacter::SetFeverGaugeMulti ( float feverValue )
-{
-	// 	auto* widget = Cast<AHSW_ThirdPersonCharacter>(GetOwner() );
-	// 	if(widget) auto* wid = widget->MainUI;
-	// 
-		// 로컬 컨트롤을 하는 캐릭터가 나 자신이라 MainUI도 가지고 있으니 그대로 갱신
-	if (IsLocallyControlled ( ) && MainUI)
-	{
-		CurrentGauge = feverValue;
-		MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
-		// UE_LOG ( LogTemp , Error , TEXT ( "LocalPlayer Gauge: %f" ), CurrentGauge );
+//void AHSW_ThirdPersonCharacter::SetFeverGaugeMulti ( float feverValue )
+//{
+//	// 	auto* widget = Cast<AHSW_ThirdPersonCharacter>(GetOwner() );
+//	// 	if(widget) auto* wid = widget->MainUI;
+//	//
+//		// 로컬 컨트롤을 하는 캐릭터가 나 자신이라 MainUI도 가지고 있으니 그대로 갱신
+//	if (IsLocallyControlled ( ) && MainUI)
+//	{
+//		CurrentGauge = feverValue;
+//		MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
+//		// UE_LOG ( LogTemp , Error , TEXT ( "LocalPlayer Gauge: %f" ), CurrentGauge );
+//
+//	}
+//	// 로컬 컨트롤을 하는 캐릭터가 내가 아닌 상황이라 나는 MainUI가 없다. 그러니 나의 MainUI를 갱신해주자
+//	else if (!IsLocallyControlled ( ) && MainUI == nullptr)
+//	{
+//		AHSW_ThirdPersonCharacter* localPlayer = Cast<AHSW_ThirdPersonCharacter> ( GetWorld ( )->GetFirstPlayerController ( )->GetCharacter ( ) );
+//		if (localPlayer != nullptr)
+//		{
+//			localPlayer->CurrentGauge = feverValue;
+//			localPlayer->MainUI->FeverGauge->SetFeverGauge ( localPlayer->CurrentGauge );
+//			UE_LOG ( LogTemp , Error , TEXT ( "Not LocalPlayer Gauge: %f" ) , localPlayer->CurrentGauge );
+//
+//		}
+//	}
+//
+//}
+#pragma endregion
 
-	}
-	// 로컬 컨트롤을 하는 캐릭터가 내가 아닌 상황이라 나는 MainUI가 없다. 그러니 나의 MainUI를 갱신해주자
-	else if (!IsLocallyControlled ( ) && MainUI == nullptr)
-	{
-		AHSW_ThirdPersonCharacter* localPlayer = Cast<AHSW_ThirdPersonCharacter> ( GetWorld ( )->GetFirstPlayerController ( )->GetCharacter ( ) );
-		if (localPlayer != nullptr)
-		{
-			localPlayer->CurrentGauge = feverValue;
-			localPlayer->MainUI->FeverGauge->SetFeverGauge ( localPlayer->CurrentGauge );
-			UE_LOG ( LogTemp , Error , TEXT ( "Not LocalPlayer Gauge: %f" ) , localPlayer->CurrentGauge );
-
-		}
-	}
-
-
-
-}
 
 void AHSW_ThirdPersonCharacter::MulticastFeverEffect_Implementation ( )
 {
@@ -592,7 +631,7 @@ void AHSW_ThirdPersonCharacter::OnMyThorwHold ( const FInputActionValue& value )
 
 void AHSW_ThirdPersonCharacter::ServerRPCThrowHold_Implementation ( FTransform t )
 {
-	
+
 	MulticastRPCThrowHold ( t );
 }
 
@@ -623,7 +662,7 @@ void AHSW_ThirdPersonCharacter::OnMyThorwPitch ( const FInputActionValue& value 
 
 void AHSW_ThirdPersonCharacter::ServerRPCThrowPitch_Implementation ( )
 {
-	
+
 	MulticastRPCThrowPitch ( );
 }
 
