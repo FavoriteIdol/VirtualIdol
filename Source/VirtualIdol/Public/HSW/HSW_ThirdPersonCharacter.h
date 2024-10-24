@@ -199,6 +199,9 @@ public:
 	UPROPERTY(Replicated, EditDefaultsOnly,BlueprintReadWrite )
 	FRotator ThrowingRotator;
 
+	UPROPERTY( Replicated, EditDefaultsOnly , BlueprintReadWrite )
+	int32 ThrowingObjectIndex = 0;
+
 	// 인터뷰 ----------------------------------------
 
 	UPROPERTY(Replicated, EditDefaultsOnly,BlueprintReadWrite )

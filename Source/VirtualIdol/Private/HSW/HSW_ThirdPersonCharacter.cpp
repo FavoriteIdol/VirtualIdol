@@ -327,6 +327,7 @@ void AHSW_ThirdPersonCharacter::GetLifetimeReplicatedProps ( TArray<FLifetimePro
 	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , bIsInterviewing );
 	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , ThrowingRotator );
 	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , bFever );
+	DOREPLIFETIME ( AHSW_ThirdPersonCharacter , ThrowingObjectIndex );
 }
 
 
@@ -641,6 +642,7 @@ void AHSW_ThirdPersonCharacter::MulticastRPCThrowHold_Implementation ( FTransfor
 	ThrowingObject = GetWorld ( )->SpawnActor<AHSW_ThrowingObject> ( ThrowingObjectFactory , t );
 	if (ThrowingObject)
 	{
+		ThrowingObject->ChangeMesh(ThrowingObjectIndex);
 		ThrowingObject->AttachToComponent ( ThrowingArrow , FAttachmentTransformRules::KeepWorldTransform );
 	}
 	else

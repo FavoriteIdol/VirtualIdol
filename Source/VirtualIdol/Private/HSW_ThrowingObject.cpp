@@ -23,17 +23,18 @@ AHSW_ThrowingObject::AHSW_ThrowingObject()
 	MeshComp->SetupAttachment(RootComponent);
 	MeshComp->SetRelativeScale3D(FVector(0.25,0.25,0.25));
 
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> LoadedMesh ( TEXT ( "'/Engine/VREditor/BasicMeshes/SM_Ball_01'" ) );
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> LoadedMesh ( TEXT ( "'/Game/Project/Personal/JSW/01_FBX_JSW/jswHeart'" ) );
 	if (LoadedMesh.Succeeded ( ))
 	{
 		MeshComp->SetStaticMesh( LoadedMesh.Object );
 	}
-
-	static ConstructorHelpers::FObjectFinder<UMaterial> LoadedMaterial ( TEXT ( "'/Engine/VREditor/BasicMeshes/MI_Ball_01'" ) );
-	if (LoadedMaterial.Succeeded ( ))
-	{
-		MeshComp->SetMaterial(0, LoadedMaterial.Object);
-	}
+	
+	
+// 	static ConstructorHelpers::FObjectFinder<UMaterial> LoadedMaterial ( TEXT ( "'/Engine/VREditor/BasicMeshes/MI_Ball_01'" ) );
+// 	if (LoadedMaterial.Succeeded ( ))
+// 	{
+// 		MeshComp->SetMaterial(0, LoadedMaterial.Object);
+// 	}
 
 	static ConstructorHelpers::FObjectFinder<UPhysicalMaterial> LoadedPhysicalMaterial ( TEXT ( "'/Game/Project/Personal/HSW/Blueprints/PM_Ball'" ) );
 
