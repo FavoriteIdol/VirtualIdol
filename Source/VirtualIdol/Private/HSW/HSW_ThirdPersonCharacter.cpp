@@ -33,6 +33,9 @@
 #include "EngineUtils.h"
 #include "KMK/VirtualGameInstance_KMK.h"
 #include "KMK/Audience_KMK.h"
+#include "Components/StaticMeshComponent.h"
+#include "Materials/MaterialInstanceDynamic.h"
+#include "Materials/MaterialInstance.h"
 
 // Sets default values
 AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
@@ -122,6 +125,7 @@ AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
 // 	}
 	bReplicates = true;
 	SetReplicateMovement ( true );
+	
 }
 
 // Called when the game starts or when spawned
@@ -200,6 +204,13 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 		GetController<APlayerController> ( )->SetInputMode(inputMode );
 	}
 #pragma endregion
+	FeverDynamicMat = UMaterialInstanceDynamic::Create ( FeverCharactMat , this );
+
+	USkeletalMeshComponent* TempMesh = GetMesh ( );
+	if (TempMesh)
+	{
+		TempMesh->SetMaterial ( 0 , FeverDynamicMat );
+	}
 
 }
 
@@ -236,7 +247,7 @@ void AHSW_ThirdPersonCharacter::Tick(float DeltaTime)
 
 void AHSW_ThirdPersonCharacter::OnRep_FeverGauge ( )
 {
-
+	
 }
 
 void AHSW_ThirdPersonCharacter::PrintFeverGaugeLogOnHead ( )
@@ -254,6 +265,7 @@ void AHSW_ThirdPersonCharacter::SetFeverGaugeMulti ( float feverValue )
 	{
 		CurrentGauge = feverValue;
 		audienceWidget->FeverGauge->SetFeverGauge ( CurrentGauge );
+		FeverDynamicMat->SetScalarParameterValue ( TEXT ( "jswEmissivePower-A" ) , FeverBright );
 		// UE_LOG ( LogTemp , Error , TEXT ( "LocalPlayer Gauge: %f" ), CurrentGauge );
 		// UE_LOG ( LogTemp , Warning , TEXT ( "In" ) );
 	}
@@ -263,6 +275,7 @@ void AHSW_ThirdPersonCharacter::SetFeverGaugeMulti ( float feverValue )
 		AHSW_ThirdPersonCharacter* localPlayer = Cast<AHSW_ThirdPersonCharacter>(GetWorld( )->GetFirstPlayerController()->GetCharacter());
 		if (localPlayer != nullptr)
 		{
+			localPlayer->FeverDynamicMat->SetScalarParameterValue ( TEXT ( "jswEmissivePower-A" ) , FeverBright );
 			localPlayer->CurrentGauge = feverValue;
 			localPlayer->audienceWidget->FeverGauge->SetFeverGauge ( localPlayer->CurrentGauge );
 			UE_LOG ( LogTemp , Error , TEXT ( "Not LocalPlayer Gauge: %f" ) , localPlayer->CurrentGauge );
@@ -270,52 +283,39 @@ void AHSW_ThirdPersonCharacter::SetFeverGaugeMulti ( float feverValue )
 		}
 	}
 
-	//if (MainUI)
-	//{
-	//	MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
-	//	UE_LOG ( LogTemp , Warning , TEXT ( "In" ) );
-	//}
-	//UE_LOG ( LogTemp , Warning , TEXT ( "out" ) );
-// 	auto* widget = Cast<AHSW_ThirdPersonCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn())->MainUI;
-// 	if(widget)
+}
+
+// void AHSW_ThirdPersonCharacter::InitMainUI ( )
+// {
+// 
+// 	auto* pc_h = Cast<AHSW_PlayerController> ( Controller );
+// 	if (pc_h == nullptr)
 // 	{
-// 	widget->FeverGauge->SetFeverGauge ( CurrentGauge );
-// 	UE_LOG ( LogTemp , Error , TEXT ( "%f" ) , CurrentGauge );
+// 		return;
 // 	}
-
-}
-
-void AHSW_ThirdPersonCharacter::InitMainUI ( )
-{
-
-	auto* pc_h = Cast<AHSW_PlayerController> ( Controller );
-	if (pc_h == nullptr)
-	{
-		return;
-	}
-
-	if (IsLocallyControlled ( ))
-	{
-		if (pc_h->mainUIWidget)
-		{
-			if (pc_h->MainUI == nullptr)
-			{
-				pc_h->MainUI = CastChecked<UHSW_MainWidget> ( CreateWidget ( GetWorld ( ) , pc_h->mainUIWidget ) );
-				if (pc_h->MainUI == nullptr)
-				{
-					//UE_LOG ( LogTemp , Error , TEXT ( "Failed to create MainUI widget." ) );
-				}
-				else
-				{
-					//UE_LOG ( LogTemp , Error , TEXT ( "Succeed to create MainUI widget." ) );
-				}
-			}
-
-			this->MainUI = pc_h->MainUI;
-			MainUI->AddToViewport ( );
-		}
-	}
-}
+// 
+// 	if (IsLocallyControlled ( ))
+// 	{
+// 		if (pc_h->mainUIWidget)
+// 		{
+// 			if (pc_h->MainUI == nullptr)
+// 			{
+// 				pc_h->MainUI = CastChecked<UHSW_MainWidget> ( CreateWidget ( GetWorld ( ) , pc_h->mainUIWidget ) );
+// 				if (pc_h->MainUI == nullptr)
+// 				{
+// 					//UE_LOG ( LogTemp , Error , TEXT ( "Failed to create MainUI widget." ) );
+// 				}
+// 				else
+// 				{
+// 					//UE_LOG ( LogTemp , Error , TEXT ( "Succeed to create MainUI widget." ) );
+// 				}
+// 			}
+// 
+// 			this->MainUI = pc_h->MainUI;
+// 			MainUI->AddToViewport ( );
+// 		}
+// 	}
+// }
 
 
 void AHSW_ThirdPersonCharacter::GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& OutLifetimeProps ) const
@@ -464,9 +464,10 @@ void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value 
 {
 	if (!HasAuthority ( ) && IsLocallyControlled())
 	{
-		ServerRPCFeverGauge (CurrentGauge);
-		PrintFeverGaugeLogOnHead ( );
 		PersonalGauge++;
+		ServerRPCFeverGauge (CurrentGauge, 10*0.15);
+		PrintFeverGaugeLogOnHead ( );
+		
 		//MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
 		//UGameplayStatics::SpawnEmitterAtLocation ( GetWorld ( ) , FeverEffect_Particle , FeverEffectLocation );
 	}
@@ -474,11 +475,12 @@ void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value 
 	//UE_LOG(LogTemp, Warning, TEXT("The Fever Gauge is being stacked..." ) );
 }
 
-void AHSW_ThirdPersonCharacter::ServerRPCFeverGauge_Implementation ( float feverValue )
+void AHSW_ThirdPersonCharacter::ServerRPCFeverGauge_Implementation ( float feverValue, float brightValue )
 {
+
 	if (feverValue < 1)
 	{
-		feverValue += 0.3;
+		feverValue += 0.15;
 	}
 
 	else if (feverValue >=1)
@@ -492,16 +494,23 @@ void AHSW_ThirdPersonCharacter::ServerRPCFeverGauge_Implementation ( float fever
 
 	}
 
-	MulticastRPCFeverGauge( feverValue );
+	MulticastRPCFeverGauge( feverValue, brightValue );
 	//MulticastRPCFeverGauge_Implementation ( CurrentGauge );
 }
 
-void AHSW_ThirdPersonCharacter::MulticastRPCFeverGauge_Implementation (float AddGauge )
+void AHSW_ThirdPersonCharacter::MulticastRPCFeverGauge_Implementation (float AddGauge, float brightValue )
 {
+	FeverBright += brightValue;
+	FeverDynamicMat->SetScalarParameterValue ( TEXT ( "jswEmissivePower-A" ) , FeverBright );
+
+	UE_LOG ( LogTemp , Warning , TEXT ( "%f" ), FeverBright );
 	ShakeBodyBlueprint ( );
 	//UE_LOG(LogTemp, Warning, TEXT("=========================================" ) );
 	SetFeverGaugeMulti ( AddGauge );
+}
 
+void AHSW_ThirdPersonCharacter::MulticastRPCBrightness_Implementation ( int index )
+{
 
 }
 
