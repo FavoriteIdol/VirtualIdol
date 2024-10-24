@@ -17,19 +17,11 @@ class VIRTUALIDOL_API AHSW_GameState_Auditorium : public AGameStateBase
 public:
 	virtual void BeginPlay ( ) override;
 
-	virtual void Tick(float DeltaSeconds) override;
-
 	UPROPERTY(EditDefaultsOnly )
 	TArray<class APlayerState *> PlayerList;
 
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="GameState" )
-	bool bFever30;
-
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="GameState" )
-	bool bFever65;
-
-	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite,Category="GameState" )
-	bool bFever100;
+	UPROPERTY ( EditDefaultsOnly , BlueprintReadWrite , Category = "GameState" )
+	bool bFever;
 
 // 	UFUNCTION(Server, Reliable)
 // 	void ServerSetPlayerName(const FString& newName);

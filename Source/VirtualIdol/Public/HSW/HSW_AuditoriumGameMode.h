@@ -31,4 +31,19 @@ public:
 	class AHSW_ThirdPersonCharacter* Player;
 
 	virtual void GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
+
+	UPROPERTY( Replicated )
+	bool bFever;
+	
+	UPROPERTY ( Replicated, EditDefaultsOnly , Category = Fever )
+	class UParticleSystem* FeverEffect_Particle;
+
+	UPROPERTY ( Replicated, EditDefaultsOnly , Category = Fever )
+	class UNiagaraSystem* FeverEffect_Niagara;
+
+	UPROPERTY ( Replicated , EditDefaultsOnly , Category = Fever )
+	FTransform FeverEffectLocation;
+
+	UFUNCTION(NetMulticast, Reliable )
+	void Multicast_FeverEffect( );
 };

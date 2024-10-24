@@ -95,6 +95,8 @@ public:
 	UPROPERTY(EditDefaultsOnly )
 	class AHSW_AuditoriumGameMode* gm;
 
+	FTransform StageLocation;
+
 	// 피버게이지 --------------------------------------------------------------
 	UPROPERTY(EditDefaultsOnly , Category = FeverGauge )
 	class UHSW_FeverGaugeWidget* FeverGauge;
@@ -116,7 +118,20 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, Category= Imogi )
 	void ShakeBodyBlueprint( );
 
+	UFUNCTION(NetMulticast, Reliable )
+	void MulticastFeverEffect( );
+
+	UPROPERTY(Replicated )
+	bool bFever;
+
+
+
 	int32 PersonalGauge = 0;
+
+	UPROPERTY ( EditDefaultsOnly , Category = Fever )
+	class UParticleSystem* FeverEffect_Particle;
+
+	FTransform FeverEffectLocation;
 
 
 	// MainWidget을 생성해서 기억하고싶다.
@@ -149,7 +164,7 @@ public:
 	UFUNCTION ( )
 	void Imoji ( int index );
 
-	void AppearImoji ();
+	void AppearImoji ( );
 
 	void DisappearImoji ();
 
@@ -181,6 +196,9 @@ public:
 	UPROPERTY(Replicated, EditDefaultsOnly,BlueprintReadWrite )
 	bool bThrowing;
 
+	UPROPERTY(Replicated, EditDefaultsOnly,BlueprintReadWrite )
+	FRotator ThrowingRotator;
+
 	// 인터뷰 ----------------------------------------
 
 	UPROPERTY(Replicated, EditDefaultsOnly,BlueprintReadWrite )
@@ -198,14 +216,13 @@ public:
 	TArray<class APlayerState*> PlayerStates;
 
 	FTransform PreLocation;
-	FTransform InterviewLocation;
 
 	// 멀티플레이 --------------------------------------
 
 	virtual void GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
 
 	UFUNCTION(Server, Reliable )
-	void ServerRPCThrowHold( );
+	void ServerRPCThrowHold( FTransform t );
 
 	UFUNCTION(NetMulticast, Reliable )
 	void MulticastRPCThrowHold( FTransform t );
@@ -229,6 +246,13 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable )
 	void MulticastRPCInterview (float bInterview   );
+
+	UFUNCTION(Server, Reliable )
+	void ServerRPCImoji( );
+
+	UFUNCTION(NetMulticast, Reliable )
+	void MulticastRPCImoji ( );
+
 
 #pragma region KMK
 
