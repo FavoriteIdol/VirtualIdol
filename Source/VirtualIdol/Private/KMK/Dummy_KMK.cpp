@@ -108,7 +108,7 @@ void ADummy_KMK::AppearImoji ( int32 num, int32 bVisible)
 	widget->SetImage(imojiFact[num] );
 	widget->SetImageVisible(bVisible);
 	GetWorld ( )->GetTimerManager ( ).ClearTimer ( timerHandle );
-	GetWorld ( )->GetTimerManager ( ).SetTimer ( timerHandle , this , &ADummy_KMK::DisappearImoji , 3.0f );
+	GetWorld ( )->GetTimerManager ( ).SetTimer ( timerHandle , this , &ADummy_KMK::DisappearImoji , 1.0f );
 }
 
 void ADummy_KMK::DisappearImoji ( )
