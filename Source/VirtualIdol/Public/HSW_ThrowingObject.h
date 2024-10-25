@@ -33,4 +33,20 @@ public:
 	bool bCanOverlap;
 
 
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = Imoji )
+	TArray<class UStaticMesh *> MeshArray;
+
+	UFUNCTION( )
+	void ChangeMesh( int32 meshIndex );
+
+	UPROPERTY( EditAnywhere, BlueprintReadWrite )
+	float DisappearTime = 3.0f;
+
+	UFUNCTION( )
+	void DestroyObject( );
+
+	FTimerHandle TimerHandleDestroy;
+
+	UFUNCTION()
+	void OnMyObjectBeginverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 };

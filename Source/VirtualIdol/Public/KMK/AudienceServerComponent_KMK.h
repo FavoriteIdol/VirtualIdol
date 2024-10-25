@@ -44,14 +44,14 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Audience" )
 	TArray<class USkeletalMesh*> audienceMesh;
 
-	UPROPERTY( ReplicatedUsing = OnRep_ChangePlayerMesh )
-	int32 playerMeshNum = 0;
+	UPROPERTY(ReplicatedUsing = OnRep_ChangePlayerMesh)
+	int32 playerMeshNum = -2;
 
 	UFUNCTION(Server, Reliable )
 	void ServerRPC_ChangeMyMesh(int32 num );
 
 	UFUNCTION(NetMulticast, Reliable )
-	void MultiRPC_ChangeMyMesh(int32 num, class AHSW_ThirdPersonCharacter* TargetMesh );
+	void MultiRPC_ChangeMyMesh(int32 num);
 	UFUNCTION( )
 	void OnRep_ChangePlayerMesh ( );
 
