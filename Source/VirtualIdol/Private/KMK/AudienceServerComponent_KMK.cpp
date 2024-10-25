@@ -27,6 +27,18 @@ void UAudienceServerComponent_KMK::BeginPlay()
 
 	player = Cast<AHSW_ThirdPersonCharacter> (GetWorld()->GetFirstPlayerController()->GetPawn());
 	playerMesh = Cast<AHSW_ThirdPersonCharacter> (GetOwner());
+	if (playerMesh->HasAuthority())
+	{
+		if (playerMesh->IsLocallyControlled())
+        {
+            playerMesh->SetActorLocation ( FVector ( 0, 0, 100 ) );
+        }
+        else
+        {
+            playerMesh->SetActorLocation ( FVector ( 3600.0f, 0.f, 300.f ) );
+            playerMesh->SetActorRotation(FRotator(0, 180, 0));
+        }
+	}
 	if (gi)
 	{
 		// 플레이어가 로컬 플레이어 일때
