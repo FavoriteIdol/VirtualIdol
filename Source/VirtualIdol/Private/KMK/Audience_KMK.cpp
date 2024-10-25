@@ -35,6 +35,7 @@
 #include "JJH/JJH_SetupGameModeBase.h"
 #include "HSW/HSW_AuditoriumGameMode.h"
 #include "HSW/HSW_GameState_Auditorium.h"
+#include "HSW_ThrowingObject.h"
 
 void UAudience_KMK::NativeConstruct ( )
 {
@@ -47,7 +48,7 @@ void UAudience_KMK::NativeConstruct ( )
         Butt_Vip->OnClicked.AddDynamic ( this , &UAudience_KMK::PressVipButt );
         Butt_Yes->OnClicked.AddDynamic ( this , &UAudience_KMK::PressYesButt );
         Butt_No->OnClicked.AddDynamic ( this , &UAudience_KMK::PressNoButt );
-       
+
     }
 #pragma region Chat
     if (Butt_Send)
@@ -335,7 +336,7 @@ void UAudience_KMK::PressSendButt ( )
             if (!EditText_Chat->GetText ( ).IsEmpty ( ))
             {
                 server->ServerRPCChat( EditText_Chat->GetText ( ).ToString ( ) );
-               
+
                 EditText_Chat->SetText ( FText::GetEmpty ( ) );
             }
         }
@@ -389,15 +390,18 @@ void UAudience_KMK::PressCancelButt ( )
 void UAudience_KMK::PressObjectButt ( )
 {
     // 오브젝트 생성
-    UE_LOG(LogTemp, Warning, TEXT("111111" ));
+    Player->ThrowingObjectIndex = 0;
+    UE_LOG(LogTemp,Warning,TEXT("ObjectButton_0" ) );
 }
 void UAudience_KMK::PressObject1Butt ( )
 {
-    UE_LOG ( LogTemp , Warning , TEXT ( "22222" ) );
+    Player->ThrowingObjectIndex = 1;
+    UE_LOG ( LogTemp , Warning , TEXT ( "ObjectButton_1" ) );
 }
 void UAudience_KMK::PressObject2Butt ( )
 {
-    UE_LOG ( LogTemp , Warning , TEXT ( "33333" ) );
+    Player->ThrowingObjectIndex = 2;
+    UE_LOG ( LogTemp , Warning , TEXT ( "ObjectButton_2" ) );
 }
 
 void UAudience_KMK::CountDownText (const FString& time )
@@ -465,7 +469,7 @@ void UAudience_KMK::PressButtMp3 ( )
             if (SoundWave)
             {
                 UAudioComponent* AudioComponent = NewObject<UAudioComponent>(GetWorld(), UAudioComponent::StaticClass());
-                AudioComponent->bAutoActivate = false; 
+                AudioComponent->bAutoActivate = false;
                 auto* musicWidget = Cast<USingWidget_KMK>(CreateWidget(GetWorld(), singWidget));
                 auto* musicWidget1 = Cast<USingWidget_KMK>(CreateWidget(GetWorld(), singWidget));
                 if (AudioComponent && SoundWave && musicWidget)
@@ -776,4 +780,3 @@ void AmplifyPCM32 ( TArray<float>& PCMData , float Gain )
 }
 
 #pragma endregion
-
