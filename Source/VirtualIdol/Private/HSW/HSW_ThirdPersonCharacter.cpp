@@ -212,6 +212,10 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 		TempMesh->SetMaterial ( 0 , FeverDynamicMat );
 	}
 
+	if (HasAuthority ( ))
+	{
+		StartVoiceChat( );
+	}
 }
 
 // Called every frame
@@ -445,6 +449,16 @@ void AHSW_ThirdPersonCharacter::MulticastRPCImoji_Implementation ( int index )
 	GetWorld ( )->GetTimerManager ( ).SetTimer ( TimerHandleImoji , this , &AHSW_ThirdPersonCharacter::DisappearImoji , 1.0f );
 }
 
+void AHSW_ThirdPersonCharacter::StartVoiceChat ( )
+{
+	pc->StartTalking( );
+}
+
+void AHSW_ThirdPersonCharacter::CancleVoiceChat ( )
+{
+	pc->StopTalking( );
+}
+
 void AHSW_ThirdPersonCharacter::AppearImoji (  )
 {
 	//UNiagaraComponent* AppearEffect = UNiagaraFunctionLibrary::SpawnSystemAtLocation ( GetWorld ( ) , EmojiEffect , ImojiComp->GetComponentLocation ( ) );
@@ -648,12 +662,14 @@ void AHSW_ThirdPersonCharacter::ChooseInterviwee ( )
 			{
 				UE_LOG ( LogTemp , Warning , TEXT ( "TargetArmLength = 250" ) );
 				localPlayer->CameraBoom->TargetArmLength = 250;
+				CancleVoiceChat();
 			}
 			// 인터뷰 중일때 실행
 			else
 			{
 				UE_LOG ( LogTemp , Warning , TEXT ( "TargetArmLength = 0" ) );
 				localPlayer->CameraBoom->TargetArmLength = 0;
+				StartVoiceChat( );
 			}
 		}
 	}
