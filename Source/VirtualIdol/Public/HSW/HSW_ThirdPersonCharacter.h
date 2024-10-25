@@ -276,6 +276,8 @@ public:
 	UFUNCTION(NetMulticast, Reliable )
 	void MulticastRPCImoji ( int index );
 
+	void StartVoiceChat( );
+	void CancleVoiceChat ( );
 
 
 #pragma region KMK

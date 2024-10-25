@@ -11,7 +11,8 @@ enum class DummyState
 	Idle,
 	Jump,
 	Move,
-	Imoji
+	Imoji,
+	Fever
 };
 UCLASS()
 class VIRTUALIDOL_API ADummy_KMK : public ACharacter
