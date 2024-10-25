@@ -70,8 +70,27 @@ void AJJH_SelectManager::ChangeMap ( int32 index )
 	//케이스 나누어서 하기
     FindActorAndDestroy(TEXT("Theme"));
 	Stage.theme = index;
-    GetWorld ( )->SpawnActor<AActor>(ThemeFactory[index] , GetActorTransform ( ) );
-
+  
+	if (index == 1)
+	{
+		UGameplayStatics::LoadStreamLevel (
+		GetWorld ( ) ,
+		FName ( "LV_Island_JSW" ) ,
+		true ,  // Whether to make the level visible
+		true ,  // Should block on load
+		FLatentActionInfo ( )
+			);
+	}
+	else
+	{
+		UGameplayStatics::UnloadStreamLevel(
+		GetWorld ( ) ,
+		FName ( "LV_Island_JSW" ) ,
+		FLatentActionInfo ( ),	
+		true   // Should block on load
+		);
+		GetWorld ( )->SpawnActor<AActor> ( ThemeFactory[index] , GetActorTransform ( ) );
+	}
 }
 
 void AJJH_SelectManager::FindActorAndDestroy(FName tag)
