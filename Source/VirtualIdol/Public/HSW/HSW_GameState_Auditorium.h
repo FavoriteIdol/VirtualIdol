@@ -25,4 +25,9 @@ public:
 
 // 	UFUNCTION(Server, Reliable)
 // 	void ServerSetPlayerName(const FString& newName);
+	UFUNCTION(NetMulticast, Reliable )
+	void MultiRPCChat(const FString& chat );
+
+	UFUNCTION(Server, Reliable)
+    void ServerRPCChat(const FString& Chat);
 };

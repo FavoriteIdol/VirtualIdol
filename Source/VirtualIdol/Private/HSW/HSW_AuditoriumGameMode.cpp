@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "../../../../Plugins/FX/Niagara/Source/Niagara/Public/NiagaraFunctionLibrary.h"
 #include "Net/UnrealNetwork.h"
+#include "HSW/HSW_GameState_Auditorium.h"
 
 AHSW_AuditoriumGameMode::AHSW_AuditoriumGameMode ( )
 {
@@ -59,4 +60,13 @@ void AHSW_AuditoriumGameMode::Multicast_FeverEffect_Implementation ( )
 	UGameplayStatics::SpawnEmitterAtLocation ( GetWorld ( ) , FeverEffect_Particle , FeverEffectLocation );
 	UE_LOG(LogTemp, Warning, TEXT("Multicast_FeverEffect_Implementation"));
 	//UNiagaraFunctionLibrary::SpawnSystemAtLocation ( GetWorld ( ) , FeverEffect_Niagara , FeverEffectLocation.GetLocation() );
+}
+
+void AHSW_AuditoriumGameMode::BroadcastChatMessage ( const FString& Chat )
+{
+    AHSW_GameState_Auditorium* gs = GetGameState<AHSW_GameState_Auditorium>();
+    if (gs)
+    {
+        gs->MultiRPCChat(Chat);
+    }
 }

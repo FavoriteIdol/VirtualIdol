@@ -33,6 +33,7 @@
 #include "EngineUtils.h"
 #include "KMK/VirtualGameInstance_KMK.h"
 #include "KMK/Audience_KMK.h"
+#include "KMK/Virtual_KMK.h"
 
 // Sets default values
 AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
@@ -170,23 +171,14 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 	UVirtualGameInstance_KMK* gi = Cast<UVirtualGameInstance_KMK> ( GetWorld ( )->GetGameInstance ( ) );
 	if (IsLocallyControlled ( ))
 	{
-        if (HasAuthority ( ))
+        if (!HasAuthority ( ))
         {
-            if (virtualWidgetFact && !audienceWidget)
-            {
-				audienceWidget = CreateWidget<UAudience_KMK> ( GetWorld ( ) , virtualWidgetFact );
-				audienceWidget->AddToViewport ( );
-				audienceWidget->pc = this;
-				audienceWidget->SetVirtualWBP();
-            }
-
-        }
-        else
-        {
-			audienceWidget = CreateWidget<UAudience_KMK> ( GetWorld ( ) , audienceWidgetFact );
+            audienceWidget = CreateWidget<UAudience_KMK> ( GetWorld ( ) , audienceWidgetFact );
 			audienceWidget->AddToViewport ( );
 			audienceWidget->pc = this;
+			gi->SetWidget(audienceWidget);
         }
+
 		if (gi)
 		{
 			if (audienceWidget && gi->playerMeshNum == 1)
@@ -258,7 +250,7 @@ void AHSW_ThirdPersonCharacter::SetFeverGaugeMulti ( float feverValue )
 		// UE_LOG ( LogTemp , Warning , TEXT ( "In" ) );
 	}
 	// 로컬 컨트롤을 하는 캐릭터가 내가 아닌 상황이라 나는 MainUI가 없다. 그러니 나의 MainUI를 갱신해주자
-	else if (!IsLocallyControlled ( ) && audienceWidget == nullptr)
+	else if (!IsLocallyControlled ( ))
 	{
 		AHSW_ThirdPersonCharacter* localPlayer = Cast<AHSW_ThirdPersonCharacter>(GetWorld( )->GetFirstPlayerController()->GetCharacter());
 		if (localPlayer != nullptr)
@@ -692,18 +684,24 @@ void AHSW_ThirdPersonCharacter::MulticastRPCThrowPitch_Implementation ( )
 #pragma region KMK
 void AHSW_ThirdPersonCharacter::InitializeAudienceWidget ( TSubclassOf<class UAudience_KMK>  widgetFact )
 {
-	if (!widgetFact) // 위젯이 nullptr인 경우에만 생성
-	{
-		if (widgetFact)
-		{
-			audienceWidget = CreateWidget<UAudience_KMK> ( GetWorld ( ) , widgetFact );
-			audienceWidget->AddToViewport ( );
-			audienceWidget->pc = this;
-		}
-		else
-		{
-			UE_LOG ( LogTemp , Error , TEXT ( "AudienceWidgetClass is not set." ) );
-		}
-	}
+	//if (!widgetFact) // 위젯이 nullptr인 경우에만 생성
+	//{
+	//	if (widgetFact)
+	//	{
+	//		audienceWidget = CreateWidget<UAudience_KMK> ( GetWorld ( ) , widgetFact );
+	//		audienceWidget->AddToViewport ( );
+	//		audienceWidget->pc = this;
+	//	}
+	//	else
+	//	{
+	//		UE_LOG ( LogTemp , Error , TEXT ( "AudienceWidgetClass is not set." ) );
+	//	}
+	//}
 }
+
+void AHSW_ThirdPersonCharacter::SetChatWidget ( const FString& text )
+{
+	if(audienceWidget)audienceWidget->CreateChatWidget(text);
+}
+
 #pragma endregion

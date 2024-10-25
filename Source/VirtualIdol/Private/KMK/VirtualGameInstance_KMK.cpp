@@ -14,6 +14,10 @@
 #include "KMK/AudienceServerComponent_KMK.h"
 #include "KMK/HttpActor_KMK.h"
 #include "Components/CanvasPanel.h"
+#include "HSW/HSW_ThirdPersonCharacter.h"
+#include "KMK/Virtual_KMK.h"
+#include "KMK/Audience_KMK.h"
+#include "Kismet/GameplayStatics.h"
 
 void UVirtualGameInstance_KMK::Init ( )
 {
@@ -281,6 +285,13 @@ FLoginInfo UVirtualGameInstance_KMK::GetMyInfo ( )
 void UVirtualGameInstance_KMK::SetConcertInfo ( const struct FConcertInfo& info )
 {
     concerInfo = info;
+}
+
+#pragma endregion
+#pragma region Chat
+void UVirtualGameInstance_KMK::SetWidget ( class UAudience_KMK* wid )
+{
+    myWidget = wid;
 }
 
 #pragma endregion

@@ -258,7 +258,7 @@ public :
 
 	UPROPERTY( )
 	float soundGain = 2;
-	UFUNCTION( )
+	UFUNCTION(BlueprintCallable)
 	void ChangeVirtualWidget( );
 
 #pragma endregion

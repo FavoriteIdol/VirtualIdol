@@ -46,4 +46,7 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable )
 	void Multicast_FeverEffect( );
+
+	UFUNCTION( )
+	void BroadcastChatMessage ( const FString& Chat );
 };

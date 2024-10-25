@@ -9,6 +9,8 @@
 #include "chrono"
 #include "HSW/HSW_ThirdPersonCharacter.h"
 
+#include "HSW/HSW_GameState_Auditorium.h"
+#include "HSW/HSW_AuditoriumGameMode.h"
 // Sets default values for this component's properties
 UAudienceServerComponent_KMK::UAudienceServerComponent_KMK()
 {
@@ -27,8 +29,9 @@ void UAudienceServerComponent_KMK::BeginPlay()
 
 	player = Cast<AHSW_ThirdPersonCharacter> (GetWorld()->GetFirstPlayerController()->GetPawn());
 	playerMesh = Cast<AHSW_ThirdPersonCharacter> (GetOwner());
-	if (playerMesh->HasAuthority())
+	if (playerMesh && playerMesh->HasAuthority())
 	{
+		
 		if (playerMesh->IsLocallyControlled())
         {
             playerMesh->SetActorLocation ( FVector ( 0, 0, 100 ) );
@@ -39,7 +42,7 @@ void UAudienceServerComponent_KMK::BeginPlay()
             playerMesh->SetActorRotation(FRotator(0, 180, 0));
         }
 	}
-	if (gi)
+	if (gi && playerMesh)
 	{
 		// 플레이어가 로컬 플레이어 일때
 		if (playerMesh->IsLocallyControlled())
@@ -102,7 +105,11 @@ void UAudienceServerComponent_KMK::TickComponent(float DeltaTime, ELevelTick Tic
 #pragma region Chat
 void UAudienceServerComponent_KMK::ServerRPCChat_Implementation ( const FString& chat )
 {
-	MultiRPCChat(chat);
+	 AHSW_GameState_Auditorium* gs = GetWorld()->GetGameState<AHSW_GameState_Auditorium>();
+    if ( gs)
+    {
+         gs->MultiRPCChat(chat);  // GameMode로 메시지 전달
+    }
 }
 
 void UAudienceServerComponent_KMK::MultiRPCChat_Implementation ( const FString& chat )
@@ -284,7 +291,6 @@ void UAudienceServerComponent_KMK::CheatStartConcert ( )
 	if (playerCharacter && playerCharacter->HasAuthority ( ))
 	{
 		playerCharacter->audienceWidget->ChangeVirtualWidget ( );
-		playerCharacter->audienceWidget->SetCountDownTextVisible ( );
 	}
 
 	ServerRPC_ChangeMyMesh ( 2 );

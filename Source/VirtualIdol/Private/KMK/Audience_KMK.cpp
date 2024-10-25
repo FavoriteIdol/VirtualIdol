@@ -32,6 +32,9 @@
 #include "Components/HorizontalBox.h"
 #include "HSW/HSW_ImojiConponent.h"
 #include "HSW/HSW_FeverGaugeWidget.h"
+#include "JJH/JJH_SetupGameModeBase.h"
+#include "HSW/HSW_AuditoriumGameMode.h"
+#include "HSW/HSW_GameState_Auditorium.h"
 
 void UAudience_KMK::NativeConstruct ( )
 {
@@ -118,7 +121,7 @@ void UAudience_KMK::NativeConstruct ( )
 
 
 	Player = Cast<AHSW_ThirdPersonCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn() );
-	ImojiComponent = Player->GetComponentByClass<UHSW_ImojiConponent>();
+	if(Player)ImojiComponent = Player->GetComponentByClass<UHSW_ImojiConponent>();
 #pragma endregion
 
 }
@@ -324,7 +327,7 @@ void UAudience_KMK::VisiblePanel ( ESlateVisibility visible )
 void UAudience_KMK::PressSendButt ( )
 {
     auto* player = Cast<AHSW_ThirdPersonCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
-    if (player)
+    if (player && !player->HasAuthority())
     {
         auto* server = player->GetComponentByClass<UAudienceServerComponent_KMK> ( );
         if (server)
@@ -332,6 +335,19 @@ void UAudience_KMK::PressSendButt ( )
             if (!EditText_Chat->GetText ( ).IsEmpty ( ))
             {
                 server->ServerRPCChat( EditText_Chat->GetText ( ).ToString ( ) );
+               
+                EditText_Chat->SetText ( FText::GetEmpty ( ) );
+            }
+        }
+    }
+    else
+    {
+        AHSW_GameState_Auditorium* gs = GetWorld()->GetGameState<AHSW_GameState_Auditorium>();
+        if (gs)
+        {
+            if (!EditText_Chat->GetText ( ).IsEmpty ( ))
+            {
+                gs->ServerRPCChat ( EditText_Chat->GetText ( ).ToString ( ) );
                 EditText_Chat->SetText ( FText::GetEmpty ( ) );
             }
         }
@@ -618,6 +634,9 @@ USoundWaveProcedural* UAudience_KMK::LoadWavFromFile(const FString& FilePath)
 void UAudience_KMK::ChangeVirtualWidget ( )
 {
     WS_Concert->SetActiveWidgetIndex(1);
+    SetVirtualWBP();
+    TEXT_Min1->SetVisibility(ESlateVisibility::Hidden);
+    FeverGauge->SetVisibility(ESlateVisibility::Visible);
 }
 
 #pragma endregion
