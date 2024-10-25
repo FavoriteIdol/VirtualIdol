@@ -442,7 +442,7 @@ void AHSW_ThirdPersonCharacter::MulticastRPCImoji_Implementation ( int index )
 	AppearImoji (  );
 
 	GetWorld ( )->GetTimerManager ( ).ClearTimer ( TimerHandleImoji );
-	GetWorld ( )->GetTimerManager ( ).SetTimer ( TimerHandleImoji , this , &AHSW_ThirdPersonCharacter::DisappearImoji , 2.0f );
+	GetWorld ( )->GetTimerManager ( ).SetTimer ( TimerHandleImoji , this , &AHSW_ThirdPersonCharacter::DisappearImoji , 1.0f );
 }
 
 void AHSW_ThirdPersonCharacter::AppearImoji (  )
@@ -466,7 +466,7 @@ void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value 
 	if (!HasAuthority ( ) && IsLocallyControlled())
 	{
 		PersonalGauge++;
-		ServerRPCFeverGauge (CurrentGauge, 10*0.15);
+		ServerRPCFeverGauge (CurrentGauge, 100*0.02);
 		PrintFeverGaugeLogOnHead ( );
 		
 		//MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
@@ -480,7 +480,7 @@ void AHSW_ThirdPersonCharacter::ServerRPCFeverGauge_Implementation ( float fever
 {
 	if (feverValue < 1)
 	{
-		feverValue += 0.15;
+		feverValue += 0.02;
 	}
 
 	else if (feverValue >=1)
@@ -493,7 +493,7 @@ void AHSW_ThirdPersonCharacter::ServerRPCFeverGauge_Implementation ( float fever
 		}
 	}
 
-	if (FeverBright <= 10)
+	if (FeverBright <= 100)
 	{
 		FeverBright += brightValue;
 		MulticastRPCBrightness(1 );
