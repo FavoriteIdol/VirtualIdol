@@ -49,4 +49,7 @@ public:
 
 	UFUNCTION( )
 	void BroadcastChatMessage ( const FString& Chat );
+
+	UFUNCTION( )
+	void BroadcastCountDown( );
 };

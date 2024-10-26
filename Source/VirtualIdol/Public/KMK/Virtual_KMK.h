@@ -37,4 +37,27 @@ public:
 
 	UFUNCTION( )
 	void SetVirtualChat(const FString& text );
+	UFUNCTION(BlueprintCallable )
+	void SetVirtualVisible(bool bVisit = false );
+	UPROPERTY( )
+	class USkeletalMeshComponent* meshComp;
+
+	UFUNCTION( )
+	void ShowCoundDownPanel( );
+
+	UFUNCTION(BlueprintCallable )
+	void CallGMShowServer( );
+
+	FTimerHandle startCountDownHandle;
+	UPROPERTY(EditAnywhere )
+	float durationTime = 6;
+	float remainTime = 0.f;
+	UPROPERTY()
+	bool bTime = false;
+
+	UFUNCTION( )
+	void StartCountDown( );
+
+	UPROPERTY ( EditDefaultsOnly , Category = Fever )
+	TArray< TSubclassOf<class AActor>> appearFact;
 };

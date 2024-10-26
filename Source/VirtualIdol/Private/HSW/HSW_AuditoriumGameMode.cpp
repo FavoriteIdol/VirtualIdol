@@ -70,3 +70,12 @@ void AHSW_AuditoriumGameMode::BroadcastChatMessage ( const FString& Chat )
         gs->MultiRPCChat(Chat);
     }
 }
+
+void AHSW_AuditoriumGameMode::BroadcastCountDown ( )
+{
+	AHSW_GameState_Auditorium* gs = GetGameState<AHSW_GameState_Auditorium> ( );
+	if (gs)
+	{
+		gs->MultiRPC_ShowCountDown();
+	}
+}

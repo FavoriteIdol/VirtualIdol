@@ -4,6 +4,7 @@
 #include "KMK/Virtual_KMK.h"
 #include "chrono"
 #include "KMK/Audience_KMK.h"
+#include "HSW/HSW_GameState_Auditorium.h"
 
 // Sets default values for this component's properties
 UVirtual_KMK::UVirtual_KMK()
@@ -20,6 +21,8 @@ UVirtual_KMK::UVirtual_KMK()
 void UVirtual_KMK::BeginPlay()
 {
 	Super::BeginPlay();
+	meshComp = GetOwner()->FindComponentByTag<USkeletalMeshComponent>(FName(TEXT("Mesh")));
+
 }
 
 
@@ -28,9 +31,17 @@ void UVirtual_KMK::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (!bVis)
+	if (bTime)
 	{
-		s = GetTimeDifference ( setConcertTime );
+		remainTime = GetWorld ( )->GetTimerManager ( ).GetTimerRemaining ( startCountDownHandle );
+		if (virtualWidget)
+		{
+			if (remainTime >= 0.0f)
+			{
+				// 남은 시간을 위젯에 표시
+				virtualWidget->CountDownText ( FString::FromInt ( remainTime ) );
+			}
+		}
 	}
 }
 #pragma region Time
@@ -103,6 +114,41 @@ FString UVirtual_KMK::GetTimeDifference ( const FString& SetTime )
 void UVirtual_KMK::SetVirtualChat ( const FString& text )
 {
 	if(virtualWidget)virtualWidget->CreateChatWidget(text);
+}
+
+void UVirtual_KMK::SetVirtualVisible ( bool bVisit /*= false */ )
+{
+	meshComp->SetRenderInMainPass ( bVisit );
+	meshComp->SetRenderInDepthPass ( bVisit );
+	meshComp->CastShadow = bVisit;
+}
+
+void UVirtual_KMK::ShowCoundDownPanel ( )
+{
+	if (!virtualWidget) return;
+	virtualWidget->CountDownPanelVisible ( ESlateVisibility::Visible );
+	StartCountDown ( );
+}
+
+void UVirtual_KMK::CallGMShowServer ( )
+{
+	AHSW_GameState_Auditorium* gs = GetWorld ( )->GetGameState<AHSW_GameState_Auditorium> ( );
+	if (gs)
+	{
+		gs->ServerRPC_ShowCountDown();
+	}
+}
+
+void UVirtual_KMK::StartCountDown ( )
+{
+	bTime = true;
+	GetWorld ( )->GetTimerManager ( ).SetTimer ( startCountDownHandle , FTimerDelegate::CreateLambda ( [this]( )
+        {
+            SetVirtualVisible ( true );
+			virtualWidget->CountDownPanelVisible ( ESlateVisibility::Hidden );
+			if(appearFact.Num() > 0) GetWorld ( )->SpawnActor<AActor> ( appearFact[0] , FTransform ( FVector ( 0 ) ) );
+        } ) , 6 , false );
+
 }
 
 #pragma endregion

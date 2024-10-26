@@ -8,6 +8,7 @@
 #include "HSW/HSW_ThirdPersonCharacter.h"
 #include "KMK/Virtual_KMK.h"
 #include "HSW/HSW_AuditoriumGameMode.h"
+#include "KMK/AudienceServerComponent_KMK.h"
 
 //void AHSW_GameState_Auditorium::BeginPlay ( )
 //{
@@ -48,5 +49,43 @@ void AHSW_GameState_Auditorium::ServerRPCChat_Implementation ( const FString& Ch
     if (gm)
     {
         gm->BroadcastChatMessage(Chat);  // GameMode에 메시지 전달
+    }
+}
+
+void AHSW_GameState_Auditorium::ServerRPC_ShowCountDown_Implementation ( )
+{
+    AHSW_AuditoriumGameMode* gm = GetWorld ( )->GetAuthGameMode<AHSW_AuditoriumGameMode> ( );
+    if (gm)
+    {
+        gm->BroadcastCountDown();
+    }
+}
+
+void AHSW_GameState_Auditorium::MultiRPC_ShowCountDown_Implementation ( )
+{
+    for (APlayerState* PlayerState : PlayerArray)
+    {
+        APawn* Pawn = PlayerState->GetPawn ( );
+        if (AHSW_ThirdPersonCharacter* Character = Cast<AHSW_ThirdPersonCharacter> ( Pawn ))
+        {
+            if (Character->IsLocallyControlled ( ))
+            {
+                Character->FindComponentByClass<UAudienceServerComponent_KMK> ( )->StartCountDown ( );
+                UAudience_KMK* MyWidget = Cast<UAudience_KMK> ( Character->audienceWidget );
+                if (MyWidget)
+                {
+                    MyWidget->CountDownPanelVisible ( ESlateVisibility::Visible );
+                    
+                }
+            }
+        }
+        else if (Pawn && Pawn->FindComponentByClass<UVirtual_KMK> ( ))
+        {
+            UVirtual_KMK* Vir = Pawn->FindComponentByClass<UVirtual_KMK> ( );
+            if (Vir && Pawn->IsLocallyControlled ( ))
+            {
+                Vir->ShowCoundDownPanel();
+            }
+        }
     }
 }

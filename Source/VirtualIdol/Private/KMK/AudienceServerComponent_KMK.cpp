@@ -11,6 +11,8 @@
 
 #include "HSW/HSW_GameState_Auditorium.h"
 #include "HSW/HSW_AuditoriumGameMode.h"
+#include "Kismet/GameplayStatics.h"
+#include "KMK/Virtual_KMK.h"
 // Sets default values for this component's properties
 UAudienceServerComponent_KMK::UAudienceServerComponent_KMK()
 {
@@ -42,6 +44,10 @@ void UAudienceServerComponent_KMK::BeginPlay()
             playerMesh->SetActorRotation(FRotator(0, 180, 0));
         }
 	}
+	else
+	{
+		FindVirtualCharacter ( );
+	}
 	if (gi && playerMesh)
 	{
 		// 플레이어가 로컬 플레이어 일때
@@ -69,16 +75,31 @@ void UAudienceServerComponent_KMK::BeginPlay()
 			}
 		}
 	}
+
+
 }
 
-
+void UAudienceServerComponent_KMK::FindVirtualCharacter ( )
+{
+	TArray<AActor*> actorArray;
+	UGameplayStatics::GetAllActorsWithTag ( GetWorld ( ) , TEXT ( "Virtual" ) , actorArray );
+	for (AActor* actor : actorArray)
+	{
+		if (actor->FindComponentByTag < USkeletalMeshComponent > ( TEXT ( "Mesh" ) ))
+		{
+			virtualCharacter = actor->FindComponentByClass<UVirtual_KMK > ( );
+			UE_LOG(LogTemp, Warning, TEXT("Find!!!!!!!!" ) );
+			if (virtualCharacter) virtualCharacter->SetVirtualVisible ( false );
+		}
+	}
+}
 // Called every frame
 void UAudienceServerComponent_KMK::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	if (!bVis)
 	{
-		s = GetTimeDifference ( setConcertTime );
+		//s = GetTimeDifference ( setConcertTime );
 		// 서버에서 시간을 계산하고 클라이언트에게 전파
 		AHSW_ThirdPersonCharacter* playerCharacter = Cast<AHSW_ThirdPersonCharacter> ( GetOwner ( ) );
 		if (playerCharacter && playerCharacter->audienceWidget && playerCharacter->IsLocallyControlled())
@@ -98,6 +119,19 @@ void UAudienceServerComponent_KMK::TickComponent(float DeltaTime, ELevelTick Tic
 			if (playerCharacter->HasAuthority ( ))
 			{
 				playerCharacter->audienceWidget->SetCountDownTextVisible( );
+			}
+		}
+	}
+	if (bTime)
+	{
+		remainTime = GetWorld ( )->GetTimerManager ( ).GetTimerRemaining ( startCountDownHandle );
+		if (player && player->audienceWidget)
+		{
+			if (remainTime >= 0.0f && remainTime < 6)
+			{
+				UE_LOG ( LogTemp , Warning , TEXT ( "시간: %f" ) , remainTime );
+				// 남은 시간을 위젯에 표시
+				player->audienceWidget->CountDownText ( FString::FromInt( remainTime) );
 			}
 		}
 	}
@@ -185,6 +219,13 @@ void UAudienceServerComponent_KMK::SetVirtualVisible ( class AHSW_ThirdPersonCha
 void UAudienceServerComponent_KMK::StartCountDown ( )
 {
 	bTime = true;
+	GetWorld ( )->GetTimerManager ( ).SetTimer ( startCountDownHandle , FTimerDelegate::CreateLambda ( [this]( )
+		{
+			playerMesh->audienceWidget->CountDownPanelVisible ( ESlateVisibility::Hidden );
+			bTime = false;
+			virtualCharacter->SetVirtualVisible(true);
+			if (appearFact.Num ( ) > 0) GetWorld ( )->SpawnActor<AActor> ( appearFact[0] , FTransform ( FVector ( 0 ) ) );
+		} ) , 6 , false );
 }
 
 
@@ -278,6 +319,9 @@ FString UAudienceServerComponent_KMK::GetTimeDifference ( const FString& SetTime
 	if(playerCharacter && playerCharacter->HasAuthority()) playerCharacter->audienceWidget->ChangeTextClock(TimeDifference );
 	return TimeDifference;
 }
+
+
+
 #pragma endregion
 void UAudienceServerComponent_KMK::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const 
 {
@@ -285,13 +329,4 @@ void UAudienceServerComponent_KMK::GetLifetimeReplicatedProps(TArray<FLifetimePr
 
     DOREPLIFETIME(UAudienceServerComponent_KMK, playerMeshNum);
 }
-void UAudienceServerComponent_KMK::CheatStartConcert ( )
-{
-	AHSW_ThirdPersonCharacter* playerCharacter = Cast<AHSW_ThirdPersonCharacter> ( GetOwner() );
-	if (playerCharacter && playerCharacter->HasAuthority ( ))
-	{
-		playerCharacter->audienceWidget->ChangeVirtualWidget ( );
-	}
 
-	ServerRPC_ChangeMyMesh ( 2 );
-}
