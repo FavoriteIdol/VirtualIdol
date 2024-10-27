@@ -44,6 +44,9 @@ void ADummy_KMK::Tick(float DeltaTime)
 	case DummyState::Imoji:
 		if(!isImoji) ImojiFucn(DeltaTime);
 		break;
+	case DummyState::Fever:
+		ServerRPC_Shake(0);
+		break;
 	}
 }
 
@@ -54,9 +57,14 @@ void ADummy_KMK::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 
 }
 
+void ADummy_KMK::GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& OutLifetimeProps ) const
+{
+	DOREPLIFETIME ( ADummy_KMK , state );
+}
+
 void ADummy_KMK::IdleFucn ( const float& DeltaTime )
 {
-	int32 rand = FMath::RandRange(0, 1);
+	int32 rand = FMath::RandRange(0, 2);
 	if(isJump) isJump = false;
 	switch (rand)
 	{
@@ -66,9 +74,9 @@ void ADummy_KMK::IdleFucn ( const float& DeltaTime )
 	case 1:
 		state = DummyState::Imoji;
 		break;
-	//case 2:
-	//	state = DummyState::Jump;
-	//	break;
+	case 2:
+		state = DummyState::Fever;
+		break;
 	//case3:
 	//	state = DummyState::Jump;
 	//	break;
@@ -115,4 +123,15 @@ void ADummy_KMK::DisappearImoji ( )
 {
 	state = DummyState::Idle;
 	isImoji = false;
+}
+
+void ADummy_KMK::ServerRPC_Shake_Implementation ( float brightValue )
+{
+	MulticastRPC_Shake( brightValue );
+}
+
+void ADummy_KMK::MulticastRPC_Shake_Implementation ( float brightValue )
+{
+	ShakeBodyBlueprint( );
+	state = DummyState::Idle;
 }

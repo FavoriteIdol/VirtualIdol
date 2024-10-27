@@ -37,7 +37,7 @@ void USingWidget_KMK::PressStartButt ( )
         sound = preSound;
         bStop = false;
     }
-    gm->ServerPlayMusic( SoundFile );
+    //gm->ServerPlayMusic( SoundFile );
     sound->SetPaused(false);
 }
 

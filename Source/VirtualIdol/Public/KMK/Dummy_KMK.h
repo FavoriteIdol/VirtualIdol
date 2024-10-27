@@ -34,6 +34,9 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual void GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
+
+	UPROPERTY(Replicated )
 	DummyState state = DummyState::Idle;
 
 	void IdleFucn(const float& DeltaTime );
@@ -55,5 +58,23 @@ public:
 	class UDummyUI_KMK* widget;
 	bool isJump = false;
 	bool isImoji = false;
+
+	UFUNCTION(BlueprintImplementableEvent, Category= Imogi )
+	void ShakeBodyBlueprint( );
+
+	//UPROPERTY ( Replicated , EditDefaultsOnly , BlueprintReadWrite )
+	//int32 IntervieweeIndex;
+
+	UFUNCTION(Server,Reliable )
+	void ServerRPC_Shake( float brightValue );
+
+	UFUNCTION(NetMulticast,Reliable )
+	void MulticastRPC_Shake( float brightValue );
+
+	UPROPERTY( EditDefaultsOnly , BlueprintReadWrite , Category = FeverGauge )
+	UMaterialInstance* FeverCharactMat;
+
+	UPROPERTY( EditAnywhere , BlueprintReadWrite , Category = FeverGauge )
+	UMaterialInstanceDynamic* FeverDynamicMat;
 
 };
