@@ -57,7 +57,7 @@ void ADummy_KMK::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 void ADummy_KMK::IdleFucn ( const float& DeltaTime )
 {
 	int32 rand = FMath::RandRange(0, 1);
-	if(isJump)isJump = false;
+	if(isJump) isJump = false;
 	switch (rand)
 	{
 	case 0:

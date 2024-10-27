@@ -97,6 +97,12 @@ public:
 
 	FTransform StageLocation;
 
+	UFUNCTION(Client, Reliable)
+	void ClientPlayMusic( class UAudioComponent* selectedMusic );
+
+	UPROPERTY( )
+	class USoundBase* soundFile;
+
 	// 피버게이지 --------------------------------------------------------------
 	UPROPERTY(EditDefaultsOnly , Category = FeverGauge )
 	class UHSW_FeverGaugeWidget* FeverGauge;

@@ -37,6 +37,8 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInstance.h"
 #include "KMK/Virtual_KMK.h"
+#include "Components/AudioComponent.h"
+#include "Misc/FileHelper.h"
 
 // Sets default values
 AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
@@ -238,6 +240,20 @@ void AHSW_ThirdPersonCharacter::Tick(float DeltaTime)
 		{
 			SetActorRotation ( ThrowingRotator );
 		}
+	}
+}
+
+void AHSW_ThirdPersonCharacter::ClientPlayMusic_Implementation ( class UAudioComponent* selectedMusic )
+{
+	//	UGameplayStatics::PlaySound2D(this, Music );
+	if (selectedMusic)
+	{
+		selectedMusic->Play ( );
+		UE_LOG ( LogTemp , Warning , TEXT ( "Music Play" ) );
+	}
+	else
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "not Music" ) );
 	}
 }
 

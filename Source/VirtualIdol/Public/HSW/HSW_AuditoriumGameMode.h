@@ -49,4 +49,15 @@ public:
 
 	UFUNCTION( )
 	void BroadcastChatMessage ( const FString& Chat );
+
+	class UAudioComponent* MusicComponent;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite);
+	class USoundBase* SoundFile;
+
+	UFUNCTION(Server, Reliable )
+	void ServerPlayMusic( class UAudioComponent* selectedMusic );
+
+	UFUNCTION(Client, Reliable)
+	void ClientPlayMusic( class UAudioComponent* selectedMusic );
 };
