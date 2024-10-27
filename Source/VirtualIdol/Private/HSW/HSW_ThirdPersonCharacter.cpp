@@ -37,6 +37,7 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInstance.h"
 #include "KMK/Virtual_KMK.h"
+#include "KMK/AudienceServerComponent_KMK.h"
 
 // Sets default values
 AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
@@ -172,6 +173,7 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 
 #pragma region KMK
 	pc = GetWorld()->GetFirstPlayerController();
+	serverComp = FindComponentByClass<UAudienceServerComponent_KMK>( );
 	UVirtualGameInstance_KMK* gi = Cast<UVirtualGameInstance_KMK> ( GetWorld ( )->GetGameInstance ( ) );
 	if (IsLocallyControlled ( ))
 	{
@@ -196,17 +198,22 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 		GetController<APlayerController> ( )->SetInputMode(inputMode );
 	}
 #pragma endregion
-	FeverDynamicMat = UMaterialInstanceDynamic::Create ( FeverCharactMat , this );
 
-	USkeletalMeshComponent* TempMesh = GetMesh ( );
-	if (TempMesh)
-	{
-		TempMesh->SetMaterial ( 0 , FeverDynamicMat );
-	}
 
 	if (HasAuthority ( ))
 	{
 		StartVoiceChat( );
+	}
+	else
+	{
+		int32 my = gi->playerMeshNum;
+		FeverDynamicMat = UMaterialInstanceDynamic::Create ( FeverCharactMat[my] , this );
+
+		USkeletalMeshComponent* TempMesh = GetMesh ( );
+		if (TempMesh)
+		{
+			TempMesh->SetMaterial ( 0 , FeverDynamicMat );
+		}
 	}
 }
 
@@ -266,13 +273,19 @@ void AHSW_ThirdPersonCharacter::SetFeverGaugeMulti ( float feverValue )
 	// 로컬 컨트롤을 하는 캐릭터가 내가 아닌 상황이라 나는 MainUI가 없다. 그러니 나의 MainUI를 갱신해주자
 	else if (!IsLocallyControlled ( ))
 	{
-		AHSW_ThirdPersonCharacter* localPlayer = Cast<AHSW_ThirdPersonCharacter>(GetWorld( )->GetFirstPlayerController()->GetCharacter());
-		if (localPlayer != nullptr)
-		{
-			localPlayer->CurrentGauge = feverValue;
-			localPlayer->audienceWidget->FeverGauge->SetFeverGauge ( localPlayer->CurrentGauge );
-			//UE_LOG ( LogTemp , Error , TEXT ( "Not LocalPlayer Gauge: %f" ) , localPlayer->CurrentGauge );
+		//// 버츄얼을 제외한 나머지
+		//AHSW_ThirdPersonCharacter* localPlayer = Cast<AHSW_ThirdPersonCharacter>(GetWorld( )->GetFirstPlayerController()->GetCharacter());
+		//if (localPlayer != nullptr)
+		//{
+		//	localPlayer->CurrentGauge = feverValue;
+		//	localPlayer->audienceWidget->FeverGauge->SetFeverGauge ( localPlayer->CurrentGauge );
+		//	//UE_LOG ( LogTemp , Error , TEXT ( "Not LocalPlayer Gauge: %f" ) , localPlayer->CurrentGauge );
 
+		//}
+		AHSW_GameState_Auditorium* myGs = GetWorld ( )->GetGameState<AHSW_GameState_Auditorium> ( );
+		if (myGs)
+		{
+			myGs->MultiRPC_FeverGauge ( feverValue );  // GameMode로 메시지 전달
 		}
 	}
 
@@ -415,6 +428,17 @@ void AHSW_ThirdPersonCharacter::Look ( const FInputActionValue& Value )
 		// add yaw and pitch input to controller
 		AddControllerYawInput ( LookAxisVector.X );
 		AddControllerPitchInput ( LookAxisVector.Y );
+	}
+}
+
+void AHSW_ThirdPersonCharacter::ChangeMyMeshMat (int32 num )
+{
+	FeverDynamicMat = UMaterialInstanceDynamic::Create ( FeverCharactMat[num] , this );
+
+	USkeletalMeshComponent* TempMesh = GetMesh ( );
+	if (TempMesh)
+	{
+		TempMesh->SetMaterial ( 0 , FeverDynamicMat );
 	}
 }
 

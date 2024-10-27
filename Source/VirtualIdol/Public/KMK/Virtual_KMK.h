@@ -60,4 +60,6 @@ public:
 
 	UPROPERTY ( EditDefaultsOnly , Category = Fever )
 	TArray< TSubclassOf<class AActor>> appearFact;
+	UPROPERTY( )
+	float currentGauge = 0;
 };

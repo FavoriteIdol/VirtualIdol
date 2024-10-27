@@ -36,6 +36,10 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable )
 	void MultiRPC_ShowCountDown( );
+
+	UFUNCTION(NetMulticast, Reliable )
+	void MultiRPC_FeverGauge( float feverValue );
+
 	FTimerHandle startCountDownHandle;
 	UPROPERTY(EditAnywhere )
 	float durationTime = 6;

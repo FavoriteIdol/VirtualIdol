@@ -71,7 +71,9 @@ void UAudienceServerComponent_KMK::BeginPlay()
 			}
 			else
 			{
+				SetVirtualVisible ( playerMesh , true );
 				playerMesh->GetMesh ( )->SetSkeletalMesh ( audienceMesh[playerMeshNum] );
+				playerMesh->ChangeMyMeshMat ( playerMeshNum );
 			}
 		}
 	}
@@ -183,7 +185,9 @@ void UAudienceServerComponent_KMK::MultiRPC_ChangeMyMesh_Implementation ( int32 
     }
 	else
 	{
+		SetVirtualVisible ( TargetMesh , true );
 		TargetMesh->GetMesh ( )->SetSkeletalMesh ( audienceMesh[num] );
+		TargetMesh->ChangeMyMeshMat( num );
 	}
 }
 
@@ -203,6 +207,7 @@ void UAudienceServerComponent_KMK::OnRep_ChangePlayerMesh()
     {
 		SetVirtualVisible ( playerMesh , true );
         playerCharacter->GetMesh ( )->SetSkeletalMesh ( audienceMesh[playerMeshNum] );
+		playerCharacter->ChangeMyMeshMat ( playerMeshNum );
     }
 }
 

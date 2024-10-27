@@ -9,6 +9,7 @@
 #include "KMK/Virtual_KMK.h"
 #include "HSW/HSW_AuditoriumGameMode.h"
 #include "KMK/AudienceServerComponent_KMK.h"
+#include "HSW/HSW_FeverGaugeWidget.h"
 
 //void AHSW_GameState_Auditorium::BeginPlay ( )
 //{
@@ -68,7 +69,7 @@ void AHSW_GameState_Auditorium::MultiRPC_ShowCountDown_Implementation ( )
         APawn* Pawn = PlayerState->GetPawn ( );
         if (AHSW_ThirdPersonCharacter* Character = Cast<AHSW_ThirdPersonCharacter> ( Pawn ))
         {
-            if (Character->IsLocallyControlled ( ))
+            if (Character && Character->IsLocallyControlled ( ))
             {
                 Character->FindComponentByClass<UAudienceServerComponent_KMK> ( )->StartCountDown ( );
                 UAudience_KMK* MyWidget = Cast<UAudience_KMK> ( Character->audienceWidget );
@@ -89,3 +90,29 @@ void AHSW_GameState_Auditorium::MultiRPC_ShowCountDown_Implementation ( )
         }
     }
 }
+
+void AHSW_GameState_Auditorium::MultiRPC_FeverGauge_Implementation ( float feverValue )
+{
+    for (APlayerState* PlayerState : PlayerArray)
+    {
+        APawn* Pawn = PlayerState->GetPawn ( );
+        if (AHSW_ThirdPersonCharacter* Character = Cast<AHSW_ThirdPersonCharacter> ( Pawn ))
+        {
+            if (Character && Character->IsLocallyControlled ( ))
+            {
+                Character->CurrentGauge = feverValue;
+                Character->audienceWidget->FeverGauge->SetFeverGauge ( Character->CurrentGauge );
+            }
+        }
+        else if (Pawn && Pawn->FindComponentByClass<UVirtual_KMK> ( ))
+        {
+            UVirtual_KMK* Vir = Pawn->FindComponentByClass<UVirtual_KMK> ( );
+            if (Vir && Pawn->IsLocallyControlled ( ))
+            {
+                Vir->currentGauge = feverValue;
+                Vir->virtualWidget->FeverGauge->SetFeverGauge ( Vir->currentGauge );
+            }
+        }
+    }
+}
+
