@@ -15,6 +15,10 @@
 #include "KMK/HttpActor_KMK.h"
 #include "Components/CanvasPanel.h"
 
+
+#include "SocketSubsystem.h"
+#include "IPAddress.h"
+
 void UVirtualGameInstance_KMK::Init ( )
 {
     Super::Init();
@@ -284,3 +288,11 @@ void UVirtualGameInstance_KMK::SetConcertInfo ( const struct FConcertInfo& info 
 }
 
 #pragma endregion
+
+
+FString UVirtualGameInstance_KMK::GetLocalIPAddress ( )
+{
+    bool bCanBindAll;
+    TSharedPtr<class FInternetAddr> Addr = ISocketSubsystem::Get ( PLATFORM_SOCKETSUBSYSTEM )->GetLocalHostAddr ( *GLog , bCanBindAll );
+    return Addr->ToString ( false );
+}

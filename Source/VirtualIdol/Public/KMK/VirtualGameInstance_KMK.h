@@ -123,7 +123,10 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 	FConcertInfo concerInfo;
 	UFUNCTION( )
 	void SetConcertInfo( const struct FConcertInfo& info );
+	
 #pragma endregion
 
+	UFUNCTION(BlueprintCallable )
+	FString GetLocalIPAddress ( );
 
 };
