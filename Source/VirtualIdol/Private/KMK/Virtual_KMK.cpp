@@ -118,9 +118,12 @@ void UVirtual_KMK::SetVirtualChat ( const FString& text )
 
 void UVirtual_KMK::SetVirtualVisible ( bool bVisit /*= false */ )
 {
-	meshComp->SetRenderInMainPass ( bVisit );
-	meshComp->SetRenderInDepthPass ( bVisit );
-	meshComp->CastShadow = bVisit;
+	if (meshComp)
+	{
+		meshComp->SetRenderInMainPass ( bVisit );
+		meshComp->SetRenderInDepthPass ( bVisit );
+		meshComp->CastShadow = bVisit;
+	}
 }
 
 void UVirtual_KMK::ShowCoundDownPanel ( )

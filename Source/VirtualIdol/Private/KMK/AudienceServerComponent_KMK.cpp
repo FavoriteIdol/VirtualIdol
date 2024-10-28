@@ -73,7 +73,8 @@ void UAudienceServerComponent_KMK::BeginPlay()
 			{
 				SetVirtualVisible ( playerMesh , true );
 				playerMesh->GetMesh ( )->SetSkeletalMesh ( audienceMesh[playerMeshNum] );
-				playerMesh->ChangeMyMeshMat ( playerMeshNum );
+				UMaterialInstanceDynamic* meshMat = playerMesh->ChangeMyMeshMat ( playerMeshNum );
+				playerMesh->GetMesh()->SetMaterial(0, meshMat);
 			}
 		}
 	}
@@ -187,7 +188,8 @@ void UAudienceServerComponent_KMK::MultiRPC_ChangeMyMesh_Implementation ( int32 
 	{
 		SetVirtualVisible ( TargetMesh , true );
 		TargetMesh->GetMesh ( )->SetSkeletalMesh ( audienceMesh[num] );
-		TargetMesh->ChangeMyMeshMat( num );
+		UMaterialInstanceDynamic* meshMat = TargetMesh->ChangeMyMeshMat ( num );
+		TargetMesh->GetMesh()->SetMaterial(0, meshMat);
 	}
 }
 
@@ -207,7 +209,8 @@ void UAudienceServerComponent_KMK::OnRep_ChangePlayerMesh()
     {
 		SetVirtualVisible ( playerMesh , true );
         playerCharacter->GetMesh ( )->SetSkeletalMesh ( audienceMesh[playerMeshNum] );
-		playerCharacter->ChangeMyMeshMat ( playerMeshNum );
+        UMaterialInstanceDynamic* meshMat = playerCharacter->ChangeMyMeshMat ( playerMeshNum );
+		playerCharacter->GetMesh()->SetMaterial(0, meshMat);
     }
 }
 

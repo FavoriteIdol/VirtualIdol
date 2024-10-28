@@ -139,8 +139,11 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
     //{
     //    InitMainUI ( );
     //}
-    ImojiComp->SetVisibility ( false );
-    imojiWidget = Cast<UHSW_ImogiWidget> ( ImojiComp->GetWidget ( ) );
+	if (ImojiComp)
+	{
+		imojiWidget = Cast<UHSW_ImogiWidget> ( ImojiComp->GetWidget ( ) );
+		ImojiComp->SetVisibility ( false );
+	}
 
 	FInputModeGameAndUI a;
 	GetWorld()->GetFirstPlayerController()->SetInputMode(a);
@@ -431,15 +434,10 @@ void AHSW_ThirdPersonCharacter::Look ( const FInputActionValue& Value )
 	}
 }
 
-void AHSW_ThirdPersonCharacter::ChangeMyMeshMat (int32 num )
+UMaterialInstanceDynamic* AHSW_ThirdPersonCharacter::ChangeMyMeshMat (int32 num )
 {
 	FeverDynamicMat = UMaterialInstanceDynamic::Create ( FeverCharactMat[num] , this );
-
-	USkeletalMeshComponent* TempMesh = GetMesh ( );
-	if (TempMesh)
-	{
-		TempMesh->SetMaterial ( 0 , FeverDynamicMat );
-	}
+	return FeverDynamicMat;
 }
 
 // Imoji ==============================================================================================
