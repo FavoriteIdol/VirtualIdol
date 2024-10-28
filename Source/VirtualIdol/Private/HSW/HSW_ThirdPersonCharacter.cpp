@@ -203,7 +203,13 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 		GetController<APlayerController> ( )->SetInputMode(inputMode );
 	}
 #pragma endregion
-
+	if (IsLocallyControlled ( ))
+	{
+		for (int i = 0; i < FeverCharactMat.Num ( ); i++)
+		{
+			FeverDynamicMats[i] = UMaterialInstanceDynamic::Create ( FeverCharactMat[i] , this );
+		}
+	}
 
 	if (HasAuthority ( ))
 	{
@@ -211,14 +217,25 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 	}
 	else
 	{
-		int32 my = 0;
-		if( gi->playerMeshNum >= 0) my =  gi->playerMeshNum;
-		FeverDynamicMat = UMaterialInstanceDynamic::Create ( FeverCharactMat[my] , this );
-
-		USkeletalMeshComponent* TempMesh = GetMesh ( );
-		if (TempMesh)
+		if (IsLocallyControlled ( ))
 		{
-			TempMesh->SetMaterial ( 0 , FeverDynamicMat );
+			int32 my = 0;
+			if (gi->playerMeshNum >= 0) my = gi->playerMeshNum;
+
+            USkeletalMeshComponent* TempMesh = GetMesh ( );
+            if (TempMesh)
+            {
+                TempMesh->SetMaterial ( 0 , FeverDynamicMats[my] );
+            }
+		}
+		else
+		{
+			UVirtualGameInstance_KMK* g = Cast<UVirtualGameInstance_KMK> ( GetWorld ( )->GetGameInstance ( ) );
+			USkeletalMeshComponent* TempMesh = GetMesh ( );
+			if (TempMesh)
+			{
+				TempMesh->SetMaterial ( 0 , FeverDynamicMats[g->playerMeshNum] );
+			}
 		}
 	}
 }
@@ -453,8 +470,16 @@ void AHSW_ThirdPersonCharacter::Look ( const FInputActionValue& Value )
 
 UMaterialInstanceDynamic* AHSW_ThirdPersonCharacter::ChangeMyMeshMat (int32 num )
 {
-	FeverDynamicMat = UMaterialInstanceDynamic::Create ( FeverCharactMat[num] , this );
-	return FeverDynamicMat;
+	if (FeverCharactMat.IsValidIndex ( num ))
+	{
+		return FeverDynamicMats[num];
+	}
+	else
+	{
+		UE_LOG ( LogTemp , Error , TEXT ( "ChangeMyMeshMat: MeshIndex %d가 유효하지 않습니다." ) , num );
+		return nullptr;  // 유효하지 않을 경우 nullptr 반환
+	}
+
 }
 
 // Imoji ==============================================================================================
@@ -556,8 +581,9 @@ void AHSW_ThirdPersonCharacter::MulticastRPCFeverGauge_Implementation (float Add
 
 void AHSW_ThirdPersonCharacter::MulticastRPCBrightness_Implementation ( int index )
 {
+	auto* gi = GetGameInstance<UVirtualGameInstance_KMK>();
 	UE_LOG ( LogTemp , Warning , TEXT ( "%f" ) , FeverBright );
-	FeverDynamicMat->SetScalarParameterValue ( TEXT ( "jswEmissivePower-A" ) , FeverBright );
+	FeverDynamicMats[gi->playerMeshNum]->SetScalarParameterValue ( TEXT ( "jswEmissivePower-A" ) , FeverBright );
 }
 
 void AHSW_ThirdPersonCharacter::PossessedBy ( AController* NewController )
