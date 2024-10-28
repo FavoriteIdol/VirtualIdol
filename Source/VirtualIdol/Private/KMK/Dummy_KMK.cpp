@@ -107,6 +107,24 @@ void ADummy_KMK::IdleFucn ( const float& DeltaTime )
 	default:
 		break;
 	}
+
+	
+	FaceTimer += DeltaTime;
+	if (FaceRand == 0 && FaceTimer >= 3)
+	{
+		// 상큼한 표정
+		FaceRand = FMath::RandRange ( 0 , 1 );
+		FaceTimer = 0;
+		SetFace(0.5);
+	}
+	else if (!(FaceRand == 0) && FaceTimer >= 2)
+	{
+		// 기본 표정
+		FaceRand = FMath::RandRange ( 0 , 1);
+		FaceTimer = 0;
+		SetFace (1);
+	}
+
 }
 
 void ADummy_KMK::JumpFunc ( const float& DeltaTime )
@@ -147,6 +165,12 @@ void ADummy_KMK::SetBrightness ( float brightValue )
 {
 	if(FeverDynamicMat)
 	FeverDynamicMat->SetScalarParameterValue ( TEXT ( "jswEmissivePower-A" ) , brightValue );
+}
+
+void ADummy_KMK::SetFace ( float faveValue)
+{
+	if (FeverDynamicMat)
+	FaceDynamicMat->SetScalarParameterValue ( TEXT ( "jswFaceChange" ) , faveValue );
 }
 
 void ADummy_KMK::ServerRPC_Shake_Implementation ( float brightValue )
@@ -191,6 +215,6 @@ void ADummy_KMK::MulticastRPC_Jump_Implementation ( const float& DeltaTime )
 {
 	// 더미끼리의 점프
 	if(IsLocallyControlled ()) Jump( );
-	if(!HasAuthority()&&!IsLocallyControlled())	UE_LOG ( LogTemp , Warning , TEXT ( "Jump" ) );
+	//if(!HasAuthority()&&!IsLocallyControlled())	UE_LOG ( LogTemp , Warning , TEXT ( "Jump" ) );
 	/*JumpFunc ( DeltaTime );*/
 }

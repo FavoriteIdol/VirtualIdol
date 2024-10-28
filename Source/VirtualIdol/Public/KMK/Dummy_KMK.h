@@ -77,10 +77,11 @@ public:
 	void SetBrightness( float brightValue );
 
 	UFUNCTION( )
-	void SetFace(float faveValue);
-
+	void SetFace(float faveValue );
+	float FaceTimer;
 	//UPROPERTY ( Replicated , EditDefaultsOnly , BlueprintReadWrite )
 	//int32 IntervieweeIndex;
+	int32 FaceRand = 1;
 
 	UFUNCTION(Server,Reliable )
 	void ServerRPC_Shake( float brightValue );
