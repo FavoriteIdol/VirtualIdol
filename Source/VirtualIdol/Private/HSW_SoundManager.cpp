@@ -36,27 +36,22 @@ void AHSW_SoundManager::GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& 
 	DOREPLIFETIME ( AHSW_SoundManager , CurrentSongComp );
 }
 
-void AHSW_SoundManager::ServerRPC_SetMusic_Implementation ( USoundBase* wavToSet )
-{
-	MulticastRPC_SetMusic(wavToSet );
-}
-
-void AHSW_SoundManager::MulticastRPC_SetMusic_Implementation ( USoundBase* wavToSet )
+void AHSW_SoundManager::SetMusic ( USoundBase* wavToSet )
 {
 	CurrentSongComp->SetSound ( wavToSet );
 }
 
-void AHSW_SoundManager::ServerRPC_PlayMusic_Implementation ( UAudioComponent* MusicToPlay )
+void AHSW_SoundManager::PlayMusic ( UAudioComponent* MusicToPlay )
 {
-	MulticastRPC_PlayMusic( MusicToPlay );
+	MusicToPlay->Play ( );
 }
 
-void AHSW_SoundManager::MulticastRPC_PlayMusic_Implementation ( UAudioComponent* MusicToPlay )
+void AHSW_SoundManager::ServerPlayMusic_Implementation ( USoundBase* wavFile )
 {
-	MusicToPlay->Play( );
+
 }
 
-void AHSW_SoundManager::PlaySound ( USoundBase* MusicToPlay )
+void AHSW_SoundManager::ClientPlayMusic_Implementation ( )
 {
 
 }

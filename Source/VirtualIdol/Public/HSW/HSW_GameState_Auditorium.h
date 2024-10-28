@@ -31,6 +31,12 @@ public:
 	UFUNCTION(Server, Reliable)
     void ServerRPCChat(const FString& Chat);
 
+	UFUNCTION(NetMulticast, Reliable )
+	void MultiRPCPlaySound(USoundBase* wavFile);
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPCPlaySound( USoundBase* wavFile);
+
 	UFUNCTION(Server, Reliable)
     void ServerRPC_ShowCountDown ();
 

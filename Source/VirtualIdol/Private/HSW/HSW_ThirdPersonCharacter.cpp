@@ -490,6 +490,30 @@ void AHSW_ThirdPersonCharacter::CancleVoiceChat ( )
 	pc->StopTalking( );
 }
 
+void AHSW_ThirdPersonCharacter::ServerRPCPlayMusic_Implementation ( )
+{
+	MulticastRPCPlayMusic( );
+}
+
+void AHSW_ThirdPersonCharacter::MulticastRPCPlayMusic_Implementation ( )
+{
+	USoundBase* wavFile = WavArray[0];
+	UAudioComponent* AudioComponent = NewObject<UAudioComponent> ( this );
+	AudioComponent->SetSound ( wavFile );
+	AudioComponent->RegisterComponent ( );
+	AudioComponent->Play ( );  // 음원 재생
+}
+
+void AHSW_ThirdPersonCharacter::PlayMusic ( USoundBase* wavFile )
+{
+
+	UE_LOG ( LogTemp , Warning , TEXT ("Client : Play Music" ) );
+	UAudioComponent* AudioComponent = NewObject<UAudioComponent> ( this );
+	AudioComponent->SetSound ( wavFile );
+	AudioComponent->RegisterComponent ( );
+	AudioComponent->Play ( );  // 음원 재생
+}
+
 void AHSW_ThirdPersonCharacter::AppearImoji (  )
 {
 	//UNiagaraComponent* AppearEffect = UNiagaraFunctionLibrary::SpawnSystemAtLocation ( GetWorld ( ) , EmojiEffect , ImojiComp->GetComponentLocation ( ) );

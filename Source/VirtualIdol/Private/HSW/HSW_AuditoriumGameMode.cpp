@@ -74,6 +74,15 @@ void AHSW_AuditoriumGameMode::BroadcastChatMessage ( const FString& Chat )
     }
 }
 
+void AHSW_AuditoriumGameMode::BroadcastPlayMusic ( USoundBase* wavFile )
+{
+	AHSW_GameState_Auditorium* gs = GetGameState<AHSW_GameState_Auditorium> ( );
+	if (gs)
+	{
+		gs->MultiRPCPlaySound ( wavFile );
+	}
+}
+
 void AHSW_AuditoriumGameMode::BroadcastCountDown ( )
 {
 	AHSW_GameState_Auditorium* gs = GetGameState<AHSW_GameState_Auditorium> ( );
@@ -96,21 +105,5 @@ void AHSW_AuditoriumGameMode::ServerPlayMusic_Implementation ( class UAudioCompo
 				PlayerCharacter->ClientPlayMusic ( selectedMusic );
 			}
 		}
-	}
-}
-
-void AHSW_AuditoriumGameMode::ClientPlayMusic_Implementation ( class UAudioComponent* selectedMusic )
-{
-//	UGameplayStatics::PlaySound2D(this, Music );
-	if (selectedMusic)
-	{
-// 		UAudioComponent* NewAudioComponent = NewObject<UAudioComponent> ( this );
-// 		NewAudioComponent = selectedMusic;
-		selectedMusic->Play();
-		UE_LOG(LogTemp,Warning,TEXT("Music Play" ) );
-	}
-	else
-	{
-		UE_LOG ( LogTemp , Warning , TEXT ( "not Music" ) );
 	}
 }

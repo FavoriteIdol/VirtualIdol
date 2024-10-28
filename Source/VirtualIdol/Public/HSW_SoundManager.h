@@ -34,18 +34,15 @@ public:
 	class UAudioComponent* CurrentSongComp;
 
 	// 기능
-	UFUNCTION(Server, Reliable )
-	void ServerRPC_SetMusic( USoundBase* wavToSet );
+	UFUNCTION( )
+	void SetMusic( USoundBase* wavToSet );
 
-	UFUNCTION(NetMulticast, Reliable )
-	void MulticastRPC_SetMusic( USoundBase* wavToSet );
+	void PlayMusic( UAudioComponent* MusicToPlay );
 
+    UFUNCTION(BlueprintCallable, Server, Reliable)
+    void ServerPlayMusic(USoundBase* wavFile);
 
-	UFUNCTION(Server, Reliable )
-	void ServerRPC_PlayMusic( UAudioComponent* MusicToPlay );
-
-	UFUNCTION(NetMulticast, Reliable )
-	void MulticastRPC_PlayMusic( UAudioComponent* MusicToPlay );
-
-	void PlaySound( USoundBase* MusicToPlay );
+	// 노래 재생 함수 (클라이언트에서도 호출 가능)
+    UFUNCTION(Client, Reliable)
+    void ClientPlayMusic();
 };

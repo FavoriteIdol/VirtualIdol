@@ -5,6 +5,8 @@
 #include "chrono"
 #include "KMK/Audience_KMK.h"
 #include "HSW/HSW_GameState_Auditorium.h"
+#include "Sound/SoundBase.h"
+#include "Components/AudioComponent.h"
 
 // Sets default values for this component's properties
 UVirtual_KMK::UVirtual_KMK()
@@ -152,6 +154,15 @@ void UVirtual_KMK::StartCountDown ( )
 			if(appearFact.Num() > 0) GetWorld ( )->SpawnActor<AActor> ( appearFact[0] , FTransform ( FVector ( 0 ) ) );
         } ) , 6 , false );
 
+}
+
+void UVirtual_KMK::PlayMusic ( USoundBase* wavFile )
+{
+	UE_LOG ( LogTemp , Warning , TEXT ( "Virtual : Play Music" ) );
+	UAudioComponent* AudioComponent = NewObject<UAudioComponent> ( this );
+	AudioComponent->SetSound ( wavFile );
+	AudioComponent->RegisterComponent ( );
+	AudioComponent->Play ( );  // 음원 재생
 }
 
 #pragma endregion

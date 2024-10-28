@@ -50,16 +50,16 @@ public:
 	UFUNCTION( )
 	void BroadcastChatMessage ( const FString& Chat );
 
-	class UAudioComponent* MusicComponent;
-
-	UPROPERTY(EditAnywhere,BlueprintReadWrite);
-	class USoundBase* SoundFile;
+	UFUNCTION( )
+	void BroadcastPlayMusic( USoundBase* wavFile);
 
 	UFUNCTION(Server, Reliable )
 	void ServerPlayMusic( class UAudioComponent* selectedMusic );
 
-	UFUNCTION(Client, Reliable)
-	void ClientPlayMusic( class UAudioComponent* selectedMusic );
+
 	UFUNCTION( )
 	void BroadcastCountDown( );
+
+	UPROPERTY( )
+	TArray<class USoundBase *> WavArray;
 };
