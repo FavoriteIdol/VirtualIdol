@@ -161,9 +161,34 @@ void UAudience_KMK::PressHiddenButt ( )
     OnOffFunction(Text_Hidden, 0, true);
 }
 
+
 void UAudience_KMK::PressModeButt ( )
 {
     OnOffFunction(Text_Mode, 1 );
+
+    if (bMondeOn)
+    {
+        bMondeOn = false;
+        SetVisibleActor (bMondeOn);
+    }
+    else
+    {
+        bMondeOn = true;
+        SetVisibleActor (bMondeOn );
+    }
+}
+void UAudience_KMK::SetVisibleActor ( bool bActive )
+{
+    TArray<AActor*> actors;
+    UGameplayStatics::GetAllActorsWithTag(GetWorld(), TEXT("OnOff" ), actors );
+    APawn* myPC = GetWorld()->GetFirstPlayerController()->GetPawn();
+    for (AActor* c : actors)
+    {
+        if (c != myPC)
+        {
+            c->SetActorHiddenInGame(bActive);
+        }
+    }
 }
 
 void UAudience_KMK::StartVoiceChat ( )

@@ -30,4 +30,20 @@ public:
 
 	UFUNCTION(Server, Reliable)
     void ServerRPCChat(const FString& Chat);
+
+	UFUNCTION(Server, Reliable)
+    void ServerRPC_ShowCountDown ();
+
+	UFUNCTION(NetMulticast, Reliable )
+	void MultiRPC_ShowCountDown( );
+
+	UFUNCTION(NetMulticast, Reliable )
+	void MultiRPC_FeverGauge( float feverValue );
+
+	FTimerHandle startCountDownHandle;
+	UPROPERTY(EditAnywhere )
+	float durationTime = 6;
+	float remainTime = 0.f;
+	UPROPERTY()
+	bool bTime = false;
 };

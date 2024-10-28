@@ -19,7 +19,7 @@ UHSW_ImojiConponent::UHSW_ImojiConponent()
 
 
 	// 이모지 텍스쳐 찾기
-	static ConstructorHelpers::FObjectFinder<UTexture2D> LoadedImoji01Texture ( TEXT ( "Texture2D'/Game/Project/Personal/HSW/Resources/Imogi/Imoji_01.Imoji_01'" ) );
+	/*static ConstructorHelpers::FObjectFinder<UTexture2D> LoadedImoji01Texture ( TEXT ( "Texture2D'/Game/Project/Personal/HSW/Resources/Imogi/Imoji_01.Imoji_01'" ) );
 	if (LoadedImoji01Texture.Succeeded ( ))
 	{
 		Imoji01Texture = LoadedImoji01Texture.Object;
@@ -80,7 +80,7 @@ UHSW_ImojiConponent::UHSW_ImojiConponent()
 // 	}
 // 	else
 // 	{
-// 		UE_LOG ( LogTemp , Warning , TEXT ( "Failed to load Fade Out Curve" ) );
+// 		UE_LOG ( LogTemp , Warning , TEXT ( "Failed to load Fade Out Curve" ) );*/
 // 	}
 }
 
@@ -91,10 +91,10 @@ void UHSW_ImojiConponent::BeginPlay()
 	Super::BeginPlay();
 
 	// 빌보드 컴포넌트
-	ImojiBillboard = Cast<UBillboardComponent> ( GetChildComponent ( 0 )->GetChildComponent ( 0 ) );
-	ImojiBillboard->SetVisibility ( false );
+	//ImojiBillboard = Cast<UBillboardComponent> ( GetChildComponent ( 0 )->GetChildComponent ( 0 ) );
+	//ImojiBillboard->SetVisibility ( false );
 
-	Me = Cast<AHSW_ThirdPersonCharacter> ( GetOwner ( ) );
+	//Me = Cast<AHSW_ThirdPersonCharacter> ( GetOwner ( ) );
 
 
 // 	// 타임라인

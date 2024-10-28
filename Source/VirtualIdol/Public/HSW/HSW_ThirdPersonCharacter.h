@@ -150,10 +150,13 @@ public:
 	int32 PersonalGauge = 0;
 
 	UPROPERTY( EditDefaultsOnly , BlueprintReadWrite , Category = FeverGauge )
-	UMaterialInstance* FeverCharactMat;
+	TArray<UMaterialInstance*> FeverCharactMat;
 
 	UPROPERTY( EditAnywhere , BlueprintReadWrite , Category = FeverGauge )
 	UMaterialInstanceDynamic* FeverDynamicMat;
+
+    UFUNCTION ( )
+    UMaterialInstanceDynamic* ChangeMyMeshMat ( int32 num = 0 );
 
 	// MainWidget을 생성해서 기억하고싶다.
 // 	UPROPERTY(EditDefaultsOnly, Category = MainUI)

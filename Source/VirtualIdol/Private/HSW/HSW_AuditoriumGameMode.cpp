@@ -74,7 +74,14 @@ void AHSW_AuditoriumGameMode::BroadcastChatMessage ( const FString& Chat )
     }
 }
 
-
+void AHSW_AuditoriumGameMode::BroadcastCountDown ( )
+{
+	AHSW_GameState_Auditorium* gs = GetGameState<AHSW_GameState_Auditorium> ( );
+	if (gs)
+	{
+		gs->MultiRPC_ShowCountDown();
+	}
+}
 void AHSW_AuditoriumGameMode::ServerPlayMusic_Implementation ( class UAudioComponent* selectedMusic )
 {
 	for (FConstPlayerControllerIterator It = GetWorld ( )->GetPlayerControllerIterator ( ); It; ++It)
