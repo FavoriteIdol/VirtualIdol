@@ -70,7 +70,7 @@ public:
 	void MultiRPC_UpdateCount( const FString& TimeText );
 	FTimerHandle startCountDownHandle;
 	UPROPERTY(EditAnywhere )
-	float durationTime = 6;
+	float durationTime = 5;
 	float remainTime = 0.f;
 	UPROPERTY()
 	bool bTime = false;
@@ -79,8 +79,17 @@ public:
 	void StartCountDown( );
 	UFUNCTION ( )
 	FString GetTimeDifference ( const FString& SetTime );
-	UFUNCTION(BlueprintCallable )
-	void CheatStartConcert( );
+
+	UPROPERTY( )
+	class UVirtual_KMK* virtualCharacter;
+
 	UPROPERTY( EditAnywhere)
 	FString setConcertTime = "22:10:00";
+
+	UFUNCTION( )
+	void FindVirtualCharacter( );
+	UPROPERTY ( EditDefaultsOnly , Category = Fever )
+	TArray< TSubclassOf<class AActor>> appearFact;
+
+	bool onReq = false;
 };

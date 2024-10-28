@@ -11,7 +11,8 @@ enum class DummyState
 	Idle,
 	Jump,
 	Move,
-	Imoji
+	Imoji,
+	Fever
 };
 UCLASS()
 class VIRTUALIDOL_API ADummy_KMK : public ACharacter
@@ -33,6 +34,9 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual void GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
+
+	UPROPERTY(Replicated )
 	DummyState state = DummyState::Idle;
 
 	void IdleFucn(const float& DeltaTime );
@@ -40,7 +44,7 @@ public:
 	void MoveFucn(const float& DeltaTime );
 	void ImojiFucn(const float& DeltaTime );
 
-	void AppearImoji ( int32 num, int32 bVisible );
+	void AppearImoji ( int32 num );
 	void DisappearImoji ( );
 
 	FTimerHandle timerHandle;
@@ -52,7 +56,60 @@ public:
 	class UWidgetComponent* imojiComp;
 	UPROPERTY( )
 	class UDummyUI_KMK* widget;
+
+
+	UPROPERTY(Replicated )
 	bool isJump = false;
+
+	UPROPERTY(Replicated )
 	bool isImoji = false;
+
+	float Brightness = 1;
+
+	UPROPERTY( )
+	class AHSW_ThirdPersonCharacter* ServerPlayer;
+
+	UFUNCTION(BlueprintImplementableEvent, Category= Fever )
+	void ShakeBodyBlueprint( );
+
+	
+	UFUNCTION( )
+	void SetBrightness( float brightValue );
+
+	UFUNCTION( )
+	void SetFace(float faveValue );
+	float FaceTimer;
+	//UPROPERTY ( Replicated , EditDefaultsOnly , BlueprintReadWrite )
+	//int32 IntervieweeIndex;
+	int32 FaceRand = 1;
+
+	float ImojiTimer = 4;
+
+	bool bVisible = false;
+
+	UFUNCTION(Server,Reliable )
+	void ServerRPC_Shake( float brightValue );
+
+	UFUNCTION(NetMulticast,Reliable )
+	void MulticastRPC_Shake( float brightValue );
+
+
+	UFUNCTION(Server,Reliable )
+	void ServerRPC_Jump( const float& DeltaTime );
+
+	UFUNCTION(NetMulticast,Reliable )
+	void MulticastRPC_Jump( const float& DeltaTime );
+
+	UPROPERTY( EditDefaultsOnly , BlueprintReadWrite , Category = FeverGauge )
+	UMaterialInstance* FeverCharactMat;
+
+	UPROPERTY( EditAnywhere , BlueprintReadWrite , Category = FeverGauge )
+	UMaterialInstanceDynamic* FeverDynamicMat;
+
+	UPROPERTY( EditDefaultsOnly , BlueprintReadWrite , Category = FeverGauge )
+	UMaterialInstance* FaceMat;
+
+	UPROPERTY( EditAnywhere , BlueprintReadWrite , Category = FeverGauge )
+	UMaterialInstanceDynamic* FaceDynamicMat;
 
 };

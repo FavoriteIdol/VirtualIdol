@@ -8,6 +8,10 @@
 #include "Kismet/GameplayStatics.h"
 #include "../../../../Plugins/FX/Niagara/Source/Niagara/Public/NiagaraFunctionLibrary.h"
 #include "Net/UnrealNetwork.h"
+#include "HSW/HSW_GameState_Auditorium.h"
+#include "Components/AudioComponent.h"
+#include "GameFramework/PlayerController.h"
+#include "Sound/SoundBase.h"
 
 AHSW_AuditoriumGameMode::AHSW_AuditoriumGameMode ( )
 {
@@ -59,4 +63,54 @@ void AHSW_AuditoriumGameMode::Multicast_FeverEffect_Implementation ( )
 	UGameplayStatics::SpawnEmitterAtLocation ( GetWorld ( ) , FeverEffect_Particle , FeverEffectLocation );
 	UE_LOG(LogTemp, Warning, TEXT("Multicast_FeverEffect_Implementation"));
 	//UNiagaraFunctionLibrary::SpawnSystemAtLocation ( GetWorld ( ) , FeverEffect_Niagara , FeverEffectLocation.GetLocation() );
+}
+
+void AHSW_AuditoriumGameMode::BroadcastChatMessage ( const FString& Chat )
+{
+    AHSW_GameState_Auditorium* gs = GetGameState<AHSW_GameState_Auditorium>();
+    if (gs)
+    {
+        gs->MultiRPCChat(Chat);
+    }
+}
+
+void AHSW_AuditoriumGameMode::BroadcastCountDown ( )
+{
+	AHSW_GameState_Auditorium* gs = GetGameState<AHSW_GameState_Auditorium> ( );
+	if (gs)
+	{
+		gs->MultiRPC_ShowCountDown();
+	}
+}
+void AHSW_AuditoriumGameMode::ServerPlayMusic_Implementation ( class UAudioComponent* selectedMusic )
+{
+	for (FConstPlayerControllerIterator It = GetWorld ( )->GetPlayerControllerIterator ( ); It; ++It)
+	{
+		APlayerController* PlayerController = It->Get();
+		if (PlayerController)
+		{
+			AHSW_ThirdPersonCharacter* PlayerCharacter = Cast<AHSW_ThirdPersonCharacter>(PlayerController->GetPawn( ));
+			if (PlayerCharacter)
+			{
+				//SoundFile = sound;
+				PlayerCharacter->ClientPlayMusic ( selectedMusic );
+			}
+		}
+	}
+}
+
+void AHSW_AuditoriumGameMode::ClientPlayMusic_Implementation ( class UAudioComponent* selectedMusic )
+{
+//	UGameplayStatics::PlaySound2D(this, Music );
+	if (selectedMusic)
+	{
+// 		UAudioComponent* NewAudioComponent = NewObject<UAudioComponent> ( this );
+// 		NewAudioComponent = selectedMusic;
+		selectedMusic->Play();
+		UE_LOG(LogTemp,Warning,TEXT("Music Play" ) );
+	}
+	else
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "not Music" ) );
+	}
 }

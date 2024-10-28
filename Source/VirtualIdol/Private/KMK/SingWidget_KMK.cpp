@@ -7,6 +7,7 @@
 #include "Sound/SoundWave.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/AudioComponent.h"
+#include "HSW/HSW_AuditoriumGameMode.h"
 
 void USingWidget_KMK::NativeConstruct ( )
 {
@@ -17,6 +18,8 @@ void USingWidget_KMK::NativeConstruct ( )
         Butt_Start->OnClicked.AddDynamic ( this , &USingWidget_KMK::PressStartButt);
         Butt_Pause->OnClicked.AddDynamic ( this , &USingWidget_KMK::PressPauseButt);
     }
+
+    gm = Cast<AHSW_AuditoriumGameMode>(GetWorld()->GetAuthGameMode());
 }
 
 void USingWidget_KMK::PressStopButt ( )
@@ -34,7 +37,7 @@ void USingWidget_KMK::PressStartButt ( )
         sound = preSound;
         bStop = false;
     }
-    sound->Play();
+    //gm->ServerPlayMusic( SoundFile );
     sound->SetPaused(false);
 }
 
@@ -52,8 +55,9 @@ void USingWidget_KMK::SetTextMusic ( const FString& text )
     }
 }
 
-void USingWidget_KMK::SetMusic ( class UAudioComponent* music )
+void USingWidget_KMK::SetMusic ( class UAudioComponent* music, class USoundBase* wavFile )
 {
+    SoundFile = wavFile;
     sound = music;
     preSound = music;
 }

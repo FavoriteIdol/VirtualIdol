@@ -36,6 +36,10 @@
 #include "Components/StaticMeshComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInstance.h"
+#include "KMK/Virtual_KMK.h"
+#include "Components/AudioComponent.h"
+#include "Misc/FileHelper.h"
+#include "KMK/AudienceServerComponent_KMK.h"
 
 // Sets default values
 AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
@@ -125,7 +129,7 @@ AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
 // 	}
 	bReplicates = true;
 	SetReplicateMovement ( true );
-	
+
 }
 
 // Called when the game starts or when spawned
@@ -137,8 +141,11 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
     //{
     //    InitMainUI ( );
     //}
-    ImojiComp->SetVisibility ( false );
-    imojiWidget = Cast<UHSW_ImogiWidget> ( ImojiComp->GetWidget ( ) );
+	if (ImojiComp)
+	{
+		imojiWidget = Cast<UHSW_ImogiWidget> ( ImojiComp->GetWidget ( ) );
+		ImojiComp->SetVisibility ( false );
+	}
 
 	FInputModeGameAndUI a;
 	GetWorld()->GetFirstPlayerController()->SetInputMode(a);
@@ -171,26 +178,18 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 
 #pragma region KMK
 	pc = GetWorld()->GetFirstPlayerController();
+	serverComp = FindComponentByClass<UAudienceServerComponent_KMK>( );
 	UVirtualGameInstance_KMK* gi = Cast<UVirtualGameInstance_KMK> ( GetWorld ( )->GetGameInstance ( ) );
 	if (IsLocallyControlled ( ))
 	{
-        if (HasAuthority ( ))
+        if (!HasAuthority ( ))
         {
-            if (virtualWidgetFact && !audienceWidget)
-            {
-				audienceWidget = CreateWidget<UAudience_KMK> ( GetWorld ( ) , virtualWidgetFact );
-				audienceWidget->AddToViewport ( );
-				audienceWidget->pc = this;
-				audienceWidget->SetVirtualWBP();
-            }
-
-        }
-        else
-        {
-			audienceWidget = CreateWidget<UAudience_KMK> ( GetWorld ( ) , audienceWidgetFact );
+            audienceWidget = CreateWidget<UAudience_KMK> ( GetWorld ( ) , audienceWidgetFact );
 			audienceWidget->AddToViewport ( );
 			audienceWidget->pc = this;
+			gi->SetWidget(audienceWidget);
         }
+
 		if (gi)
 		{
 			if (audienceWidget && gi->playerMeshNum == 1)
@@ -204,14 +203,24 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 		GetController<APlayerController> ( )->SetInputMode(inputMode );
 	}
 #pragma endregion
-	FeverDynamicMat = UMaterialInstanceDynamic::Create ( FeverCharactMat , this );
 
-	USkeletalMeshComponent* TempMesh = GetMesh ( );
-	if (TempMesh)
+
+	if (HasAuthority ( ))
 	{
-		TempMesh->SetMaterial ( 0 , FeverDynamicMat );
+		StartVoiceChat( );
 	}
+	else
+	{
+		int32 my = 0;
+		if( gi->playerMeshNum >= 0) my =  gi->playerMeshNum;
+		FeverDynamicMat = UMaterialInstanceDynamic::Create ( FeverCharactMat[my] , this );
 
+		USkeletalMeshComponent* TempMesh = GetMesh ( );
+		if (TempMesh)
+		{
+			TempMesh->SetMaterial ( 0 , FeverDynamicMat );
+		}
+	}
 }
 
 // Called every frame
@@ -245,9 +254,23 @@ void AHSW_ThirdPersonCharacter::Tick(float DeltaTime)
 	}
 }
 
+void AHSW_ThirdPersonCharacter::ClientPlayMusic_Implementation ( class UAudioComponent* selectedMusic )
+{
+	//	UGameplayStatics::PlaySound2D(this, Music );
+	if (selectedMusic)
+	{
+		selectedMusic->Play ( );
+		UE_LOG ( LogTemp , Warning , TEXT ( "Music Play" ) );
+	}
+	else
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "not Music" ) );
+	}
+}
+
 void AHSW_ThirdPersonCharacter::OnRep_FeverGauge ( )
 {
-	
+
 }
 
 void AHSW_ThirdPersonCharacter::PrintFeverGaugeLogOnHead ( )
@@ -268,15 +291,21 @@ void AHSW_ThirdPersonCharacter::SetFeverGaugeMulti ( float feverValue )
 
 	}
 	// 로컬 컨트롤을 하는 캐릭터가 내가 아닌 상황이라 나는 MainUI가 없다. 그러니 나의 MainUI를 갱신해주자
-	else if (!IsLocallyControlled ( ) && audienceWidget == nullptr)
+	else if (!IsLocallyControlled ( ))
 	{
-		AHSW_ThirdPersonCharacter* localPlayer = Cast<AHSW_ThirdPersonCharacter>(GetWorld( )->GetFirstPlayerController()->GetCharacter());
-		if (localPlayer != nullptr)
-		{
-			localPlayer->CurrentGauge = feverValue;
-			localPlayer->audienceWidget->FeverGauge->SetFeverGauge ( localPlayer->CurrentGauge );
-			//UE_LOG ( LogTemp , Error , TEXT ( "Not LocalPlayer Gauge: %f" ) , localPlayer->CurrentGauge );
+		//// 버츄얼을 제외한 나머지
+		//AHSW_ThirdPersonCharacter* localPlayer = Cast<AHSW_ThirdPersonCharacter>(GetWorld( )->GetFirstPlayerController()->GetCharacter());
+		//if (localPlayer != nullptr)
+		//{
+		//	localPlayer->CurrentGauge = feverValue;
+		//	localPlayer->audienceWidget->FeverGauge->SetFeverGauge ( localPlayer->CurrentGauge );
+		//	//UE_LOG ( LogTemp , Error , TEXT ( "Not LocalPlayer Gauge: %f" ) , localPlayer->CurrentGauge );
 
+		//}
+		AHSW_GameState_Auditorium* myGs = GetWorld ( )->GetGameState<AHSW_GameState_Auditorium> ( );
+		if (myGs)
+		{
+			myGs->MultiRPC_FeverGauge ( feverValue );  // GameMode로 메시지 전달
 		}
 	}
 
@@ -284,13 +313,13 @@ void AHSW_ThirdPersonCharacter::SetFeverGaugeMulti ( float feverValue )
 
 // void AHSW_ThirdPersonCharacter::InitMainUI ( )
 // {
-// 
+//
 // 	auto* pc_h = Cast<AHSW_PlayerController> ( Controller );
 // 	if (pc_h == nullptr)
 // 	{
 // 		return;
 // 	}
-// 
+//
 // 	if (IsLocallyControlled ( ))
 // 	{
 // 		if (pc_h->mainUIWidget)
@@ -307,7 +336,7 @@ void AHSW_ThirdPersonCharacter::SetFeverGaugeMulti ( float feverValue )
 // 					//UE_LOG ( LogTemp , Error , TEXT ( "Succeed to create MainUI widget." ) );
 // 				}
 // 			}
-// 
+//
 // 			this->MainUI = pc_h->MainUI;
 // 			MainUI->AddToViewport ( );
 // 		}
@@ -422,6 +451,12 @@ void AHSW_ThirdPersonCharacter::Look ( const FInputActionValue& Value )
 	}
 }
 
+UMaterialInstanceDynamic* AHSW_ThirdPersonCharacter::ChangeMyMeshMat (int32 num )
+{
+	FeverDynamicMat = UMaterialInstanceDynamic::Create ( FeverCharactMat[num] , this );
+	return FeverDynamicMat;
+}
+
 // Imoji ==============================================================================================
 
 void AHSW_ThirdPersonCharacter::Imoji ( int index )
@@ -443,6 +478,16 @@ void AHSW_ThirdPersonCharacter::MulticastRPCImoji_Implementation ( int index )
 
 	GetWorld ( )->GetTimerManager ( ).ClearTimer ( TimerHandleImoji );
 	GetWorld ( )->GetTimerManager ( ).SetTimer ( TimerHandleImoji , this , &AHSW_ThirdPersonCharacter::DisappearImoji , 1.0f );
+}
+
+void AHSW_ThirdPersonCharacter::StartVoiceChat ( )
+{
+	pc->StartTalking( );
+}
+
+void AHSW_ThirdPersonCharacter::CancleVoiceChat ( )
+{
+	pc->StopTalking( );
 }
 
 void AHSW_ThirdPersonCharacter::AppearImoji (  )
@@ -468,7 +513,7 @@ void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value 
 		PersonalGauge++;
 		ServerRPCFeverGauge (CurrentGauge, 100*0.02);
 		PrintFeverGaugeLogOnHead ( );
-		
+
 		//MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
 		//UGameplayStatics::SpawnEmitterAtLocation ( GetWorld ( ) , FeverEffect_Particle , FeverEffectLocation );
 	}
@@ -602,7 +647,7 @@ void AHSW_ThirdPersonCharacter::MulticastRPCInterview_Implementation ( )
 	{
 		UE_LOG ( LogTemp , Warning , TEXT ( "Interview is in progress." ) );
 		// 멀티캐스트 확인용 임시로 사용할 쉐이크바뤼
-		ShakeBodyBlueprint ( );
+		//ShakeBodyBlueprint ( );
 	}
 	else
 	{
@@ -617,7 +662,7 @@ void AHSW_ThirdPersonCharacter::ChooseInterviwee ( )
 	//AHSW_ThirdPersonCharacter* intervieweePlayer = Cast<AHSW_ThirdPersonCharacter> ( IntervieweePlayerState->GetPlayerController ( )->GetCharacter ( ) );
 	if (IsLocallyControlled ())
 	{
-		
+
 		if (bIsInterviewing)
 		{
 			UE_LOG ( LogTemp , Warning , TEXT ( "플레이어 수: %d" ) , PlayerStates.Num ( ) );
@@ -648,12 +693,14 @@ void AHSW_ThirdPersonCharacter::ChooseInterviwee ( )
 			{
 				UE_LOG ( LogTemp , Warning , TEXT ( "TargetArmLength = 250" ) );
 				localPlayer->CameraBoom->TargetArmLength = 250;
+				CancleVoiceChat();
 			}
 			// 인터뷰 중일때 실행
 			else
 			{
 				UE_LOG ( LogTemp , Warning , TEXT ( "TargetArmLength = 0" ) );
 				localPlayer->CameraBoom->TargetArmLength = 0;
+				StartVoiceChat( );
 			}
 		}
 	}
@@ -733,18 +780,24 @@ void AHSW_ThirdPersonCharacter::MulticastRPCThrowPitch_Implementation ( )
 #pragma region KMK
 void AHSW_ThirdPersonCharacter::InitializeAudienceWidget ( TSubclassOf<class UAudience_KMK>  widgetFact )
 {
-	if (!widgetFact) // 위젯이 nullptr인 경우에만 생성
-	{
-		if (widgetFact)
-		{
-			audienceWidget = CreateWidget<UAudience_KMK> ( GetWorld ( ) , widgetFact );
-			audienceWidget->AddToViewport ( );
-			audienceWidget->pc = this;
-		}
-		else
-		{
-			UE_LOG ( LogTemp , Error , TEXT ( "AudienceWidgetClass is not set." ) );
-		}
-	}
+	//if (!widgetFact) // 위젯이 nullptr인 경우에만 생성
+	//{
+	//	if (widgetFact)
+	//	{
+	//		audienceWidget = CreateWidget<UAudience_KMK> ( GetWorld ( ) , widgetFact );
+	//		audienceWidget->AddToViewport ( );
+	//		audienceWidget->pc = this;
+	//	}
+	//	else
+	//	{
+	//		UE_LOG ( LogTemp , Error , TEXT ( "AudienceWidgetClass is not set." ) );
+	//	}
+	//}
 }
+
+void AHSW_ThirdPersonCharacter::SetChatWidget ( const FString& text )
+{
+	if(audienceWidget)audienceWidget->CreateChatWidget(text);
+}
+
 #pragma endregion

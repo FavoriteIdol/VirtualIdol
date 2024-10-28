@@ -14,6 +14,10 @@
 #include "KMK/AudienceServerComponent_KMK.h"
 #include "KMK/HttpActor_KMK.h"
 #include "Components/CanvasPanel.h"
+#include "HSW/HSW_ThirdPersonCharacter.h"
+#include "KMK/Virtual_KMK.h"
+#include "KMK/Audience_KMK.h"
+#include "Kismet/GameplayStatics.h"
 
 
 #include "SocketSubsystem.h"
@@ -289,7 +293,13 @@ void UVirtualGameInstance_KMK::SetConcertInfo ( const struct FConcertInfo& info 
 }
 
 #pragma endregion
+#pragma region Chat
+void UVirtualGameInstance_KMK::SetWidget ( class UAudience_KMK* wid )
+{
+	myWidget = wid;
+}
 
+#pragma endregion
 
 FString UVirtualGameInstance_KMK::GetLocalIPAddress ( )
 {
@@ -320,3 +330,5 @@ void UVirtualGameInstance_KMK::SendMulticastMessage ( )
     Socket->Close ( );
     ISocketSubsystem::Get ( PLATFORM_SOCKETSUBSYSTEM )->DestroySocket ( Socket );
 }
+
+

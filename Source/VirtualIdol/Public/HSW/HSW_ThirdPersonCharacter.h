@@ -97,6 +97,12 @@ public:
 
 	FTransform StageLocation;
 
+	UFUNCTION(Client, Reliable)
+	void ClientPlayMusic( class UAudioComponent* selectedMusic );
+
+	UPROPERTY( )
+	class USoundBase* soundFile;
+
 	// 피버게이지 --------------------------------------------------------------
 	UPROPERTY(EditDefaultsOnly , Category = FeverGauge )
 	class UHSW_FeverGaugeWidget* FeverGauge;
@@ -144,10 +150,13 @@ public:
 	int32 PersonalGauge = 0;
 
 	UPROPERTY( EditDefaultsOnly , BlueprintReadWrite , Category = FeverGauge )
-	UMaterialInstance* FeverCharactMat;
+	TArray<UMaterialInstance*> FeverCharactMat;
 
 	UPROPERTY( EditAnywhere , BlueprintReadWrite , Category = FeverGauge )
 	UMaterialInstanceDynamic* FeverDynamicMat;
+
+    UFUNCTION ( )
+    UMaterialInstanceDynamic* ChangeMyMeshMat ( int32 num = 0 );
 
 	// MainWidget을 생성해서 기억하고싶다.
 // 	UPROPERTY(EditDefaultsOnly, Category = MainUI)
@@ -276,6 +285,8 @@ public:
 	UFUNCTION(NetMulticast, Reliable )
 	void MulticastRPCImoji ( int index );
 
+	void StartVoiceChat( );
+	void CancleVoiceChat ( );
 
 
 #pragma region KMK
@@ -300,6 +311,9 @@ public:
 
 	UFUNCTION( )
 	void InitializeAudienceWidget( TSubclassOf<class UAudience_KMK>  widgetFact );
+
+	UFUNCTION( )
+	void SetChatWidget(const FString& text );
 #pragma endregion
 
 

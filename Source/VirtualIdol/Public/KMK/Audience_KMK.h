@@ -13,13 +13,13 @@ struct FButtonInfo
 	GENERATED_BODY ( )
 
 	UPROPERTY(meta = (BindWidget))
-    class UButton* button;
+    class UButton* button = nullptr;
 	UPROPERTY(meta = (BindWidget ) )
-	class UImage* backImage;
+	class UImage* backImage = nullptr;
 	UPROPERTY(meta = (BindWidget ) )
-	class UImage* image;
+	class UImage* image = nullptr;
 	UPROPERTY(meta = (BindWidget ) )
-    class UTextBlock* text;
+    class UTextBlock* text = nullptr;
 
 };
 UCLASS()
@@ -61,10 +61,13 @@ public :
 	UFUNCTION( )
 	void PressHiddenButt( );
 	// 2. Mode
+	bool bMondeOn = false;
 	UPROPERTY(meta = (BindWidget))
     class UButton* Butt_Mode;
 	UPROPERTY(meta = (BindWidget))
     class UTextBlock* Text_Mode;
+	UFUNCTION( )
+	void SetVisibleActor(bool bActive );
 
 	UFUNCTION( )
 	void PressModeButt( );
@@ -258,7 +261,7 @@ public :
 
 	UPROPERTY( )
 	float soundGain = 2;
-	UFUNCTION( )
+	UFUNCTION(BlueprintCallable)
 	void ChangeVirtualWidget( );
 
 #pragma endregion
