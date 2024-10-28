@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -13,5 +13,7 @@ UCLASS()
 class VIRTUALIDOL_API AJJH_SetupGameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+public:
+	UFUNCTION(Server, Reliable)
+    void ServerRPCChat(const FString& Chat);
 };

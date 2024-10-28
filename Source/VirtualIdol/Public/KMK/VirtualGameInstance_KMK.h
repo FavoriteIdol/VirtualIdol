@@ -15,19 +15,19 @@ struct FRoomInfo
 	GENERATED_BODY ( )
 
 	UPROPERTY(BlueprintReadOnly)
-	FString roomName;
+	FString roomName = TEXT("");
 	UPROPERTY(BlueprintReadOnly)
-	FString hostName;
+	FString hostName= TEXT("");
 	UPROPERTY(BlueprintReadOnly)
 	int32 MaxPlayer = 0;
 	UPROPERTY(BlueprintReadOnly)
 	int32 CurrentPlayer = 0;
 	UPROPERTY(BlueprintReadOnly)
-	int32 pingMS;
+	int32 pingMS = 0;
 	UPROPERTY(BlueprintReadOnly )
-	class UTexture2D* texture;
+	class UTexture2D* texture = NULL;
 
-	int32 index;
+	int32 index = -1;
 
 	FString ToString()
 	{
@@ -123,7 +123,20 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 	FConcertInfo concerInfo;
 	UFUNCTION( )
 	void SetConcertInfo( const struct FConcertInfo& info );
+	
+#pragma endregion
+#pragma region Chat
+
+	UFUNCTION(BlueprintCallable )
+	void SetWidget(class UAudience_KMK* wid );
+
+	UPROPERTY( )
+	class UAudience_KMK* myWidget;
 #pragma endregion
 
+	UFUNCTION ( BlueprintCallable )
+	FString GetLocalIPAddress ( );
 
+	UFUNCTION ( BlueprintCallable )
+	void SendMulticastMessage ( );
 };

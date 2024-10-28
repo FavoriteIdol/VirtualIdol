@@ -9,6 +9,10 @@
 #include "chrono"
 #include "HSW/HSW_ThirdPersonCharacter.h"
 
+#include "HSW/HSW_GameState_Auditorium.h"
+#include "HSW/HSW_AuditoriumGameMode.h"
+#include "Kismet/GameplayStatics.h"
+#include "KMK/Virtual_KMK.h"
 // Sets default values for this component's properties
 UAudienceServerComponent_KMK::UAudienceServerComponent_KMK()
 {
@@ -27,12 +31,38 @@ void UAudienceServerComponent_KMK::BeginPlay()
 
 	player = Cast<AHSW_ThirdPersonCharacter> (GetWorld()->GetFirstPlayerController()->GetPawn());
 	playerMesh = Cast<AHSW_ThirdPersonCharacter> (GetOwner());
-	if (gi)
+	if (playerMesh && playerMesh->HasAuthority())
 	{
-		// 플레이어가 로컬 플레이어 일때
-		if (!playerMesh->IsLocallyControlled())
+		
+		if (playerMesh->IsLocallyControlled())
         {
-			// 로컬이 아닌 경우에 플레이어의 playerMeshNum에 따라 
+            playerMesh->SetActorLocation ( FVector ( 0, 0, 100 ) );
+        }
+        else
+        {
+            playerMesh->SetActorLocation ( FVector ( 3600.0f, 0.f, 300.f ) );
+            playerMesh->SetActorRotation(FRotator(0, 180, 0));
+        }
+	}
+	else
+	{
+		FindVirtualCharacter ( );
+	}
+	if (gi && playerMesh)
+	{
+		
+		// 플레이어가 로컬 플레이어 일때
+		if (playerMesh->IsLocallyControlled())
+        {
+			// if(gi->playerMeshNum >= 0) playerMesh->GetMesh()->SetSkeletalMesh(audienceMesh[gi->playerMeshNum]);
+			// 클라이언트에서 서버로 RPC 호출
+			ServerRPC_ChangeMyMesh ( gi->playerMeshNum );
+			
+        }
+		else
+		{
+			UVirtualGameInstance_KMK* g = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance());
+			 //로컬이 아닌 경우에 플레이어의 playerMeshNum에 따라 
 			if (playerMeshNum < 0)
 			{
 				SetVirtualVisible ( playerMesh , false );
@@ -43,26 +73,38 @@ void UAudienceServerComponent_KMK::BeginPlay()
 			}
 			else
 			{
-				playerMesh->GetMesh ( )->SetSkeletalMesh ( audienceMesh[playerMeshNum] );
+				SetVirtualVisible ( playerMesh , true );
+				playerMesh->GetMesh ( )->SetSkeletalMesh ( audienceMesh[g->playerMeshNum] );
+				UMaterialInstanceDynamic* meshMat = playerMesh->ChangeMyMeshMat ( g->playerMeshNum );
+				playerMesh->GetMesh()->SetMaterial(0, meshMat);
 			}
-        }
-		else
+		}
+	}
+
+
+}
+
+void UAudienceServerComponent_KMK::FindVirtualCharacter ( )
+{
+	TArray<AActor*> actorArray;
+	UGameplayStatics::GetAllActorsWithTag ( GetWorld ( ) , TEXT ( "Virtual" ) , actorArray );
+	for (AActor* actor : actorArray)
+	{
+		if (actor->FindComponentByTag < USkeletalMeshComponent > ( TEXT ( "Mesh" ) ))
 		{
-			if(gi->playerMeshNum >=0 )playerMesh->GetMesh()->SetSkeletalMesh(audienceMesh[gi->playerMeshNum]);
-			// 클라이언트에서 서버로 RPC 호출
-			ServerRPC_ChangeMyMesh ( gi->playerMeshNum );
+			virtualCharacter = actor->FindComponentByClass<UVirtual_KMK > ( );
+			UE_LOG(LogTemp, Warning, TEXT("Find!!!!!!!!" ) );
+			if (virtualCharacter) virtualCharacter->SetVirtualVisible ( false );
 		}
 	}
 }
-
-
 // Called every frame
 void UAudienceServerComponent_KMK::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	if (!bVis)
 	{
-		s = GetTimeDifference ( setConcertTime );
+		//s = GetTimeDifference ( setConcertTime );
 		// 서버에서 시간을 계산하고 클라이언트에게 전파
 		AHSW_ThirdPersonCharacter* playerCharacter = Cast<AHSW_ThirdPersonCharacter> ( GetOwner ( ) );
 		if (playerCharacter && playerCharacter->audienceWidget && playerCharacter->IsLocallyControlled())
@@ -85,11 +127,28 @@ void UAudienceServerComponent_KMK::TickComponent(float DeltaTime, ELevelTick Tic
 			}
 		}
 	}
+	if (bTime)
+	{
+		remainTime = GetWorld ( )->GetTimerManager ( ).GetTimerRemaining ( startCountDownHandle );
+		if (player && player->audienceWidget)
+		{
+			if (remainTime >= 0.0f && remainTime < 6)
+			{
+				UE_LOG ( LogTemp , Warning , TEXT ( "시간: %f" ) , remainTime );
+				// 남은 시간을 위젯에 표시
+				player->audienceWidget->CountDownText ( FString::FromInt( remainTime) );
+			}
+		}
+	}
 }
-
+#pragma region Chat
 void UAudienceServerComponent_KMK::ServerRPCChat_Implementation ( const FString& chat )
 {
-	MultiRPCChat(chat);
+	 AHSW_GameState_Auditorium* gs = GetWorld()->GetGameState<AHSW_GameState_Auditorium>();
+    if ( gs)
+    {
+         gs->MultiRPCChat(chat);  // GameMode로 메시지 전달
+    }
 }
 
 void UAudienceServerComponent_KMK::MultiRPCChat_Implementation ( const FString& chat )
@@ -101,23 +160,27 @@ void UAudienceServerComponent_KMK::MultiRPCChat_Implementation ( const FString& 
 	}
 
 }
-
+#pragma endregion
 
 void UAudienceServerComponent_KMK::ServerRPC_ChangeMyMesh_Implementation ( int32 num)
 {
-	playerMeshNum = num;
-	// 클라이언트에게 RPC 호출
-	MultiRPC_ChangeMyMesh ( playerMeshNum , playerMesh );
+    UE_LOG(LogTemp, Warning, TEXT("Server is setting playerMeshNum to: %d"), num);
+    playerMeshNum = num;
+    UE_LOG(LogTemp, Warning, TEXT("Server updated playerMeshNum: %d"), playerMeshNum);
+
+    // 모든 클라이언트에게 RPC 호출
+    MultiRPC_ChangeMyMesh(playerMeshNum);
+
 }
 
-void UAudienceServerComponent_KMK::MultiRPC_ChangeMyMesh_Implementation ( int32 num, class AHSW_ThirdPersonCharacter* TargetMesh )
+void UAudienceServerComponent_KMK::MultiRPC_ChangeMyMesh_Implementation ( int32 num )
 {
-	
-
+	auto* TargetMesh = Cast<AHSW_ThirdPersonCharacter> (GetOwner());
     // 로컬 플레이어도 포함하여 모든 클라이언트에서 메쉬 동기화
+	if(!TargetMesh) return;
     if (num < 0)
     {
-        SetVirtualVisible(TargetMesh, false);
+        if(!TargetMesh->HasAuthority())SetVirtualVisible(TargetMesh, false);
     }
     else if (num > 1)
     {
@@ -125,54 +188,57 @@ void UAudienceServerComponent_KMK::MultiRPC_ChangeMyMesh_Implementation ( int32 
     }
 	else
 	{
+		SetVirtualVisible ( TargetMesh , true );
 		TargetMesh->GetMesh ( )->SetSkeletalMesh ( audienceMesh[num] );
+		UMaterialInstanceDynamic* meshMat = TargetMesh->ChangeMyMeshMat ( num );
+		TargetMesh->GetMesh()->SetMaterial(0, meshMat);
 	}
-
 }
 
 void UAudienceServerComponent_KMK::OnRep_ChangePlayerMesh()
 {
+	AHSW_ThirdPersonCharacter* playerCharacter = Cast<AHSW_ThirdPersonCharacter>(GetOwner());
     UE_LOG(LogTemp, Warning, TEXT("OnRep_ChangePlayerMesh: %s의 playerMeshNum: %d"), *GetOwner()->GetName(), playerMeshNum);
-
-    if (playerMesh)
-	{
-		if (playerMeshNum < 0)
-		{
-			SetVirtualVisible ( playerMesh , false );
-		}
-		else if (playerMeshNum > 1)
-		{
-			SetVirtualVisible ( playerMesh , true );
-		}
-		else
-		{
-			playerMesh->GetMesh ( )->SetSkeletalMesh ( audienceMesh[playerMeshNum] );
-		}
-	}
+	if (playerMeshNum < 0)
+    {
+        SetVirtualVisible ( playerCharacter , false );
+    }
+    else if (playerMeshNum > 1)
+    {
+        SetVirtualVisible ( playerCharacter , true );
+    }
+    else
+    {
+		onReq = true;
+		SetVirtualVisible ( playerMesh , true );
+        playerCharacter->GetMesh ( )->SetSkeletalMesh ( audienceMesh[playerMeshNum] );
+        UMaterialInstanceDynamic* meshMat = playerCharacter->ChangeMyMeshMat ( playerMeshNum );
+		playerCharacter->GetMesh()->SetMaterial(0, meshMat);
+    }
 }
 
 void UAudienceServerComponent_KMK::SetVirtualVisible ( class AHSW_ThirdPersonCharacter* mesh , bool bVisible )
 {
-	if (mesh)
+	if (mesh && !mesh->HasAuthority())
 	{
 		mesh->GetMesh ( )->SetRenderInMainPass ( bVisible );
 		mesh->GetMesh ( )->SetRenderInDepthPass ( bVisible );
 		UE_LOG ( LogTemp , Warning , TEXT ( "SetVirtualVisible: %s visibility: %s" ) , *mesh->GetName ( ) , bVisible ? TEXT ( "Visible" ) : TEXT ( "Hidden" ) );
 	}
 }
-
+#pragma region StartConcert
 void UAudienceServerComponent_KMK::StartCountDown ( )
 {
 	bTime = true;
-
+	GetWorld ( )->GetTimerManager ( ).SetTimer ( startCountDownHandle , FTimerDelegate::CreateLambda ( [this]( )
+		{
+			playerMesh->audienceWidget->CountDownPanelVisible ( ESlateVisibility::Hidden );
+			bTime = false;
+			virtualCharacter->SetVirtualVisible(true);
+			if (appearFact.Num ( ) > 0) GetWorld ( )->SpawnActor<AActor> ( appearFact[0] , FTransform ( FVector ( 0 ) ) );
+		} ) , 6 , false );
 }
-void UAudienceServerComponent_KMK::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const 
-{
-    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-    // playerMeshNum이 클라이언트에게 제대로 복제되도록 보장
-    DOREPLIFETIME(UAudienceServerComponent_KMK, playerMeshNum);
-}
 
 void UAudienceServerComponent_KMK::ServerRPC_StartConcert_Implementation ( )
 {
@@ -188,8 +254,6 @@ void UAudienceServerComponent_KMK::MultiRPC_StartConcert_Implementation ( float 
 		playerCharacter->audienceWidget->CountDownPanelVisible ( ESlateVisibility::Visible );
 	}
 }
-
-
 void UAudienceServerComponent_KMK::MultiRPC_UpdateCount_Implementation ( const FString& TimeText )
 {
 	AHSW_ThirdPersonCharacter* playerCharacter = Cast<AHSW_ThirdPersonCharacter> ( GetOwner() );
@@ -199,7 +263,8 @@ void UAudienceServerComponent_KMK::MultiRPC_UpdateCount_Implementation ( const F
 		playerCharacter->audienceWidget->CountDownText ( TimeText );
 	}
 }
-
+#pragma endregion
+#pragma region Time
 FString UAudienceServerComponent_KMK::GetTimeDifference ( const FString& SetTime )
 {
 	// 현재 시스템 시간을 가져오기
@@ -266,14 +331,13 @@ FString UAudienceServerComponent_KMK::GetTimeDifference ( const FString& SetTime
 	return TimeDifference;
 }
 
-void UAudienceServerComponent_KMK::CheatStartConcert ( )
-{
-	AHSW_ThirdPersonCharacter* playerCharacter = Cast<AHSW_ThirdPersonCharacter> ( GetOwner() );
-	if (playerCharacter && playerCharacter->HasAuthority ( ))
-	{
-		playerCharacter->audienceWidget->ChangeVirtualWidget ( );
-		playerCharacter->audienceWidget->SetCountDownTextVisible ( );
-	}
 
-	ServerRPC_ChangeMyMesh ( 2 );
+
+#pragma endregion
+void UAudienceServerComponent_KMK::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const 
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+    DOREPLIFETIME(UAudienceServerComponent_KMK, playerMeshNum);
 }
+

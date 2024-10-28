@@ -32,6 +32,10 @@
 #include "Components/HorizontalBox.h"
 #include "HSW/HSW_ImojiConponent.h"
 #include "HSW/HSW_FeverGaugeWidget.h"
+#include "JJH/JJH_SetupGameModeBase.h"
+#include "HSW/HSW_AuditoriumGameMode.h"
+#include "HSW/HSW_GameState_Auditorium.h"
+#include "HSW_ThrowingObject.h"
 
 void UAudience_KMK::NativeConstruct ( )
 {
@@ -44,7 +48,7 @@ void UAudience_KMK::NativeConstruct ( )
         Butt_Vip->OnClicked.AddDynamic ( this , &UAudience_KMK::PressVipButt );
         Butt_Yes->OnClicked.AddDynamic ( this , &UAudience_KMK::PressYesButt );
         Butt_No->OnClicked.AddDynamic ( this , &UAudience_KMK::PressNoButt );
-       
+
     }
 #pragma region Chat
     if (Butt_Send)
@@ -118,7 +122,7 @@ void UAudience_KMK::NativeConstruct ( )
 
 
 	Player = Cast<AHSW_ThirdPersonCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn() );
-	ImojiComponent = Player->GetComponentByClass<UHSW_ImojiConponent>();
+	if(Player)ImojiComponent = Player->GetComponentByClass<UHSW_ImojiConponent>();
 #pragma endregion
 
 }
@@ -157,9 +161,34 @@ void UAudience_KMK::PressHiddenButt ( )
     OnOffFunction(Text_Hidden, 0, true);
 }
 
+
 void UAudience_KMK::PressModeButt ( )
 {
     OnOffFunction(Text_Mode, 1 );
+
+    if (bMondeOn)
+    {
+        bMondeOn = false;
+        SetVisibleActor (bMondeOn);
+    }
+    else
+    {
+        bMondeOn = true;
+        SetVisibleActor (bMondeOn );
+    }
+}
+void UAudience_KMK::SetVisibleActor ( bool bActive )
+{
+    TArray<AActor*> actors;
+    UGameplayStatics::GetAllActorsWithTag(GetWorld(), TEXT("OnOff" ), actors );
+    APawn* myPC = GetWorld()->GetFirstPlayerController()->GetPawn();
+    for (AActor* c : actors)
+    {
+        if (c != myPC)
+        {
+            c->SetActorHiddenInGame(bActive);
+        }
+    }
 }
 
 void UAudience_KMK::StartVoiceChat ( )
@@ -324,7 +353,7 @@ void UAudience_KMK::VisiblePanel ( ESlateVisibility visible )
 void UAudience_KMK::PressSendButt ( )
 {
     auto* player = Cast<AHSW_ThirdPersonCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
-    if (player)
+    if (player && !player->HasAuthority())
     {
         auto* server = player->GetComponentByClass<UAudienceServerComponent_KMK> ( );
         if (server)
@@ -332,6 +361,19 @@ void UAudience_KMK::PressSendButt ( )
             if (!EditText_Chat->GetText ( ).IsEmpty ( ))
             {
                 server->ServerRPCChat( EditText_Chat->GetText ( ).ToString ( ) );
+
+                EditText_Chat->SetText ( FText::GetEmpty ( ) );
+            }
+        }
+    }
+    else
+    {
+        AHSW_GameState_Auditorium* gs = GetWorld()->GetGameState<AHSW_GameState_Auditorium>();
+        if (gs)
+        {
+            if (!EditText_Chat->GetText ( ).IsEmpty ( ))
+            {
+                gs->ServerRPCChat ( EditText_Chat->GetText ( ).ToString ( ) );
                 EditText_Chat->SetText ( FText::GetEmpty ( ) );
             }
         }
@@ -373,15 +415,18 @@ void UAudience_KMK::PressCancelButt ( )
 void UAudience_KMK::PressObjectButt ( )
 {
     // 오브젝트 생성
-    UE_LOG(LogTemp, Warning, TEXT("111111" ));
+    Player->ThrowingObjectIndex = 0;
+    UE_LOG(LogTemp,Warning,TEXT("ObjectButton_0" ) );
 }
 void UAudience_KMK::PressObject1Butt ( )
 {
-    UE_LOG ( LogTemp , Warning , TEXT ( "22222" ) );
+    Player->ThrowingObjectIndex = 1;
+    UE_LOG ( LogTemp , Warning , TEXT ( "ObjectButton_1" ) );
 }
 void UAudience_KMK::PressObject2Butt ( )
 {
-    UE_LOG ( LogTemp , Warning , TEXT ( "33333" ) );
+    Player->ThrowingObjectIndex = 2;
+    UE_LOG ( LogTemp , Warning , TEXT ( "ObjectButton_2" ) );
 }
 
 void UAudience_KMK::CountDownText (const FString& time )
@@ -449,7 +494,7 @@ void UAudience_KMK::PressButtMp3 ( )
             if (SoundWave)
             {
                 UAudioComponent* AudioComponent = NewObject<UAudioComponent>(GetWorld(), UAudioComponent::StaticClass());
-                AudioComponent->bAutoActivate = false; 
+                AudioComponent->bAutoActivate = false;
                 auto* musicWidget = Cast<USingWidget_KMK>(CreateWidget(GetWorld(), singWidget));
                 auto* musicWidget1 = Cast<USingWidget_KMK>(CreateWidget(GetWorld(), singWidget));
                 if (AudioComponent && SoundWave && musicWidget)
@@ -457,8 +502,8 @@ void UAudience_KMK::PressButtMp3 ( )
                     AudioComponent->SetSound(SoundWave);
                     musicWidget->SetTextMusic(FileName);
                     musicWidget1->SetTextMusic(FileName);
-                    musicWidget->SetMusic(AudioComponent);
-                    musicWidget1->SetMusic(AudioComponent);
+                    musicWidget->SetMusic(AudioComponent, SoundWave );
+                    musicWidget1->SetMusic(AudioComponent, SoundWave );
                     if (VB_SingList && VB_SingList1)
                     {
                         VB_SingList->AddChild(musicWidget);
@@ -618,6 +663,9 @@ USoundWaveProcedural* UAudience_KMK::LoadWavFromFile(const FString& FilePath)
 void UAudience_KMK::ChangeVirtualWidget ( )
 {
     WS_Concert->SetActiveWidgetIndex(1);
+    SetVirtualWBP();
+    TEXT_Min1->SetVisibility(ESlateVisibility::Hidden);
+    FeverGauge->SetVisibility(ESlateVisibility::Visible);
 }
 
 #pragma endregion
@@ -757,4 +805,3 @@ void AmplifyPCM32 ( TArray<float>& PCMData , float Gain )
 }
 
 #pragma endregion
-

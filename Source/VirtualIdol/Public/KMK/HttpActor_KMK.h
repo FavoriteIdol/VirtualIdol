@@ -14,25 +14,25 @@ struct FConcertInfo
 	GENERATED_BODY ( )
 
 	UPROPERTY(BlueprintReadOnly)
-	FString name;
+	FString name = TEXT("");
 	UPROPERTY(BlueprintReadOnly)
-	FString img;
+	FString img = TEXT("");
 	UPROPERTY(BlueprintReadOnly)
-	FString concertDate;
+	FString concertDate = TEXT("");
 	UPROPERTY(BlueprintReadOnly)
-	FString startTime;
+	FString startTime = TEXT("");
 	UPROPERTY(BlueprintReadOnly)
-	FString endTime;
+	FString endTime = TEXT("");
 	UPROPERTY(BlueprintReadOnly)
-	int32 appearedVFX;
+	int32 appearedVFX = -1;
 	UPROPERTY(BlueprintReadOnly)
-	int32 feverVFX;
+	int32 feverVFX = -1;
 	UPROPERTY ( BlueprintReadOnly )
-    int32 stageId;
+    int32 stageId = -1;
 	UPROPERTY(BlueprintReadOnly)
-    int32 ticketPrice;
+    int32 ticketPrice = -1;
 	UPROPERTY(BlueprintReadOnly)
-	int32 peopleScale;
+	int32 peopleScale = -1;
 
 	void Clear ( )
 	{
@@ -56,13 +56,13 @@ struct FLoginInfo
 	GENERATED_BODY ( )
 
 	UPROPERTY(BlueprintReadOnly)
-	FString email;
+	FString email= TEXT("");
 	UPROPERTY(BlueprintReadOnly)
-	FString password;
+	FString password= TEXT("");
 	UPROPERTY(BlueprintReadOnly)
-	FString token;
+	FString token= TEXT("");
 	UPROPERTY(BlueprintReadOnly)
-	FString userName;
+	FString userName= TEXT("");
 };
 
 //무대 정보
