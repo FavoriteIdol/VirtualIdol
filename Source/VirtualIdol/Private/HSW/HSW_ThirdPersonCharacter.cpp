@@ -624,7 +624,7 @@ void AHSW_ThirdPersonCharacter::MulticastRPCInterview_Implementation ( )
 	{
 		UE_LOG ( LogTemp , Warning , TEXT ( "Interview is in progress." ) );
 		// 멀티캐스트 확인용 임시로 사용할 쉐이크바뤼
-		ShakeBodyBlueprint ( );
+		//ShakeBodyBlueprint ( );
 	}
 	else
 	{

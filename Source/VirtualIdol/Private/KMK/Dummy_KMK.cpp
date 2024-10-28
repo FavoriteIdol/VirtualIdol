@@ -24,6 +24,7 @@ void ADummy_KMK::BeginPlay()
 	{
 		widget = Cast<UDummyUI_KMK>(imojiComp->GetWidget());
 	}
+
 }
 
 // Called every frame
@@ -36,7 +37,7 @@ void ADummy_KMK::Tick(float DeltaTime)
 		IdleFucn(DeltaTime);
 		break;
 	case DummyState::Jump:
-		JumpFunc(DeltaTime);
+		if(HasAuthority()) ServerRPC_Jump(DeltaTime);
 		break;
 	case DummyState::Move:
 		MoveFucn(DeltaTime);
@@ -45,7 +46,7 @@ void ADummy_KMK::Tick(float DeltaTime)
 		if(!isImoji) ImojiFucn(DeltaTime);
 		break;
 	case DummyState::Fever:
-		ServerRPC_Shake(0);
+		if (HasAuthority ( )) ServerRPC_Shake(0);
 		break;
 	}
 }
@@ -60,6 +61,8 @@ void ADummy_KMK::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent
 void ADummy_KMK::GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& OutLifetimeProps ) const
 {
 	DOREPLIFETIME ( ADummy_KMK , state );
+	DOREPLIFETIME ( ADummy_KMK , isJump );
+	DOREPLIFETIME ( ADummy_KMK , isImoji );
 }
 
 void ADummy_KMK::IdleFucn ( const float& DeltaTime )
@@ -85,16 +88,8 @@ void ADummy_KMK::IdleFucn ( const float& DeltaTime )
 
 void ADummy_KMK::JumpFunc ( const float& DeltaTime )
 {
-	if (!isJump)
-	{
-		Jump();
-		isJump = true;
-	}
-	else
-	{
-		state = DummyState::Idle;
-		isJump = false;
-	}
+	Jump ( );
+
 }
 
 void ADummy_KMK::MoveFucn ( const float& DeltaTime )
@@ -132,6 +127,39 @@ void ADummy_KMK::ServerRPC_Shake_Implementation ( float brightValue )
 
 void ADummy_KMK::MulticastRPC_Shake_Implementation ( float brightValue )
 {
-	ShakeBodyBlueprint( );
-	state = DummyState::Idle;
+	int32 rand = FMath::RandRange ( 0 , 2 );
+	if (rand == 2)
+	{
+		state = DummyState::Idle;
+	}
+	else
+	{
+		ShakeBodyBlueprint( );
+	}
+}
+
+void ADummy_KMK::ServerRPC_Jump_Implementation ( const float& DeltaTime )
+{
+	if (!isJump)
+	{
+		int32 rand = FMath::RandRange ( 0 , 2 );
+		if (rand == 0)
+		{	
+			MulticastRPC_Jump(DeltaTime );
+			isJump = true;
+		}
+	}
+	else
+	{
+		state = DummyState::Idle;
+		isJump = false;
+	}
+}
+
+void ADummy_KMK::MulticastRPC_Jump_Implementation ( const float& DeltaTime )
+{
+	// 더미끼리의 점프
+	if(IsLocallyControlled ()) Jump( );
+	if(!HasAuthority()&&!IsLocallyControlled())	UE_LOG ( LogTemp , Warning , TEXT ( "Jump" ) );
+	/*JumpFunc ( DeltaTime );*/
 }

@@ -56,7 +56,12 @@ public:
 	class UWidgetComponent* imojiComp;
 	UPROPERTY( )
 	class UDummyUI_KMK* widget;
+
+
+	UPROPERTY(Replicated )
 	bool isJump = false;
+
+	UPROPERTY(Replicated )
 	bool isImoji = false;
 
 	UFUNCTION(BlueprintImplementableEvent, Category= Imogi )
@@ -70,6 +75,17 @@ public:
 
 	UFUNCTION(NetMulticast,Reliable )
 	void MulticastRPC_Shake( float brightValue );
+
+
+	UFUNCTION(Server,Reliable )
+	void ServerRPC_Jump( const float& DeltaTime );
+
+	UFUNCTION(NetMulticast,Reliable )
+	void MulticastRPC_Jump( const float& DeltaTime );
+
+	
+	UFUNCTION(BlueprintImplementableEvent, Category= jump )
+	void JumpBody( );
 
 	UPROPERTY( EditDefaultsOnly , BlueprintReadWrite , Category = FeverGauge )
 	UMaterialInstance* FeverCharactMat;
