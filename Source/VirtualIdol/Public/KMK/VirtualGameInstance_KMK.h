@@ -126,7 +126,9 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 	
 #pragma endregion
 
-	UFUNCTION(BlueprintCallable )
+	UFUNCTION ( BlueprintCallable )
 	FString GetLocalIPAddress ( );
 
+	UFUNCTION ( BlueprintCallable )
+	void SendMulticastMessage ( );
 };

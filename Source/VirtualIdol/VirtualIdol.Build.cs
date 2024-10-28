@@ -8,7 +8,7 @@ public class VirtualIdol : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "OnlineSubsystemSteam", "OnlineSubsystem", "UMG", "Json", "JsonUtilities", "HTTP", "SlateCore", "AudioMixer", "Synthesis", "PhysicsCore", "Niagara", "Sockets" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "OnlineSubsystemSteam", "OnlineSubsystem", "UMG", "Json", "JsonUtilities", "HTTP", "SlateCore", "AudioMixer", "Synthesis", "PhysicsCore", "Niagara", "Sockets", "Networking" });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 

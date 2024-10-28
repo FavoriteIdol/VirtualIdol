@@ -17,6 +17,7 @@
 
 
 #include "SocketSubsystem.h"
+#include "Sockets.h"
 #include "IPAddress.h"
 
 void UVirtualGameInstance_KMK::Init ( )
@@ -295,4 +296,27 @@ FString UVirtualGameInstance_KMK::GetLocalIPAddress ( )
     bool bCanBindAll;
     TSharedPtr<class FInternetAddr> Addr = ISocketSubsystem::Get ( PLATFORM_SOCKETSUBSYSTEM )->GetLocalHostAddr ( *GLog , bCanBindAll );
     return Addr->ToString ( false );
+}
+
+void UVirtualGameInstance_KMK::SendMulticastMessage ( )
+{
+    FSocket* Socket = ISocketSubsystem::Get ( PLATFORM_SOCKETSUBSYSTEM )->CreateSocket ( NAME_DGram , TEXT ( "MulticastSocket" ) , false );
+    TSharedRef<FInternetAddr> MulticastAddr = ISocketSubsystem::Get ( PLATFORM_SOCKETSUBSYSTEM )->CreateInternetAddr ( );
+
+    bool bIsValid;
+    MulticastAddr->SetIp ( TEXT ( "239.1.1.1" ) , bIsValid ); // 멀티캐스트 주소
+    MulticastAddr->SetPort ( 5500 );
+
+    if (bIsValid)
+    {
+        int32 Sent;
+        FString Message = TEXT ( "Hello, Multicast!" );
+        TArray<uint8> Data;
+        Data.Append ( (uint8*)TCHAR_TO_UTF8 ( *Message ) , Message.Len ( ) );
+
+        Socket->SendTo ( Data.GetData ( ) , Data.Num ( ) , Sent , *MulticastAddr );
+    }
+
+    Socket->Close ( );
+    ISocketSubsystem::Get ( PLATFORM_SOCKETSUBSYSTEM )->DestroySocket ( Socket );
 }
