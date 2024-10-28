@@ -61,6 +61,7 @@ void UAudienceServerComponent_KMK::BeginPlay()
         }
 		else
 		{
+			UVirtualGameInstance_KMK* g = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance());
 			 //로컬이 아닌 경우에 플레이어의 playerMeshNum에 따라 
 			if (playerMeshNum < 0)
 			{
@@ -73,8 +74,8 @@ void UAudienceServerComponent_KMK::BeginPlay()
 			else
 			{
 				SetVirtualVisible ( playerMesh , true );
-				playerMesh->GetMesh ( )->SetSkeletalMesh ( audienceMesh[gi->playerMeshNum] );
-				UMaterialInstanceDynamic* meshMat = playerMesh->ChangeMyMeshMat ( gi->playerMeshNum );
+				playerMesh->GetMesh ( )->SetSkeletalMesh ( audienceMesh[g->playerMeshNum] );
+				UMaterialInstanceDynamic* meshMat = playerMesh->ChangeMyMeshMat ( g->playerMeshNum );
 				playerMesh->GetMesh()->SetMaterial(0, meshMat);
 			}
 		}
