@@ -36,17 +36,17 @@ AHSW_ThrowingObject::AHSW_ThrowingObject()
 // 		MeshComp->SetMaterial(0, LoadedMaterial.Object);
 // 	}
 
-	static ConstructorHelpers::FObjectFinder<UPhysicalMaterial> LoadedPhysicalMaterial ( TEXT ( "'/Game/Project/Personal/HSW/Blueprints/PM_Ball'" ) );
-
-	if (LoadedPhysicalMaterial.Succeeded ( ))
-	{
-		MeshComp->SetPhysMaterialOverride( LoadedPhysicalMaterial.Object);
-	}
-
-
-	MeshComp->BodyInstance.bNotifyRigidBodyCollision = true;
-	MeshComp->CanCharacterStepUpOn = ECB_No;
-	MeshComp->SetCollisionProfileName(TEXT("BlockAllDynamic" ));
+// 	static ConstructorHelpers::FObjectFinder<UPhysicalMaterial> LoadedPhysicalMaterial ( TEXT ( "'/Game/Project/Personal/HSW/Blueprints/PM_Ball'" ) );
+// 
+// 	if (LoadedPhysicalMaterial.Succeeded ( ))
+// 	{
+// 		MeshComp->SetPhysMaterialOverride ( LoadedPhysicalMaterial.Object );
+// 	}
+// 
+// 
+// 	MeshComp->BodyInstance.bNotifyRigidBodyCollision = true;
+// 	MeshComp->CanCharacterStepUpOn = ECB_No;
+// 	MeshComp->SetCollisionProfileName(TEXT("BlockAllDynamic" ));
 
 }
 
