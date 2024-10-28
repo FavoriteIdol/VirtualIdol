@@ -6,6 +6,8 @@
 #include "Net/UnrealNetwork.h"
 #include "KMK/DummyUI_KMK.h"
 #include "Components/WidgetComponent.h"
+#include "Materials/MaterialInstanceDynamic.h"
+#include "HSW/HSW_ThirdPersonCharacter.h"
 
 // Sets default values
 ADummy_KMK::ADummy_KMK()
@@ -23,6 +25,16 @@ void ADummy_KMK::BeginPlay()
 	if (imojiComp)
 	{
 		widget = Cast<UDummyUI_KMK>(imojiComp->GetWidget());
+	}
+
+	FeverDynamicMat = UMaterialInstanceDynamic::Create ( FeverCharactMat , this );
+	FaceDynamicMat = UMaterialInstanceDynamic::Create ( FaceMat , this );
+
+	USkeletalMeshComponent* TempMesh = GetMesh ( );
+	if (TempMesh)
+	{
+		TempMesh->SetMaterial ( 0 , FeverDynamicMat );
+		TempMesh->SetMaterial ( 2 , FaceDynamicMat );
 	}
 
 }
@@ -46,7 +58,7 @@ void ADummy_KMK::Tick(float DeltaTime)
 		if(!isImoji) ImojiFucn(DeltaTime);
 		break;
 	case DummyState::Fever:
-		if (HasAuthority ( )) ServerRPC_Shake(0);
+		if (HasAuthority ( )) ServerRPC_Shake(0.1);
 		break;
 	}
 }
@@ -67,7 +79,7 @@ void ADummy_KMK::GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& OutLife
 
 void ADummy_KMK::IdleFucn ( const float& DeltaTime )
 {
-	int32 rand = FMath::RandRange(0, 2);
+	int32 rand = FMath::RandRange(0, 80);
 	if(isJump) isJump = false;
 	switch (rand)
 	{
@@ -80,9 +92,20 @@ void ADummy_KMK::IdleFucn ( const float& DeltaTime )
 	case 2:
 		state = DummyState::Fever;
 		break;
-	//case3:
-	//	state = DummyState::Jump;
-	//	break;
+	case 3:
+		state = DummyState::Fever;
+		break;
+	case 4:
+		state = DummyState::Fever;
+		break;
+	case 5:
+		state = DummyState::Fever;
+		break;
+	case 6:
+		state = DummyState::Fever;
+		break;
+	default:
+		break;
 	}
 }
 
@@ -120,21 +143,29 @@ void ADummy_KMK::DisappearImoji ( )
 	isImoji = false;
 }
 
+void ADummy_KMK::SetBrightness ( float brightValue )
+{
+	if(FeverDynamicMat)
+	FeverDynamicMat->SetScalarParameterValue ( TEXT ( "jswEmissivePower-A" ) , brightValue );
+}
+
 void ADummy_KMK::ServerRPC_Shake_Implementation ( float brightValue )
 {
-	MulticastRPC_Shake( brightValue );
+	Brightness += brightValue;
+	MulticastRPC_Shake( Brightness );
 }
 
 void ADummy_KMK::MulticastRPC_Shake_Implementation ( float brightValue )
 {
-	int32 rand = FMath::RandRange ( 0 , 2 );
-	if (rand == 2)
+	int32 rand = FMath::RandRange ( 0 , 1 );
+	if (rand == 0 )
 	{
 		state = DummyState::Idle;
 	}
 	else
 	{
 		ShakeBodyBlueprint( );
+		SetBrightness(brightValue);
 	}
 }
 
@@ -142,7 +173,7 @@ void ADummy_KMK::ServerRPC_Jump_Implementation ( const float& DeltaTime )
 {
 	if (!isJump)
 	{
-		int32 rand = FMath::RandRange ( 0 , 2 );
+		int32 rand = FMath::RandRange ( 0 , 40);
 		if (rand == 0)
 		{	
 			MulticastRPC_Jump(DeltaTime );

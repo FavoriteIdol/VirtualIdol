@@ -64,8 +64,20 @@ public:
 	UPROPERTY(Replicated )
 	bool isImoji = false;
 
-	UFUNCTION(BlueprintImplementableEvent, Category= Imogi )
+	float Brightness = 1;
+
+	UPROPERTY( )
+	class AHSW_ThirdPersonCharacter* ServerPlayer;
+
+	UFUNCTION(BlueprintImplementableEvent, Category= Fever )
 	void ShakeBodyBlueprint( );
+
+	
+	UFUNCTION( )
+	void SetBrightness( float brightValue );
+
+	UFUNCTION( )
+	void SetFace(float faveValue);
 
 	//UPROPERTY ( Replicated , EditDefaultsOnly , BlueprintReadWrite )
 	//int32 IntervieweeIndex;
@@ -83,14 +95,16 @@ public:
 	UFUNCTION(NetMulticast,Reliable )
 	void MulticastRPC_Jump( const float& DeltaTime );
 
-	
-	UFUNCTION(BlueprintImplementableEvent, Category= jump )
-	void JumpBody( );
-
 	UPROPERTY( EditDefaultsOnly , BlueprintReadWrite , Category = FeverGauge )
 	UMaterialInstance* FeverCharactMat;
 
 	UPROPERTY( EditAnywhere , BlueprintReadWrite , Category = FeverGauge )
 	UMaterialInstanceDynamic* FeverDynamicMat;
+
+	UPROPERTY( EditDefaultsOnly , BlueprintReadWrite , Category = FeverGauge )
+	UMaterialInstance* FaceMat;
+
+	UPROPERTY( EditAnywhere , BlueprintReadWrite , Category = FeverGauge )
+	UMaterialInstanceDynamic* FaceDynamicMat;
 
 };
