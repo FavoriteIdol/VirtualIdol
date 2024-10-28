@@ -50,6 +50,7 @@ void UAudienceServerComponent_KMK::BeginPlay()
 	}
 	if (gi && playerMesh)
 	{
+		
 		// 플레이어가 로컬 플레이어 일때
 		if (playerMesh->IsLocallyControlled())
         {
@@ -60,6 +61,7 @@ void UAudienceServerComponent_KMK::BeginPlay()
         }
 		else
 		{
+			if(onReq) return;
 			 //로컬이 아닌 경우에 플레이어의 playerMeshNum에 따라 
 			if (playerMeshNum < 0)
 			{
@@ -72,8 +74,8 @@ void UAudienceServerComponent_KMK::BeginPlay()
 			else
 			{
 				SetVirtualVisible ( playerMesh , true );
-				playerMesh->GetMesh ( )->SetSkeletalMesh ( audienceMesh[playerMeshNum] );
-				UMaterialInstanceDynamic* meshMat = playerMesh->ChangeMyMeshMat ( playerMeshNum );
+				playerMesh->GetMesh ( )->SetSkeletalMesh ( audienceMesh[gi->playerMeshNum] );
+				UMaterialInstanceDynamic* meshMat = playerMesh->ChangeMyMeshMat ( gi->playerMeshNum );
 				playerMesh->GetMesh()->SetMaterial(0, meshMat);
 			}
 		}
@@ -207,6 +209,7 @@ void UAudienceServerComponent_KMK::OnRep_ChangePlayerMesh()
     }
     else
     {
+		onReq = true;
 		SetVirtualVisible ( playerMesh , true );
         playerCharacter->GetMesh ( )->SetSkeletalMesh ( audienceMesh[playerMeshNum] );
         UMaterialInstanceDynamic* meshMat = playerCharacter->ChangeMyMeshMat ( playerMeshNum );

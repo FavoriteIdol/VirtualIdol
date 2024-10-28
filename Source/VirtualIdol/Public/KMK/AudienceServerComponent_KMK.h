@@ -90,4 +90,6 @@ public:
 	void FindVirtualCharacter( );
 	UPROPERTY ( EditDefaultsOnly , Category = Fever )
 	TArray< TSubclassOf<class AActor>> appearFact;
+
+	bool onReq = false;
 };
