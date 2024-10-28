@@ -209,7 +209,8 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 	}
 	else
 	{
-		int32 my = gi->playerMeshNum;
+		int32 my = 0;
+		if( gi->playerMeshNum >= 0) my =  gi->playerMeshNum;
 		FeverDynamicMat = UMaterialInstanceDynamic::Create ( FeverCharactMat[my] , this );
 
 		USkeletalMeshComponent* TempMesh = GetMesh ( );

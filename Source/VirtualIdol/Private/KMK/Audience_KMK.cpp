@@ -169,12 +169,12 @@ void UAudience_KMK::PressModeButt ( )
     if (bMondeOn)
     {
         bMondeOn = false;
-        SetVisibleActor (true);
+        SetVisibleActor (bMondeOn);
     }
     else
     {
         bMondeOn = true;
-        SetVisibleActor (false );
+        SetVisibleActor (bMondeOn );
     }
 }
 void UAudience_KMK::SetVisibleActor ( bool bActive )
