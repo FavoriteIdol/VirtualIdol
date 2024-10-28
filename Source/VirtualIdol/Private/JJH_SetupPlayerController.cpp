@@ -16,8 +16,7 @@ void AJJH_SetupPlayerController::BeginPlay ( )
 	bShowMouseCursor = true;
 	FInputModeGameAndUI InputMode;
 	SetInputMode ( InputMode );
-
-
+	
 }
 
 #pragma region full screenshot

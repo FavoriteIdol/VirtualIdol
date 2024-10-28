@@ -167,6 +167,7 @@ void UStartWidget_KMK::NativeTick ( const FGeometry& MyGeometry , float InDeltaT
 			Text_Price->SetText(FText::AsNumber(a));
 		}
 	}
+	
 }
 
 #pragma region BackFunction
