@@ -502,8 +502,8 @@ void UAudience_KMK::PressButtMp3 ( )
                     AudioComponent->SetSound(SoundWave);
                     musicWidget->SetTextMusic(FileName);
                     musicWidget1->SetTextMusic(FileName);
-                    musicWidget->SetMusic(AudioComponent);
-                    musicWidget1->SetMusic(AudioComponent);
+                    musicWidget->SetMusic(AudioComponent, SoundWave );
+                    musicWidget1->SetMusic(AudioComponent, SoundWave );
                     if (VB_SingList && VB_SingList1)
                     {
                         VB_SingList->AddChild(musicWidget);

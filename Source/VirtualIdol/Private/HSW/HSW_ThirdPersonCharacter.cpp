@@ -37,6 +37,8 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInstance.h"
 #include "KMK/Virtual_KMK.h"
+#include "Components/AudioComponent.h"
+#include "Misc/FileHelper.h"
 #include "KMK/AudienceServerComponent_KMK.h"
 
 // Sets default values
@@ -249,6 +251,20 @@ void AHSW_ThirdPersonCharacter::Tick(float DeltaTime)
 		{
 			SetActorRotation ( ThrowingRotator );
 		}
+	}
+}
+
+void AHSW_ThirdPersonCharacter::ClientPlayMusic_Implementation ( class UAudioComponent* selectedMusic )
+{
+	//	UGameplayStatics::PlaySound2D(this, Music );
+	if (selectedMusic)
+	{
+		selectedMusic->Play ( );
+		UE_LOG ( LogTemp , Warning , TEXT ( "Music Play" ) );
+	}
+	else
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "not Music" ) );
 	}
 }
 
@@ -631,7 +647,7 @@ void AHSW_ThirdPersonCharacter::MulticastRPCInterview_Implementation ( )
 	{
 		UE_LOG ( LogTemp , Warning , TEXT ( "Interview is in progress." ) );
 		// 멀티캐스트 확인용 임시로 사용할 쉐이크바뤼
-		ShakeBodyBlueprint ( );
+		//ShakeBodyBlueprint ( );
 	}
 	else
 	{

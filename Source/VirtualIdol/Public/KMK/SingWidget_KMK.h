@@ -35,9 +35,17 @@ public:
 
 	UFUNCTION( )
 	void SetTextMusic(const FString& text );
+
     UPROPERTY ( )
     class UAudioComponent* sound;
+
+	UPROPERTY ( )
+	class USoundBase* SoundFile;
+
     class UAudioComponent* preSound;
 	UFUNCTION( )
-	void SetMusic(class UAudioComponent* music );
+	void SetMusic(class UAudioComponent* music, class USoundBase* wavFile );
+
+	UPROPERTY()
+	class AHSW_AuditoriumGameMode* gm;
 };

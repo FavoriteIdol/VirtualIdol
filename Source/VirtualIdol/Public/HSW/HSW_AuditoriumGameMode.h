@@ -7,13 +7,13 @@
 #include "HSW_AuditoriumGameMode.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class VIRTUALIDOL_API AHSW_AuditoriumGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
-	
+
 public:
 	AHSW_AuditoriumGameMode();
 
@@ -34,7 +34,7 @@ public:
 
 	UPROPERTY( Replicated )
 	bool bFever;
-	
+
 	UPROPERTY ( Replicated, EditDefaultsOnly , Category = Fever )
 	class UParticleSystem* FeverEffect_Particle;
 
@@ -50,6 +50,16 @@ public:
 	UFUNCTION( )
 	void BroadcastChatMessage ( const FString& Chat );
 
+	class UAudioComponent* MusicComponent;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite);
+	class USoundBase* SoundFile;
+
+	UFUNCTION(Server, Reliable )
+	void ServerPlayMusic( class UAudioComponent* selectedMusic );
+
+	UFUNCTION(Client, Reliable)
+	void ClientPlayMusic( class UAudioComponent* selectedMusic );
 	UFUNCTION( )
 	void BroadcastCountDown( );
 };
