@@ -44,7 +44,7 @@ public:
 	void MoveFucn(const float& DeltaTime );
 	void ImojiFucn(const float& DeltaTime );
 
-	void AppearImoji ( int32 num, int32 bVisible );
+	void AppearImoji ( int32 num );
 	void DisappearImoji ( );
 
 	FTimerHandle timerHandle;
@@ -82,6 +82,10 @@ public:
 	//UPROPERTY ( Replicated , EditDefaultsOnly , BlueprintReadWrite )
 	//int32 IntervieweeIndex;
 	int32 FaceRand = 1;
+
+	float ImojiTimer = 4;
+
+	bool bVisible = false;
 
 	UFUNCTION(Server,Reliable )
 	void ServerRPC_Shake( float brightValue );
