@@ -61,7 +61,6 @@ void UAudienceServerComponent_KMK::BeginPlay()
         }
 		else
 		{
-			if(onReq) return;
 			 //로컬이 아닌 경우에 플레이어의 playerMeshNum에 따라 
 			if (playerMeshNum < 0)
 			{
