@@ -7,6 +7,9 @@
 #include "HSW/HSW_GameState_Auditorium.h"
 #include "Sound/SoundBase.h"
 #include "Components/AudioComponent.h"
+#include "GameFramework/PlayerState.h"
+#include "Engine/StaticMeshActor.h"
+#include "EngineUtils.h"
 
 // Sets default values for this component's properties
 UVirtual_KMK::UVirtual_KMK()
@@ -25,6 +28,15 @@ void UVirtual_KMK::BeginPlay()
 	Super::BeginPlay();
 	meshComp = GetOwner()->FindComponentByTag<USkeletalMeshComponent>(FName(TEXT("Mesh")));
 
+	FName tag = TEXT ( "InterviewLocation" );
+	for (TActorIterator<AActor> It ( GetWorld ( ) , AStaticMeshActor::StaticClass ( ) ); It; ++It)
+	{
+		AActor* Actor = *It;
+		if (IsValid ( Actor ) && Actor->ActorHasTag ( tag ))
+		{
+			StageLocation = Actor->GetTransform ( );
+		}
+	}
 }
 
 
@@ -163,6 +175,21 @@ void UVirtual_KMK::PlayMusic ( USoundBase* wavFile )
 	AudioComponent->SetSound ( wavFile );
 	AudioComponent->RegisterComponent ( );
 	AudioComponent->Play ( );  // 음원 재생
+}
+
+void UVirtual_KMK::SetInterviewee ( bool bInterview , APlayerState* interviewee, FTransform preLoc )
+{
+	if (bInterview)
+	{
+		//intervieweePlayer->CameraBoom->TargetArmLength = 0;
+		interviewee->GetPawn ( )->SetActorTransform ( StageLocation );
+		interviewee->GetPawn ( )->SetActorScale3D ( FVector ( 3.0 ) );
+	}
+	else
+	{
+		interviewee->GetPawn ( )->SetActorTransform ( preLoc );
+		interviewee->GetPawn ( )->SetActorScale3D ( FVector ( 2.0 ) );
+	}
 }
 
 #pragma endregion

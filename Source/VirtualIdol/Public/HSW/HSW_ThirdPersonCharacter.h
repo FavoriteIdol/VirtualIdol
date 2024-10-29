@@ -257,6 +257,9 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, Category= Interview )
 	void MICOffBlueprint( );
+
+	UFUNCTION( )
+	void SetInterviewee( bool bInterview, APlayerState* interviewee, FTransform preLoc );
 	// 멀티플레이 --------------------------------------
 
 	virtual void GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;

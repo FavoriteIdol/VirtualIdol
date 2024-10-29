@@ -65,4 +65,10 @@ public:
 
 	UFUNCTION( )
 	void PlayMusic(USoundBase* wavFile);
+
+	UFUNCTION( )
+	void SetInterviewee( bool bInterview, APlayerState* interviewee, FTransform preLoc );
+
+	FTransform StageLocation;
+	FTransform PreLocation;
 };

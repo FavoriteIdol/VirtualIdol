@@ -58,4 +58,15 @@ public:
 	float remainTime = 0.f;
 	UPROPERTY()
 	bool bTime = false;
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void ServerRPC_SetInterviewee ( );
+
+	UFUNCTION(NetMulticast, Reliable )
+	void MultiRPC_SetInterviewee( bool bInterview , APlayerState* interviewee , FTransform preLoc );
+
+	bool bIsInterviewing;
+	int32 IntervieweeIndex;
+	class APlayerState* IntervieweePlayerState;
+	FTransform PreLocation;
 };
