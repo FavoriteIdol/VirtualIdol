@@ -132,8 +132,8 @@ void UAudience_KMK::NativeConstruct ( )
 
         if (musicWidget && musicWidget1)
         {
-            musicWidget->SetTextMusic ( TEXT ( "최예나 - 네모네모" ) );
-            musicWidget1->SetTextMusic ( TEXT ( "최예나 - 네모네모" ) );
+            musicWidget->SetTextMusic ( TEXT ( "뉴진스 - How Sweet" ) );
+            musicWidget1->SetTextMusic ( TEXT ( "뉴진스 - How Sweet" ) );
 
             if (VB_SingList && VB_SingList1)
             {
