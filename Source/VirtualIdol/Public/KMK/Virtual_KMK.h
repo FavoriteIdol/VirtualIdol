@@ -71,4 +71,10 @@ public:
 
 	FTransform StageLocation;
 	FTransform PreLocation;
+
+	void StartVoiceChat ( );
+	void CancleVoiceChat ( );
+
+	UPROPERTY( )
+	class APlayerController* pc;
 };

@@ -206,7 +206,7 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 
 	if (HasAuthority ( ))
 	{
-		StartVoiceChat( );
+		//StartVoiceChat( );
 	}
 	else
 	{
@@ -303,7 +303,14 @@ void AHSW_ThirdPersonCharacter::SetInterviewee ( bool bInterview, APlayerState* 
 		//intervieweePlayer->CameraBoom->TargetArmLength = 0;
 		interviewee->GetPawn ( )->SetActorTransform ( StageLocation );
 		interviewee->GetPawn ( )->SetActorScale3D(FVector(3.0));
-
+		
+		if (APawn* pawn = interviewee->GetPawn ( ))
+		{
+			if (AHSW_ThirdPersonCharacter* Character = Cast<AHSW_ThirdPersonCharacter> ( pawn ))
+			{
+				Character->StartVoiceChat();
+			}
+		}
 		//AHSW_ThirdPersonCharacter* localPlayer = Cast<AHSW_ThirdPersonCharacter> ( interviewee->GetPawn ( ) );
 
 		//DrawDebugString ( GetWorld ( ) , interviewee->GetPawn ( )->GetActorLocation ( ) + FVector ( 0 , 0 , 90 ) , TEXT ( "Interviewee~" ) , nullptr , FColor::Red , 5 , true , 1 );
@@ -312,6 +319,13 @@ void AHSW_ThirdPersonCharacter::SetInterviewee ( bool bInterview, APlayerState* 
 	{
 		interviewee->GetPawn ( )->SetActorTransform ( preLoc );
 		interviewee->GetPawn ( )->SetActorScale3D ( FVector ( 2.0 ) );
+		if (APawn* pawn = interviewee->GetPawn ( ))
+		{
+			if (AHSW_ThirdPersonCharacter* Character = Cast<AHSW_ThirdPersonCharacter> ( pawn ))
+			{
+				Character->CancleVoiceChat ( );
+			}
+		}
 	}
 }
 
