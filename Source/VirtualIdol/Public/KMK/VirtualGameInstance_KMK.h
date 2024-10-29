@@ -123,6 +123,7 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 	FConcertInfo concerInfo;
 	UFUNCTION( )
 	void SetConcertInfo( const struct FConcertInfo& info );
+	
 #pragma endregion
 #pragma region Chat
 
@@ -133,5 +134,9 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 	class UAudience_KMK* myWidget;
 #pragma endregion
 
+	UFUNCTION ( BlueprintCallable )
+	FString GetLocalIPAddress ( );
 
+	UFUNCTION ( BlueprintCallable )
+	void SendMulticastMessage ( );
 };

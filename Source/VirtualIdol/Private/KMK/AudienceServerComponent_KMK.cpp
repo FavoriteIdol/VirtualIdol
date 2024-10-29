@@ -52,33 +52,31 @@ void UAudienceServerComponent_KMK::BeginPlay()
 	{
 		
 		// 플레이어가 로컬 플레이어 일때
-		if (playerMesh->IsLocallyControlled())
-        {
-			// if(gi->playerMeshNum >= 0) playerMesh->GetMesh()->SetSkeletalMesh(audienceMesh[gi->playerMeshNum]);
-			// 클라이언트에서 서버로 RPC 호출
-			ServerRPC_ChangeMyMesh ( gi->playerMeshNum );
-			
-        }
-		else
+		if (playerMesh && playerMesh->IsLocallyControlled ( ))
 		{
-			if(onReq) return;
-			 //로컬이 아닌 경우에 플레이어의 playerMeshNum에 따라 
-			if (playerMeshNum < 0)
-			{
-				SetVirtualVisible ( playerMesh , false );
-			}
-			else if (playerMeshNum > 1)
-			{
-				SetVirtualVisible ( playerMesh , true );
-			}
-			else
-			{
-				SetVirtualVisible ( playerMesh , true );
-				playerMesh->GetMesh ( )->SetSkeletalMesh ( audienceMesh[gi->playerMeshNum] );
-				UMaterialInstanceDynamic* meshMat = playerMesh->ChangeMyMeshMat ( gi->playerMeshNum );
-				playerMesh->GetMesh()->SetMaterial(0, meshMat);
-			}
+			// 서버에 요청하여 고유한 `playerMeshNum` 할당
+			ServerRPC_ChangeMyMesh ( gi->playerMeshNum );
 		}
+		//else
+		//{
+		//	UVirtualGameInstance_KMK* g = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance());
+		//	 //로컬이 아닌 경우에 플레이어의 playerMeshNum에 따라 
+		//	if (playerMeshNum < 0)
+		//	{
+		//		SetVirtualVisible ( playerMesh , false );
+		//	}
+		//	else if (playerMeshNum > 1)
+		//	{
+		//		SetVirtualVisible ( playerMesh , true );
+		//	}
+		//	else
+		//	{
+		//		SetVirtualVisible ( playerMesh , true );
+		//		playerMesh->GetMesh ( )->SetSkeletalMesh ( audienceMesh[g->playerMeshNum] );
+		//		UMaterialInstanceDynamic* meshMat = playerMesh->ChangeMyMeshMat ( g->playerMeshNum );
+		//		playerMesh->GetMesh()->SetMaterial(0, meshMat);
+		//	}
+		//}
 	}
 
 
@@ -164,18 +162,23 @@ void UAudienceServerComponent_KMK::MultiRPCChat_Implementation ( const FString& 
 
 void UAudienceServerComponent_KMK::ServerRPC_ChangeMyMesh_Implementation ( int32 num)
 {
-    UE_LOG(LogTemp, Warning, TEXT("Server is setting playerMeshNum to: %d"), num);
-    playerMeshNum = num;
-    UE_LOG(LogTemp, Warning, TEXT("Server updated playerMeshNum: %d"), playerMeshNum);
+	if (playerMesh->HasAuthority ( ))
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "Server is setting playerMeshNum to: %d" ) , num );
+		playerMeshNum = num;
+		UE_LOG ( LogTemp , Warning , TEXT ( "Server updated playerMeshNum: %d" ) , playerMeshNum );
 
-    // 모든 클라이언트에게 RPC 호출
-    MultiRPC_ChangeMyMesh(playerMeshNum);
+		// 모든 클라이언트에게 RPC 호출
+		// MultiRPC_ChangeMyMesh ( playerMeshNum );
+	}
 
 }
 
 void UAudienceServerComponent_KMK::MultiRPC_ChangeMyMesh_Implementation ( int32 num )
 {
 	auto* TargetMesh = Cast<AHSW_ThirdPersonCharacter> (GetOwner());
+	UE_LOG ( LogTemp , Warning , TEXT ( "OnRep_ChangePlayerMesh: %s의 playerMeshNum: %d" ) , *GetOwner ( )->GetName ( ) , num );
+
     // 로컬 플레이어도 포함하여 모든 클라이언트에서 메쉬 동기화
 	if(!TargetMesh) return;
     if (num < 0)
@@ -198,6 +201,14 @@ void UAudienceServerComponent_KMK::MultiRPC_ChangeMyMesh_Implementation ( int32 
 void UAudienceServerComponent_KMK::OnRep_ChangePlayerMesh()
 {
 	AHSW_ThirdPersonCharacter* playerCharacter = Cast<AHSW_ThirdPersonCharacter>(GetOwner());
+
+	if (!playerCharacter || playerMeshNum < 0 || playerMeshNum >= audienceMesh.Num ( ) || !audienceMesh[playerMeshNum])
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "OnRep_ChangePlayerMesh 로드 실패" ));
+		// 만약 메쉬 설정이 실패하면 타이머로 재시도
+		GetWorld ( )->GetTimerManager ( ).SetTimerForNextTick ( this , &UAudienceServerComponent_KMK::OnRep_ChangePlayerMesh );
+		return;
+	}
     UE_LOG(LogTemp, Warning, TEXT("OnRep_ChangePlayerMesh: %s의 playerMeshNum: %d"), *GetOwner()->GetName(), playerMeshNum);
 	if (playerMeshNum < 0)
     {
@@ -211,9 +222,9 @@ void UAudienceServerComponent_KMK::OnRep_ChangePlayerMesh()
     {
 		onReq = true;
 		SetVirtualVisible ( playerMesh , true );
+        UMaterialInstanceDynamic* meshMat = playerCharacter->FeverDynamicMats[playerMeshNum];
         playerCharacter->GetMesh ( )->SetSkeletalMesh ( audienceMesh[playerMeshNum] );
-        UMaterialInstanceDynamic* meshMat = playerCharacter->ChangeMyMeshMat ( playerMeshNum );
-		playerCharacter->GetMesh()->SetMaterial(0, meshMat);
+		playerCharacter->GetMesh()->SetMaterial(0, playerCharacter->FeverDynamicMats[playerMeshNum] );
     }
 }
 

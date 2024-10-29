@@ -153,6 +153,9 @@ public:
 	TArray<UMaterialInstance*> FeverCharactMat;
 
 	UPROPERTY( EditAnywhere , BlueprintReadWrite , Category = FeverGauge )
+	TArray< UMaterialInstanceDynamic*> FeverDynamicMats;
+
+	UPROPERTY( )
 	UMaterialInstanceDynamic* FeverDynamicMat;
 
     UFUNCTION ( )
