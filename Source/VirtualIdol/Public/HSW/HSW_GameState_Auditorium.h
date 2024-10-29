@@ -46,6 +46,12 @@ public:
 	UFUNCTION(NetMulticast, Reliable )
 	void MultiRPC_FeverGauge( float feverValue );
 
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_StopSound ();
+
+	UFUNCTION(NetMulticast, Reliable )
+	void MultiRPC_StopSound( );
+
 	FTimerHandle startCountDownHandle;
 	UPROPERTY(EditAnywhere )
 	float durationTime = 6;

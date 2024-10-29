@@ -148,3 +148,35 @@ void AHSW_GameState_Auditorium::MultiRPC_FeverGauge_Implementation ( float fever
     }
 }
 
+void AHSW_GameState_Auditorium::ServerRPC_StopSound_Implementation ( )
+{
+    AHSW_AuditoriumGameMode* gm = GetWorld ( )->GetAuthGameMode<AHSW_AuditoriumGameMode> ( );
+    if (gm)
+    {
+        //gm->BroadcastPlayMusic ( );
+    }
+}
+
+void AHSW_GameState_Auditorium::MultiRPC_StopSound_Implementation ( )
+{
+    for (APlayerState* PlayerState : PlayerArray)
+    {
+        APawn* Pawn = PlayerState->GetPawn ( );
+        if (AHSW_ThirdPersonCharacter* Character = Cast<AHSW_ThirdPersonCharacter> ( Pawn ))
+        {
+            if (Character->IsLocallyControlled ( ))
+            {
+                //Character->PlayMusic ( wavFile );
+            }
+        }
+        else if (Pawn && Pawn->FindComponentByClass<UVirtual_KMK> ( ))
+        {
+            UVirtual_KMK* Vir = Pawn->FindComponentByClass<UVirtual_KMK> ( );
+            if (Vir && Pawn->IsLocallyControlled ( ))
+            {
+                //Vir->PlayMusic ( wavFile );
+            }
+        }
+    }
+}
+
