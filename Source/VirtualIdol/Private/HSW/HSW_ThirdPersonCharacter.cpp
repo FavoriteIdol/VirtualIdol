@@ -302,6 +302,7 @@ void AHSW_ThirdPersonCharacter::SetInterviewee ( bool bInterview, APlayerState* 
 	{
 		//intervieweePlayer->CameraBoom->TargetArmLength = 0;
 		interviewee->GetPawn ( )->SetActorTransform ( StageLocation );
+		interviewee->GetPawn ( )->SetActorScale3D(FVector(3.0));
 
 		//AHSW_ThirdPersonCharacter* localPlayer = Cast<AHSW_ThirdPersonCharacter> ( interviewee->GetPawn ( ) );
 
@@ -310,6 +311,7 @@ void AHSW_ThirdPersonCharacter::SetInterviewee ( bool bInterview, APlayerState* 
 	else
 	{
 		interviewee->GetPawn ( )->SetActorTransform ( preLoc );
+		interviewee->GetPawn ( )->SetActorScale3D ( FVector ( 2.0 ) );
 	}
 }
 
