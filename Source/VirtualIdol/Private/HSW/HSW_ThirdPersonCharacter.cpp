@@ -553,7 +553,7 @@ void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value 
 	if (!HasAuthority ( ) && IsLocallyControlled())
 	{
 		PersonalGauge++;
-		ServerRPCFeverGauge (CurrentGauge, 100*0.02);
+		ServerRPCFeverGauge (CurrentGauge, 10*0.02);
 		PrintFeverGaugeLogOnHead ( );
 
 		//MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
@@ -580,7 +580,7 @@ void AHSW_ThirdPersonCharacter::ServerRPCFeverGauge_Implementation ( float fever
 		}
 	}
 
-	if (FeverBright <= 100)
+	if (FeverBright <= 10)
 	{
 		FeverBright += brightValue;
 		MulticastRPCBrightness(1 );
