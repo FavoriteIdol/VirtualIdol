@@ -37,9 +37,8 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInstance.h"
 #include "KMK/Virtual_KMK.h"
-#include "Components/AudioComponent.h"
-#include "Misc/FileHelper.h"
 #include "KMK/AudienceServerComponent_KMK.h"
+#include "Components/AudioComponent.h"
 
 // Sets default values
 AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
@@ -203,13 +202,7 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 		GetController<APlayerController> ( )->SetInputMode(inputMode );
 	}
 #pragma endregion
-	if (IsLocallyControlled ( ))
-	{
-		for (int i = 0; i < FeverCharactMat.Num ( ); i++)
-		{
-			FeverDynamicMats[i] = UMaterialInstanceDynamic::Create ( FeverCharactMat[i] , this );
-		}
-	}
+
 
 	if (HasAuthority ( ))
 	{
@@ -217,25 +210,14 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 	}
 	else
 	{
-		if (IsLocallyControlled ( ))
-		{
-			int32 my = 0;
-			if (gi->playerMeshNum >= 0) my = gi->playerMeshNum;
+		int32 my = 0;
+		if( gi->playerMeshNum >= 0) my =  gi->playerMeshNum;
+		FeverDynamicMat = UMaterialInstanceDynamic::Create ( FeverCharactMat[my] , this );
 
-            USkeletalMeshComponent* TempMesh = GetMesh ( );
-            if (TempMesh)
-            {
-                TempMesh->SetMaterial ( 0 , FeverDynamicMats[my] );
-            }
-		}
-		else
+		USkeletalMeshComponent* TempMesh = GetMesh ( );
+		if (TempMesh)
 		{
-			UVirtualGameInstance_KMK* g = Cast<UVirtualGameInstance_KMK> ( GetWorld ( )->GetGameInstance ( ) );
-			USkeletalMeshComponent* TempMesh = GetMesh ( );
-			if (TempMesh)
-			{
-				TempMesh->SetMaterial ( 0 , FeverDynamicMats[g->playerMeshNum] );
-			}
+			TempMesh->SetMaterial ( 0 , FeverDynamicMat );
 		}
 	}
 }
@@ -268,20 +250,6 @@ void AHSW_ThirdPersonCharacter::Tick(float DeltaTime)
 		{
 			SetActorRotation ( ThrowingRotator );
 		}
-	}
-}
-
-void AHSW_ThirdPersonCharacter::ClientPlayMusic_Implementation ( class UAudioComponent* selectedMusic )
-{
-	//	UGameplayStatics::PlaySound2D(this, Music );
-	if (selectedMusic)
-	{
-		selectedMusic->Play ( );
-		UE_LOG ( LogTemp , Warning , TEXT ( "Music Play" ) );
-	}
-	else
-	{
-		UE_LOG ( LogTemp , Warning , TEXT ( "not Music" ) );
 	}
 }
 
@@ -470,16 +438,8 @@ void AHSW_ThirdPersonCharacter::Look ( const FInputActionValue& Value )
 
 UMaterialInstanceDynamic* AHSW_ThirdPersonCharacter::ChangeMyMeshMat (int32 num )
 {
-	if (FeverCharactMat.IsValidIndex ( num ))
-	{
-		return FeverDynamicMats[num];
-	}
-	else
-	{
-		UE_LOG ( LogTemp , Error , TEXT ( "ChangeMyMeshMat: MeshIndex %d가 유효하지 않습니다." ) , num );
-		return nullptr;  // 유효하지 않을 경우 nullptr 반환
-	}
-
+	FeverDynamicMat = UMaterialInstanceDynamic::Create ( FeverCharactMat[num] , this );
+	return FeverDynamicMat;
 }
 
 // Imoji ==============================================================================================
@@ -581,9 +541,8 @@ void AHSW_ThirdPersonCharacter::MulticastRPCFeverGauge_Implementation (float Add
 
 void AHSW_ThirdPersonCharacter::MulticastRPCBrightness_Implementation ( int index )
 {
-	auto* gi = GetGameInstance<UVirtualGameInstance_KMK>();
 	UE_LOG ( LogTemp , Warning , TEXT ( "%f" ) , FeverBright );
-	FeverDynamicMats[gi->playerMeshNum]->SetScalarParameterValue ( TEXT ( "jswEmissivePower-A" ) , FeverBright );
+	FeverDynamicMat->SetScalarParameterValue ( TEXT ( "jswEmissivePower-A" ) , FeverBright );
 }
 
 void AHSW_ThirdPersonCharacter::PossessedBy ( AController* NewController )
@@ -673,7 +632,7 @@ void AHSW_ThirdPersonCharacter::MulticastRPCInterview_Implementation ( )
 	{
 		UE_LOG ( LogTemp , Warning , TEXT ( "Interview is in progress." ) );
 		// 멀티캐스트 확인용 임시로 사용할 쉐이크바뤼
-		//ShakeBodyBlueprint ( );
+		ShakeBodyBlueprint ( );
 	}
 	else
 	{
@@ -827,3 +786,16 @@ void AHSW_ThirdPersonCharacter::SetChatWidget ( const FString& text )
 }
 
 #pragma endregion
+void AHSW_ThirdPersonCharacter::ClientPlayMusic_Implementation ( class UAudioComponent* selectedMusic )
+{
+	//	UGameplayStatics::PlaySound2D(this, Music );
+	if (selectedMusic)
+	{
+		selectedMusic->Play ( );
+		UE_LOG ( LogTemp , Warning , TEXT ( "Music Play" ) );
+	}
+	else
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "not Music" ) );
+	}
+}
