@@ -10,6 +10,7 @@
 #include "GameFramework/PlayerState.h"
 #include "Engine/StaticMeshActor.h"
 #include "EngineUtils.h"
+#include "HSW/HSW_ThirdPersonCharacter.h"
 
 // Sets default values for this component's properties
 UVirtual_KMK::UVirtual_KMK()
@@ -196,11 +197,27 @@ void UVirtual_KMK::SetInterviewee ( bool bInterview , APlayerState* interviewee,
 		//intervieweePlayer->CameraBoom->TargetArmLength = 0;
 		interviewee->GetPawn ( )->SetActorTransform ( StageLocation );
 		interviewee->GetPawn ( )->SetActorScale3D ( FVector ( 3.0 ) );
+
+		if (APawn* pawn = interviewee->GetPawn ( ))
+		{
+			if (AHSW_ThirdPersonCharacter* Character = Cast<AHSW_ThirdPersonCharacter> ( pawn ))
+			{
+				Character->StartVoiceChat ( );
+			}
+		}
 	}
 	else
 	{
 		interviewee->GetPawn ( )->SetActorTransform ( preLoc );
 		interviewee->GetPawn ( )->SetActorScale3D ( FVector ( 2.0 ) );
+
+		if (APawn* pawn = interviewee->GetPawn ( ))
+		{
+			if (AHSW_ThirdPersonCharacter* Character = Cast<AHSW_ThirdPersonCharacter> ( pawn ))
+			{
+				Character->CancleVoiceChat ( );
+			}
+		}
 	}
 }
 
