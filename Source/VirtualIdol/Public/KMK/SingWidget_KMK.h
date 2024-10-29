@@ -39,6 +39,9 @@ public:
     UPROPERTY ( )
     class UAudioComponent* sound;
 
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite )
+	TArray<class USoundBase*> WavArray;
+
 	UPROPERTY ( )
 	class USoundBase* SoundFile;
 
@@ -48,4 +51,6 @@ public:
 
 	UPROPERTY()
 	class AHSW_AuditoriumGameMode* gm;
+
+	class AHSW_ThirdPersonCharacter* pc;
 };

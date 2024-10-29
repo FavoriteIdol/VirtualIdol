@@ -249,6 +249,14 @@ public:
 	UPROPERTY(Replicated, EditDefaultsOnly,BlueprintReadWrite )
 	FTransform PreLocation;
 
+	UFUNCTION(BlueprintImplementableEvent, Category= Interview )
+	void MICSettingBlueprint( );
+
+	UFUNCTION(BlueprintImplementableEvent, Category= Interview )
+	void MICOnBlueprint( );
+
+	UFUNCTION(BlueprintImplementableEvent, Category= Interview )
+	void MICOffBlueprint( );
 	// 멀티플레이 --------------------------------------
 
 	virtual void GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
@@ -290,6 +298,17 @@ public:
 
 	void StartVoiceChat( );
 	void CancleVoiceChat ( );
+
+	UFUNCTION(Server, Reliable )
+	void ServerRPCPlayMusic(  );
+
+	UFUNCTION(NetMulticast, Reliable )
+	void MulticastRPCPlayMusic ( );
+
+	UFUNCTION( )
+	void PlayMusic(USoundBase* wavFile);
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TArray<class USoundBase* > WavArray;
 
 
 #pragma region KMK

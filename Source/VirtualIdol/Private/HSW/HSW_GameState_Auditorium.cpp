@@ -53,6 +53,38 @@ void AHSW_GameState_Auditorium::ServerRPCChat_Implementation ( const FString& Ch
     }
 }
 
+void AHSW_GameState_Auditorium::MultiRPCPlaySound_Implementation ( USoundBase* wavFile )
+{
+    for (APlayerState* PlayerState : PlayerArray)
+    {
+        APawn* Pawn = PlayerState->GetPawn ( );
+        if (AHSW_ThirdPersonCharacter* Character = Cast<AHSW_ThirdPersonCharacter> ( Pawn ))
+        {
+            if (Character->IsLocallyControlled ( ))
+            {
+                Character->PlayMusic( wavFile );
+            }
+        }
+        else if (Pawn && Pawn->FindComponentByClass<UVirtual_KMK> ( ))
+        {
+            UVirtual_KMK* Vir = Pawn->FindComponentByClass<UVirtual_KMK> ( );
+            if (Vir && Pawn->IsLocallyControlled ( ))
+            {
+                Vir->PlayMusic ( wavFile );
+            }
+        }
+    }
+}
+
+void AHSW_GameState_Auditorium::ServerRPCPlaySound_Implementation ( USoundBase* wavFile )
+{
+    AHSW_AuditoriumGameMode* gm = GetWorld ( )->GetAuthGameMode<AHSW_AuditoriumGameMode> ( );
+    if (gm)
+    {
+        gm->BroadcastPlayMusic ( wavFile );
+    }
+}
+
 void AHSW_GameState_Auditorium::ServerRPC_ShowCountDown_Implementation ( )
 {
     AHSW_AuditoriumGameMode* gm = GetWorld ( )->GetAuthGameMode<AHSW_AuditoriumGameMode> ( );
@@ -111,6 +143,38 @@ void AHSW_GameState_Auditorium::MultiRPC_FeverGauge_Implementation ( float fever
             {
                 Vir->currentGauge = feverValue;
                 Vir->virtualWidget->FeverGauge->SetFeverGauge ( Vir->currentGauge );
+            }
+        }
+    }
+}
+
+void AHSW_GameState_Auditorium::ServerRPC_StopSound_Implementation ( )
+{
+    AHSW_AuditoriumGameMode* gm = GetWorld ( )->GetAuthGameMode<AHSW_AuditoriumGameMode> ( );
+    if (gm)
+    {
+        //gm->BroadcastPlayMusic ( );
+    }
+}
+
+void AHSW_GameState_Auditorium::MultiRPC_StopSound_Implementation ( )
+{
+    for (APlayerState* PlayerState : PlayerArray)
+    {
+        APawn* Pawn = PlayerState->GetPawn ( );
+        if (AHSW_ThirdPersonCharacter* Character = Cast<AHSW_ThirdPersonCharacter> ( Pawn ))
+        {
+            if (Character->IsLocallyControlled ( ))
+            {
+                //Character->PlayMusic ( wavFile );
+            }
+        }
+        else if (Pawn && Pawn->FindComponentByClass<UVirtual_KMK> ( ))
+        {
+            UVirtual_KMK* Vir = Pawn->FindComponentByClass<UVirtual_KMK> ( );
+            if (Vir && Pawn->IsLocallyControlled ( ))
+            {
+                //Vir->PlayMusic ( wavFile );
             }
         }
     }

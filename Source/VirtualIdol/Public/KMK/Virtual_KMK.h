@@ -62,4 +62,7 @@ public:
 	TArray< TSubclassOf<class AActor>> appearFact;
 	UPROPERTY( )
 	float currentGauge = 0;
+
+	UFUNCTION( )
+	void PlayMusic(USoundBase* wavFile);
 };
