@@ -37,6 +37,18 @@ void UVirtual_KMK::BeginPlay()
 			StageLocation = Actor->GetTransform ( );
 		}
 	}
+
+	pc = GetWorld ( )->GetFirstPlayerController ( );
+
+	if (pc)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PC" ));
+		StartVoiceChat( );
+	}
+	else
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "PC none" ) );
+	}
 }
 
 
@@ -190,6 +202,16 @@ void UVirtual_KMK::SetInterviewee ( bool bInterview , APlayerState* interviewee,
 		interviewee->GetPawn ( )->SetActorTransform ( preLoc );
 		interviewee->GetPawn ( )->SetActorScale3D ( FVector ( 2.0 ) );
 	}
+}
+
+void UVirtual_KMK::StartVoiceChat ( )
+{
+	pc->StartTalking ( );
+}
+
+void UVirtual_KMK::CancleVoiceChat ( )
+{
+	pc->StopTalking( );
 }
 
 #pragma endregion
