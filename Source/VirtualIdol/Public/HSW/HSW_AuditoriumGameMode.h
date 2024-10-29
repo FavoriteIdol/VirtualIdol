@@ -53,6 +53,9 @@ public:
 	UFUNCTION( )
 	void BroadcastPlayMusic( USoundBase* wavFile);
 
+	UFUNCTION( )
+	void BroadcastSetInterviewee( bool bInterview, APlayerState* interviewee, FTransform preLoc);
+
 	UFUNCTION(Server, Reliable )
 	void ServerPlayMusic( class UAudioComponent* selectedMusic );
 
@@ -62,4 +65,5 @@ public:
 
 	UPROPERTY( )
 	TArray<class USoundBase *> WavArray;
+
 };

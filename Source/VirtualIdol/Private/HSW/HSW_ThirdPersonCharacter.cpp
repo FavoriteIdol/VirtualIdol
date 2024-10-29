@@ -296,6 +296,23 @@ void AHSW_ThirdPersonCharacter::SetFeverGaugeMulti ( float feverValue )
 
 }
 
+void AHSW_ThirdPersonCharacter::SetInterviewee ( bool bInterview, APlayerState* interviewee , FTransform preLoc )
+{
+	if (bInterview)
+	{
+		//intervieweePlayer->CameraBoom->TargetArmLength = 0;
+		interviewee->GetPawn ( )->SetActorTransform ( StageLocation );
+
+		//AHSW_ThirdPersonCharacter* localPlayer = Cast<AHSW_ThirdPersonCharacter> ( interviewee->GetPawn ( ) );
+
+		//DrawDebugString ( GetWorld ( ) , interviewee->GetPawn ( )->GetActorLocation ( ) + FVector ( 0 , 0 , 90 ) , TEXT ( "Interviewee~" ) , nullptr , FColor::Red , 5 , true , 1 );
+	}
+	else
+	{
+		interviewee->GetPawn ( )->SetActorTransform ( preLoc );
+	}
+}
+
 // void AHSW_ThirdPersonCharacter::InitMainUI ( )
 // {
 //

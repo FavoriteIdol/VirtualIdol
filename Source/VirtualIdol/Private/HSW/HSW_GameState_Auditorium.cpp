@@ -180,3 +180,50 @@ void AHSW_GameState_Auditorium::MultiRPC_StopSound_Implementation ( )
     }
 }
 
+void AHSW_GameState_Auditorium::ServerRPC_SetInterviewee_Implementation ( )
+{
+    AHSW_AuditoriumGameMode* gm = GetWorld ( )->GetAuthGameMode<AHSW_AuditoriumGameMode> ( );
+    if (gm)
+    {
+        // 인터뷰 끝나는 조건 나중에 바꾸기
+        bIsInterviewing = !bIsInterviewing;
+
+        if (PlayerArray.Num ( ) > 0 && bIsInterviewing)
+        {
+            IntervieweeIndex = FMath::RandRange ( 1 , PlayerArray.Num ( ) - 1 );
+            IntervieweePlayerState = PlayerArray[IntervieweeIndex];
+
+            PreLocation = IntervieweePlayerState->GetPawn ( )->GetActorTransform ( );
+        }
+        else
+        {
+            UE_LOG ( LogTemp , Warning , TEXT ( "플레이어가 없습니다." ) );
+        }
+        gm->BroadcastSetInterviewee ( bIsInterviewing, IntervieweePlayerState, PreLocation );
+
+    }
+}
+
+void AHSW_GameState_Auditorium::MultiRPC_SetInterviewee_Implementation ( bool bInterview , APlayerState* interviewee , FTransform preLoc )
+{
+    for (APlayerState* PlayerState : PlayerArray)
+    {
+        APawn* Pawn = PlayerState->GetPawn ( );
+        if (AHSW_ThirdPersonCharacter* Character = Cast<AHSW_ThirdPersonCharacter> ( Pawn ))
+        {
+            if (Character->IsLocallyControlled ( ))
+            {
+                Character->SetInterviewee ( bInterview, interviewee, preLoc );
+            }
+        }
+        else if (Pawn && Pawn->FindComponentByClass<UVirtual_KMK> ( ))
+        {
+            UVirtual_KMK* Vir = Pawn->FindComponentByClass<UVirtual_KMK> ( );
+            if (Vir && Pawn->IsLocallyControlled ( ))
+            {
+               Vir->SetInterviewee ( bInterview, interviewee , preLoc );
+            }
+        }
+    }
+}
+

@@ -83,6 +83,15 @@ void AHSW_AuditoriumGameMode::BroadcastPlayMusic ( USoundBase* wavFile )
 	}
 }
 
+void AHSW_AuditoriumGameMode::BroadcastSetInterviewee ( bool bInterview , APlayerState* interviewee , FTransform preLoc )
+{
+	AHSW_GameState_Auditorium* gs = GetGameState<AHSW_GameState_Auditorium> ( );
+	if (gs)
+	{
+		gs->MultiRPC_SetInterviewee( bInterview, interviewee, preLoc );
+	}
+}
+
 void AHSW_AuditoriumGameMode::BroadcastCountDown ( )
 {
 	AHSW_GameState_Auditorium* gs = GetGameState<AHSW_GameState_Auditorium> ( );
