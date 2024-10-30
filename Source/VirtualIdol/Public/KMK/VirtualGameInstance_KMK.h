@@ -49,7 +49,7 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 	IOnlineSessionPtr sessionInterface;
 
 	// 호스트 이름은 서버에서 닉네임 받아올 예정
-	FString HostName = TEXT("최애의 아이");
+	FString HostName = TEXT("미호짱");
 
 	UPROPERTY( )
 	bool bLogin = false;

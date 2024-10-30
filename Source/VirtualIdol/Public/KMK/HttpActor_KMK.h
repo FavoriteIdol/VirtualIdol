@@ -73,17 +73,17 @@ struct FStageInfo
 	GENERATED_BODY( )
 
 	UPROPERTY(BlueprintReadOnly)
-	FString name;
+	FString name= TEXT("");
 	UPROPERTY(BlueprintReadOnly)
-	int32 terrain;
+	int32 terrain = -1;
 	UPROPERTY(BlueprintReadOnly)
-	int32 sky;
+	int32 sky = -1;
 	UPROPERTY(BlueprintReadOnly)
-	int32 theme;
+	int32 theme = -1;
 	UPROPERTY(BlueprintReadOnly)
-	int32 specialEffect;
+	int32 specialEffect = -1;
 	UPROPERTY(BlueprintReadOnly)
-	FString img;
+	FString img= TEXT("");
 
 };
 
