@@ -203,6 +203,7 @@ void UJJH_MapSelectWidget::OnCaptureButtonClicked ( )
 		CaptureButton->SetVisibility(ESlateVisibility::Hidden);
 		ReturnButton->SetVisibility ( ESlateVisibility::Hidden );
 		ReturnToMenuButton->SetVisibility ( ESlateVisibility::Hidden );
+		SetUpFinishBorder->SetVisibility ( ESlateVisibility::Hidden );
 	}
 
 	// 0.3초 후에 SetImageWithCapturedImage 함수 호출
