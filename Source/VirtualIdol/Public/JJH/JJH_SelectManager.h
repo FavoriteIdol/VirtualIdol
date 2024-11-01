@@ -78,4 +78,11 @@ public:
 	FStageInfo Stage;
 	//파일 경로
 	FString FullFileName;
+
+#pragma region LoadStage
+	void CreateStage(const struct FStageInfo& info );
+	UFUNCTION( )
+	void DeleteStage( );
+#pragma endregion
+
 };

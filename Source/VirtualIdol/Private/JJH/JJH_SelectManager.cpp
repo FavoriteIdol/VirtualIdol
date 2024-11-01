@@ -24,6 +24,7 @@ void AJJH_SelectManager::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if(!MapSelectWidgetFactory) return;
 	MapSelectWidget = CreateWidget<UJJH_MapSelectWidget> ( GetWorld() , MapSelectWidgetFactory );
 	if (MapSelectWidget) MapSelectWidget->AddToViewport ( );
 
@@ -266,5 +267,44 @@ void AJJH_SelectManager::SaveImage ( UTextureRenderTarget2D* RenderTarget2 )
 	}
 }
 
+
+void AJJH_SelectManager::CreateStage ( const struct FStageInfo& info )
+{
+	DeleteStage();
+	GetWorld()->SpawnActor<AActor>(SkyFactory[info.sky], GetActorTransform ( ) );
+	if (info.theme == 1)
+	{
+		UGameplayStatics::LoadStreamLevel (
+		GetWorld ( ) ,
+		FName ( "LV_Island_JSW" ) ,
+		true ,  // Whether to make the level visible
+		true ,  // Should block on load
+		FLatentActionInfo ( )
+			);
+	}
+	else
+	{
+		UGameplayStatics::UnloadStreamLevel(
+		GetWorld ( ) ,
+		FName ( "LV_Island_JSW" ) ,
+		FLatentActionInfo ( ),	
+		true   // Should block on load
+		);
+		GetWorld ( )->SpawnActor<AActor> ( ThemeFactory[info.theme] , GetActorTransform ( ) );
+	}
+	GetWorld ( )->SpawnActor<AActor> (FloorFactory[info.terrain] , GetActorTransform ( ) );
+	GetWorld ( )->SpawnActor<AActor> (VFXFactory[info.specialEffect] , GetActorTransform ( ) );
+
+	UE_LOG(LogTemp, Warning, TEXT("%d, %d, %d, %d" ), info.sky, info.theme, info.terrain, info.specialEffect);
+}
+
+void AJJH_SelectManager::DeleteStage ( )
+{
+	TArray<FName> tagName = {TEXT("VFX" ), TEXT ( "Floor" ), TEXT ( "Skybox" ) ,TEXT("Theme")  };
+	for (int i = 0; i < tagName.Num ( ); i++)
+	{
+		FindActorAndDestroy(tagName[i] );
+	}
+}
 
 #pragma endregion 

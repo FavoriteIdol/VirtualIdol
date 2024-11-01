@@ -36,6 +36,11 @@ public:
 	class AHttpActor_KMK* httpActor;
 	UPROPERTY(EditAnywhere, Category = Http )
 	TSubclassOf<class AHttpActor_KMK> httpFact;
+
+	UPROPERTY( )
+	class AJJH_SelectManager* selectManager;
+	UPROPERTY(EditAnywhere, Category = select )
+	TSubclassOf<class AJJH_SelectManager> selectFact;
 #pragma region Login Widget Panel
 // ================================================================
 // Login Widget Panel
@@ -154,7 +159,6 @@ public:
     class UButton* Butt_CreateTicket1;
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UMultiLineEditableText* EditMultiText_Ticket;
-
 	UFUNCTION( )
 	void PressCreateTicket();
 	UFUNCTION( )
@@ -166,6 +170,8 @@ public:
 	// 이펙트 결정 패널
     UPROPERTY ( meta = ( BindWidget ) )
     class UCanvasPanel* SetEffectPanel;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UImage* Image_Effect;
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UButton* Butt_AppearEffect;
 	UPROPERTY ( meta = ( BindWidget ) )
@@ -262,6 +268,12 @@ public:
 #pragma endregion
 
 #pragma region Select Stage
+	UPROPERTY(EditAnywhere, Category = SetConcert )
+	TArray<class UNiagaraSystem*> setConcert_Effects;
+	// 내 무대인지 확인
+	TArray<struct FStageInfo> myStageInfoArray;
+	// 전체 무대
+	TArray<struct FStageInfo> allStageInfoArray;
 	// 버튼
 	UPROPERTY(meta = (BindWidget))
     class UButton* Butt_UserStage;
@@ -280,7 +292,7 @@ public:
 	UFUNCTION()
 	void PressMyStageButt( );
 	UFUNCTION()
-	void CreateStageWidget( const FString& createName );
+	void CreateStageWidget( const struct FStageInfo& stageInfo );
 	UFUNCTION( )
 	void ClearSB( );
 #pragma endregion

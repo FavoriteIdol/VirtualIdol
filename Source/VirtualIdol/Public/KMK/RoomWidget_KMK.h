@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "KMK/HttpActor_KMK.h"
 #include "RoomWidget_KMK.generated.h"
 
 /**
@@ -42,7 +43,12 @@ public :
 	UFUNCTION( )
 	void SetImageAndText(const struct FRoomInfo& info);
 	UFUNCTION( )
-	void SetStageText(const FString& createName);
-
+	void SetStageText(const struct FStageInfo& stageInfo);
+	// StageInfo를 저장할 멤버 변수
+	UPROPERTY()
+	FStageInfo myStageInfo;
 	int32 roomNum = 0;
+	
+	UPROPERTY( )
+	class AJJH_SelectManager* sm;
 };

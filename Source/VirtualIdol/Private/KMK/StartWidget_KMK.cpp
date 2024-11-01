@@ -21,6 +21,7 @@
 #include "Components/MultiLineEditableText.h"
 #include "Components/ScrollBox.h"
 #include "KMK/HttpActor_KMK.h"
+#include "JJH/JJH_SelectManager.h"
 
 void UStartWidget_KMK::NativeConstruct ( )
 {	
@@ -28,6 +29,8 @@ void UStartWidget_KMK::NativeConstruct ( )
 	// GI 찾기
 	gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance() );
 	httpActor = Cast<AHttpActor_KMK>(UGameplayStatics::GetActorOfClass(GetWorld() , httpFact));
+	selectManager = Cast<AJJH_SelectManager>(UGameplayStatics::GetActorOfClass(GetWorld() , selectFact));
+	
 	if (gi->bLogin)
 	{
 		StartSwitcher->SetActiveWidgetIndex ( 1 );
@@ -188,8 +191,8 @@ void UStartWidget_KMK::OnMyLogin ( )
 	if (!EditText_ID->GetText ( ).IsEmpty ( ) && !EditText_PW->GetText ( ).IsEmpty ( ))
 	{
 		// 서버에 정보값 보내기
-		//httpActor->ReqLogin(EditText_ID->GetText().ToString(), EditText_PW->GetText().ToString());
-		StartSwitcher->SetActiveWidgetIndex ( 1 );
+		httpActor->ReqLogin(EditText_ID->GetText().ToString(), EditText_PW->GetText().ToString());
+		//StartSwitcher->SetActiveWidgetIndex ( 1 );
 	}
 }
 
@@ -210,10 +213,7 @@ void UStartWidget_KMK::CreateStagePanel ( )
 void UStartWidget_KMK::SettingStagePanel ( )
 {
 	StartSwitcher->SetActiveWidgetIndex ( 3 );
-	for (int i = 0; i < 6; i++)
-	{
-		CreateStageWidget ( FString::FromInt ( i ) );
-	}
+	httpActor->ReqCheckStage(this);
 }
 // 공연 시작 : 세션 생성
 void UStartWidget_KMK::StartConcertPanel ( )
@@ -238,28 +238,29 @@ void UStartWidget_KMK::ComeInStagePanel ( )
 void UStartWidget_KMK::PressUserStageButt ( )
 {
 	ClearSB( );
-	for (int i = 0; i < 5; i++)
+	// BE에서 스테이지 정보값 조회
+
+	for (int i = 0; i < allStageInfoArray.Num ( ); i++)
 	{
-		CreateStageWidget ( FString::FromInt ( i ) );
+		CreateStageWidget(allStageInfoArray[i]);
 	}
 }
 
 void UStartWidget_KMK::PressMyStageButt ( )
 {
 	ClearSB( );
-	for (int i = 0; i < 2; i++)
-	{
-		CreateStageWidget ( FString::FromInt ( i ) );
-	}
+	// BE에서 스테이지 정보값 조회 
 
 }
 
-void UStartWidget_KMK::CreateStageWidget ( const FString& createName )
+void UStartWidget_KMK::CreateStageWidget (const struct FStageInfo& stageInfo )
 {
+	// 이펙트를 고르기 위한
 	auto* wid = Cast<URoomWidget_KMK> ( CreateWidget ( GetWorld ( ) , roomWidgetFact ) );
 	if (wid)
 	{
-		wid->SetStageText ( createName );
+		wid->SetStageText ( stageInfo );
+		wid->sm = selectManager;
 		SB_FindStage->AddChild(wid);
 	}
 }
@@ -394,6 +395,7 @@ void UStartWidget_KMK::PressCreateTicket ( )
 	if(!EditMultiText_Ticket->GetText().IsEmpty()) UE_LOG(LogTemp, Warning, TEXT("Create!" ) );
 	TMap<FString, FString> data;
 	data.Add(TEXT("prompt" ), EditMultiText_Ticket->GetText().ToString());
+	// 이 부분 정보는 BE에서 끌어와야함
 	data.Add(TEXT("description"), TEXT("안녕하세요!! 오랜만입니다!!" ));
 	httpActor->ReqTicket(data);
 	// EditMultiText_Ticket->SetText ( FText::GetEmpty ( ) );
@@ -401,7 +403,7 @@ void UStartWidget_KMK::PressCreateTicket ( )
 
 void UStartWidget_KMK::CreateTicketMaterial ( UTexture2D* texture)
 {
-	Image_SetStage->SetBrushFromTexture(texture);
+	Image_FinalStageImage->SetBrushFromTexture(texture);
 }
 
 void UStartWidget_KMK::ClearAllText ( )
