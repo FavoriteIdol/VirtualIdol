@@ -667,17 +667,26 @@ void AHSW_ThirdPersonCharacter::ServerRPCInterview_Implementation (  )
 	bIsInterviewing = !bIsInterviewing;
 
 	PlayerStates = GetWorld()->GetGameState()->PlayerArray;
-	if (PlayerStates.Num ( ) > 0 && bIsInterviewing)
+	if (PlayerStates.Num ( ) > 0)
 	{
+		if (bIsInterviewing)
+		{
 		IntervieweeIndex = FMath::RandRange ( 1 , PlayerStates.Num ( ) - 1 );
 		IntervieweePlayerState = PlayerStates[IntervieweeIndex];
 
 		PreLocation = IntervieweePlayerState->GetPawn ( )->GetActorTransform ( );
-
+		}
 	}
 	else
 	{
-		UE_LOG ( LogTemp , Warning , TEXT ( "플레이어가 없습니다." ) );
+		if(IsLocallyControlled())
+		{
+			UE_LOG ( LogTemp , Warning , TEXT ( "Local: 플레이어가 없습니다." ) );
+		}
+		else 
+		{
+			UE_LOG ( LogTemp , Warning , TEXT ( "Not Local: 플레이어가 없습니다." ) );
+		}
 	}
 
 	MulticastRPCInterview(  );

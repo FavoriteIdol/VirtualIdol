@@ -43,7 +43,7 @@ void UVirtual_KMK::BeginPlay()
 
 	if (pc)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("PC" ));
+		UE_LOG ( LogTemp , Warning , TEXT ( "name: %s" ) , *( GetName ( ) ) );
 		StartVoiceChat( );
 	}
 	else
@@ -202,6 +202,7 @@ void UVirtual_KMK::SetInterviewee ( bool bInterview , APlayerState* interviewee,
 		{
 			if (AHSW_ThirdPersonCharacter* Character = Cast<AHSW_ThirdPersonCharacter> ( pawn ))
 			{
+				UE_LOG ( LogTemp , Warning , TEXT ( "character name: %s" ) , *( Character->GetName() ) );
 				Character->StartVoiceChat ( );
 			}
 		}
@@ -215,6 +216,7 @@ void UVirtual_KMK::SetInterviewee ( bool bInterview , APlayerState* interviewee,
 		{
 			if (AHSW_ThirdPersonCharacter* Character = Cast<AHSW_ThirdPersonCharacter> ( pawn ))
 			{
+				UE_LOG ( LogTemp , Warning , TEXT ( "character name: %s" ) , *( Character->GetName ( ) ) );
 				Character->CancleVoiceChat ( );
 			}
 		}
