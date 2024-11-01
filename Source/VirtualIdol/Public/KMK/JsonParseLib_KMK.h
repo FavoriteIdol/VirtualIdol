@@ -21,6 +21,10 @@ public :
 	static FString MakeLoginJson( const FString& id,  const FString& pw);
 	static FLoginInfo ParsecMyInfo(const FString& json);
 #pragma endregion
+#pragma region Load Stage
+	static TArray<struct FStageInfo> ParsecStageInfos(const FString& json, const FString& giName, const TArray<struct FStageInfo> myArray);
+#pragma endregion
+
 #pragma region Set Concert
 	static FString MakeConcertJson(const struct FConcertInfo& concert);
 

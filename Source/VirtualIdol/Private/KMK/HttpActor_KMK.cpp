@@ -76,7 +76,7 @@ void AHttpActor_KMK::OnResLogin ( FHttpRequestPtr Request , FHttpResponsePtr Res
 		// 실패
 		UE_LOG ( LogTemp , Warning , TEXT ( "OnResLogin Failed..." ) );
 	}
-	FString authHeader = FString::Printf ( TEXT ( "Bearer %s" ) , *gi->loginInfo.token );
+	FString authHeader = FString::Printf ( TEXT ( "Bearer %s" ) , *loginInfo.token );
 }
 #pragma endregion
 #pragma region Concert
@@ -127,6 +127,52 @@ void AHttpActor_KMK::OnResSetConcert ( FHttpRequestPtr Request , FHttpResponsePt
         }
 	}
 }
+// 무대 불러오기
+
+
+void AHttpActor_KMK::ReqCheckStage (class UStartWidget_KMK* startWidget )
+{
+	if(!startWidget) return;
+	sw = startWidget;
+	// HTTP 모듈 생성
+	FHttpModule& httpModule = FHttpModule::Get ( );
+	TSharedRef<IHttpRequest> req = httpModule.CreateRequest ( );
+	// 요청할 정보를 설정
+	FString authHeader = FString::Printf ( TEXT ( "Bearer %s" ) , *gi->loginInfo.token );
+    req->SetHeader(TEXT("Authorization"), *( authHeader ));
+	req->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+	req->SetURL(TEXT("http://master-of-prediction.shop:8123/api/v1/stages") );
+	req->SetVerb ( TEXT ( "GET" ) );
+
+	req->ProcessRequest ( );
+	// 응답받을 함수를 연결
+	req->OnProcessRequestComplete ( ).BindUObject ( this , &AHttpActor_KMK::OnResCheckStage );
+}
+
+void AHttpActor_KMK::OnResCheckStage ( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully )
+{
+	if (Response->GetResponseCode ( ) == 200)
+	{
+		UE_LOG ( LogTemp , Error , TEXT ( "CheckStage Successed" ));
+		// 성공
+		FString respon = Response->GetContentAsString();
+		// gi에 있는 닉네임 파악
+		allStageInfoArray = UJsonParseLib_KMK::ParsecStageInfos(respon, gi->GetMyInfo().userName, myStageInfoArray);
+		if(allStageInfoArray.Num() > 0) sw->allStageInfoArray = allStageInfoArray;
+		if(myStageInfoArray.Num() > 0) sw->myStageInfoArray = myStageInfoArray;
+		for (int i = 0; i < allStageInfoArray.Num ( ); i++)
+		{
+			sw->CreateStageWidget(allStageInfoArray[i]);
+			UE_LOG ( LogTemp , Error , TEXT ( "%s" ) , *allStageInfoArray[i].name);
+		}
+
+		UE_LOG ( LogTemp , Error , TEXT ( "%d" ), allStageInfoArray.Num());
+	}
+	else
+	{
+		UE_LOG ( LogTemp , Error , TEXT ( "CheckStage Failed" ));
+	}
+}
 #pragma endregion
 
 #pragma region with Ai for Ticket
@@ -139,13 +185,14 @@ void AHttpActor_KMK::ReqTicket ( const TMap<FString , FString> data )
 	// 요청할 정보를 설정
 	//TMap<FString , FString> data;
 	//data.Add ( TEXT ( "key" ) , json );
+	if(ticketData.Num() <= 0) ticketData = data;
 
 	req->SetURL(TEXT("https://singular-swine-deeply.ngrok-free.app/generate-image") );
 	req->SetVerb ( TEXT ( "POST" ) );
 	// TEXT ( "application/json" )  ->TEXT("image/jpeg")
 	req->SetHeader ( TEXT ( "content-type" ) , TEXT ( "application/json" ) );
 	req->SetTimeout(180.f);
-	req->SetContentAsString ( UJsonParseLib_KMK::CreateTicketJson ( data ) );
+	req->SetContentAsString ( UJsonParseLib_KMK::CreateTicketJson ( ticketData ) );
 	req->ProcessRequest ( );
 	// 응답받을 함수를 연결
 	req->OnProcessRequestComplete ( ).BindUObject ( this , &AHttpActor_KMK::OnResTicket );
@@ -200,8 +247,6 @@ void AHttpActor_KMK::OnTextureCreated(UTexture2D* texture)
 {
 	 gi->widget->CreateTicketMaterial(texture );
 }
-
-
 #pragma endregion
 
 #pragma region with BE for StageSettings

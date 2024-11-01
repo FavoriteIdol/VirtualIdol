@@ -252,6 +252,7 @@ void UVirtualGameInstance_KMK::VisibleStartWidget (bool bVisible)
     if (!bVisible)
     {
         widget->ClearSB();
+        // 위잿이미지 변경
         SwitchWidget ( 5 );
     }
 }
@@ -259,7 +260,6 @@ void UVirtualGameInstance_KMK::VisibleStartWidget (bool bVisible)
 void UVirtualGameInstance_KMK::SwitchWidget ( int32 num )
 {
     widget->StartSwitcher->SetActiveWidgetIndex ( num );
-
 }
 
 void UVirtualGameInstance_KMK::PopUpVisible ( )

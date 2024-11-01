@@ -46,6 +46,46 @@ FLoginInfo UJsonParseLib_KMK::ParsecMyInfo ( const FString& json )
     return result;
 }
 
+TArray<struct FStageInfo>  UJsonParseLib_KMK::ParsecStageInfos ( const FString& json, const FString& giName, TArray<struct FStageInfo> myArray )
+{
+    // 서버에서 가져온 json 파일 읽기
+    TSharedRef<TJsonReader<TCHAR>> reader = TJsonReaderFactory<TCHAR>::Create ( json );
+    // FJsonObject 형식으로 읽어온 json 데이터를 저장함 => 공유 포인터 형태로 객체 감싸기
+    TSharedPtr<FJsonObject> response = MakeShareable ( new FJsonObject ( ) );
+    TArray<struct FStageInfo> stageInfos;
+    if ( FJsonSerializer::Deserialize(reader,response) )
+    {
+        int32 stageCount = response->GetIntegerField(TEXT("totalElements" ));
+        const TArray<TSharedPtr<FJsonValue>>* stageArrays;
+        if (response->TryGetArrayField ( TEXT ( "content" ) , stageArrays ))
+        {
+            for ( const TSharedPtr<FJsonValue>& stage : *stageArrays )
+            {
+                FStageInfo info;
+                TSharedPtr<FJsonObject> stageEle = stage->AsObject();
+                if ( stageEle.IsValid() )
+                { 
+                   info.name = stageEle->GetStringField(TEXT("name"));
+                   info.terrain = stageEle->GetIntegerField(TEXT("terrain" ));
+                   info.sky = stageEle->GetIntegerField(TEXT("sky" ));
+                   info.theme = stageEle->GetIntegerField(TEXT("theme" ));
+                   info.specialEffect = stageEle->GetIntegerField(TEXT("specialEffect" ));
+                   info.img = stageEle->GetStringField(TEXT("img"));
+                   FString userName = stageEle->GetStringField(TEXT("userName"));
+
+                   if (userName == giName)
+                   {
+                       myArray.Add(info);
+                   }
+                   stageInfos.Add(info);
+                }
+            }
+        }
+
+    }
+    return stageInfos;
+}
+
 #pragma endregion
 
 #pragma region Set Concert

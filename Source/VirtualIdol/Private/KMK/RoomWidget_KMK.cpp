@@ -5,8 +5,10 @@
 #include "Components/Button.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
+#include "KMK/HttpActor_KMK.h"
 #include "KMK/VirtualGameInstance_KMK.h"
 #include "VirtualIdol.h"
+#include "JJH/JJH_SelectManager.h"
 
 void URoomWidget_KMK::NativeConstruct ( )
 {
@@ -29,12 +31,13 @@ void URoomWidget_KMK::SetImageAndText (const struct FRoomInfo& info)
 	roomNum = info.index;
 }
 
-void URoomWidget_KMK::SetStageText ( const FString& createName )
+void URoomWidget_KMK::SetStageText( const struct FStageInfo& stageInfo)
 {
+	myStageInfo = stageInfo;
 	Image_Stage->SetColorAndOpacity(FLinearColor::Yellow);
 	Butt_JoinSession->SetVisibility ( ESlateVisibility::Hidden );
     Butt_SetStage->SetVisibility ( ESlateVisibility::Visible );
-	Text_Name->SetText( FText::FromString( createName + TEXT ( "가 만든 무대" ) ));
+	Text_Name->SetText( FText::FromString( stageInfo.name ));
 }
 
 void URoomWidget_KMK::PressJoinSessionButt( )
@@ -49,10 +52,13 @@ void URoomWidget_KMK::PressJoinSessionButt( )
 void URoomWidget_KMK::PressSetStageButt ( )
 {
 	// 원래 보이던 위잿을 비활성화
+	UE_LOG(LogTemp, Warning, TEXT("Load Stage" ));
+	UE_LOG(LogTemp, Warning, TEXT("%s" ), *myStageInfo.name);
 	// 추가되어야하는것 : 저장된 무대를 로드
-	if (gi)
+	if (gi && sm)
 	{
 		gi->VisibleStartWidget(false);
+		sm->CreateStage(myStageInfo);
 	}
 }
 
