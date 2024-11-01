@@ -33,10 +33,12 @@ void UStartWidget_KMK::NativeConstruct ( )
 	
 	if (gi->bLogin)
 	{
+		selectManager->DeleteStage ( );
 		StartSwitcher->SetActiveWidgetIndex ( 1 );
 	}
 	else
 	{
+		
 		gi->bLogin = true;
 	}
 #pragma region LoginPanel
@@ -176,6 +178,7 @@ void UStartWidget_KMK::NativeTick ( const FGeometry& MyGeometry , float InDeltaT
 #pragma region BackFunction
 void UStartWidget_KMK::GoBack ( )
 {
+	selectManager->DeleteStage ( );
     StartSwitcher->SetActiveWidgetIndex (1);
 	ClearSB( );
 }
