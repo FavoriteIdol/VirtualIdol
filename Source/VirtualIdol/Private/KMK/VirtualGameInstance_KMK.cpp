@@ -23,6 +23,7 @@
 #include "SocketSubsystem.h"
 #include "Sockets.h"
 #include "IPAddress.h"
+#include "JJH/JJH_SelectManager.h"
 
 void UVirtualGameInstance_KMK::Init ( )
 {
@@ -247,6 +248,7 @@ void UVirtualGameInstance_KMK::SwitchStartUIWidget (int32 num )
     SwitchWidget ( 4 );
     widget->roomNum = num;
 }
+
 void UVirtualGameInstance_KMK::VisibleStartWidget (bool bVisible)
 {
     if (!bVisible)
@@ -332,3 +334,20 @@ void UVirtualGameInstance_KMK::SendMulticastMessage ( )
 }
 
 
+void UVirtualGameInstance_KMK::OnJoinSessionButt( )
+{
+	SwitchStartUIWidget(roomNum);
+}
+// 무대 선택에서 무대선택한 경우
+void UVirtualGameInstance_KMK::OnSetStageButt ( )
+{
+	// 원래 보이던 위잿을 비활성화
+	UE_LOG(LogTemp, Warning, TEXT("Load Stage" ));
+	UE_LOG(LogTemp, Warning, TEXT("%s" ), *myStageInfo.name);
+	// 추가되어야하는것 : 저장된 무대를 로드
+	if (sm)
+	{
+		VisibleStartWidget(false);
+		sm->CreateStage(myStageInfo);
+	}
+}

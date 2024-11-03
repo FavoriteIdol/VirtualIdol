@@ -35,6 +35,8 @@ public :
 	class UVirtualGameInstance_KMK* gi;
 	UPROPERTY( )
 	class AHSW_ThirdPersonCharacter* pc;
+	UPROPERTY(EditAnywhere, Category = Cash )
+	int32 myCash = 50000;
 
 	void OnOffFunction(class UTextBlock* textBlocks, int32 num, bool bAllVisib = false );
 	void ChangeTextAndImage ( FLinearColor color , int32 num , TArray<FString> textArray , bool bMyAuth = false );
@@ -45,21 +47,21 @@ public :
 	TArray<FButtonInfo> ButtonsInfoArray;
 	void SetUpButtonInfo( );
 
-	TArray<FString> buttonName = {TEXT("Hidden"), TEXT("Mode"), TEXT("Mike"), TEXT("Chat"), TEXT("Emotion"), TEXT("Vip")};
+	TArray<FString> buttonName = {TEXT("Hidden"), TEXT("Mode"), TEXT("Mike"), TEXT("Chat"), TEXT("Emotion")};
 	UPROPERTY(EditAnywhere )
-	TArray<FString> currentText = {TEXT("숨기기"), TEXT("1인 모드"), TEXT("마이크"), TEXT("채팅"), TEXT("이모티콘"), TEXT("VIP 결제")};
+	TArray<FString> currentText = {TEXT("숨기기"), TEXT("1인 모드"), TEXT("마이크"), TEXT("채팅"), TEXT("이모티콘")};
 	UPROPERTY(EditAnywhere )
-	TArray<FString> changeText = {TEXT("보이기"), TEXT("다인 vip모드"), TEXT("음소거"), TEXT("채팅"), TEXT("이모티콘"), TEXT("VIP")};
+	TArray<FString> changeText = {TEXT("보이기"), TEXT("다인 vip모드"), TEXT("음소거"), TEXT("채팅"), TEXT("이모티콘")};
 	
 	void OnOffInfo(FLinearColor color,  ESlateVisibility bVisib, int32 num, TArray<FString> textArray );
 
 	bool bMyVip = false;
 	// 1. Hidden
+	bool bHide = false;
 	UPROPERTY(meta = (BindWidget))
     class UButton* Butt_Hidden;
 	UPROPERTY(meta = (BindWidget))
-    class UTextBlock* Text_Hidden;
-
+	class UCanvasPanel* ButtPanel;
 	UFUNCTION( )
 	void PressHiddenButt( );
 	// 2. Mode
@@ -107,13 +109,6 @@ public :
 	void PressEmotionButt( );
 	// 6. VIP
 	bool bVip = false;
-	UPROPERTY(meta = (BindWidget))
-    class UButton* Butt_Vip;		
-	UPROPERTY(meta = (BindWidget))
-    class UTextBlock* Text_Vip;
-
-	UFUNCTION( )
-	void PressVipButt( );
 	UFUNCTION( )
 	void VipAuthority( );
 
@@ -200,6 +195,8 @@ public :
 
 #pragma endregion
 #pragma region Cash
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UTextBlock* Text_MyCash;
 	UPROPERTY ( meta = ( BindWidget ) )
     class UButton* Butt_Object0;
 	UPROPERTY ( meta = ( BindWidget ) )

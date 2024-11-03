@@ -20,14 +20,16 @@ public :
 	// 인터페이스
 	class UVirtualGameInstance_KMK* gi;
 	// 버튼
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	class UButton* Butt_JoinSession;	
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	class UButton* Butt_SetStage;
 
 	// 이미지
-	UPROPERTY(meta = (BindWidget))
-	class UImage* Image_Stage;
+	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
+    class UImage* Image_Stage;
+	UPROPERTY ( BlueprintReadWrite , meta = ( BindWidget ) )
+    class UImage* Image_StageOut;
 	
 	// 텍스트
 	UPROPERTY(meta = (BindWidget))
@@ -38,6 +40,7 @@ public :
 	void PressJoinSessionButt(  );
 	UFUNCTION()
 	void PressSetStageButt(  );
+
 
 	// 기타함수
 	UFUNCTION( )

@@ -119,7 +119,7 @@ public:
 #pragma region Set Day
 	// 공연일자 패널
 	UPROPERTY ( meta = ( BindWidget ) )
-	class UCanvasPanel* SetDayPanel;
+    class UCanvasPanel* SetDayPanel;
 	UPROPERTY ( meta = ( BindWidget ) )
     class UEditableText* EditText_StageName;
 	UPROPERTY ( meta = ( BindWidget ) )
@@ -197,7 +197,15 @@ public:
 	void PressSelect1Butt( );
 
 	void AddIndex( int32 num , TArray<class UMaterial*> meshArray , class UImage* image );
-	void MinusIndex( int32 num , TArray<class UMaterial*>  meshArray , class UImage* image );
+	void MinusIndex( int32 num , TArray<class UMaterial*>  meshArray , class UImage* image );	
+	UPROPERTY( BlueprintReadWrite , meta = ( BindWidget ) )
+    class UCanvasPanel* EffectPopUp;
+	UPROPERTY ( BlueprintReadWrite , meta = ( BindWidget ) )
+    class UCanvasPanel* EffectPopUp1;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UTextBlock* Text_Effect1;	
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UMultiLineEditableTextBox* MultiText_PopUp;
 #pragma endregion
 
 #pragma region Final Set Stage
@@ -270,8 +278,6 @@ public:
 #pragma region Select Stage
 	UPROPERTY(EditAnywhere, Category = SetConcert )
 	TArray<class UNiagaraSystem*> setConcert_Effects;
-	// 내 무대인지 확인
-	TArray<struct FStageInfo> myStageInfoArray;
 	// 전체 무대
 	TArray<struct FStageInfo> allStageInfoArray;
 	// 버튼
@@ -320,6 +326,10 @@ public:
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UButton* Butt_Back3;
 
+	UPROPERTY(meta = (BindWidget))
+    class UTextBlock* TEXT_VIP;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UMultiLineEditableTextBox* MultiText_VIP;
 	// 버튼 연동 함수
     UFUNCTION ( )
 	void PressYesButt( );
@@ -349,7 +359,8 @@ public:
 	
 #pragma endregion
 #pragma region FindRoom & Select Stage
-
+	UPROPERTY( )
+	bool bCreateTicket = false;
 #pragma endregion
 
 };

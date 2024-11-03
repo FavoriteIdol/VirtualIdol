@@ -46,7 +46,7 @@ FLoginInfo UJsonParseLib_KMK::ParsecMyInfo ( const FString& json )
     return result;
 }
 
-TArray<struct FStageInfo>  UJsonParseLib_KMK::ParsecStageInfos ( const FString& json, const FString& giName, TArray<struct FStageInfo> myArray )
+TArray<struct FStageInfo>  UJsonParseLib_KMK::ParsecStageInfos ( const FString& json, const FString& giName)
 {
     // 서버에서 가져온 json 파일 읽기
     TSharedRef<TJsonReader<TCHAR>> reader = TJsonReaderFactory<TCHAR>::Create ( json );
@@ -73,10 +73,6 @@ TArray<struct FStageInfo>  UJsonParseLib_KMK::ParsecStageInfos ( const FString& 
                    info.img = stageEle->GetStringField(TEXT("img"));
                    FString userName = stageEle->GetStringField(TEXT("userName"));
 
-                   if (userName == giName)
-                   {
-                       myArray.Add(info);
-                   }
                    stageInfos.Add(info);
                 }
             }

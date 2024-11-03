@@ -157,9 +157,7 @@ void AHttpActor_KMK::OnResCheckStage ( FHttpRequestPtr Request , FHttpResponsePt
 		// 성공
 		FString respon = Response->GetContentAsString();
 		// gi에 있는 닉네임 파악
-		allStageInfoArray = UJsonParseLib_KMK::ParsecStageInfos(respon, gi->GetMyInfo().userName, myStageInfoArray);
-		if(allStageInfoArray.Num() > 0) sw->allStageInfoArray = allStageInfoArray;
-		if(myStageInfoArray.Num() > 0) sw->myStageInfoArray = myStageInfoArray;
+		allStageInfoArray = UJsonParseLib_KMK::ParsecStageInfos(respon, gi->GetMyInfo().userName);
 		for (int i = 0; i < allStageInfoArray.Num ( ); i++)
 		{
 			sw->CreateStageWidget(allStageInfoArray[i]);
@@ -219,7 +217,7 @@ void AHttpActor_KMK::OnResTicket ( FHttpRequestPtr Request , FHttpResponsePtr Re
             if (Texture)
             {
                 UE_LOG(LogTemp, Log, TEXT("Texture successfully created from downloaded image"));
-
+				sw->bCreateTicket = true;
                 // Use the texture as needed, e.g., apply it to a material or widget
                 OnTextureCreated(Texture);  // Custom method to handle the texture
             }

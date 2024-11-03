@@ -42,10 +42,13 @@ void UAudience_KMK::NativeConstruct ( )
     Super::NativeConstruct( );
     SetUpButtonInfo();
     gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance());
-    if (Butt_Vip && Butt_Yes && Butt_No && PopUpPanel && FeverGauge)
+    if (Text_MyCash)
+    {
+        Text_MyCash->SetText(FText::AsNumber(myCash));
+    }
+    if (Butt_Yes && Butt_No && PopUpPanel && FeverGauge)
     {
         VisiblePanel(ESlateVisibility::Hidden);
-        Butt_Vip->OnClicked.AddDynamic ( this , &UAudience_KMK::PressVipButt );
         Butt_Yes->OnClicked.AddDynamic ( this , &UAudience_KMK::PressYesButt );
         Butt_No->OnClicked.AddDynamic ( this , &UAudience_KMK::PressNoButt );
 
@@ -57,9 +60,9 @@ void UAudience_KMK::NativeConstruct ( )
     }
 #pragma endregion
 #pragma region ButtonInfoSetting
-    if (Butt_Hidden && Butt_Mode && Butt_Mike && Butt_Chat && Butt_Emotion)
+     if (Butt_Hidden && Butt_Mode && Butt_Mike && Butt_Chat && Butt_Emotion)
     {
-        Butt_Hidden->OnClicked.AddDynamic ( this , &UAudience_KMK::PressHiddenButt);
+    Butt_Hidden->OnClicked.AddDynamic ( this , &UAudience_KMK::PressHiddenButt);
         Butt_Mode->OnClicked.AddDynamic ( this , &UAudience_KMK::PressModeButt);
         Butt_Mike->OnClicked.AddDynamic ( this , &UAudience_KMK::PressMikeButt);
         Butt_Chat->OnClicked.AddDynamic ( this , &UAudience_KMK::PressChatButt);
@@ -156,7 +159,7 @@ void UAudience_KMK::NativePreConstruct ( )
 
 void UAudience_KMK::SetUpButtonInfo ( )
 {
-    for (int i = 0; i < buttonName.Num ( ); i++)
+    for (int i = 1; i < buttonName.Num ( ); i++)
     {
         FName bName = FName(*FString::Printf(TEXT("Butt_") ) + buttonName[i]);
         FName bImgName = FName(*FString::Printf(TEXT("Image_Back_")  )+ buttonName[i] );
@@ -179,16 +182,24 @@ void UAudience_KMK::SetUpButtonInfo ( )
         }
     }
 }
-
 void UAudience_KMK::PressHiddenButt ( )
 {
-    OnOffFunction(Text_Hidden, 0, true);
+    if (!bHide)
+    {
+        ButtPanel->SetVisibility(ESlateVisibility::Hidden);
+        bHide = true;
+    }
+    else 
+    {
+        ButtPanel->SetVisibility(ESlateVisibility::Visible);
+        bHide = true;
+    }
 }
 
 
 void UAudience_KMK::PressModeButt ( )
 {
-    OnOffFunction(Text_Mode, 1 );
+    OnOffFunction(Text_Mode, 0 );
 
     if (bMondeOn)
     {
@@ -229,7 +240,7 @@ void UAudience_KMK::StopVoiceChat ( )
 
 void UAudience_KMK::PressMikeButt ( )
 {
-    OnOffFunction ( Text_Mike , 2 );
+    OnOffFunction ( Text_Mike , 1 );
     if (bMikeOn)
     {
         StartVoiceChat ( );
@@ -244,10 +255,10 @@ void UAudience_KMK::PressMikeButt ( )
 
 void UAudience_KMK::OnOffFunction (class UTextBlock* textBlocks, int32 num , bool bAllVisib )
 {
-    if (textBlocks->GetText().ToString() == currentText[num])
+    if (textBlocks->GetText().ToString() == currentText[num + 1])
     {
         if(bAllVisib)OnOffInfo(FLinearColor::Yellow, ESlateVisibility::Hidden, num, changeText );
-        else ChangeTextAndImage ( FLinearColor::Yellow , num , changeText );
+        else ChangeTextAndImage ( FLinearColor::Yellow , num, changeText );
     }
     else
     {
@@ -259,7 +270,7 @@ void UAudience_KMK::OnOffFunction (class UTextBlock* textBlocks, int32 num , boo
 void UAudience_KMK::ChangeTextAndImage ( FLinearColor color , int32 num , TArray<FString> textArray , bool bMyAuth )
 {
     ButtonsInfoArray[num].image->SetBrushTintColor ( color );
-    ButtonsInfoArray[num].text->SetText ( FText::FromString ( textArray[num] ) );
+    ButtonsInfoArray[num].text->SetText ( FText::FromString ( textArray[num + 1] ) );
     if (bMyAuth)
     {
         VipAuthority ( );
@@ -278,13 +289,13 @@ void UAudience_KMK::PressChatButt ( )
     {
         ChatGridPanel->SetVisibility(ESlateVisibility::Visible);
         bChatOn = true;
-        ChangeTextAndImage (FLinearColor::Yellow, 3, changeText );
+        ChangeTextAndImage (FLinearColor::Yellow, 2, changeText );
     }
     else
     {
         bChatOn = false;
         ChatGridPanel->SetVisibility(ESlateVisibility::Hidden);
-        ChangeTextAndImage (FLinearColor::White, 3, currentText);
+        ChangeTextAndImage (FLinearColor::White, 2, currentText);
     }
 }
 
@@ -293,31 +304,20 @@ void UAudience_KMK::PressEmotionButt ( )
     if (!bEmotion)
     {
         bEmotion = true;
-        ChangeTextAndImage ( FLinearColor::Yellow , 4 , changeText );
+        ChangeTextAndImage ( FLinearColor::Yellow , 3 , changeText );
         ImojiBox->SetVisibility(ESlateVisibility::Visible);
     }
     else
     {
         bEmotion = false;
-        ChangeTextAndImage ( FLinearColor::White , 4 , currentText );
+        ChangeTextAndImage ( FLinearColor::White , 3 , currentText );
         ImojiBox->SetVisibility(ESlateVisibility::Hidden);
     }
 }
 
-
-void UAudience_KMK::PressVipButt ( )
-{
-    VisiblePanel ( ESlateVisibility::Visible );
-    if (Text_Vip->GetText().ToString() == currentText[5])
-    {
-        ChangeTextAndImage ( FLinearColor::White , 5 , changeText );
-    }
-}
-
-
 void UAudience_KMK::OnOffInfo ( FLinearColor color,  ESlateVisibility bVisib, int32 num, TArray<FString> textArray  )
 {
-    for (int i = 0; i < ButtonsInfoArray.Num(); i++)
+    for (int i = 1; i < ButtonsInfoArray.Num(); i++)
     {
         if (i == num)
         {
@@ -438,17 +438,23 @@ void UAudience_KMK::PressCancelButt ( )
 #pragma region Cash
 void UAudience_KMK::PressObjectButt ( )
 {
+    myCash -= 500;
+    Text_MyCash->SetText(FText::AsNumber(myCash));
     // 오브젝트 생성
     Player->ThrowingObjectIndex = 0;
     UE_LOG(LogTemp,Warning,TEXT("ObjectButton_0" ) );
 }
 void UAudience_KMK::PressObject1Butt ( )
 {
+    myCash -= 1000;
+    Text_MyCash->SetText(FText::AsNumber(myCash));
     Player->ThrowingObjectIndex = 1;
     UE_LOG ( LogTemp , Warning , TEXT ( "ObjectButton_1" ) );
 }
 void UAudience_KMK::PressObject2Butt ( )
 {
+    myCash -= 5000;
+    Text_MyCash->SetText(FText::AsNumber(myCash));
     Player->ThrowingObjectIndex = 2;
     UE_LOG ( LogTemp , Warning , TEXT ( "ObjectButton_2" ) );
 }

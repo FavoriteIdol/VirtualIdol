@@ -22,7 +22,7 @@ public :
 	static FLoginInfo ParsecMyInfo(const FString& json);
 #pragma endregion
 #pragma region Load Stage
-	static TArray<struct FStageInfo> ParsecStageInfos(const FString& json, const FString& giName, const TArray<struct FStageInfo> myArray);
+	static TArray<struct FStageInfo> ParsecStageInfos(const FString& json, const FString& giName);
 #pragma endregion
 
 #pragma region Set Concert

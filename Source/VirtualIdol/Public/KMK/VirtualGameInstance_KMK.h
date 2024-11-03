@@ -53,7 +53,10 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 
 	UPROPERTY( )
 	bool bLogin = false;
-
+	UPROPERTY(BlueprintReadWrite )
+	bool bPressSession = false;
+	UPROPERTY(BlueprintReadWrite )
+	bool bPressStage = false;
 	void CreateMySession(FString RoomName, int32 PlayerCount);
 
 	void OnMyCreateSessionComplete(FName SessionName, bool bSuccessful);
@@ -139,4 +142,18 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 
 	UFUNCTION ( BlueprintCallable )
 	void SendMulticastMessage ( );
+
+	// StageInfo를 저장할 멤버 변수
+	UPROPERTY()
+	int32 roomNum = 0;
+	UPROPERTY()
+	FStageInfo myStageInfo;
+	
+	UFUNCTION (BlueprintCallable)
+	void OnJoinSessionButt(  );
+	UFUNCTION(BlueprintCallable)
+	void OnSetStageButt(  );
+		
+	UPROPERTY( )
+	class AJJH_SelectManager* sm;
 };

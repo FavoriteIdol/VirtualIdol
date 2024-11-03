@@ -138,8 +138,6 @@ public:
 	void ReqCheckStage(class UStartWidget_KMK* startWidget );
 	// 응답 
 	void OnResCheckStage( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
-	// 내 무대인지 확인
-	TArray<struct FStageInfo> myStageInfoArray;
 	// 전체 무대
 	TArray<struct FStageInfo> allStageInfoArray;
 	
