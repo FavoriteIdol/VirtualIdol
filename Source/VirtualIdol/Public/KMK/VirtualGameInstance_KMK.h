@@ -49,7 +49,7 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 	IOnlineSessionPtr sessionInterface;
 
 	// 호스트 이름은 서버에서 닉네임 받아올 예정
-	FString HostName = TEXT("미호짱");
+	FString HostName;
 
 	UPROPERTY( )
 	bool bLogin = false;
@@ -148,6 +148,8 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 	int32 roomNum = 0;
 	UPROPERTY()
 	FStageInfo myStageInfo;
+	UPROPERTY()
+	FRoomInfo mySessionInfo;
 	
 	UFUNCTION (BlueprintCallable)
 	void OnJoinSessionButt(  );
@@ -156,4 +158,15 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 		
 	UPROPERTY( )
 	class AJJH_SelectManager* sm;
+
+	UPROPERTY( )
+	class URoomWidget_KMK* roomWidget;
+	UPROPERTY( )
+	class URoomWidget_KMK* sessionWidget;
+
+	UPROPERTY(EditAnywhere, Category = Cash )
+	int32 myCash = 50000;
+
+	UFUNCTION( )
+	void SetMyProfile( );
 };

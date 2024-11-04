@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Interfaces/IHttpRequest.h"
 #include "Interfaces/IHttpResponse.h"
+#include "IImageWrapper.h"
 #include "HttpActor_KMK.generated.h"
 // 세션을 위한 roomInfo 구조체
 USTRUCT ( BlueprintType )
@@ -55,6 +56,8 @@ struct FLoginInfo
 {
 	GENERATED_BODY ( )
 
+	UPROPERTY(BlueprintReadOnly)
+	int32 userId = -1;
 	UPROPERTY(BlueprintReadOnly)
 	FString email= TEXT("");
 	UPROPERTY(BlueprintReadOnly)
@@ -140,9 +143,20 @@ public:
 	void OnResCheckStage( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
 	// 전체 무대
 	TArray<struct FStageInfo> allStageInfoArray;
+	TArray<struct FStageInfo> myStageInfoArray;
 	
 	UPROPERTY( )
 	class UStartWidget_KMK* sw;
+
+	// 내무대 확인
+	// 요청
+	void ReqCheckMyStage(class UStartWidget_KMK* startWidget );
+	// 응답 
+	void OnResCheckMyStage( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
+
+	// 이미지 생성 및 다운
+	void DownloadImageFromUrl ( const FString& imageUrl , const FStageInfo& stageInfo );
+	void OnImageDownComplete ( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bWasSuccessful, FStageInfo stageInfo );
 #pragma endregion
 
 #pragma region with Ai for Text

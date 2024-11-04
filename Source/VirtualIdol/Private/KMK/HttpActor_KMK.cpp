@@ -9,6 +9,8 @@
 #include "Components/CanvasPanel.h"
 #include "GenericPlatform/GenericPlatformHttp.h"
 #include "JsonObjectConverter.h"
+#include "Kismet/KismetRenderingLibrary.h"
+#include "IImageWrapper.h"
 
 // Sets default values
 AHttpActor_KMK::AHttpActor_KMK()
@@ -65,6 +67,7 @@ void AHttpActor_KMK::OnResLogin ( FHttpRequestPtr Request , FHttpResponsePtr Res
 			gi->SetMyInfo(loginInfo);
 			UE_LOG ( LogTemp , Log , TEXT ( "%s" ) , *loginInfo.token );
             gi->SwitchWidget ( 1 );
+			gi->SetMyProfile();
 		}
 		else
 		{
@@ -160,8 +163,8 @@ void AHttpActor_KMK::OnResCheckStage ( FHttpRequestPtr Request , FHttpResponsePt
 		allStageInfoArray = UJsonParseLib_KMK::ParsecStageInfos(respon, gi->GetMyInfo().userName);
 		for (int i = 0; i < allStageInfoArray.Num ( ); i++)
 		{
-			sw->CreateStageWidget(allStageInfoArray[i]);
-			UE_LOG ( LogTemp , Error , TEXT ( "%s" ) , *allStageInfoArray[i].name);
+			DownloadImageFromUrl(allStageInfoArray[i].img, allStageInfoArray[i] );
+			//sw->CreateStageWidget(allStageInfoArray[i] , texture );
 		}
 
 		UE_LOG ( LogTemp , Error , TEXT ( "%d" ), allStageInfoArray.Num());
@@ -171,6 +174,107 @@ void AHttpActor_KMK::OnResCheckStage ( FHttpRequestPtr Request , FHttpResponsePt
 		UE_LOG ( LogTemp , Error , TEXT ( "CheckStage Failed" ));
 	}
 }
+
+
+void AHttpActor_KMK::ReqCheckMyStage ( class UStartWidget_KMK* startWidget )
+{
+	if(!startWidget) return;
+	sw = startWidget;
+	// HTTP 모듈 생성
+	FHttpModule& httpModule = FHttpModule::Get ( );
+	TSharedRef<IHttpRequest> req = httpModule.CreateRequest ( );
+	// 요청할 정보를 설정
+	FString authHeader = FString::Printf ( TEXT ( "Bearer %s" ) , *gi->loginInfo.token );
+    req->SetHeader(TEXT("Authorization"), *( authHeader ));
+	req->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+	FString url = TEXT("http://master-of-prediction.shop:8123/api/v1/stages/user/") + FString::FormatAsNumber(gi->GetMyInfo().userId );
+	UE_LOG ( LogTemp , Warning , TEXT ( "ImagePath: %s" ) , *url );
+	req->SetURL(url );
+	req->SetVerb ( TEXT ( "GET" ) );
+
+	req->ProcessRequest ( );
+	// 응답받을 함수를 연결
+	req->OnProcessRequestComplete ( ).BindUObject ( this , &AHttpActor_KMK::OnResCheckMyStage );
+}
+
+void AHttpActor_KMK::OnResCheckMyStage ( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully )
+{
+	if (bConnectedSuccessfully)
+	{
+		// 성공
+		FString respon = Response->GetContentAsString();
+		// gi에 있는 닉네임 파악
+		myStageInfoArray = UJsonParseLib_KMK::ParsecStageInfos(respon, gi->GetMyInfo().userName);
+		for (int i = 0; i < myStageInfoArray.Num ( ); i++)
+		{
+			DownloadImageFromUrl(myStageInfoArray[i].img, myStageInfoArray[i] );
+			//sw->CreateStageWidget(myStageInfoArray[i] , texture );
+			UE_LOG ( LogTemp , Error , TEXT ( "%s" ) , *myStageInfoArray[i].name);
+		}
+	}
+	else
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "Failed myStage" ) );
+	}
+}
+
+void AHttpActor_KMK::DownloadImageFromUrl(const FString& imageUrl, const FStageInfo& stageInfo)
+{
+	FHttpModule* http = &FHttpModule::Get();
+    TSharedRef<IHttpRequest> req = http->CreateRequest();
+    req->SetURL(imageUrl);
+    req->SetVerb("GET");
+    req->OnProcessRequestComplete().BindUObject(this, &AHttpActor_KMK::OnImageDownComplete, stageInfo);
+    req->ProcessRequest();
+}
+
+void AHttpActor_KMK::OnImageDownComplete ( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bWasSuccessful, FStageInfo stageInfo )
+{
+	if (bWasSuccessful&& Response.IsValid())
+	{
+		if (Response->GetResponseCode() != 200)
+        {
+            UE_LOG ( LogTemp , Error , TEXT ( "Failed to get image. Response Code: %d" ) , Response->GetResponseCode ( ) );
+            return;
+        }
+		FString ContentType = Response->GetContentType();
+        UE_LOG ( LogTemp , Log , TEXT ( "Content-Type: %s" ) , *ContentType );
+
+        if (!ContentType.Contains ( "image" ))
+        {
+            UE_LOG ( LogTemp , Error , TEXT ( "Unexpected Content-Type: %s" ) , *ContentType );
+            return;
+        }
+        // 다운로드 받은 PNG 데이터를 파일로 저장
+        const TArray<uint8>& ImageData = Response->GetContent();
+
+		UTexture2D* texture = UJsonParseLib_KMK::MakeTexture(ImageData);
+        if (texture)
+        {
+            UE_LOG(LogTemp, Log, TEXT("Image downloaded and texture created successfully!"));
+            // 예: 다운로드한 텍스처를 위젯이나 다른 액터에 할당
+            sw->CreateStageWidget(stageInfo, texture);
+        }
+        else
+        {
+            UE_LOG(LogTemp, Error, TEXT("Failed to create texture from downloaded image data."));
+        }
+    }
+   else
+   {
+       if (Response.IsValid())
+       {
+           UE_LOG(LogTemp, Error, TEXT("Failed to download image. Response code: %d"), Response->GetResponseCode());
+       }
+       else
+       {
+           UE_LOG(LogTemp, Error, TEXT("Response is invalid"));
+		   if(ticketData.Num() > 0) ReqTicket(ticketData );
+       }
+   }
+    
+}
+
 #pragma endregion
 
 #pragma region with Ai for Ticket
@@ -189,7 +293,7 @@ void AHttpActor_KMK::ReqTicket ( const TMap<FString , FString> data )
 	req->SetVerb ( TEXT ( "POST" ) );
 	// TEXT ( "application/json" )  ->TEXT("image/jpeg")
 	req->SetHeader ( TEXT ( "content-type" ) , TEXT ( "application/json" ) );
-	req->SetTimeout(180.f);
+	req->SetTimeout(240.f);
 	req->SetContentAsString ( UJsonParseLib_KMK::CreateTicketJson ( ticketData ) );
 	req->ProcessRequest ( );
 	// 응답받을 함수를 연결
@@ -237,6 +341,7 @@ void AHttpActor_KMK::OnResTicket ( FHttpRequestPtr Request , FHttpResponsePtr Re
        else
        {
            UE_LOG(LogTemp, Error, TEXT("Response is invalid"));
+		   if(ticketData.Num() > 0) ReqTicket(ticketData );
        }
    }
 
@@ -248,8 +353,6 @@ void AHttpActor_KMK::OnTextureCreated(UTexture2D* texture)
 #pragma endregion
 
 #pragma region with BE for StageSettings
-
-
 
 void AHttpActor_KMK::ReqMultipartCapturedURL ( FStageInfo& Stage , const FString& ImagePath )
 {   

@@ -102,13 +102,30 @@ public:
 	TArray<class UMaterial*> FeversParticles;
 	// 텍스트
 	UPROPERTY(meta = (BindWidget))
-    class UTextBlock* Text_Title;	
+    class UTextBlock* Text_Title;
+	UPROPERTY(meta = (BindWidget))
+    class UTextBlock* Text_MyNick;	
+	UPROPERTY(meta = (BindWidget))
+    class UTextBlock* Text_MyCash;	
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UButton* Butt_Select;
-	
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UImage* Image_Profile;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UImage* Image_Load;
 	UFUNCTION( )
 	void PressSelectButt( );
 
+	UFUNCTION( )
+	void ChangeMyProfile( );
+
+	UPROPERTY(EditAnywhere, Category = load )
+	UMaterialInstance* loadMatFact;
+	UPROPERTY( )
+	UMaterialInstanceDynamic* loadMatInst;
+	UFUNCTION( )
+	void ChangeLoadMat(float num );
+	float matNum = 0;
 	int32 selectNum = 0;
 
 	UFUNCTION( )
@@ -298,7 +315,7 @@ public:
 	UFUNCTION()
 	void PressMyStageButt( );
 	UFUNCTION()
-	void CreateStageWidget( const struct FStageInfo& stageInfo );
+	void CreateStageWidget( const struct FStageInfo& stageInfo, UTexture2D* image );
 	UFUNCTION( )
 	void ClearSB( );
 #pragma endregion

@@ -50,7 +50,7 @@ void UVirtualGameInstance_KMK::CreateMySession ( FString RoomName, int32 PlayerC
     FOnlineSessionSettings settings;
     // 전용서버를 사용하는가? => 데디케이트 서버
     settings.bIsDedicated = false;
-
+    HostName = loginInfo.userName;
     // 랜선인가?
     FName subSystemName = IOnlineSubsystem::Get( )->GetSubsystemName();
     // 온라인 서브 시스템이 없는 경우에 LAN으로 연결, 아니라면 온라인 서브 시스템으로 연결
@@ -278,6 +278,7 @@ void UVirtualGameInstance_KMK::LoginPanel ( )
 #pragma region Token
 void UVirtualGameInstance_KMK::SetMyInfo (const struct FLoginInfo& info )
 {
+    loginInfo.userId = info.userId;
     loginInfo.email = info.email;
     loginInfo.password = info.password;
     loginInfo.token = info.token;
@@ -345,9 +346,14 @@ void UVirtualGameInstance_KMK::OnSetStageButt ( )
 	UE_LOG(LogTemp, Warning, TEXT("Load Stage" ));
 	UE_LOG(LogTemp, Warning, TEXT("%s" ), *myStageInfo.name);
 	// 추가되어야하는것 : 저장된 무대를 로드
-	if (sm)
+	if (sm && !myStageInfo.name.IsEmpty())
 	{
 		VisibleStartWidget(false);
 		sm->CreateStage(myStageInfo);
 	}
+}
+
+void UVirtualGameInstance_KMK::SetMyProfile ( )
+{
+    widget->ChangeMyProfile();
 }

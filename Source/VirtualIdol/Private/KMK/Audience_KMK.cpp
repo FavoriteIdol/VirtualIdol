@@ -44,7 +44,7 @@ void UAudience_KMK::NativeConstruct ( )
     gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance());
     if (Text_MyCash)
     {
-        Text_MyCash->SetText(FText::AsNumber(myCash));
+        Text_MyCash->SetText(FText::AsNumber(gi->myCash));
     }
     if (Butt_Yes && Butt_No && PopUpPanel && FeverGauge)
     {
@@ -438,23 +438,23 @@ void UAudience_KMK::PressCancelButt ( )
 #pragma region Cash
 void UAudience_KMK::PressObjectButt ( )
 {
-    myCash -= 500;
-    Text_MyCash->SetText(FText::AsNumber(myCash));
+    gi->myCash -= 500;
+    Text_MyCash->SetText(FText::AsNumber(gi->myCash));
     // 오브젝트 생성
     Player->ThrowingObjectIndex = 0;
     UE_LOG(LogTemp,Warning,TEXT("ObjectButton_0" ) );
 }
 void UAudience_KMK::PressObject1Butt ( )
 {
-    myCash -= 1000;
-    Text_MyCash->SetText(FText::AsNumber(myCash));
+    gi->myCash -= 1000;
+    Text_MyCash->SetText(FText::AsNumber(gi->myCash));
     Player->ThrowingObjectIndex = 1;
     UE_LOG ( LogTemp , Warning , TEXT ( "ObjectButton_1" ) );
 }
 void UAudience_KMK::PressObject2Butt ( )
 {
-    myCash -= 5000;
-    Text_MyCash->SetText(FText::AsNumber(myCash));
+    gi->myCash -= 5000;
+    Text_MyCash->SetText(FText::AsNumber(gi->myCash));
     Player->ThrowingObjectIndex = 2;
     UE_LOG ( LogTemp , Warning , TEXT ( "ObjectButton_2" ) );
 }

@@ -23,6 +23,7 @@
 #include "KMK/HttpActor_KMK.h"
 #include "JJH/JJH_SelectManager.h"
 #include "Components/MultiLineEditableTextBox.h"
+#include "Materials/MaterialInstanceDynamic.h"
 
 void UStartWidget_KMK::NativeConstruct ( )
 {	
@@ -31,7 +32,12 @@ void UStartWidget_KMK::NativeConstruct ( )
 	gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance() );
 	httpActor = Cast<AHttpActor_KMK>(UGameplayStatics::GetActorOfClass(GetWorld() , httpFact));
 	selectManager = Cast<AJJH_SelectManager>(UGameplayStatics::GetActorOfClass(GetWorld() , selectFact));
-	StartSwitcher->SetActiveWidgetIndex(5);
+	loadMatInst = UMaterialInstanceDynamic::Create ( loadMatFact, this );
+	if (Image_Load)
+	{
+		Image_Load->SetBrushFromMaterial(loadMatInst);
+		loadMatInst->SetScalarParameterValue ( TEXT ( "Gauge" ) , 0 );
+	}
 	if (gi->bLogin)
 	{
 		selectManager->DeleteStage ( );
@@ -39,7 +45,6 @@ void UStartWidget_KMK::NativeConstruct ( )
 	}
 	else
 	{
-		
 		gi->bLogin = true;
 	}
 #pragma region LoginPanel
@@ -173,6 +178,11 @@ void UStartWidget_KMK::NativeTick ( const FGeometry& MyGeometry , float InDeltaT
 			Text_Price->SetText(FText::AsNumber(a));
 		}
 	}
+	if (!bCreateTicket)
+	{
+		matNum += 0.005f;
+		ChangeLoadMat( matNum);
+	}
 	
 }
 
@@ -195,8 +205,9 @@ void UStartWidget_KMK::OnMyLogin ( )
 	if (!EditText_ID->GetText ( ).IsEmpty ( ) && !EditText_PW->GetText ( ).IsEmpty ( ))
 	{
 		// 서버에 정보값 보내기
-		//httpActor->ReqLogin(EditText_ID->GetText().ToString(), EditText_PW->GetText().ToString());
-		StartSwitcher->SetActiveWidgetIndex ( 1 );
+		httpActor->ReqLogin(EditText_ID->GetText().ToString(), EditText_PW->GetText().ToString());
+
+		//StartSwitcher->SetActiveWidgetIndex ( 1 );
 	}
 }
 
@@ -208,6 +219,12 @@ void UStartWidget_KMK::OnFailLogin ( )
 #pragma endregion
 
 #pragma region FourButtPanel
+void UStartWidget_KMK::ChangeMyProfile ( )
+{
+	Text_MyCash->SetText(FText::AsNumber(gi->myCash));
+	Text_MyNick->SetText(FText::FromString(gi->GetMyInfo().userName));
+}
+
 // 무대 꾸미기 레벨로 이동
 void UStartWidget_KMK::CreateStagePanel ( )
 {
@@ -217,6 +234,9 @@ void UStartWidget_KMK::CreateStagePanel ( )
 void UStartWidget_KMK::SettingStagePanel ( )
 {
 	StartSwitcher->SetActiveWidgetIndex ( 3 );
+	Butt_UserStage->SetVisibility(ESlateVisibility::Visible);
+	Butt_MyStage->SetVisibility(ESlateVisibility::Visible);
+	Butt_Star->SetVisibility(ESlateVisibility::Visible);
 	httpActor->ReqCheckStage(this);
 }
 // 공연 시작 : 세션 생성
@@ -232,6 +252,9 @@ void UStartWidget_KMK::StartConcertPanel ( )
 void UStartWidget_KMK::ComeInStagePanel ( )
 {	
 	// 세션 찾기
+	Butt_UserStage->SetVisibility(ESlateVisibility::Hidden);
+	Butt_MyStage->SetVisibility(ESlateVisibility::Hidden);
+	Butt_Star->SetVisibility(ESlateVisibility::Hidden);
 	FindRoom();
 }
 
@@ -243,28 +266,24 @@ void UStartWidget_KMK::PressUserStageButt ( )
 {
 	ClearSB( );
 	// BE에서 스테이지 정보값 조회
-
-	for (int i = 0; i < allStageInfoArray.Num ( ); i++)
-	{
-		CreateStageWidget(allStageInfoArray[i]);
-	}
+	httpActor->ReqCheckStage(this);
 }
 
 void UStartWidget_KMK::PressMyStageButt ( )
 {
 	ClearSB( );
 	// BE에서 스테이지 정보값 조회 
-
+	httpActor->ReqCheckMyStage(this);
 }
 
-void UStartWidget_KMK::CreateStageWidget (const struct FStageInfo& stageInfo )
+void UStartWidget_KMK::CreateStageWidget (const struct FStageInfo& stageInfo, UTexture2D* image )
 {
 	// 이펙트를 고르기 위한
 	auto* wid = Cast<URoomWidget_KMK> ( CreateWidget ( GetWorld ( ) , roomWidgetFact ) );
 	if (wid)
 	{
-		wid->SetStageText ( stageInfo );
-		wid->sm = selectManager;
+		wid->SetStageText ( stageInfo, image );
+		gi->sm = selectManager;
 		SB_FindStage->AddChild(wid);
 	}
 }
@@ -317,6 +336,13 @@ void UStartWidget_KMK::PressSelectButt ( )
 		selectNum = 0;
 	}
 
+}
+
+
+void UStartWidget_KMK::ChangeLoadMat ( float num )
+{
+	if(matNum < 1)loadMatInst->SetScalarParameterValue ( TEXT ( "Gauge" ) , num );
+	else matNum = 0;
 }
 
 void UStartWidget_KMK::SetTitleText ( const FString& title )
@@ -413,7 +439,16 @@ void UStartWidget_KMK::PressCreateTicket ( )
 	TMap<FString, FString> data;
 	data.Add(TEXT("prompt" ), EditMultiText_Ticket->GetText().ToString());
 	// 이 부분 정보는 BE에서 끌어와야함
-	data.Add(TEXT("description"), TEXT("안녕하세요!! 오랜만입니다!!" ));
+    FString year = TEXT ( "20" ) + EditText_Year->GetText ( ).ToString ( );
+    FString mon = ChangeString ( EditText_Day->GetText ( ).ToString ( ) );
+    FString day = ChangeString ( EditText_Day->GetText ( ).ToString ( ) );
+	
+    FString sH = EditText_SHour->GetText ( ).ToString ( );
+    FString sM = EditText_SMin->GetText ( ).ToString ( );
+
+	FString concertString = TEXT("공연 명 : ") + EditText_StageName->GetText ( ).ToString ( ) + TEXT ( "\n" ) 
+						TEXT("공연 날짜 : " ) + year + TEXT ( "년" )+ mon + TEXT("월") + day + TEXT("일") + TEXT("\n") + TEXT("공연 시간 : " ) + sH +TEXT("시") + sM +TEXT("분");
+	data.Add(TEXT("description"), *concertString);
 	httpActor->ReqTicket(data);
 	// EditMultiText_Ticket->SetText ( FText::GetEmpty ( ) );
 }
@@ -512,6 +547,8 @@ void UStartWidget_KMK::PressNextButt ( )
 	StageScalePanel->SetVisibility ( ESlateVisibility::Hidden );
 	Text_FinalCount->SetText ( EditText_ScaleNum->GetText() );
 	Text_FinalPay->SetText ( Text_Price->GetText() );
+	FString s = Text_FinalPay->GetText().ToString();
+	gi->myCash -= FCString::Atoi(*s);
 	Butt_Next->SetVisibility ( ESlateVisibility::Hidden );
 	Butt_CreateTicket1->SetVisibility(ESlateVisibility::Visible);
 	Text_Price->SetText(FText::GetEmpty ( ) );
@@ -538,6 +575,8 @@ void UStartWidget_KMK::PressPayMoney ( )
 
 void UStartWidget_KMK::PressOkayButt ( )
 {
+	Text_MyCash->SetText(FText::AsNumber(gi->myCash));
+
 	ClearSB ( );
 	StartSwitcher->SetActiveWidgetIndex ( 1 );
 	ResetWidget( );

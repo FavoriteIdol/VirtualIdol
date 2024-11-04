@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "KMK/HttpActor_KMK.h"
+#include "VirtualGameInstance_KMK.h"
 #include "RoomWidget_KMK.generated.h"
 
 /**
@@ -46,12 +47,17 @@ public :
 	UFUNCTION( )
 	void SetImageAndText(const struct FRoomInfo& info);
 	UFUNCTION( )
-	void SetStageText(const struct FStageInfo& stageInfo);
+	void SetStageText(const struct FStageInfo& stageInfo, UTexture2D* image);
 	// StageInfo를 저장할 멤버 변수
 	UPROPERTY()
-	FStageInfo myStageInfo;
+    FStageInfo myStageInfo;
+	UPROPERTY ( )
+    FRoomInfo mySessionInfo;
 	int32 roomNum = 0;
 	
 	UPROPERTY( )
 	class AJJH_SelectManager* sm;
+
+	void ChangeMyOutSide( );
+	void ChangeSessionOutSide( );
 };

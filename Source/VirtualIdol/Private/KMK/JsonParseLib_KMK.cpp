@@ -37,6 +37,7 @@ FLoginInfo UJsonParseLib_KMK::ParsecMyInfo ( const FString& json )
     {
          if (response->TryGetStringField ( TEXT ( "token" ) , result.token ))
          {
+            response->TryGetNumberField ( TEXT ( "userId" ), result.userId );
             response->TryGetStringField ( TEXT ( "email" ), result.email );
             response->TryGetStringField ( TEXT ( "password" ), result.password );
             response->TryGetStringField ( TEXT ( "userName" ), result.userName );
@@ -141,24 +142,6 @@ FString UJsonParseLib_KMK::CreateTicketJson ( const TMap<FString , FString> tick
 	return json;
 
 }
-
-FString UJsonParseLib_KMK::ParsecTicketJson ( const FString& json )
-{
-
-    // 서버에서 가져온 json 파일 읽기
-    TSharedRef<TJsonReader<TCHAR>> reader = TJsonReaderFactory<TCHAR>::Create ( json );
-    // FJsonObject 형식으로 읽어온 json 데이터를 저장함 => 공유 포인터 형태로 객체 감싸기
-    TSharedPtr<FJsonObject> response = MakeShareable ( new FJsonObject ( ) );
-    FString image;
-    if (FJsonSerializer::Deserialize ( reader , response ))
-    {
-        // sonObject 형식으로 만든다.
-	   image  = response->GetStringField ( TEXT ( "image" ) );
-    }
-	// 반환한다.
-	return image;
-}
-
 #pragma endregion
 
 // Json으로 만들어서 데이터 전송
@@ -216,9 +199,18 @@ TMap<FString , FString> UJsonParseLib_KMK::ResultAlchemistParsec ( const FString
 
 UTexture2D* UJsonParseLib_KMK::MakeTexture(const TArray<uint8>& ImageData)
 {
+    if (ImageData.Num() == 0)
+    {
+        UE_LOG(LogTemp, Error, TEXT("Image data is empty."));
+        return nullptr;
+    }
     IImageWrapperModule& ImageWrapperModule = FModuleManager::LoadModuleChecked<IImageWrapperModule>(FName("ImageWrapper"));
     TSharedPtr<IImageWrapper> ImageWrapper = ImageWrapperModule.CreateImageWrapper(EImageFormat::PNG);
-
+    if (!ImageWrapper.IsValid() || !ImageWrapper->SetCompressed(ImageData.GetData(), ImageData.Num()))
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to parse image data."));
+        return nullptr;
+    }
     if (ImageWrapper.IsValid() && ImageWrapper->SetCompressed(ImageData.GetData(), ImageData.Num()))
     {
         // Create a TArray to hold the raw image data

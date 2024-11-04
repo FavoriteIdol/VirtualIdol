@@ -27,19 +27,22 @@ void URoomWidget_KMK::SetImageAndText (const struct FRoomInfo& info)
 {
 	// 이미지 설정
 	//Image_Stage->SetBrushFromTexture( newTexture );
+	if(!gi) gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance());
 	if(!gi->sm)gi->sm = sm;
 	Image_Stage->SetColorAndOpacity(FLinearColor::Blue);
+	mySessionInfo = info;
 	Butt_JoinSession->SetVisibility ( ESlateVisibility::Visible );
 	Butt_SetStage->SetVisibility(ESlateVisibility::Hidden);
 	Text_Name->SetText( FText::FromString( info.hostName + TEXT ( "의 콘서트" ) ));
 	gi->roomNum = info.index;
 }
 
-void URoomWidget_KMK::SetStageText( const struct FStageInfo& stageInfo)
+void URoomWidget_KMK::SetStageText( const struct FStageInfo& stageInfo, UTexture2D* image)
 {
-	if(!gi->sm)gi->sm = sm;
-	gi->myStageInfo = stageInfo;
-	Image_Stage->SetColorAndOpacity(FLinearColor::Yellow);
+	if(!gi) gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance());
+	if(gi && gi->sm && !sm)gi->sm = sm;
+	myStageInfo = stageInfo;
+	if(image)Image_Stage->SetBrushFromTexture(image);
 	Butt_JoinSession->SetVisibility ( ESlateVisibility::Hidden );
     Butt_SetStage->SetVisibility ( ESlateVisibility::Visible );
 	Text_Name->SetText( FText::FromString( stageInfo.name ));
@@ -47,30 +50,57 @@ void URoomWidget_KMK::SetStageText( const struct FStageInfo& stageInfo)
 
 void URoomWidget_KMK::PressJoinSessionButt ( )
 {
+	if (gi->bPressSession && gi->sessionWidget != this)
+	{
+		gi->sessionWidget->Image_StageOut->SetVisibility(ESlateVisibility::Hidden);
+		gi->sessionWidget = nullptr;
+		gi->bPressSession = false;
+	}
 	if(!gi->bPressSession)
 	{
-		gi->bPressSession = true;
-		Image_StageOut->SetVisibility(ESlateVisibility::Visible);
+		ChangeSessionOutSide( );
 	}
 	else
 	{
 		gi->bPressSession = false;
+		gi->sessionWidget = nullptr;
 		Image_StageOut->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
 
 void URoomWidget_KMK::PressSetStageButt ( )
 {
+	if (gi->roomWidget && gi->roomWidget != this)
+	{
+		gi->roomWidget->Image_StageOut->SetVisibility(ESlateVisibility::Hidden);
+		gi->roomWidget = nullptr;
+		gi->bPressStage = false;
+	}
 	if(!gi->bPressStage)
 	{
-		gi->bPressStage = true;
-		Image_StageOut->SetVisibility(ESlateVisibility::Visible);
+		ChangeMyOutSide( );
 	}
 	else
 	{
 		gi->bPressStage = false;
+		gi->roomWidget = nullptr;
 		Image_StageOut->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
 
+void URoomWidget_KMK::ChangeMyOutSide ( )
+{
+	gi->bPressStage = true;
+    gi->roomWidget = this;
+    gi->myStageInfo = myStageInfo;
+    Image_StageOut->SetVisibility ( ESlateVisibility::Visible );
+}
+
+void URoomWidget_KMK::ChangeSessionOutSide ( )
+{
+	gi->bPressSession = true;
+    gi->sessionWidget = this;
+    gi->mySessionInfo = mySessionInfo;
+    Image_StageOut->SetVisibility ( ESlateVisibility::Visible );
+}
 
