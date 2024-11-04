@@ -110,7 +110,7 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
     void LoginPanel ( );
 
     UPROPERTY ( )
-    int32 playerMeshNum = -1;
+    int32 playerMeshNum = 0;
 
 #pragma region Token
 	UPROPERTY( )

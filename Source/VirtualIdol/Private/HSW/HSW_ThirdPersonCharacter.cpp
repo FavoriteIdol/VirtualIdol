@@ -553,7 +553,7 @@ void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value 
 	if (!HasAuthority ( ) && IsLocallyControlled())
 	{
 		PersonalGauge++;
-		ServerRPCFeverGauge (CurrentGauge, 10*0.02);
+		ServerRPCFeverGauge (CurrentGauge, 5*0.02);
 		PrintFeverGaugeLogOnHead ( );
 
 		//MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
@@ -580,7 +580,7 @@ void AHSW_ThirdPersonCharacter::ServerRPCFeverGauge_Implementation ( float fever
 		}
 	}
 
-	if (FeverBright <= 10)
+	if (FeverBright <= 5)
 	{
 		FeverBright += brightValue;
 		MulticastRPCBrightness(1 );
@@ -651,6 +651,7 @@ void AHSW_ThirdPersonCharacter::MulticastFeverEffect_Implementation ( )
 // 	DamagedEffect->SetAutoDestroy ( true );
 
 	FeverEffect_Actor = GetWorld ( )->SpawnActor<AActor> ( FeverEffectFactory , FeverEffectLocation );
+	
 }
 
 // 인터뷰 =================================================================================================
