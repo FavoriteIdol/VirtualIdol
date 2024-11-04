@@ -605,6 +605,7 @@ void AHSW_ThirdPersonCharacter::MulticastRPCBrightness_Implementation ( int inde
 
 void AHSW_ThirdPersonCharacter::ServerFeverReset_Implementation ( )
 {
+	FeverBright = 0;
 	MulticastFeverReset( );
 	SetFeverGaugeMulti(0 );
 }
@@ -612,7 +613,7 @@ void AHSW_ThirdPersonCharacter::ServerFeverReset_Implementation ( )
 void AHSW_ThirdPersonCharacter::MulticastFeverReset_Implementation ( )
 {
 	
-	FeverDynamicMat->SetScalarParameterValue ( TEXT ( "jswEmissivePower-A" ) , 0 );
+	FeverDynamicMat->SetScalarParameterValue ( TEXT ( "jswEmissivePower-A" ) , 1 );
 }
 void AHSW_ThirdPersonCharacter::PossessedBy ( AController* NewController )
 {
