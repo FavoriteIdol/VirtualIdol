@@ -161,6 +161,12 @@ public:
     UFUNCTION ( )
     UMaterialInstanceDynamic* ChangeMyMeshMat ( int32 num = 0 );
 
+	UFUNCTION(Server, Reliable, BlueprintCallable )
+	void ServerFeverReset( );
+
+	UFUNCTION(NetMulticast, Reliable )
+	void MulticastFeverReset( );
+
 	// MainWidget을 생성해서 기억하고싶다.
 // 	UPROPERTY(EditDefaultsOnly, Category = MainUI)
 // 	TSubclassOf<class UUserWidget> MainUIFactory;

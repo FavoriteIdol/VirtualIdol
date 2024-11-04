@@ -475,6 +475,7 @@ UMaterialInstanceDynamic* AHSW_ThirdPersonCharacter::ChangeMyMeshMat (int32 num 
 	return FeverDynamicMat;
 }
 
+
 // Imoji ==============================================================================================
 
 void AHSW_ThirdPersonCharacter::Imoji ( int index )
@@ -602,6 +603,17 @@ void AHSW_ThirdPersonCharacter::MulticastRPCBrightness_Implementation ( int inde
 	FeverDynamicMat->SetScalarParameterValue ( TEXT ( "jswEmissivePower-A" ) , FeverBright );
 }
 
+void AHSW_ThirdPersonCharacter::ServerFeverReset_Implementation ( )
+{
+	MulticastFeverReset( );
+	SetFeverGaugeMulti(0 );
+}
+
+void AHSW_ThirdPersonCharacter::MulticastFeverReset_Implementation ( )
+{
+	
+	FeverDynamicMat->SetScalarParameterValue ( TEXT ( "jswEmissivePower-A" ) , 0 );
+}
 void AHSW_ThirdPersonCharacter::PossessedBy ( AController* NewController )
 {
 	Super::PossessedBy ( NewController );
