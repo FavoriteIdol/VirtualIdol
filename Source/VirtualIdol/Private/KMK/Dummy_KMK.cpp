@@ -8,6 +8,9 @@
 #include "Components/WidgetComponent.h"
 #include "Materials/MaterialInstanceDynamic.h"
 #include "HSW/HSW_ThirdPersonCharacter.h"
+#include "Components/ArrowComponent.h"
+#include "HSW_ThrowingObject.h"
+#include "HSW_AnimInstance_Audience.h"
 
 // Sets default values
 ADummy_KMK::ADummy_KMK ( )
@@ -15,6 +18,9 @@ ADummy_KMK::ADummy_KMK ( )
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	ThrowingArrow = CreateDefaultSubobject<UArrowComponent> ( TEXT ( "ThrowingArrow" ) );
+	ThrowingArrow->SetupAttachment ( RootComponent );
+	ThrowingArrow->SetRelativeLocation ( FVector ( 80 , 0 , 70 ) );
 }
 
 // Called when the game starts or when spawned
@@ -37,6 +43,7 @@ void ADummy_KMK::BeginPlay ( )
 		TempMesh->SetMaterial ( 2 , FaceDynamicMat );
 	}
 
+	ThrowingObjectIndex = FMath::RandRange ( 0 , 2 );
 }
 
 // Called every frame
@@ -54,16 +61,20 @@ void ADummy_KMK::Tick ( float DeltaTime )
 	case DummyState::Move:
 		MoveFucn ( DeltaTime );
 		break;
-	case DummyState::Imoji:
-		ImojiFucn ( DeltaTime );
+	case DummyState::Emoji:
+		EmojiFucn ( DeltaTime );
 		break;
 	case DummyState::Fever:
 		if (HasAuthority ( )) ServerRPC_Shake ( 0.03 );
+		break;
+	case DummyState::Throw:
+		CreateThrowingObject( );
 		break;
 	}
 
 	FaceTimer += DeltaTime;
 	ImojiTimer += DeltaTime;
+	ThrowTimer += DeltaTime;
 
 	if (FaceRand == 0 && FaceTimer >= 3)
 	{
@@ -93,12 +104,15 @@ void ADummy_KMK::GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& OutLife
 	DOREPLIFETIME ( ADummy_KMK , state );
 	DOREPLIFETIME ( ADummy_KMK , isJump );
 	DOREPLIFETIME ( ADummy_KMK , isImoji );
+	DOREPLIFETIME ( ADummy_KMK , bCanThrow ); 
+	DOREPLIFETIME ( ADummy_KMK , ThrowingObject ); 
+	DOREPLIFETIME ( ADummy_KMK , bThrowing );
 }
 
 void ADummy_KMK::IdleFucn ( const float& DeltaTime )
 {
 	int32 rand = FMath::RandRange ( 0 , 80 );
-
+	if(bCanThrow) rand = FMath::RandRange ( 0 , 81 );
 	if (isJump) isJump = false;
 	if (( rand == 1 ) && isImoji == true)
 	{
@@ -111,7 +125,7 @@ void ADummy_KMK::IdleFucn ( const float& DeltaTime )
 		state = DummyState::Jump;
 		break;
 	case 1:
-		state = DummyState::Imoji;
+		state = DummyState::Emoji;
 		break;
 	case 2:
 		state = DummyState::Fever;
@@ -127,6 +141,9 @@ void ADummy_KMK::IdleFucn ( const float& DeltaTime )
 		break;
 	case 6:
 		state = DummyState::Fever;
+		break;
+	case 81:
+		state = DummyState::Throw;
 		break;
 	default:
 		break;
@@ -146,7 +163,7 @@ void ADummy_KMK::MoveFucn ( const float& DeltaTime )
 
 }
 
-void ADummy_KMK::ImojiFucn ( const float& DeltaTime )
+void ADummy_KMK::EmojiFucn ( const float& DeltaTime )
 {
 	if (ImojiTimer >= 2.5f)
 	{
@@ -236,4 +253,65 @@ void ADummy_KMK::MulticastRPC_Jump_Implementation ( const float& DeltaTime )
 	if (IsLocallyControlled ( )) Jump ( );
 	//if(!HasAuthority()&&!IsLocallyControlled())	UE_LOG ( LogTemp , Warning , TEXT ( "Jump" ) );
 	/*JumpFunc ( DeltaTime );*/
+}
+
+void ADummy_KMK::CreateThrowingObject ( )
+{
+	//bThrowing = true;
+	if (ThrowTimer > 0.5)
+	{
+		FTransform t = ThrowingArrow->GetComponentTransform ( );
+		ThrowingObject = GetWorld ( )->SpawnActor<AHSW_ThrowingObject> ( ThrowingObjectFactory , t );
+		if (ThrowingObject)
+		{
+			ThrowingObject->ChangeMesh ( ThrowingObjectIndex );
+			ThrowingObject->MeshComp->SetSimulatePhysics ( true );
+
+			FVector ThrowingForce = ThrowingArrow->GetForwardVector ( ) * ThrowingSpeed;
+			ThrowingObject->MeshComp->AddForce ( ThrowingForce );
+			ThrowingObject = nullptr;
+
+			ShakeBodyBlueprint ( );
+			// 재장전 애니메이션 재생
+			auto* anim = Cast<UHSW_AnimInstance_Audience> ( GetMesh ( )->GetAnimInstance ( ) );
+			if (anim)
+			{
+				anim->PlayThrowMontage ( );
+			}
+		}
+	}
+	state = DummyState::Idle;
+// 	if (HasAuthority ( ) && !bThrowing)
+// 	{
+// 		bThrowing = true;
+// 		FTransform t = ThrowingArrow->GetComponentTransform ( );
+// 		ThrowingObject = GetWorld ( )->SpawnActor<AHSW_ThrowingObject> ( ThrowingObjectFactory , t );
+// 		if (ThrowingObject)
+// 		{
+// 			ThrowingObject->ChangeMesh ( ThrowingObjectIndex );
+// 			ThrowingObject->AttachToComponent ( ThrowingArrow , FAttachmentTransformRules::KeepWorldTransform );
+// 
+// 			state = DummyState::Idle;
+// 			MulticastRPC_ThrowObject( );
+// 		}
+// 	}
+}
+
+void ADummy_KMK::MulticastRPC_ThrowObject_Implementation ()
+{
+	ThrowingObject->DetachFromActor ( FDetachmentTransformRules::KeepWorldTransform );
+	ThrowingObject->MeshComp->SetSimulatePhysics ( true );
+
+	FVector ThrowingForce = ThrowingArrow->GetForwardVector ( ) * ThrowingSpeed;
+	ThrowingObject->MeshComp->AddForce ( ThrowingForce );
+	ThrowingObject = nullptr;
+
+	ShakeBodyBlueprint ( );
+	// 재장전 애니메이션 재생
+	auto* anim = Cast<UHSW_AnimInstance_Audience> ( GetMesh ( )->GetAnimInstance ( ) );
+	if (anim)
+	{
+		anim->PlayThrowMontage ( );
+	}
+
 }
