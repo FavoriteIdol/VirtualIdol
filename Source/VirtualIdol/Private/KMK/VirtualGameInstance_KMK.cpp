@@ -357,3 +357,9 @@ void UVirtualGameInstance_KMK::SetMyProfile ( )
 {
     widget->ChangeMyProfile();
 }
+
+void UVirtualGameInstance_KMK::ChangeTextureWidget ( UTexture2D* texture )
+{
+    widget->ChangeImageStage(texture);
+    UE_LOG(LogTemp, Warning, TEXT("%d" ), stageNum);
+}

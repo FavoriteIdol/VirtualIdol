@@ -32,7 +32,7 @@ public:
 	class UVirtualGameInstance_KMK* gi;
 
 	// httpactor
-	UPROPERTY( )
+	UPROPERTY( BlueprintReadWrite)
 	class AHttpActor_KMK* httpActor;
 	UPROPERTY(EditAnywhere, Category = Http )
 	TSubclassOf<class AHttpActor_KMK> httpFact;
@@ -113,6 +113,8 @@ public:
     class UImage* Image_Profile;
 	UPROPERTY ( meta = ( BindWidget ) )
     class UImage* Image_Load;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UImage* Image_Stage;
 	UFUNCTION( )
 	void PressSelectButt( );
 
@@ -158,6 +160,9 @@ public:
 	bool BEditTextEmpty( );
 
 	FString ChangeString(const FString& editText);
+
+	UFUNCTION( )
+	void ChangeImageStage(UTexture2D* texture );
 
 	bool EditTextDigit(const FString& editText );
 
@@ -271,8 +276,11 @@ public:
 	class UTextBlock* Text_Pay;	
 	UPROPERTY ( meta = ( BindWidget ) )
     class UButton* Butt_PayMoney;	
+
 	UFUNCTION( )
-	void PressPayMoney( );
+	void PressMoneyPay( );
+	UPROPERTY( )
+	bool bPayMoney = false;
 
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UCanvasPanel* PayPopUpPanel;

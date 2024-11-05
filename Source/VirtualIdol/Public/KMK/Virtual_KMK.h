@@ -29,7 +29,7 @@ public:
 
 	UFUNCTION( )
 	FString GetTimeDifference ( const FString& SetTime );
-
+	FString diffTime;
 	bool bVis = false;
 	FString s;
 	UPROPERTY( EditAnywhere)

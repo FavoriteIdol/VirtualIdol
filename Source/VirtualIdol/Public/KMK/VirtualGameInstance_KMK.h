@@ -148,6 +148,8 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 	int32 roomNum = 0;
 	UPROPERTY()
 	FStageInfo myStageInfo;
+	UPROPERTY( )
+	int32 stageNum = 0;
 	UPROPERTY()
 	FRoomInfo mySessionInfo;
 	
@@ -169,4 +171,8 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 
 	UFUNCTION( )
 	void SetMyProfile( );
+
+	UFUNCTION( )
+	void ChangeTextureWidget(UTexture2D* texture );
+	
 };

@@ -43,6 +43,7 @@ void URoomWidget_KMK::SetStageText( const struct FStageInfo& stageInfo, UTexture
 	if(gi && gi->sm && !sm)gi->sm = sm;
 	myStageInfo = stageInfo;
 	if(image)Image_Stage->SetBrushFromTexture(image);
+	myTexture = image;
 	Butt_JoinSession->SetVisibility ( ESlateVisibility::Hidden );
     Butt_SetStage->SetVisibility ( ESlateVisibility::Visible );
 	Text_Name->SetText( FText::FromString( stageInfo.name ));
@@ -93,6 +94,8 @@ void URoomWidget_KMK::ChangeMyOutSide ( )
 	gi->bPressStage = true;
     gi->roomWidget = this;
     gi->myStageInfo = myStageInfo;
+	gi->stageNum = myStageInfo.stageID;
+	gi->ChangeTextureWidget(myTexture);
     Image_StageOut->SetVisibility ( ESlateVisibility::Visible );
 }
 

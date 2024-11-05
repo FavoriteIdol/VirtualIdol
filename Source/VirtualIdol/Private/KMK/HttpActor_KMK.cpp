@@ -83,24 +83,25 @@ void AHttpActor_KMK::OnResLogin ( FHttpRequestPtr Request , FHttpResponsePtr Res
 }
 #pragma endregion
 #pragma region Concert
-
-void AHttpActor_KMK::ReqSetConcert ( const FConcertInfo& concert )
+void AHttpActor_KMK::ReqSetMyConcert ( const FConcertInfo& concert )
 {
 	// HTTP 모듈 생성
 	FHttpModule& httpModule = FHttpModule::Get ( );
 	TSharedRef<IHttpRequest> req = httpModule.CreateRequest ( );
-	FString authHeader = FString::Printf ( TEXT ( "Bearer %s" ) , *gi->loginInfo.token );
-    req->SetHeader(TEXT("Authorization"), *( authHeader ));
+
 	req->SetURL(TEXT("http://master-of-prediction.shop:8123/api/v1/concerts") );
 	req->SetVerb(TEXT("POST"));
 	req->SetHeader(TEXT("content-type") , TEXT("application/json"));
 	FString s = UJsonParseLib_KMK::MakeConcertJson(concert) ;
-    req->SetContentAsString ( s);
+    req->SetContentAsString (s);
+	FString AuthHeader = FString::Printf(TEXT("Bearer %s"), *loginInfo.token);
+	req->SetHeader(TEXT("Authorization"), AuthHeader);
 	UE_LOG ( LogTemp , Log , TEXT ( "%s" ) ,  *(TEXT("Bearer " ) + loginInfo.token) );
 	req->OnProcessRequestComplete().BindUObject(this , &AHttpActor_KMK::OnResSetConcert);
 
 	req->ProcessRequest();
 }
+
 void AHttpActor_KMK::OnResSetConcert ( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully )
 {
 	if (!bConnectedSuccessfully)
@@ -113,26 +114,19 @@ void AHttpActor_KMK::OnResSetConcert ( FHttpRequestPtr Request , FHttpResponsePt
 	{
         int32 StatusCode = Response->GetResponseCode ( );
         FString ResponseBody = Response->GetContentAsString ( );
-
-        if (StatusCode == 403)
+		if (StatusCode == 403)
         {
 			if(count > 1)  return;
             UE_LOG ( LogTemp , Error , TEXT ( "403 Forbidden: 인증 문제 또는 권한 부족 - 응답 내용: %s" ) , *ResponseBody );
-			FPlatformProcess::Sleep ( 1.0f ); // 1초 대기
-			 ReqSetConcert (gi->concerInfo);
-			count++;
         }
         else
         {
             UE_LOG ( LogTemp , Warning , TEXT ( "응답 코드: %d - %s" ) , StatusCode , *ResponseBody );
             gi->PopUpVisible ( );
-			//gi->concerInfo.Clear( );
         }
 	}
 }
 // 무대 불러오기
-
-
 void AHttpActor_KMK::ReqCheckStage (class UStartWidget_KMK* startWidget )
 {
 	if(!startWidget) return;
@@ -274,7 +268,6 @@ void AHttpActor_KMK::OnImageDownComplete ( FHttpRequestPtr Request , FHttpRespon
    }
     
 }
-
 #pragma endregion
 
 #pragma region with Ai for Ticket
@@ -349,6 +342,41 @@ void AHttpActor_KMK::OnResTicket ( FHttpRequestPtr Request , FHttpResponsePtr Re
 void AHttpActor_KMK::OnTextureCreated(UTexture2D* texture)
 {
 	 gi->widget->CreateTicketMaterial(texture );
+}
+#pragma endregion
+#pragma region BE for CheckConcert
+void AHttpActor_KMK::ReqCheckMyConcert ( )
+{
+	// HTTP 모듈 생성
+	FHttpModule& httpModule = FHttpModule::Get ( );
+	TSharedRef<IHttpRequest> req = httpModule.CreateRequest ( );
+	// 요청할 정보를 설정
+	FString AuthHeader = FString::Printf ( TEXT ( "Bearer %s" ) , *gi->loginInfo.token );
+	req->SetHeader ( TEXT ( "Authorization" ) , AuthHeader );
+	req->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+	FString url = TEXT("http://master-of-prediction.shop:8123/api/v1/concerts") + FString::FormatAsNumber(gi->GetMyInfo().userId );
+	UE_LOG ( LogTemp , Warning , TEXT ( "ImagePath: %s" ) , *url );
+	req->SetURL(url );
+	req->SetVerb ( TEXT ( "GET" ) );
+
+	req->ProcessRequest ( );
+	// 응답받을 함수를 연결
+	req->OnProcessRequestComplete ( ).BindUObject ( this , &AHttpActor_KMK::OnResqCheckMyConcert );
+}
+
+void AHttpActor_KMK::OnResqCheckMyConcert ( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully )
+{
+	if (bConnectedSuccessfully)
+	{
+		// 성공
+		FString respon = Response->GetContentAsString();
+		gi->concerInfo = UJsonParseLib_KMK::ParsecMyConcertInfo(respon);
+		
+	}
+	else
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "Failed myStage" ) );
+	}
 }
 #pragma endregion
 
@@ -472,7 +500,4 @@ void AHttpActor_KMK::OnReqStageInfo ( FHttpRequestPtr Request , FHttpResponsePtr
 	}
 
 }
-
-
-
 #pragma endregion

@@ -30,7 +30,7 @@ void UStartWidget_KMK::NativeConstruct ( )
     Super::NativeConstruct();
 	// GI 찾기
 	gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance() );
-	httpActor = Cast<AHttpActor_KMK>(UGameplayStatics::GetActorOfClass(GetWorld() , httpFact));
+
 	selectManager = Cast<AJJH_SelectManager>(UGameplayStatics::GetActorOfClass(GetWorld() , selectFact));
 	loadMatInst = UMaterialInstanceDynamic::Create ( loadMatFact, this );
 	if (Image_Load)
@@ -68,6 +68,7 @@ void UStartWidget_KMK::NativeConstruct ( )
 	if (Butt_StartConcert)
 	{
 		Butt_StartConcert->OnClicked.AddDynamic ( this , &UStartWidget_KMK::StartConcertPanel );
+		Butt_StartConcert->bIsEnabled = false;
 	}
 	if (Butt_ComeInStage)
 	{
@@ -112,8 +113,7 @@ void UStartWidget_KMK::NativeConstruct ( )
 #pragma region Pay Moneny
 	if (Butt_PayMoney)
 	{
-		Butt_PayMoney->OnClicked.Clear();
-		Butt_PayMoney->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressPayMoney );
+		Butt_PayMoney->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressMoneyPay );
 	}
 	if (Butt_Next)
 	{
@@ -175,6 +175,7 @@ void UStartWidget_KMK::NativeTick ( const FGeometry& MyGeometry , float InDeltaT
 		{
 			FString s = EditText_ScaleNum->GetText().ToString();
 			int a = FCString::Atoi(*s) * concertPrice;
+			concertInfo.ticketPrice = a;
 			Text_Price->SetText(FText::AsNumber(a));
 		}
 	}
@@ -421,6 +422,12 @@ FString UStartWidget_KMK::ChangeString ( const FString& editText )
 	return s;
 }
 
+void UStartWidget_KMK::ChangeImageStage ( UTexture2D* texture )
+{
+	Image_Stage->SetBrushFromTexture(texture);
+	//Image_SetStage->SetBrushFromTexture(texture);
+}
+
 bool UStartWidget_KMK::EditTextDigit ( const FString& editText )
 {
 	for (char c : editText)
@@ -456,6 +463,7 @@ void UStartWidget_KMK::PressCreateTicket ( )
 void UStartWidget_KMK::CreateTicketMaterial ( UTexture2D* texture)
 {
 	Image_FinalStageImage->SetBrushFromTexture(texture);
+	Image_FinalConcert->SetBrushFromTexture(texture);
 }
 
 void UStartWidget_KMK::ClearAllText ( )
@@ -554,23 +562,27 @@ void UStartWidget_KMK::PressNextButt ( )
 	Text_Price->SetText(FText::GetEmpty ( ) );
 	EditText_ScaleNum->SetText ( FText::GetEmpty ( ) );
 }
-void UStartWidget_KMK::PressPayMoney ( )
+
+void UStartWidget_KMK::PressMoneyPay ( )
 {
-	if (!bCreateTicket)
-	{
-		Text_Effect1->SetVisibility(ESlateVisibility::Hidden);
-		MultiText_PopUp->SetVisibility(ESlateVisibility::Visible);
-		EffectPopUp1->SetVisibility(ESlateVisibility::Visible);
-		return;
-	}
-	else
-	{
-		Text_Effect1->SetVisibility(ESlateVisibility::Visible);
-		MultiText_PopUp->SetVisibility(ESlateVisibility::Hidden);
-		EffectPopUp1->SetVisibility(ESlateVisibility::Hidden);
-	}
+	//if (!bCreateTicket)
+	//{
+	//	Text_Effect1->SetVisibility(ESlateVisibility::Hidden);
+	//	MultiText_PopUp->SetVisibility(ESlateVisibility::Visible);
+	//	EffectPopUp1->SetVisibility(ESlateVisibility::Visible);
+	//	return;
+	//}
+	//else
+	//{
+	//	Text_Effect1->SetVisibility(ESlateVisibility::Visible);
+	//	MultiText_PopUp->SetVisibility(ESlateVisibility::Hidden);
+	//	EffectPopUp1->SetVisibility(ESlateVisibility::Hidden);
+	//	Image_Load->SetVisibility(ESlateVisibility::Hidden);
+	//}
+	concertInfo.stageId = gi->stageNum;
+	UE_LOG(LogTemp, Warning, TEXT("%d" ), concertInfo.stageId);
 	gi->SetConcertInfo(concertInfo);
-	httpActor->ReqSetConcert(concertInfo);
+	httpActor->ReqSetMyConcert(concertInfo);
 }
 
 void UStartWidget_KMK::PressOkayButt ( )
@@ -675,8 +687,6 @@ void UStartWidget_KMK::ClearChild ( )
 		SB_FindStage->ClearChildren();
 	}
 }
-
-
 #pragma endregion
 
 

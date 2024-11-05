@@ -25,21 +25,16 @@ public :
 	static TArray<struct FStageInfo> ParsecStageInfos(const FString& json, const FString& giName);
 #pragma endregion
 
-#pragma region Set Concert
+#pragma region Concert
 	static FString MakeConcertJson(const struct FConcertInfo& concert);
-
+	static FConcertInfo ParsecMyConcertInfo(const FString& json);
 #pragma endregion
 #pragma region CreateTicket
 	static FString CreateTicketJson( const TMap<FString , FString> ticketSetText);
 #pragma endregion
 
-
-#pragma region Example
-	static FString MakeJson ( const TMap<FString , FString> source );
-	static TMap<FString , FString>  ResultAlchemistParsec ( const FString& json );
-#pragma endregion
-
 public:
 	static UTexture2D* MakeTexture ( const TArray<uint8>& ImageData );
 	static UTexture2D* CreateTextureFromImage(int32 Width, int32 Height, const TArray<uint8>& RawData);
+	FString ChangeString ( const FString& editText );
 };

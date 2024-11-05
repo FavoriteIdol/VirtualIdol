@@ -225,6 +225,9 @@ public :
 	void CountDownPanelVisible( ESlateVisibility visiblePanel );
 	UFUNCTION( )
 	void SetCountDownTextVisible( );
+
+	UFUNCTION( )
+	void BeforeStartConcertCount(const FString& time );
 #pragma endregion
 #pragma region Virtual
 
@@ -295,12 +298,3 @@ public :
 
 
 };
-void ApplyHighPassFilter16 ( TArray<int16>& PCMData , float CutoffFrequency , int32 SampleRate );
-void ApplyLowPassFilter16 ( TArray<int16>& PCMData , float CutoffFrequency , int32 SampleRate );
-void ApplyHighPassFilter24 ( TArray<int32>& PCMData , float CutoffFrequency , int32 SampleRate );
-void ApplyLowPassFilter24 ( TArray<int32>& PCMData , float CutoffFrequency , int32 SampleRate );
-void ApplyHighPassFilter32 ( TArray<float>& PCMData , float CutoffFrequency , int32 SampleRate );
-void ApplyLowPassFilter32 ( TArray<float>& PCMData , float CutoffFrequency , int32 SampleRate );
-void AmplifyPCM16 ( TArray<int16>& PCMData , float Gain );
-void AmplifyPCM24 ( TArray<int32>& PCMData , float Gain );
-void AmplifyPCM32 ( TArray<float>& PCMData , float Gain );

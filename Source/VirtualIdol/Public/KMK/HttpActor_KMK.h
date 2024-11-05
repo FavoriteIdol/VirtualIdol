@@ -29,7 +29,7 @@ struct FConcertInfo
 	UPROPERTY(BlueprintReadOnly)
 	int32 feverVFX = -1;
 	UPROPERTY ( BlueprintReadOnly )
-    int32 stageId = -1;
+    int32 stageId = 1;
 	UPROPERTY(BlueprintReadOnly)
     int32 ticketPrice = -1;
 	UPROPERTY(BlueprintReadOnly)
@@ -85,6 +85,8 @@ struct FStageInfo
 	int32 theme = -1;
 	UPROPERTY(BlueprintReadOnly)
 	int32 specialEffect = -1;
+	UPROPERTY( )
+	int32 stageID = -1;
 	UPROPERTY(BlueprintReadOnly)
 	FString img= TEXT("");
 
@@ -122,7 +124,7 @@ public:
 #pragma region with BE for SettingStage
 	int32 count = 0;
 	// 요청
-	void ReqSetConcert(const FConcertInfo& concert );
+	void ReqSetMyConcert(const FConcertInfo& concert );
 	// 응답
 	void OnResSetConcert( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
 #pragma endregion
@@ -157,6 +159,15 @@ public:
 	// 이미지 생성 및 다운
 	void DownloadImageFromUrl ( const FString& imageUrl , const FStageInfo& stageInfo );
 	void OnImageDownComplete ( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bWasSuccessful, FStageInfo stageInfo );
+#pragma endregion
+#pragma region Check My Concert
+	// 내무대 확인
+	UPROPERTY( )
+	class UStartWidget_KMK* myStartWid;
+	// 요청
+	void ReqCheckMyConcert( );
+	// 응답 
+	void OnResqCheckMyConcert( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
 #pragma endregion
 
 #pragma region with Ai for Text

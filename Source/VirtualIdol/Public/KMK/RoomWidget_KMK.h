@@ -54,6 +54,8 @@ public :
 	UPROPERTY ( )
     FRoomInfo mySessionInfo;
 	int32 roomNum = 0;
+
+	UTexture2D* myTexture;
 	
 	UPROPERTY( )
 	class AJJH_SelectManager* sm;

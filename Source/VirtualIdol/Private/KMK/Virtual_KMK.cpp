@@ -70,6 +70,18 @@ void UVirtual_KMK::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 			}
 		}
 	}
+	else
+	{
+		if (pc->HasAuthority ( ) && pc->IsLocalController ( ))
+		{
+			diffTime = GetTimeDifference ( setConcertTime );
+            if (virtualWidget)
+            {
+                virtualWidget->BeforeStartConcertCount(diffTime);
+            }
+		}
+	}
+
 }
 #pragma region Time
 FString UVirtual_KMK::GetTimeDifference ( const FString& SetTime )
