@@ -34,7 +34,7 @@ void URoomWidget_KMK::SetImageAndText (const struct FRoomInfo& info)
 	Butt_JoinSession->SetVisibility ( ESlateVisibility::Visible );
 	Butt_SetStage->SetVisibility(ESlateVisibility::Hidden);
 	Text_Name->SetText( FText::FromString( info.hostName + TEXT ( "의 콘서트" ) ));
-	gi->roomNum = info.index;
+	
 }
 
 void URoomWidget_KMK::SetStageText( const struct FStageInfo& stageInfo, UTexture2D* image)
@@ -104,6 +104,8 @@ void URoomWidget_KMK::ChangeSessionOutSide ( )
 	gi->bPressSession = true;
     gi->sessionWidget = this;
     gi->mySessionInfo = mySessionInfo;
+	gi->roomNum = mySessionInfo.index;
+	gi->HostName = mySessionInfo.hostName;
     Image_StageOut->SetVisibility ( ESlateVisibility::Visible );
 }
 

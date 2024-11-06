@@ -32,7 +32,7 @@ public:
 	class UVirtualGameInstance_KMK* gi;
 
 	// httpactor
-	UPROPERTY( BlueprintReadWrite)
+	UPROPERTY( EditAnywhere, BlueprintReadWrite)
 	class AHttpActor_KMK* httpActor;
 	UPROPERTY(EditAnywhere, Category = Http )
 	TSubclassOf<class AHttpActor_KMK> httpFact;
@@ -48,7 +48,7 @@ public:
 
 	// 버튼
 	UPROPERTY(meta = (BindWidget))
-	class UButton* Butt_Login;
+    class UButton* Butt_Login;
 
 	// 텍스트 블럭
 	UPROPERTY(meta = (BindWidget))
@@ -80,6 +80,12 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* Butt_ComeInStage;
 
+	UFUNCTION( )
+	void SetButtEnable(bool bEnable = false);
+
+	UPROPERTY(BlueprintReadWrite )
+	bool isButtEanble = false;
+
 	// 버튼 연동 함수
 	UFUNCTION()
 	void CreateStagePanel();
@@ -96,10 +102,6 @@ public:
 // Stage Setting Widget Panel
 // ================================================================
 	// 추가 기능
-	UPROPERTY(EditAnywhere, Category="Particle" )
-	TArray<class UMaterial*> EffectParticles;
-	UPROPERTY(EditAnywhere, Category = "Particle")
-	TArray<class UMaterial*> FeversParticles;
 	// 텍스트
 	UPROPERTY(meta = (BindWidget))
     class UTextBlock* Text_Title;
@@ -180,12 +182,17 @@ public:
 	UPROPERTY ( meta = ( BindWidget ) )
     class UButton* Butt_CreateTicket1;
 	UPROPERTY ( meta = ( BindWidget ) )
+    class UButton* Butt_Upload;
+	UPROPERTY ( meta = ( BindWidget ) )
 	class UMultiLineEditableText* EditMultiText_Ticket;
 	UFUNCTION( )
 	void PressCreateTicket();
 	UFUNCTION( )
 	void CreateTicketMaterial(UTexture2D* texture);
-
+	UFUNCTION( )
+	void PressUpload( );
+	UFUNCTION( )
+	bool OpenFileExample(TArray<FString>& FileNames, FString DialogueTitle, FString FileTypes, bool multiselect);
 	void ClearAllText( );
 #pragma endregion
 #pragma region Set Effect
@@ -301,8 +308,6 @@ public:
 #pragma endregion
 
 #pragma region Select Stage
-	UPROPERTY(EditAnywhere, Category = SetConcert )
-	TArray<class UNiagaraSystem*> setConcert_Effects;
 	// 전체 무대
 	TArray<struct FStageInfo> allStageInfoArray;
 	// 버튼

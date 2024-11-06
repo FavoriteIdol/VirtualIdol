@@ -11,6 +11,8 @@
 #include "Engine/StaticMeshActor.h"
 #include "EngineUtils.h"
 #include "HSW/HSW_ThirdPersonCharacter.h"
+#include "JJH/JJH_SelectManager.h"
+#include "KMK/VirtualGameInstance_KMK.h"
 
 // Sets default values for this component's properties
 UVirtual_KMK::UVirtual_KMK()
@@ -28,7 +30,7 @@ void UVirtual_KMK::BeginPlay()
 {
 	Super::BeginPlay();
 	meshComp = GetOwner()->FindComponentByTag<USkeletalMeshComponent>(FName(TEXT("Mesh")));
-
+	gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance());
 	FName tag = TEXT ( "InterviewLocation" );
 	for (TActorIterator<AActor> It ( GetWorld ( ) , AStaticMeshActor::StaticClass ( ) ); It; ++It)
 	{
@@ -37,6 +39,7 @@ void UVirtual_KMK::BeginPlay()
 		{
 			StageLocation = Actor->GetTransform ( );
 		}
+
 	}
 
 	pc = GetWorld ( )->GetFirstPlayerController ( );
@@ -50,6 +53,10 @@ void UVirtual_KMK::BeginPlay()
 	{
 		UE_LOG ( LogTemp , Warning , TEXT ( "PC none" ) );
 	}
+    if (sm)
+    {
+        sm->CreateStage ( gi->GetConcertStageInfo() );
+    }
 }
 
 
@@ -188,7 +195,8 @@ void UVirtual_KMK::StartCountDown ( )
         {
             SetVirtualVisible ( true );
 			virtualWidget->CountDownPanelVisible ( ESlateVisibility::Hidden );
-			if(appearFact.Num() > 0) GetWorld ( )->SpawnActor<AActor> ( appearFact[0] , FTransform ( FVector ( 0 ) ) );
+			if(appearFact.Num() > 0) GetWorld ( )->SpawnActor<AActor> ( gi->effectArray[gi->GetConcertInfo().appearedVFX] , FTransform ( FVector ( 0 ) ) );
+			UE_LOG(LogTemp, Warning, TEXT("%d" ), gi->GetConcertInfo().appearedVFX);
         } ) , 6 , false );
 
 }

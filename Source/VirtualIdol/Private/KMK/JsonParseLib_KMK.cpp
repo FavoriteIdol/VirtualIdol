@@ -83,6 +83,30 @@ TArray<struct FStageInfo>  UJsonParseLib_KMK::ParsecStageInfos ( const FString& 
     }
     return stageInfos;
 }
+FStageInfo UJsonParseLib_KMK::ParsecMyStageInfo ( const FString& json )
+{
+    // 서버에서 가져온 json 파일 읽기
+    TSharedRef<TJsonReader<TCHAR>> reader = TJsonReaderFactory<TCHAR>::Create ( json );
+    // FJsonObject 형식으로 읽어온 json 데이터를 저장함 => 공유 포인터 형태로 객체 감싸기
+    TSharedPtr<FJsonObject> response = MakeShareable ( new FJsonObject ( ) );
+    FStageInfo stageInfos;
+    if ( FJsonSerializer::Deserialize(reader,response) )
+    {
+        if ( response.IsValid() )
+        { 
+            stageInfos.name = response->GetStringField ( TEXT ( "name" ) );
+            stageInfos.terrain = response->GetIntegerField ( TEXT ( "terrain" ) );
+            stageInfos.sky = response->GetIntegerField ( TEXT ( "sky" ) );
+            stageInfos.theme = response->GetIntegerField ( TEXT ( "theme" ) );
+            stageInfos.specialEffect = response->GetIntegerField ( TEXT ( "specialEffect" ) );
+            stageInfos.stageID = response->GetIntegerField ( TEXT ( "id" ) );
+            stageInfos.img = response->GetStringField ( TEXT ( "img" ) );
+        }
+
+    }
+    return stageInfos;
+}
+
 
 #pragma endregion
 
@@ -130,37 +154,44 @@ FConcertInfo  UJsonParseLib_KMK::ParsecMyConcertInfo ( const FString& json )
     TSharedRef<TJsonReader<TCHAR>> reader = TJsonReaderFactory<TCHAR>::Create ( json );
     // FJsonObject 형식으로 읽어온 json 데이터를 저장함 => 공유 포인터 형태로 객체 감싸기
     TSharedPtr<FJsonObject> response = MakeShareable ( new FJsonObject ( ) );
-    FConcertInfo concertInfo;
+    TArray<struct FConcertInfo> concertInfoArray;
+     FConcertInfo con;
     if ( FJsonSerializer::Deserialize(reader,response) )
     {
         int32 stageCount = response->GetIntegerField(TEXT("totalElements" ));
-       
-        TSharedPtr<FJsonObject> startTimeArray;
-        if ( response.IsValid() )
-        { 
-            concertInfo.name = response->GetStringField(TEXT("name"));
-            concertInfo.img = response->GetStringField(TEXT("img"));
-            FString price = response->GetStringField(TEXT("ticketPrice"));
-            concertInfo.ticketPrice =  FCString::Atoi(*price);
-            FString scale = response->GetStringField(TEXT("peopleScale"));
-            concertInfo.peopleScale = FCString::Atoi(*scale);
-            concertInfo.stageId = response->GetIntegerField(TEXT("stageId" ));
+        const TArray<TSharedPtr<FJsonValue>>* conecertArray;
+        if (response->TryGetArrayField ( TEXT ( "content" ) , conecertArray ))
+        {
+            
+            for ( const TSharedPtr<FJsonValue>& concert : *conecertArray )
+            {
+                FConcertInfo concertInfo;
+                TSharedPtr<FJsonObject> concertEle = concert->AsObject();
+                if ( concertEle.IsValid() )
+                { 
+                    concertInfo.name = concertEle->GetStringField ( TEXT ( "name" ) );
+                    concertInfo.img = concertEle->GetStringField ( TEXT ( "img" ) );
+                    FString price = concertEle->GetStringField ( TEXT ( "ticketPrice" ) );
+                    concertInfo.ticketPrice = FCString::Atoi ( *price );
+                    FString scale = concertEle->GetStringField ( TEXT ( "peopleScale" ) );
+                    concertInfo.peopleScale = FCString::Atoi ( *scale );
+                    concertInfo.stageId = concertEle->GetIntegerField ( TEXT ( "stageId" ) );
 
-            concertInfo.appearedVFX = response->GetIntegerField(TEXT("appearedVFX" ));
-            concertInfo.feverVFX = response->GetIntegerField(TEXT("feverVFX" ));
+                    concertInfo.appearedVFX = concertEle->GetIntegerField ( TEXT ( "appearedVFX" ) );
+                    concertInfo.feverVFX = concertEle->GetIntegerField ( TEXT ( "feverVFX" ) );
 
-            int32 id = response->GetIntegerField(TEXT("id" ));
-            startTimeArray = response->GetObjectField(TEXT("startTime" ));
-            int32 h = startTimeArray->GetIntegerField(TEXT("hour" ));
-            int32 m = startTimeArray->GetIntegerField(TEXT("minute" ));
-            FString hour = FString::FromInt(h );
-            FString minute = FString::FromInt(m );
+                    int32 id = concertEle->GetIntegerField ( TEXT ( "id" ) );
+                    concertInfo.concertDate = concertEle->GetStringField ( TEXT ( "concertDate" ) );
 
-            concertInfo.startTime = hour + TEXT(":" ) + minute + TEXT(":" ) + TEXT("00");
+                    concertInfo.startTime = concertEle->GetStringField ( TEXT ( "startTime" ) );
+                    concertInfoArray.Add(concertInfo);
+                }
+            }
         }
 
     }
-    return concertInfo;
+    if(concertInfoArray.Num() <= 0) return con;
+    return concertInfoArray[0];
 }
 
 #pragma endregion

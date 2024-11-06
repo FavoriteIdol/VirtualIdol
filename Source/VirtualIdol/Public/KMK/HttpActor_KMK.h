@@ -78,13 +78,13 @@ struct FStageInfo
 	UPROPERTY(BlueprintReadOnly)
 	FString name= TEXT("");
 	UPROPERTY(BlueprintReadOnly)
-	int32 terrain = -1;
+	int32 terrain = 0;
 	UPROPERTY(BlueprintReadOnly)
-	int32 sky = -1;
+	int32 sky = 0;
 	UPROPERTY(BlueprintReadOnly)
-	int32 theme = -1;
+	int32 theme = 0;
 	UPROPERTY(BlueprintReadOnly)
-	int32 specialEffect = -1;
+	int32 specialEffect = 0;
 	UPROPERTY( )
 	int32 stageID = -1;
 	UPROPERTY(BlueprintReadOnly)
@@ -108,6 +108,9 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<TSubclassOf<AActor>> effectArray;
 
 #pragma region with BE for Login
 	UPROPERTY( )
@@ -159,6 +162,10 @@ public:
 	// 이미지 생성 및 다운
 	void DownloadImageFromUrl ( const FString& imageUrl , const FStageInfo& stageInfo );
 	void OnImageDownComplete ( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bWasSuccessful, FStageInfo stageInfo );
+
+	// 특정 무대 요청
+	void ReqCheckIdStage( int32 num);
+	void OnResCheckIdStage(FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
 #pragma endregion
 #pragma region Check My Concert
 	// 내무대 확인

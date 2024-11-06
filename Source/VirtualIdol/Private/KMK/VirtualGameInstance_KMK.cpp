@@ -176,16 +176,24 @@ void UVirtualGameInstance_KMK::JoinRoom ( int32 ChooseRoomNum, int32 vipNum)
 
 void UVirtualGameInstance_KMK::JoinRoomComplete ( FName SessionName , EOnJoinSessionCompleteResult::Type result )
 {
-    if (EOnJoinSessionCompleteResult::Success == result)
+   
+    if (result == EOnJoinSessionCompleteResult::Success)
     {
-        auto* pc = GetWorld()->GetFirstPlayerController();
-
         FString url;
-        sessionInterface->GetResolvedConnectString(SessionName, url);
-        if (!url.IsEmpty ( ))
+        if (sessionInterface->GetResolvedConnectString(SessionName, url) && !url.IsEmpty())
         {
-            pc->ClientTravel(url , ETravelType::TRAVEL_Absolute);
+            PRINTLOG(TEXT("Successfully obtained URL: %s"), *url);
+            auto* pc = GetWorld()->GetFirstPlayerController();
+            pc->ClientTravel(url, ETravelType::TRAVEL_Absolute);
         }
+        else
+        {
+            PRINTLOG(TEXT("Failed to resolve connect string: URL is empty"));
+        }
+    }
+    else
+    {
+        PRINTLOG(TEXT("Failed to join session: %d"), (int32)result);
     }
 }
 
@@ -246,7 +254,6 @@ void UVirtualGameInstance_KMK::SetStartWidget ( class UStartWidget_KMK* startUi 
 void UVirtualGameInstance_KMK::SwitchStartUIWidget (int32 num )
 {
     SwitchWidget ( 4 );
-    widget->roomNum = num;
 }
 
 void UVirtualGameInstance_KMK::VisibleStartWidget (bool bVisible)
@@ -293,6 +300,30 @@ FLoginInfo UVirtualGameInstance_KMK::GetMyInfo ( )
 void UVirtualGameInstance_KMK::SetConcertInfo ( const struct FConcertInfo& info )
 {
     concerInfo = info;
+    FDateTime currentDataTime = FDateTime::Now();
+    int32 year = currentDataTime.GetYear();
+    int32 mon = currentDataTime.GetMonth();
+    int32 day = currentDataTime.GetDay();
+
+    FString start = FString::FromInt(year) + TEXT("-") + ChangeString(FString::FromInt(mon))+ TEXT("-") +ChangeString( FString::FromInt(day));
+
+    if (concerInfo.concertDate == start)
+    {
+        widget->SetButtEnable(true);
+    }
+}
+FString UVirtualGameInstance_KMK::ChangeString ( const FString& editText )
+{
+    FString s = editText;
+    if (s.Len ( ) == 1)
+    {
+        s = TEXT ( "0" ) + s;
+    }
+	return s;
+}
+FConcertInfo UVirtualGameInstance_KMK::GetConcertInfo ( )
+{
+    return concerInfo;
 }
 
 #pragma endregion
@@ -362,4 +393,14 @@ void UVirtualGameInstance_KMK::ChangeTextureWidget ( UTexture2D* texture )
 {
     widget->ChangeImageStage(texture);
     UE_LOG(LogTemp, Warning, TEXT("%d" ), stageNum);
+}
+
+void UVirtualGameInstance_KMK::SetConcertStageInfo ( FStageInfo& info )
+{
+    concertStageInfo = info;
+}
+
+FStageInfo UVirtualGameInstance_KMK::GetConcertStageInfo ( )
+{
+    return concertStageInfo;
 }

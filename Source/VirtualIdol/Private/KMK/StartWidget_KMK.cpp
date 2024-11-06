@@ -24,6 +24,8 @@
 #include "JJH/JJH_SelectManager.h"
 #include "Components/MultiLineEditableTextBox.h"
 #include "Materials/MaterialInstanceDynamic.h"
+#include "IDesktopPlatform.h"
+#include "DesktopPlatformModule.h"
 
 void UStartWidget_KMK::NativeConstruct ( )
 {	
@@ -42,6 +44,7 @@ void UStartWidget_KMK::NativeConstruct ( )
 	{
 		selectManager->DeleteStage ( );
 		StartSwitcher->SetActiveWidgetIndex ( 1 );
+		ChangeMyProfile ( );
 	}
 	else
 	{
@@ -98,10 +101,11 @@ void UStartWidget_KMK::NativeConstruct ( )
 		Butt_AppearEffect->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressAppearEffect );
 		Butt_FeverEffect->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressFeverEffect );
 	}
-	if (Butt_Select &&Butt_Select1)
+	if (Butt_Select &&Butt_Select1 && Butt_Upload)
 	{
 		Butt_Select->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressSelectButt );
 		Butt_Select1->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressSelect1Butt );
+		Butt_Upload->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressUpload );
     }	
 	if (SetDayPanel && SetTicketPanel && StageChargePanel)
 	{
@@ -163,7 +167,7 @@ void UStartWidget_KMK::NativeConstruct ( )
 
 #pragma endregion
 
-
+	SetButtEnable( );
 }
 
 void UStartWidget_KMK::NativeTick ( const FGeometry& MyGeometry , float InDeltaTime )
@@ -207,7 +211,7 @@ void UStartWidget_KMK::OnMyLogin ( )
 	{
 		// 서버에 정보값 보내기
 		httpActor->ReqLogin(EditText_ID->GetText().ToString(), EditText_PW->GetText().ToString());
-
+		
 		//StartSwitcher->SetActiveWidgetIndex ( 1 );
 	}
 }
@@ -224,6 +228,12 @@ void UStartWidget_KMK::ChangeMyProfile ( )
 {
 	Text_MyCash->SetText(FText::AsNumber(gi->myCash));
 	Text_MyNick->SetText(FText::FromString(gi->GetMyInfo().userName));
+}
+
+void UStartWidget_KMK::SetButtEnable ( bool bEnable /*= false*/ )
+{
+	Butt_StartConcert->SetIsEnabled(bEnable);
+	isButtEanble = bEnable;
 }
 
 // 무대 꾸미기 레벨로 이동
@@ -379,7 +389,7 @@ bool UStartWidget_KMK::BEditTextEmpty ( )
 		Text_FinalDay->SetText(EditText_Day->GetText());
 
 		FString year = TEXT("20") + EditText_Year->GetText ( ).ToString ( );
-		FString mon = ChangeString(EditText_Day->GetText().ToString());
+		FString mon = ChangeString(EditText_Mon->GetText().ToString());
 		FString day = ChangeString(EditText_Day->GetText().ToString());
 
 		concertInfo.concertDate = year + TEXT("-") + mon + TEXT("-") + day;
@@ -466,6 +476,50 @@ void UStartWidget_KMK::CreateTicketMaterial ( UTexture2D* texture)
 	Image_FinalConcert->SetBrushFromTexture(texture);
 }
 
+void UStartWidget_KMK::PressUpload ( )
+{
+    TArray<FString> SelectedFiles;
+    FString FileTypes = TEXT("이미지 파일 (*.png;*.jpg;*.jpeg)|*.png;*.jpg;*.jpeg|모든 파일 (*.*)|*.*");
+
+    // 파일 탐색기를 열고 사용자에게 파일 선택을 요청
+    bool bFileSelected =  OpenFileExample(SelectedFiles, TEXT("업로드할 이미지를 선택하세요"), FileTypes, true);
+
+    if (bFileSelected && SelectedFiles.Num() > 0)
+    {
+        for (const FString& FilePath : SelectedFiles)
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Selected File: %s"), *FilePath);
+            FString FileName = FPaths::GetCleanFilename(FilePath);  // "Example.wav"
+        }
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("File Selected Failed!!!"))
+    }
+}
+// 파일 열기
+bool UStartWidget_KMK::OpenFileExample(TArray<FString>& FileNames, FString DialogueTitle, FString FileTypes, bool multiselect)
+{
+
+   IDesktopPlatform* DesktopPlatform = FDesktopPlatformModule::Get();
+   bool bOpened = false;
+   FString DefaultPath = FPaths::ProjectContentDir(); // 기본 경로를 프로젝트 콘텐츠 폴더로 설정
+
+   if (DesktopPlatform)
+   {
+      uint32 SelectionFlag = multiselect ? EFileDialogFlags::Multiple : EFileDialogFlags::None;
+      bOpened = DesktopPlatform->OpenFileDialog(
+         NULL,
+         DialogueTitle,
+         DefaultPath,
+         TEXT(""),
+         FileTypes,
+         SelectionFlag,
+         FileNames
+      );
+   }
+   return bOpened;
+}
 void UStartWidget_KMK::ClearAllText ( )
 {
 	
@@ -581,7 +635,7 @@ void UStartWidget_KMK::PressMoneyPay ( )
 	//}
 	concertInfo.stageId = gi->stageNum;
 	UE_LOG(LogTemp, Warning, TEXT("%d" ), concertInfo.stageId);
-	gi->SetConcertInfo(concertInfo);
+	
 	httpActor->ReqSetMyConcert(concertInfo);
 }
 
@@ -592,6 +646,7 @@ void UStartWidget_KMK::PressOkayButt ( )
 	ClearSB ( );
 	StartSwitcher->SetActiveWidgetIndex ( 1 );
 	ResetWidget( );
+	httpActor->ReqCheckMyConcert();
 }
 
 void UStartWidget_KMK::ResetWidget ( )
@@ -617,17 +672,16 @@ void UStartWidget_KMK::ResetWidget ( )
 // vip 접속
 void UStartWidget_KMK::PressYesButt ( )
 {
-
-	if (gi && roomNum >= 0)
+	if (gi && gi->roomNum >= 0)
 	{
 		
 		if (TEXT_VIP->GetText ( ).ToString ( ).Contains ( TEXT ( "VIP" ) ))
         {
-			gi->JoinRoom(roomNum, 1);
+			gi->JoinRoom(gi->roomNum , 1);
         }
 		else
 		{
-			gi->JoinRoom(roomNum);
+			gi->JoinRoom(gi->roomNum );
 		}
 		//ChangeAudienceMesh(0);
 	}
