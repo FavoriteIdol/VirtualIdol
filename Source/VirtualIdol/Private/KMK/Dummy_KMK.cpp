@@ -101,6 +101,8 @@ void ADummy_KMK::SetupPlayerInputComponent ( UInputComponent* PlayerInputCompone
 
 void ADummy_KMK::GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& OutLifetimeProps ) const
 {
+	Super::GetLifetimeReplicatedProps ( OutLifetimeProps );
+
 	DOREPLIFETIME ( ADummy_KMK , state );
 	DOREPLIFETIME ( ADummy_KMK , isJump );
 	DOREPLIFETIME ( ADummy_KMK , isImoji );
@@ -266,6 +268,17 @@ void ADummy_KMK::CreateThrowingObject ( )
 		{
 			ThrowingObject->ChangeMesh ( ThrowingObjectIndex );
 			ThrowingObject->MeshComp->SetSimulatePhysics ( true );
+
+			if (ThrowingObjectIndex == 1)
+			{
+				ThrowingObject->MeshComp->SetMassOverrideInKg(NAME_None,170.f,true);
+
+			}
+			else if (ThrowingObjectIndex == 2)
+			{
+				ThrowingObject->MeshComp->SetMassOverrideInKg ( NAME_None , 160.f , true );
+
+			}
 
 			FVector ThrowingForce = ThrowingArrow->GetForwardVector ( ) * ThrowingSpeed;
 			ThrowingObject->MeshComp->AddForce ( ThrowingForce );
