@@ -188,12 +188,16 @@ void AHSW_GameState_Auditorium::ServerRPC_SetInterviewee_Implementation ( )
         // 인터뷰 끝나는 조건 나중에 바꾸기
         bIsInterviewing = !bIsInterviewing;
 
-        if (PlayerArray.Num ( ) > 0 && bIsInterviewing)
+        if (PlayerArray.Num ( ) > 0 )
         {
+            if (bIsInterviewing)
+            {
+
             IntervieweeIndex = FMath::RandRange ( 1 , PlayerArray.Num ( ) - 1 );
             IntervieweePlayerState = PlayerArray[IntervieweeIndex];
 
             PreLocation = IntervieweePlayerState->GetPawn ( )->GetActorTransform ( );
+            }
         }
         else
         {
