@@ -475,6 +475,7 @@ UMaterialInstanceDynamic* AHSW_ThirdPersonCharacter::ChangeMyMeshMat (int32 num 
 	return FeverDynamicMat;
 }
 
+
 // Imoji ==============================================================================================
 
 void AHSW_ThirdPersonCharacter::Imoji ( int index )
@@ -553,7 +554,7 @@ void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value 
 	if (!HasAuthority ( ) && IsLocallyControlled())
 	{
 		PersonalGauge++;
-		ServerRPCFeverGauge (CurrentGauge, 10*0.02);
+		ServerRPCFeverGauge (CurrentGauge, 5*0.02);
 		PrintFeverGaugeLogOnHead ( );
 
 		//MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
@@ -580,7 +581,7 @@ void AHSW_ThirdPersonCharacter::ServerRPCFeverGauge_Implementation ( float fever
 		}
 	}
 
-	if (FeverBright <= 10)
+	if (FeverBright <= 5)
 	{
 		FeverBright += brightValue;
 		MulticastRPCBrightness(1 );
@@ -602,6 +603,18 @@ void AHSW_ThirdPersonCharacter::MulticastRPCBrightness_Implementation ( int inde
 	FeverDynamicMat->SetScalarParameterValue ( TEXT ( "jswEmissivePower-A" ) , FeverBright );
 }
 
+void AHSW_ThirdPersonCharacter::ServerFeverReset_Implementation ( )
+{
+	FeverBright = 0;
+	MulticastFeverReset( );
+	SetFeverGaugeMulti(0 );
+}
+
+void AHSW_ThirdPersonCharacter::MulticastFeverReset_Implementation ( )
+{
+	
+	FeverDynamicMat->SetScalarParameterValue ( TEXT ( "jswEmissivePower-A" ) , 1 );
+}
 void AHSW_ThirdPersonCharacter::PossessedBy ( AController* NewController )
 {
 	Super::PossessedBy ( NewController );
@@ -651,6 +664,7 @@ void AHSW_ThirdPersonCharacter::MulticastFeverEffect_Implementation ( )
 // 	DamagedEffect->SetAutoDestroy ( true );
 
 	FeverEffect_Actor = GetWorld ( )->SpawnActor<AActor> ( FeverEffectFactory , FeverEffectLocation );
+	
 }
 
 // 인터뷰 =================================================================================================
@@ -667,17 +681,26 @@ void AHSW_ThirdPersonCharacter::ServerRPCInterview_Implementation (  )
 	bIsInterviewing = !bIsInterviewing;
 
 	PlayerStates = GetWorld()->GetGameState()->PlayerArray;
-	if (PlayerStates.Num ( ) > 0 && bIsInterviewing)
+	if (PlayerStates.Num ( ) > 0)
 	{
+		if (bIsInterviewing)
+		{
 		IntervieweeIndex = FMath::RandRange ( 1 , PlayerStates.Num ( ) - 1 );
 		IntervieweePlayerState = PlayerStates[IntervieweeIndex];
 
 		PreLocation = IntervieweePlayerState->GetPawn ( )->GetActorTransform ( );
-
+		}
 	}
 	else
 	{
-		UE_LOG ( LogTemp , Warning , TEXT ( "플레이어가 없습니다." ) );
+		if(IsLocallyControlled())
+		{
+			UE_LOG ( LogTemp , Warning , TEXT ( "Local: 플레이어가 없습니다." ) );
+		}
+		else 
+		{
+			UE_LOG ( LogTemp , Warning , TEXT ( "Not Local: 플레이어가 없습니다." ) );
+		}
 	}
 
 	MulticastRPCInterview(  );
