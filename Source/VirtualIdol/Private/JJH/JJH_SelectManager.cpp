@@ -9,6 +9,7 @@
 #include "Engine/TextureRenderTarget2D.h"
 #include "ImageUtils.h"
 #include "Components/Image.h"
+#include "JJH_SetupPlayerController.h"
 
 // Sets default values
 AJJH_SelectManager::AJJH_SelectManager()
@@ -30,6 +31,8 @@ void AJJH_SelectManager::BeginPlay()
 	// SceneCaptureComponent2D를 생성
 	CaptureComponent2D = NewObject<USceneCaptureComponent2D> ( this );
 	CaptureComponent2D->RegisterComponent ( );
+	JJHPC = Cast<AJJH_SetupPlayerController>( GetWorld ( )->GetFirstPlayerController ( ) );
+
 	CaptureComponent2D->SetWorldLocation (GetWorld()->GetFirstPlayerController()->GetPawn ( )->GetActorLocation ( )); // 플레이어 위치 기준으로 캡처
 
 	// 렌더 타겟 생성
@@ -48,7 +51,16 @@ void AJJH_SelectManager::BeginPlay()
 void AJJH_SelectManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (JJHPC)
+	{
+		// 카메라 매니저에서 현재 카메라 위치와 회전 가져오기
+		FVector CameraLocation = JJHPC->PlayerCameraManager->GetCameraLocation ( );
+		FRotator CameraRotation = JJHPC->PlayerCameraManager->GetCameraRotation ( );
 
+		// CaptureComponent2D의 위치와 회전 설정
+		CaptureComponent2D->SetWorldLocation ( CameraLocation );
+		CaptureComponent2D->SetWorldRotation ( CameraRotation );
+	}
 }
 
 void AJJH_SelectManager::UpdateSunNightPosition ( bool isNight )
