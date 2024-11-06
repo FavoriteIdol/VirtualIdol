@@ -124,9 +124,33 @@ void UAudience_KMK::NativeConstruct ( )
 	Player = Cast<AHSW_ThirdPersonCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn() );
 	if(Player)ImojiComponent = Player->GetComponentByClass<UHSW_ImojiConponent>();
 #pragma endregion
+    if (singWidget)
+    {
 
+        auto* musicWidget = Cast<USingWidget_KMK> ( CreateWidget ( GetWorld ( ) , singWidget ) );
+        auto* musicWidget1 = Cast<USingWidget_KMK> ( CreateWidget ( GetWorld ( ) , singWidget ) );
+
+        if (musicWidget && musicWidget1)
+        {
+            musicWidget->SetTextMusic ( TEXT ( "뉴진스 - How Sweet" ) );
+            musicWidget1->SetTextMusic ( TEXT ( "뉴진스 - How Sweet" ) );
+
+            if (VB_SingList && VB_SingList1)
+            {
+                VB_SingList->AddChild ( musicWidget );
+                VB_SingList1->AddChild ( musicWidget1 );
+            }
+        }
+    }
 }
 
+
+void UAudience_KMK::NativePreConstruct ( )
+{
+    Super::NativePreConstruct();
+
+
+}
 
 #pragma region PopUp
 

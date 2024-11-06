@@ -29,6 +29,8 @@ class VIRTUALIDOL_API UAudience_KMK : public UUserWidget
 public :
 	virtual void NativeConstruct ( ) override;
 	
+	virtual void NativePreConstruct() override;
+
 	UPROPERTY( )
 	class UVirtualGameInstance_KMK* gi;
 	UPROPERTY( )

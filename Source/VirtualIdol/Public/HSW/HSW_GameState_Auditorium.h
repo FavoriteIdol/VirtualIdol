@@ -31,6 +31,12 @@ public:
 	UFUNCTION(Server, Reliable)
     void ServerRPCChat(const FString& Chat);
 
+	UFUNCTION(NetMulticast, Reliable )
+	void MultiRPCPlaySound(USoundBase* wavFile);
+
+	UFUNCTION(Server, Reliable)
+	void ServerRPCPlaySound( USoundBase* wavFile);
+
 	UFUNCTION(Server, Reliable)
     void ServerRPC_ShowCountDown ();
 
@@ -40,10 +46,27 @@ public:
 	UFUNCTION(NetMulticast, Reliable )
 	void MultiRPC_FeverGauge( float feverValue );
 
+	UFUNCTION(Server, Reliable)
+	void ServerRPC_StopSound ();
+
+	UFUNCTION(NetMulticast, Reliable )
+	void MultiRPC_StopSound( );
+
 	FTimerHandle startCountDownHandle;
 	UPROPERTY(EditAnywhere )
 	float durationTime = 6;
 	float remainTime = 0.f;
 	UPROPERTY()
 	bool bTime = false;
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void ServerRPC_SetInterviewee ( );
+
+	UFUNCTION(NetMulticast, Reliable )
+	void MultiRPC_SetInterviewee( bool bInterview , APlayerState* interviewee , FTransform preLoc );
+
+	bool bIsInterviewing;
+	int32 IntervieweeIndex;
+	class APlayerState* IntervieweePlayerState;
+	FTransform PreLocation;
 };

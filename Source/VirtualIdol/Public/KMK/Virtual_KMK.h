@@ -62,4 +62,19 @@ public:
 	TArray< TSubclassOf<class AActor>> appearFact;
 	UPROPERTY( )
 	float currentGauge = 0;
+
+	UFUNCTION( )
+	void PlayMusic(USoundBase* wavFile);
+
+	UFUNCTION( )
+	void SetInterviewee( bool bInterview, APlayerState* interviewee, FTransform preLoc );
+
+	FTransform StageLocation;
+	FTransform PreLocation;
+
+	void StartVoiceChat ( );
+	void CancleVoiceChat ( );
+
+	UPROPERTY( )
+	class APlayerController* pc;
 };

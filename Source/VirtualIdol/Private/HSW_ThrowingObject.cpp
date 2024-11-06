@@ -36,17 +36,17 @@ AHSW_ThrowingObject::AHSW_ThrowingObject()
 // 		MeshComp->SetMaterial(0, LoadedMaterial.Object);
 // 	}
 
-	static ConstructorHelpers::FObjectFinder<UPhysicalMaterial> LoadedPhysicalMaterial ( TEXT ( "'/Game/Project/Personal/HSW/Blueprints/PM_Ball'" ) );
-
-	if (LoadedPhysicalMaterial.Succeeded ( ))
-	{
-		MeshComp->SetPhysMaterialOverride( LoadedPhysicalMaterial.Object);
-	}
-
-
-	MeshComp->BodyInstance.bNotifyRigidBodyCollision = true;
-	MeshComp->CanCharacterStepUpOn = ECB_No;
-	MeshComp->SetCollisionProfileName(TEXT("BlockAllDynamic" ));
+// 	static ConstructorHelpers::FObjectFinder<UPhysicalMaterial> LoadedPhysicalMaterial ( TEXT ( "'/Game/Project/Personal/HSW/Blueprints/PM_Ball'" ) );
+// 
+// 	if (LoadedPhysicalMaterial.Succeeded ( ))
+// 	{
+// 		MeshComp->SetPhysMaterialOverride ( LoadedPhysicalMaterial.Object );
+// 	}
+// 
+// 
+// 	MeshComp->BodyInstance.bNotifyRigidBodyCollision = true;
+// 	MeshComp->CanCharacterStepUpOn = ECB_No;
+// 	MeshComp->SetCollisionProfileName(TEXT("BlockAllDynamic" ));
 
 }
 
@@ -57,11 +57,11 @@ void AHSW_ThrowingObject::BeginPlay()
 
 	SphereComp->OnComponentBeginOverlap.AddDynamic ( this , &AHSW_ThrowingObject::OnMyObjectBeginverlap );
 
-	GetWorldTimerManager ( ).SetTimer ( TimerHandleDestroy , FTimerDelegate::CreateLambda ( [&]
-		{
-			UE_LOG ( LogTemp , Warning , TEXT ( "TimeOver Destroyed" ) );
-			this->Destroy ( );
-		} ) , 15.f , false );
+// 	GetWorldTimerManager ( ).SetTimer ( TimerHandleDestroy , FTimerDelegate::CreateLambda ( [&]
+// 		{
+// 			UE_LOG ( LogTemp , Warning , TEXT ( "TimeOver Destroyed" ) );
+// 			this->Destroy ( );
+// 		} ) , 15.f , false );
 }
 
 // Called every frame
@@ -90,9 +90,9 @@ void AHSW_ThrowingObject::DestroyObject ( )
 
 void AHSW_ThrowingObject::OnMyObjectBeginverlap ( UPrimitiveComponent* OverlappedComponent , AActor* OtherActor , UPrimitiveComponent* OtherComp , int32 OtherBodyIndex , bool bFromSweep , const FHitResult& SweepResult )
 {
-	if (!( OtherActor->IsA<AHSW_ThrowingObject> ( ) )) 
-	{
-		UE_LOG(LogTemp, Warning, TEXT("%s" ), *OtherActor->GetName() );
-		DestroyObject( );
-	}
+// 	if (!( OtherActor->IsA<AHSW_ThrowingObject> ( ) )) 
+// 	{
+// 		UE_LOG(LogTemp, Warning, TEXT("%s" ), *OtherActor->GetName() );
+// 		DestroyObject( );
+// 	}
 }

@@ -37,9 +37,8 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "Materials/MaterialInstance.h"
 #include "KMK/Virtual_KMK.h"
-#include "Components/AudioComponent.h"
-#include "Misc/FileHelper.h"
 #include "KMK/AudienceServerComponent_KMK.h"
+#include "Components/AudioComponent.h"
 
 // Sets default values
 AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
@@ -207,7 +206,7 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 
 	if (HasAuthority ( ))
 	{
-		StartVoiceChat( );
+		//StartVoiceChat( );
 	}
 	else
 	{
@@ -254,20 +253,6 @@ void AHSW_ThirdPersonCharacter::Tick(float DeltaTime)
 	}
 }
 
-void AHSW_ThirdPersonCharacter::ClientPlayMusic_Implementation ( class UAudioComponent* selectedMusic )
-{
-	//	UGameplayStatics::PlaySound2D(this, Music );
-	if (selectedMusic)
-	{
-		selectedMusic->Play ( );
-		UE_LOG ( LogTemp , Warning , TEXT ( "Music Play" ) );
-	}
-	else
-	{
-		UE_LOG ( LogTemp , Warning , TEXT ( "not Music" ) );
-	}
-}
-
 void AHSW_ThirdPersonCharacter::OnRep_FeverGauge ( )
 {
 
@@ -309,6 +294,39 @@ void AHSW_ThirdPersonCharacter::SetFeverGaugeMulti ( float feverValue )
 		}
 	}
 
+}
+
+void AHSW_ThirdPersonCharacter::SetInterviewee ( bool bInterview, APlayerState* interviewee , FTransform preLoc )
+{
+	if (bInterview)
+	{
+		//intervieweePlayer->CameraBoom->TargetArmLength = 0;
+		interviewee->GetPawn ( )->SetActorTransform ( StageLocation );
+		interviewee->GetPawn ( )->SetActorScale3D(FVector(3.0));
+		
+		if (APawn* pawn = interviewee->GetPawn ( ))
+		{
+			if (AHSW_ThirdPersonCharacter* Character = Cast<AHSW_ThirdPersonCharacter> ( pawn ))
+			{
+				Character->StartVoiceChat();
+			}
+		}
+		//AHSW_ThirdPersonCharacter* localPlayer = Cast<AHSW_ThirdPersonCharacter> ( interviewee->GetPawn ( ) );
+
+		//DrawDebugString ( GetWorld ( ) , interviewee->GetPawn ( )->GetActorLocation ( ) + FVector ( 0 , 0 , 90 ) , TEXT ( "Interviewee~" ) , nullptr , FColor::Red , 5 , true , 1 );
+	}
+	else
+	{
+		interviewee->GetPawn ( )->SetActorTransform ( preLoc );
+		interviewee->GetPawn ( )->SetActorScale3D ( FVector ( 2.0 ) );
+		if (APawn* pawn = interviewee->GetPawn ( ))
+		{
+			if (AHSW_ThirdPersonCharacter* Character = Cast<AHSW_ThirdPersonCharacter> ( pawn ))
+			{
+				Character->CancleVoiceChat ( );
+			}
+		}
+	}
 }
 
 // void AHSW_ThirdPersonCharacter::InitMainUI ( )
@@ -457,6 +475,7 @@ UMaterialInstanceDynamic* AHSW_ThirdPersonCharacter::ChangeMyMeshMat (int32 num 
 	return FeverDynamicMat;
 }
 
+
 // Imoji ==============================================================================================
 
 void AHSW_ThirdPersonCharacter::Imoji ( int index )
@@ -490,6 +509,30 @@ void AHSW_ThirdPersonCharacter::CancleVoiceChat ( )
 	pc->StopTalking( );
 }
 
+void AHSW_ThirdPersonCharacter::ServerRPCPlayMusic_Implementation ( )
+{
+	MulticastRPCPlayMusic( );
+}
+
+void AHSW_ThirdPersonCharacter::MulticastRPCPlayMusic_Implementation ( )
+{
+	USoundBase* wavFile = WavArray[0];
+	UAudioComponent* AudioComponent = NewObject<UAudioComponent> ( this );
+	AudioComponent->SetSound ( wavFile );
+	AudioComponent->RegisterComponent ( );
+	AudioComponent->Play ( );  // 음원 재생
+}
+
+void AHSW_ThirdPersonCharacter::PlayMusic ( USoundBase* wavFile )
+{
+
+	UE_LOG ( LogTemp , Warning , TEXT ("Client : Play Music" ) );
+	UAudioComponent* AudioComponent = NewObject<UAudioComponent> ( this );
+	AudioComponent->SetSound ( wavFile );
+	AudioComponent->RegisterComponent ( );
+	AudioComponent->Play ( );  // 음원 재생
+}
+
 void AHSW_ThirdPersonCharacter::AppearImoji (  )
 {
 	//UNiagaraComponent* AppearEffect = UNiagaraFunctionLibrary::SpawnSystemAtLocation ( GetWorld ( ) , EmojiEffect , ImojiComp->GetComponentLocation ( ) );
@@ -511,7 +554,7 @@ void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value 
 	if (!HasAuthority ( ) && IsLocallyControlled())
 	{
 		PersonalGauge++;
-		ServerRPCFeverGauge (CurrentGauge, 100*0.02);
+		ServerRPCFeverGauge (CurrentGauge, 5*0.02);
 		PrintFeverGaugeLogOnHead ( );
 
 		//MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
@@ -538,7 +581,7 @@ void AHSW_ThirdPersonCharacter::ServerRPCFeverGauge_Implementation ( float fever
 		}
 	}
 
-	if (FeverBright <= 100)
+	if (FeverBright <= 5)
 	{
 		FeverBright += brightValue;
 		MulticastRPCBrightness(1 );
@@ -560,6 +603,18 @@ void AHSW_ThirdPersonCharacter::MulticastRPCBrightness_Implementation ( int inde
 	FeverDynamicMat->SetScalarParameterValue ( TEXT ( "jswEmissivePower-A" ) , FeverBright );
 }
 
+void AHSW_ThirdPersonCharacter::ServerFeverReset_Implementation ( )
+{
+	FeverBright = 0;
+	MulticastFeverReset( );
+	SetFeverGaugeMulti(0 );
+}
+
+void AHSW_ThirdPersonCharacter::MulticastFeverReset_Implementation ( )
+{
+	
+	FeverDynamicMat->SetScalarParameterValue ( TEXT ( "jswEmissivePower-A" ) , 1 );
+}
 void AHSW_ThirdPersonCharacter::PossessedBy ( AController* NewController )
 {
 	Super::PossessedBy ( NewController );
@@ -609,6 +664,7 @@ void AHSW_ThirdPersonCharacter::MulticastFeverEffect_Implementation ( )
 // 	DamagedEffect->SetAutoDestroy ( true );
 
 	FeverEffect_Actor = GetWorld ( )->SpawnActor<AActor> ( FeverEffectFactory , FeverEffectLocation );
+	
 }
 
 // 인터뷰 =================================================================================================
@@ -625,17 +681,26 @@ void AHSW_ThirdPersonCharacter::ServerRPCInterview_Implementation (  )
 	bIsInterviewing = !bIsInterviewing;
 
 	PlayerStates = GetWorld()->GetGameState()->PlayerArray;
-	if (PlayerStates.Num ( ) > 0 && bIsInterviewing)
+	if (PlayerStates.Num ( ) > 0)
 	{
+		if (bIsInterviewing)
+		{
 		IntervieweeIndex = FMath::RandRange ( 1 , PlayerStates.Num ( ) - 1 );
 		IntervieweePlayerState = PlayerStates[IntervieweeIndex];
 
 		PreLocation = IntervieweePlayerState->GetPawn ( )->GetActorTransform ( );
-
+		}
 	}
 	else
 	{
-		UE_LOG ( LogTemp , Warning , TEXT ( "플레이어가 없습니다." ) );
+		if(IsLocallyControlled())
+		{
+			UE_LOG ( LogTemp , Warning , TEXT ( "Local: 플레이어가 없습니다." ) );
+		}
+		else 
+		{
+			UE_LOG ( LogTemp , Warning , TEXT ( "Not Local: 플레이어가 없습니다." ) );
+		}
 	}
 
 	MulticastRPCInterview(  );
@@ -647,7 +712,7 @@ void AHSW_ThirdPersonCharacter::MulticastRPCInterview_Implementation ( )
 	{
 		UE_LOG ( LogTemp , Warning , TEXT ( "Interview is in progress." ) );
 		// 멀티캐스트 확인용 임시로 사용할 쉐이크바뤼
-		//ShakeBodyBlueprint ( );
+		ShakeBodyBlueprint ( );
 	}
 	else
 	{
@@ -801,3 +866,16 @@ void AHSW_ThirdPersonCharacter::SetChatWidget ( const FString& text )
 }
 
 #pragma endregion
+void AHSW_ThirdPersonCharacter::ClientPlayMusic_Implementation ( class UAudioComponent* selectedMusic )
+{
+	//	UGameplayStatics::PlaySound2D(this, Music );
+	if (selectedMusic)
+	{
+		selectedMusic->Play ( );
+		UE_LOG ( LogTemp , Warning , TEXT ( "Music Play" ) );
+	}
+	else
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "not Music" ) );
+	}
+}

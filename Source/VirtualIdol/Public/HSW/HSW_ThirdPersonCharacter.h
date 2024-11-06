@@ -153,10 +153,19 @@ public:
 	TArray<UMaterialInstance*> FeverCharactMat;
 
 	UPROPERTY( EditAnywhere , BlueprintReadWrite , Category = FeverGauge )
+	TArray< UMaterialInstanceDynamic*> FeverDynamicMats;
+
+	UPROPERTY( )
 	UMaterialInstanceDynamic* FeverDynamicMat;
 
     UFUNCTION ( )
     UMaterialInstanceDynamic* ChangeMyMeshMat ( int32 num = 0 );
+
+	UFUNCTION(Server, Reliable, BlueprintCallable )
+	void ServerFeverReset( );
+
+	UFUNCTION(NetMulticast, Reliable )
+	void MulticastFeverReset( );
 
 	// MainWidget을 생성해서 기억하고싶다.
 // 	UPROPERTY(EditDefaultsOnly, Category = MainUI)
@@ -246,6 +255,17 @@ public:
 	UPROPERTY(Replicated, EditDefaultsOnly,BlueprintReadWrite )
 	FTransform PreLocation;
 
+	UFUNCTION(BlueprintImplementableEvent, Category= Interview )
+	void MICSettingBlueprint( );
+
+	UFUNCTION(BlueprintImplementableEvent, Category= Interview )
+	void MICOnBlueprint( );
+
+	UFUNCTION(BlueprintImplementableEvent, Category= Interview )
+	void MICOffBlueprint( );
+
+	UFUNCTION( )
+	void SetInterviewee( bool bInterview, APlayerState* interviewee, FTransform preLoc );
 	// 멀티플레이 --------------------------------------
 
 	virtual void GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
@@ -287,6 +307,17 @@ public:
 
 	void StartVoiceChat( );
 	void CancleVoiceChat ( );
+
+	UFUNCTION(Server, Reliable )
+	void ServerRPCPlayMusic(  );
+
+	UFUNCTION(NetMulticast, Reliable )
+	void MulticastRPCPlayMusic ( );
+
+	UFUNCTION( )
+	void PlayMusic(USoundBase* wavFile);
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TArray<class USoundBase* > WavArray;
 
 
 #pragma region KMK

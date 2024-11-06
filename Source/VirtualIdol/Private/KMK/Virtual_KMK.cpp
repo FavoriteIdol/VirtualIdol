@@ -5,6 +5,12 @@
 #include "chrono"
 #include "KMK/Audience_KMK.h"
 #include "HSW/HSW_GameState_Auditorium.h"
+#include "Sound/SoundBase.h"
+#include "Components/AudioComponent.h"
+#include "GameFramework/PlayerState.h"
+#include "Engine/StaticMeshActor.h"
+#include "EngineUtils.h"
+#include "HSW/HSW_ThirdPersonCharacter.h"
 
 // Sets default values for this component's properties
 UVirtual_KMK::UVirtual_KMK()
@@ -23,6 +29,27 @@ void UVirtual_KMK::BeginPlay()
 	Super::BeginPlay();
 	meshComp = GetOwner()->FindComponentByTag<USkeletalMeshComponent>(FName(TEXT("Mesh")));
 
+	FName tag = TEXT ( "InterviewLocation" );
+	for (TActorIterator<AActor> It ( GetWorld ( ) , AStaticMeshActor::StaticClass ( ) ); It; ++It)
+	{
+		AActor* Actor = *It;
+		if (IsValid ( Actor ) && Actor->ActorHasTag ( tag ))
+		{
+			StageLocation = Actor->GetTransform ( );
+		}
+	}
+
+	pc = GetWorld ( )->GetFirstPlayerController ( );
+
+	if (pc)
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "name: %s" ) , *( GetName ( ) ) );
+		StartVoiceChat( );
+	}
+	else
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "PC none" ) );
+	}
 }
 
 
@@ -152,6 +179,58 @@ void UVirtual_KMK::StartCountDown ( )
 			if(appearFact.Num() > 0) GetWorld ( )->SpawnActor<AActor> ( appearFact[0] , FTransform ( FVector ( 0 ) ) );
         } ) , 6 , false );
 
+}
+
+void UVirtual_KMK::PlayMusic ( USoundBase* wavFile )
+{
+	UE_LOG ( LogTemp , Warning , TEXT ( "Virtual : Play Music" ) );
+	UAudioComponent* AudioComponent = NewObject<UAudioComponent> ( this );
+	AudioComponent->SetSound ( wavFile );
+	AudioComponent->RegisterComponent ( );
+	AudioComponent->Play ( );  // 음원 재생
+}
+
+void UVirtual_KMK::SetInterviewee ( bool bInterview , APlayerState* interviewee, FTransform preLoc )
+{
+	if (bInterview)
+	{
+		//intervieweePlayer->CameraBoom->TargetArmLength = 0;
+		interviewee->GetPawn ( )->SetActorTransform ( StageLocation );
+		interviewee->GetPawn ( )->SetActorScale3D ( FVector ( 5.0 ) );
+
+		if (APawn* pawn = interviewee->GetPawn ( ))
+		{
+			if (AHSW_ThirdPersonCharacter* Character = Cast<AHSW_ThirdPersonCharacter> ( pawn ))
+			{
+				UE_LOG ( LogTemp , Warning , TEXT ( "character name: %s" ) , *( Character->GetName() ) );
+				Character->StartVoiceChat ( );
+			}
+		}
+	}
+	else
+	{
+		interviewee->GetPawn ( )->SetActorTransform ( preLoc );
+		interviewee->GetPawn ( )->SetActorScale3D ( FVector ( 2.0 ) );
+
+		if (APawn* pawn = interviewee->GetPawn ( ))
+		{
+			if (AHSW_ThirdPersonCharacter* Character = Cast<AHSW_ThirdPersonCharacter> ( pawn ))
+			{
+				UE_LOG ( LogTemp , Warning , TEXT ( "character name: %s" ) , *( Character->GetName ( ) ) );
+				Character->CancleVoiceChat ( );
+			}
+		}
+	}
+}
+
+void UVirtual_KMK::StartVoiceChat ( )
+{
+	pc->StartTalking ( );
+}
+
+void UVirtual_KMK::CancleVoiceChat ( )
+{
+	pc->StopTalking( );
 }
 
 #pragma endregion

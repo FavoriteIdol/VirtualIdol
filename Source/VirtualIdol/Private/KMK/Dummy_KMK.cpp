@@ -58,7 +58,7 @@ void ADummy_KMK::Tick ( float DeltaTime )
 		ImojiFucn ( DeltaTime );
 		break;
 	case DummyState::Fever:
-		if (HasAuthority ( )) ServerRPC_Shake ( 0.1 );
+		if (HasAuthority ( )) ServerRPC_Shake ( 0.03 );
 		break;
 	}
 

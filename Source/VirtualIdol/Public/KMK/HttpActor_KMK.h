@@ -73,17 +73,17 @@ struct FStageInfo
 	GENERATED_BODY( )
 
 	UPROPERTY(BlueprintReadOnly)
-	FString name;
+	FString name= TEXT("");
 	UPROPERTY(BlueprintReadOnly)
-	int32 terrain;
+	int32 terrain = -1;
 	UPROPERTY(BlueprintReadOnly)
-	int32 sky;
+	int32 sky = -1;
 	UPROPERTY(BlueprintReadOnly)
-	int32 theme;
+	int32 theme = -1;
 	UPROPERTY(BlueprintReadOnly)
-	int32 specialEffect;
+	int32 specialEffect = -1;
 	UPROPERTY(BlueprintReadOnly)
-	FString img;
+	FString img= TEXT("");
 
 };
 
@@ -103,9 +103,11 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
 #pragma region with BE for Login
 	UPROPERTY( )
 	class UVirtualGameInstance_KMK* gi;
+
 	UPROPERTY( )
 	struct FLoginInfo loginInfo;
 	TMap<FString, FString> myInfo;
@@ -122,6 +124,8 @@ public:
 	void OnResSetConcert( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
 #pragma endregion
 #pragma region with Ai for Ticket
+	// 티켓 정보 저장
+	TMap<FString , FString> ticketData;
 	// 요청
 	void ReqTicket( const TMap<FString , FString> data);
 	// 응답
@@ -129,6 +133,20 @@ public:
 	
 	void OnTextureCreated(UTexture2D* texture );
 #pragma endregion
+#pragma region BE CheckAll Stage
+	// 요청
+	void ReqCheckStage(class UStartWidget_KMK* startWidget );
+	// 응답 
+	void OnResCheckStage( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
+	// 내 무대인지 확인
+	TArray<struct FStageInfo> myStageInfoArray;
+	// 전체 무대
+	TArray<struct FStageInfo> allStageInfoArray;
+	
+	UPROPERTY( )
+	class UStartWidget_KMK* sw;
+#pragma endregion
+
 #pragma region with Ai for Text
 
 #pragma endregion

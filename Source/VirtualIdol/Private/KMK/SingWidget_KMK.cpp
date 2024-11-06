@@ -8,6 +8,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/AudioComponent.h"
 #include "HSW/HSW_AuditoriumGameMode.h"
+#include "HSW/HSW_ThirdPersonCharacter.h"
+#include "HSW/HSW_GameState_Auditorium.h"
 
 void USingWidget_KMK::NativeConstruct ( )
 {
@@ -20,6 +22,7 @@ void USingWidget_KMK::NativeConstruct ( )
     }
 
     gm = Cast<AHSW_AuditoriumGameMode>(GetWorld()->GetAuthGameMode());
+    pc = Cast<AHSW_ThirdPersonCharacter>(GetOwningPlayer());
 }
 
 void USingWidget_KMK::PressStopButt ( )
@@ -30,15 +33,23 @@ void USingWidget_KMK::PressStopButt ( )
 }
 
 void USingWidget_KMK::PressStartButt ( )
-{
-    if(sound == nullptr) return;
+{   
+
+    //if(sound == nullptr) return;
     if(bStop) 
     {
         sound = preSound;
         bStop = false;
     }
-    //gm->ServerPlayMusic( SoundFile );
-    sound->SetPaused(false);
+    //sound->SetPaused(false);
+    AHSW_GameState_Auditorium* gs = GetWorld ( )->GetGameState<AHSW_GameState_Auditorium> ( );
+
+    if (gs)
+    {
+        gs->ServerRPCPlaySound( WavArray[0] );
+    }
+   
+
 }
 
 void USingWidget_KMK::PressPauseButt ( )
