@@ -33,10 +33,10 @@ public:
 #pragma region Chatting
 	// 서버에게 채팅 요청
 	UFUNCTION(Server, Reliable )
-	void ServerRPCChat(const FString& chat);
+	void ServerRPCChat(const FString& nickName, const FString& chat);
 	// 채팅 업데이트
 	UFUNCTION(NetMulticast, Reliable )
-	void MultiRPCChat ( const FString& chat );
+	void MultiRPCChat (const FString& nickName, const FString& chat );
 #pragma endregion
 
 #pragma region ChangeMyMesh

@@ -140,21 +140,21 @@ void UAudienceServerComponent_KMK::TickComponent(float DeltaTime, ELevelTick Tic
 	}
 }
 #pragma region Chat
-void UAudienceServerComponent_KMK::ServerRPCChat_Implementation ( const FString& chat )
+void UAudienceServerComponent_KMK::ServerRPCChat_Implementation (const FString& nickName, const FString& chat )
 {
 	 AHSW_GameState_Auditorium* gs = GetWorld()->GetGameState<AHSW_GameState_Auditorium>();
     if ( gs)
     {
-         gs->MultiRPCChat(chat);  // GameMode로 메시지 전달
+         gs->MultiRPCChat(nickName, chat);  // GameMode로 메시지 전달
     }
 }
 
-void UAudienceServerComponent_KMK::MultiRPCChat_Implementation ( const FString& chat )
+void UAudienceServerComponent_KMK::MultiRPCChat_Implementation (const FString& nickName, const FString& chat )
 {
 	auto* p = Cast<AHSW_ThirdPersonCharacter> ( GetWorld ( )->GetFirstPlayerController ( )->GetPawn ( ) );
 	if (p->audienceWidget)
 	{
-		p->audienceWidget->CreateChatWidget(chat );
+		p->audienceWidget->CreateChatWidget(nickName, chat );
 	}
 
 }

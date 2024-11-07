@@ -860,9 +860,9 @@ void AHSW_ThirdPersonCharacter::InitializeAudienceWidget ( TSubclassOf<class UAu
 	//}
 }
 
-void AHSW_ThirdPersonCharacter::SetChatWidget ( const FString& text )
+void AHSW_ThirdPersonCharacter::SetChatWidget (const FString& nickName, const FString& text )
 {
-	if(audienceWidget)audienceWidget->CreateChatWidget(text);
+	if(audienceWidget)audienceWidget->CreateChatWidget(nickName, text);
 }
 
 #pragma endregion

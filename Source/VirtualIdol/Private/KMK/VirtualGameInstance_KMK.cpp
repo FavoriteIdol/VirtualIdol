@@ -47,6 +47,29 @@ void UVirtualGameInstance_KMK::Init ( )
 
 void UVirtualGameInstance_KMK::CreateMySession ( FString RoomName, int32 PlayerCount )
 {
+    // IOnlineSubsystem을 통해 세션 인터페이스 가져오기
+    IOnlineSubsystem* subSystem = IOnlineSubsystem::Get();
+    if (!subSystem)
+    {
+        UE_LOG(LogTemp, Error, TEXT("OnlineSubsystem is null. Make sure your Online Subsystem plugin is enabled in the project settings."));
+        return;
+    }
+
+    sessionInterface = subSystem->GetSessionInterface();
+    if (!sessionInterface.IsValid())
+    {
+        UE_LOG(LogTemp, Error, TEXT("Session interface is null. Unable to create session."));
+        return;
+    }
+
+    // NetID 가져오기
+    FUniqueNetIdPtr NetID = GetWorld()->GetFirstLocalPlayerFromController()->GetUniqueNetIdForPlatformUser().GetUniqueNetId();
+    if (!NetID.IsValid())
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to retrieve a valid UniqueNetId for the local player."));
+        return;
+    }
+
     FOnlineSessionSettings settings;
     // 전용서버를 사용하는가? => 데디케이트 서버
     settings.bIsDedicated = false;
@@ -70,7 +93,7 @@ void UVirtualGameInstance_KMK::CreateMySession ( FString RoomName, int32 PlayerC
     // FUniqueNetId
     // GetUniqueNetIdForPlatformUser():스팀에서 사용하는 고유 번호
     // 현재 컨트롤러의 첫번째 로컬 플레이어의 고유한 네트워크 ID 가져옴
-    FUniqueNetIdPtr NetID = GetWorld()->GetFirstLocalPlayerFromController()->GetUniqueNetIdForPlatformUser().GetUniqueNetId();
+   // FUniqueNetIdPtr NetID = GetWorld()->GetFirstLocalPlayerFromController()->GetUniqueNetIdForPlatformUser().GetUniqueNetId();
 
     sessionInterface->CreateSession( *NetID, FName(*HostName) , settings);
     
@@ -146,6 +169,7 @@ void UVirtualGameInstance_KMK::OnMyFindSessionComplete ( bool bSuccessful )
                 if (concert.userName == roomInfo.hostName)
                 {
                     roomInfo.roomName = concert.name;
+                    concerInfo = concert;
                 }
             }
             // 최대 플레이어 수
@@ -314,7 +338,7 @@ void UVirtualGameInstance_KMK::SetConcertInfo ( const struct FConcertInfo& info 
     int32 day = currentDataTime.GetDay();
 
     // FString start = FString::FromInt(year) + TEXT("-") + ChangeString(FString::FromInt(mon))+ TEXT("-") +ChangeString( FString::FromInt(day));
-    FString start = TEXT("2024-11-06" );
+    FString start = TEXT("2024-11-07" );
     if (concerInfo.concertDate == start)
     {
         widget->SetButtEnable(true);

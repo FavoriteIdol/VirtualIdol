@@ -157,7 +157,7 @@ public :
 
 	// 기타 함수
 	UFUNCTION( )
-	void CreateChatWidget(const FString& chatText );
+	void CreateChatWidget(const FString& nickname, const FString& chatText );
 
 	UPROPERTY(EditDefaultsOnly )
 	TSubclassOf<class USendChat_KMK> chatWidgetFact;

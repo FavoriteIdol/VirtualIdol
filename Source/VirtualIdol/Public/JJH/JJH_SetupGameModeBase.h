@@ -15,5 +15,5 @@ class VIRTUALIDOL_API AJJH_SetupGameModeBase : public AGameModeBase
 	GENERATED_BODY()
 public:
 	UFUNCTION(Server, Reliable)
-    void ServerRPCChat(const FString& Chat);
+    void ServerRPCChat(const FString& nickName,const FString& Chat);
 };

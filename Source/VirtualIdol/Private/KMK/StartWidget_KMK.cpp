@@ -468,6 +468,7 @@ void UStartWidget_KMK::PressCreateTicket ( )
 	FString concertString = TEXT("공연 명 : ") + EditText_StageName->GetText ( ).ToString ( ) + TEXT ( "\n" ) 
 						TEXT("공연 날짜 : " ) + year + TEXT ( "년" )+ mon + TEXT("월") + day + TEXT("일") + TEXT("\n") + TEXT("공연 시간 : " ) + sH +TEXT("시") + sM +TEXT("분");
 	data.Add(TEXT("description"), *concertString);
+	// 티켓 만들기
 	httpActor->ReqTicket(data);
 	// EditMultiText_Ticket->SetText ( FText::GetEmpty ( ) );
 }
@@ -676,6 +677,7 @@ void UStartWidget_KMK::PressYesButt ( )
 {
 	if (gi && gi->roomNum >= 0)
 	{
+		httpActor->ReqCheckIdStage(gi->GetConcertInfo().stageId );
 		
 		if (TEXT_VIP->GetText ( ).ToString ( ).Contains ( TEXT ( "VIP" ) ))
         {

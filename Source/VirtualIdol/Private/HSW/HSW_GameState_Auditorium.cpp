@@ -16,7 +16,7 @@
 //	// PlayerList = PlayerArray;
 //}
 
-void AHSW_GameState_Auditorium::MultiRPCChat_Implementation ( const FString& chat )
+void AHSW_GameState_Auditorium::MultiRPCChat_Implementation (const FString& nickName, const FString& chat )
 {
  // 각 클라이언트의 위젯에 메시지 전달
     for (APlayerState* PlayerState : PlayerArray)
@@ -29,7 +29,7 @@ void AHSW_GameState_Auditorium::MultiRPCChat_Implementation ( const FString& cha
                 UAudience_KMK* MyWidget = Cast<UAudience_KMK>(Character->audienceWidget);
                 if (MyWidget)
                 {
-                    MyWidget->CreateChatWidget(chat);
+                    MyWidget->CreateChatWidget(nickName, chat);
                 }
             }
         }
@@ -38,18 +38,18 @@ void AHSW_GameState_Auditorium::MultiRPCChat_Implementation ( const FString& cha
             UVirtual_KMK* Vir = Pawn->FindComponentByClass<UVirtual_KMK>();
             if (Vir && Pawn->IsLocallyControlled())
             {
-                Vir->SetVirtualChat(chat);
+                Vir->SetVirtualChat(nickName, chat);
             }
         }
     }
 }
 
-void AHSW_GameState_Auditorium::ServerRPCChat_Implementation ( const FString& Chat )
+void AHSW_GameState_Auditorium::ServerRPCChat_Implementation (const FString& nickName, const FString& Chat )
 {
      AHSW_AuditoriumGameMode* gm = GetWorld()->GetAuthGameMode<AHSW_AuditoriumGameMode>();
     if (gm)
     {
-        gm->BroadcastChatMessage(Chat);  // GameMode에 메시지 전달
+        gm->BroadcastChatMessage(nickName, Chat);  // GameMode에 메시지 전달
     }
 }
 
