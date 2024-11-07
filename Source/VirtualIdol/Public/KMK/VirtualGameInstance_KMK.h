@@ -49,11 +49,14 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 	IOnlineSessionPtr sessionInterface;
 
 	// 호스트 이름은 서버에서 닉네임 받아올 예정
-	FString HostName = TEXT("미호짱");
+	FString HostName;
 
 	UPROPERTY( )
 	bool bLogin = false;
-
+	UPROPERTY(BlueprintReadWrite )
+	bool bPressSession = false;
+	UPROPERTY(BlueprintReadWrite )
+	bool bPressStage = false;
 	void CreateMySession(FString RoomName, int32 PlayerCount);
 
 	void OnMyCreateSessionComplete(FName SessionName, bool bSuccessful);
@@ -123,7 +126,9 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 	FConcertInfo concerInfo;
 	UFUNCTION( )
 	void SetConcertInfo( const struct FConcertInfo& info );
-	
+	FString ChangeString ( const FString& editText );
+	UFUNCTION (BlueprintCallable)
+	FConcertInfo GetConcertInfo(  );
 #pragma endregion
 #pragma region Chat
 
@@ -139,4 +144,52 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 
 	UFUNCTION ( BlueprintCallable )
 	void SendMulticastMessage ( );
+
+	// StageInfo를 저장할 멤버 변수
+	UPROPERTY()
+	int32 roomNum = 0;
+	UPROPERTY()
+	FStageInfo myStageInfo;
+	UPROPERTY( )
+	int32 stageNum = 0;
+	UPROPERTY()
+	FRoomInfo mySessionInfo;
+	
+	UFUNCTION (BlueprintCallable)
+	void OnJoinSessionButt(  );
+	UFUNCTION(BlueprintCallable)
+	void OnSetStageButt(  );
+		
+	UPROPERTY( )
+	class AJJH_SelectManager* sm;
+
+	UPROPERTY( )
+	class URoomWidget_KMK* roomWidget;
+	UPROPERTY( )
+	class URoomWidget_KMK* sessionWidget;
+
+	UPROPERTY(EditAnywhere, Category = Cash )
+	int32 myCash = 50000;
+
+	UFUNCTION( )
+	void SetMyProfile( );
+
+	UFUNCTION( )
+	void ChangeTextureWidget(UTexture2D* texture );
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<TSubclassOf<AActor>>effectArray;
+	
+	UPROPERTY( )
+	FStageInfo concertStageInfo;
+
+	UFUNCTION( )
+	void SetConcertStageInfo(FStageInfo& info );
+
+	UFUNCTION( )
+	FStageInfo GetConcertStageInfo( );
+
+	UPROPERTY( )
+	TArray<struct FConcertInfo> allConcertInfoArray;
+
 };

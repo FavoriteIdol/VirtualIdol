@@ -270,7 +270,6 @@ void AJJH_SelectManager::SaveImage ( UTextureRenderTarget2D* RenderTarget2 )
 
 void AJJH_SelectManager::CreateStage ( const struct FStageInfo& info )
 {
-	DeleteStage();
 	GetWorld()->SpawnActor<AActor>(SkyFactory[info.sky], GetActorTransform ( ) );
 	if (info.theme == 1)
 	{
@@ -284,12 +283,6 @@ void AJJH_SelectManager::CreateStage ( const struct FStageInfo& info )
 	}
 	else
 	{
-		UGameplayStatics::UnloadStreamLevel(
-		GetWorld ( ) ,
-		FName ( "LV_Island_JSW" ) ,
-		FLatentActionInfo ( ),	
-		true   // Should block on load
-		);
 		GetWorld ( )->SpawnActor<AActor> ( ThemeFactory[info.theme] , GetActorTransform ( ) );
 	}
 	GetWorld ( )->SpawnActor<AActor> (FloorFactory[info.terrain] , GetActorTransform ( ) );
@@ -304,7 +297,14 @@ void AJJH_SelectManager::DeleteStage ( )
 	for (int i = 0; i < tagName.Num ( ); i++)
 	{
 		FindActorAndDestroy(tagName[i] );
+
 	}
+	UGameplayStatics::UnloadStreamLevel(
+		GetWorld ( ) ,
+		FName ( "LV_Island_JSW" ) ,
+		FLatentActionInfo ( ),	
+		true   // Should block on load
+		);
 }
 
 #pragma endregion 
