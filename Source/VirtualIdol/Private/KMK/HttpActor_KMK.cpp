@@ -397,6 +397,49 @@ void AHttpActor_KMK::OnResqCheckMyConcert ( FHttpRequestPtr Request , FHttpRespo
 		UE_LOG ( LogTemp , Warning , TEXT ( "Failed myStage" ) );
 	}
 }
+void AHttpActor_KMK::ReqCheckAllOpenConcert ( )
+{
+	// HTTP 모듈 생성
+	FHttpModule& httpModule = FHttpModule::Get ( );
+	TSharedRef<IHttpRequest> req = httpModule.CreateRequest ( );
+	// 요청할 정보를 설정
+	FString AuthHeader = FString::Printf ( TEXT ( "Bearer %s" ) , *gi->loginInfo.token );
+	req->SetHeader ( TEXT ( "Authorization" ) , AuthHeader );
+	req->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+	req->SetURL(TEXT("http://master-of-prediction.shop:8123/api/v1/concerts" ) );
+	req->SetVerb ( TEXT ( "GET" ) );
+
+	req->ProcessRequest ( );
+	// 응답받을 함수를 연결
+	req->OnProcessRequestComplete ( ).BindUObject ( this , &AHttpActor_KMK::OnResCheckAllOpenConcert );
+}
+
+void AHttpActor_KMK::OnResCheckAllOpenConcert ( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully )
+{
+if (bConnectedSuccessfully)
+	{
+		// 성공
+		FString respon = Response->GetContentAsString();
+		if (Response.IsValid() && Response->GetResponseCode() == 200)
+		{
+			allConcertInfoArray = UJsonParseLib_KMK::ParsecAllConcert(respon);
+			if (allConcertInfoArray.Num ( ) > 0)
+			{
+				gi->allConcertInfoArray = allConcertInfoArray;
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Failed to download image. Response code: %d"), Response->GetResponseCode());
+		}
+		
+	}
+	else
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "Failed myStage" ) );
+	}
+}
+
 void AHttpActor_KMK::ReqCheckIdStage ( int32 num )
 {
 	// HTTP 모듈 생성

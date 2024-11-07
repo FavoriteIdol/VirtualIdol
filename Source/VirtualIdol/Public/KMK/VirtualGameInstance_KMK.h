@@ -127,7 +127,7 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 	UFUNCTION( )
 	void SetConcertInfo( const struct FConcertInfo& info );
 	FString ChangeString ( const FString& editText );
-	UFUNCTION ( )
+	UFUNCTION (BlueprintCallable)
 	FConcertInfo GetConcertInfo(  );
 #pragma endregion
 #pragma region Chat
@@ -188,4 +188,8 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 
 	UFUNCTION( )
 	FStageInfo GetConcertStageInfo( );
+
+	UPROPERTY( )
+	TArray<struct FConcertInfo> allConcertInfoArray;
+
 };

@@ -588,6 +588,12 @@ bool UAudience_KMK::OpenFileExample(TArray<FString>& FileNames, FString Dialogue
    }
    return bOpened;
 }
+
+void UAudience_KMK::SetConcertName ( const FString& text )
+{
+    if(TEXT_ConcertName) TEXT_ConcertName->SetText(FText::FromString(text));
+}
+
 // 오디오 파일을 불러와 USoundWave로 변환
 USoundWaveProcedural* UAudience_KMK::LoadWavFromFile(const FString& FilePath)
 {

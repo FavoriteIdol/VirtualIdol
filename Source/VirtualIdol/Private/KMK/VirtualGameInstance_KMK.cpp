@@ -136,10 +136,18 @@ void UVirtualGameInstance_KMK::OnMyFindSessionComplete ( bool bSuccessful )
             FString room;
             result.Session.SessionSettings.Get(FName("ROOM_NAME" ), room );
             roomInfo.roomName = StringBase64Decode(room);
+
             // 호스트 이름
             FString host;
             result.Session.SessionSettings.Get(FName("HOST_NAME" ), host );
             roomInfo.hostName = StringBase64Decode(host);
+            for (auto& concert : allConcertInfoArray)
+            {
+                if (concert.userName == roomInfo.hostName)
+                {
+                    roomInfo.roomName = concert.name;
+                }
+            }
             // 최대 플레이어 수
             roomInfo.MaxPlayer = result.Session.SessionSettings.NumPublicConnections;
             // 핑정보
@@ -147,7 +155,7 @@ void UVirtualGameInstance_KMK::OnMyFindSessionComplete ( bool bSuccessful )
             if (OnSearchSignatureCompleteDelegate.IsBound ( ))
             {
                 OnSearchSignatureCompleteDelegate.Broadcast(roomInfo);
-                
+
                 PRINTLOG(TEXT("%s"), *roomInfo.ToString());
             }
         }
@@ -305,8 +313,8 @@ void UVirtualGameInstance_KMK::SetConcertInfo ( const struct FConcertInfo& info 
     int32 mon = currentDataTime.GetMonth();
     int32 day = currentDataTime.GetDay();
 
-    FString start = FString::FromInt(year) + TEXT("-") + ChangeString(FString::FromInt(mon))+ TEXT("-") +ChangeString( FString::FromInt(day));
-
+    // FString start = FString::FromInt(year) + TEXT("-") + ChangeString(FString::FromInt(mon))+ TEXT("-") +ChangeString( FString::FromInt(day));
+    FString start = TEXT("2024-11-06" );
     if (concerInfo.concertDate == start)
     {
         widget->SetButtEnable(true);

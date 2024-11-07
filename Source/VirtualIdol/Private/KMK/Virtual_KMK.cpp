@@ -57,6 +57,7 @@ void UVirtual_KMK::BeginPlay()
     {
         sm->CreateStage ( gi->GetConcertStageInfo() );
     }
+
 }
 
 

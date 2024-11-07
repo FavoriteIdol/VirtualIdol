@@ -34,6 +34,8 @@ struct FConcertInfo
     int32 ticketPrice = -1;
 	UPROPERTY(BlueprintReadOnly)
 	int32 peopleScale = -1;
+	UPROPERTY( )
+	FString userName = TEXT("" );
 
 	void Clear ( )
 	{
@@ -166,6 +168,7 @@ public:
 	// 특정 무대 요청
 	void ReqCheckIdStage( int32 num);
 	void OnResCheckIdStage(FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
+
 #pragma endregion
 #pragma region Check My Concert
 	// 내무대 확인
@@ -175,6 +178,10 @@ public:
 	void ReqCheckMyConcert( );
 	// 응답 
 	void OnResqCheckMyConcert( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
+	TArray<struct FConcertInfo> allConcertInfoArray;
+		// 열린 무대 확인
+	void ReqCheckAllOpenConcert( );
+	void OnResCheckAllOpenConcert( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
 #pragma endregion
 
 #pragma region with Ai for Text

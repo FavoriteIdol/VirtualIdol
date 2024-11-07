@@ -32,7 +32,7 @@ void UStartWidget_KMK::NativeConstruct ( )
     Super::NativeConstruct();
 	// GI 찾기
 	gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance() );
-
+	httpActor = Cast<AHttpActor_KMK>(UGameplayStatics::GetActorOfClass(GetWorld() , httpFact));
 	selectManager = Cast<AJJH_SelectManager>(UGameplayStatics::GetActorOfClass(GetWorld() , selectFact));
 	loadMatInst = UMaterialInstanceDynamic::Create ( loadMatFact, this );
 	if (Image_Load)
@@ -266,6 +266,8 @@ void UStartWidget_KMK::ComeInStagePanel ( )
 	Butt_UserStage->SetVisibility(ESlateVisibility::Hidden);
 	Butt_MyStage->SetVisibility(ESlateVisibility::Hidden);
 	Butt_Star->SetVisibility(ESlateVisibility::Hidden);
+	// 무대 조회하기
+	httpActor->ReqCheckAllOpenConcert();
 	FindRoom();
 }
 

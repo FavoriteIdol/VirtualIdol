@@ -171,6 +171,7 @@ FConcertInfo  UJsonParseLib_KMK::ParsecMyConcertInfo ( const FString& json )
                 { 
                     concertInfo.name = concertEle->GetStringField ( TEXT ( "name" ) );
                     concertInfo.img = concertEle->GetStringField ( TEXT ( "img" ) );
+                    concertInfo.userName = concertEle->GetStringField ( TEXT ( "userName" ) );
                     FString price = concertEle->GetStringField ( TEXT ( "ticketPrice" ) );
                     concertInfo.ticketPrice = FCString::Atoi ( *price );
                     FString scale = concertEle->GetStringField ( TEXT ( "peopleScale" ) );
@@ -193,7 +194,50 @@ FConcertInfo  UJsonParseLib_KMK::ParsecMyConcertInfo ( const FString& json )
     if(concertInfoArray.Num() <= 0) return con;
     return concertInfoArray[0];
 }
+TArray<struct FConcertInfo>  UJsonParseLib_KMK::ParsecAllConcert ( const FString& json )
+{
+    // 서버에서 가져온 json 파일 읽기
+    TSharedRef<TJsonReader<TCHAR>> reader = TJsonReaderFactory<TCHAR>::Create ( json );
+    // FJsonObject 형식으로 읽어온 json 데이터를 저장함 => 공유 포인터 형태로 객체 감싸기
+    TSharedPtr<FJsonObject> response = MakeShareable ( new FJsonObject ( ) );
+    TArray<struct FConcertInfo> concertInfoArray;
+    if ( FJsonSerializer::Deserialize(reader,response) )
+    {
+        int32 stageCount = response->GetIntegerField(TEXT("totalElements" ));
+        const TArray<TSharedPtr<FJsonValue>>* conecertArray;
+        if (response->TryGetArrayField ( TEXT ( "content" ) , conecertArray ))
+        {
+            
+            for ( const TSharedPtr<FJsonValue>& concert : *conecertArray )
+            {
+                FConcertInfo concertInfo;
+                TSharedPtr<FJsonObject> concertEle = concert->AsObject();
+                if ( concertEle.IsValid() )
+                { 
+                    concertInfo.name = concertEle->GetStringField ( TEXT ( "name" ) );
+                    concertInfo.img = concertEle->GetStringField ( TEXT ( "img" ) );
+                    concertInfo.userName = concertEle->GetStringField ( TEXT ( "userName" ) );
+                    FString price = concertEle->GetStringField ( TEXT ( "ticketPrice" ) );
+                    concertInfo.ticketPrice = FCString::Atoi ( *price );
+                    FString scale = concertEle->GetStringField ( TEXT ( "peopleScale" ) );
+                    concertInfo.peopleScale = FCString::Atoi ( *scale );
+                    concertInfo.stageId = concertEle->GetIntegerField ( TEXT ( "stageId" ) );
 
+                    concertInfo.appearedVFX = concertEle->GetIntegerField ( TEXT ( "appearedVFX" ) );
+                    concertInfo.feverVFX = concertEle->GetIntegerField ( TEXT ( "feverVFX" ) );
+
+                    int32 id = concertEle->GetIntegerField ( TEXT ( "id" ) );
+                    concertInfo.concertDate = concertEle->GetStringField ( TEXT ( "concertDate" ) );
+
+                    concertInfo.startTime = concertEle->GetStringField ( TEXT ( "startTime" ) );
+                    concertInfoArray.Add(concertInfo);
+                }
+            }
+        }
+
+    }
+    return concertInfoArray;
+}
 #pragma endregion
 #pragma region Create Ticket
 FString UJsonParseLib_KMK::CreateTicketJson ( const TMap<FString , FString> ticketSetText )

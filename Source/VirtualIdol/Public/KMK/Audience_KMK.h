@@ -245,6 +245,8 @@ public :
     class UTextBlock* TEXT_Min;
 	UPROPERTY ( meta = ( BindWidget ) )
     class UTextBlock* TEXT_Min1;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UTextBlock* TEXT_ConcertName;
 	UPROPERTY(EditAnywhere )
 	TSubclassOf<class USingWidget_KMK> singWidget;
 	UFUNCTION( )
@@ -255,7 +257,8 @@ public :
 	void PressButtModel( );
 	UFUNCTION( )
 	bool OpenFileExample(TArray<FString>& FileNames, FString DialogueTitle, FString FileTypes, bool multiselect);
-
+	UFUNCTION(BlueprintCallable )
+	void SetConcertName(const FString& text );
 	UFUNCTION( )
 	USoundWaveProcedural* LoadWavFromFile ( const FString& FilePath );
 

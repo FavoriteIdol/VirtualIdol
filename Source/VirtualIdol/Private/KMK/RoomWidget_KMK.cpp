@@ -33,7 +33,7 @@ void URoomWidget_KMK::SetImageAndText (const struct FRoomInfo& info)
 	mySessionInfo = info;
 	Butt_JoinSession->SetVisibility ( ESlateVisibility::Visible );
 	Butt_SetStage->SetVisibility(ESlateVisibility::Hidden);
-	Text_Name->SetText( FText::FromString( info.hostName + TEXT ( "의 콘서트" ) ));
+	Text_Name->SetText( FText::FromString( info.roomName ));
 	
 }
 
