@@ -37,6 +37,7 @@ FLoginInfo UJsonParseLib_KMK::ParsecMyInfo ( const FString& json )
     {
          if (response->TryGetStringField ( TEXT ( "token" ) , result.token ))
          {
+            response->TryGetNumberField ( TEXT ( "userId" ), result.userId );
             response->TryGetStringField ( TEXT ( "email" ), result.email );
             response->TryGetStringField ( TEXT ( "password" ), result.password );
             response->TryGetStringField ( TEXT ( "userName" ), result.userName );
@@ -46,7 +47,7 @@ FLoginInfo UJsonParseLib_KMK::ParsecMyInfo ( const FString& json )
     return result;
 }
 
-TArray<struct FStageInfo>  UJsonParseLib_KMK::ParsecStageInfos ( const FString& json, const FString& giName, TArray<struct FStageInfo> myArray )
+TArray<struct FStageInfo>  UJsonParseLib_KMK::ParsecStageInfos ( const FString& json, const FString& giName)
 {
     // 서버에서 가져온 json 파일 읽기
     TSharedRef<TJsonReader<TCHAR>> reader = TJsonReaderFactory<TCHAR>::Create ( json );
@@ -70,13 +71,10 @@ TArray<struct FStageInfo>  UJsonParseLib_KMK::ParsecStageInfos ( const FString& 
                    info.sky = stageEle->GetIntegerField(TEXT("sky" ));
                    info.theme = stageEle->GetIntegerField(TEXT("theme" ));
                    info.specialEffect = stageEle->GetIntegerField(TEXT("specialEffect" ));
+                   info.stageID = stageEle->GetIntegerField(TEXT("id" ));
                    info.img = stageEle->GetStringField(TEXT("img"));
                    FString userName = stageEle->GetStringField(TEXT("userName"));
 
-                   if (userName == giName)
-                   {
-                       myArray.Add(info);
-                   }
                    stageInfos.Add(info);
                 }
             }
@@ -85,6 +83,30 @@ TArray<struct FStageInfo>  UJsonParseLib_KMK::ParsecStageInfos ( const FString& 
     }
     return stageInfos;
 }
+FStageInfo UJsonParseLib_KMK::ParsecMyStageInfo ( const FString& json )
+{
+    // 서버에서 가져온 json 파일 읽기
+    TSharedRef<TJsonReader<TCHAR>> reader = TJsonReaderFactory<TCHAR>::Create ( json );
+    // FJsonObject 형식으로 읽어온 json 데이터를 저장함 => 공유 포인터 형태로 객체 감싸기
+    TSharedPtr<FJsonObject> response = MakeShareable ( new FJsonObject ( ) );
+    FStageInfo stageInfos;
+    if ( FJsonSerializer::Deserialize(reader,response) )
+    {
+        if ( response.IsValid() )
+        { 
+            stageInfos.name = response->GetStringField ( TEXT ( "name" ) );
+            stageInfos.terrain = response->GetIntegerField ( TEXT ( "terrain" ) );
+            stageInfos.sky = response->GetIntegerField ( TEXT ( "sky" ) );
+            stageInfos.theme = response->GetIntegerField ( TEXT ( "theme" ) );
+            stageInfos.specialEffect = response->GetIntegerField ( TEXT ( "specialEffect" ) );
+            stageInfos.stageID = response->GetIntegerField ( TEXT ( "id" ) );
+            stageInfos.img = response->GetStringField ( TEXT ( "img" ) );
+        }
+
+    }
+    return stageInfos;
+}
+
 
 #pragma endregion
 
@@ -126,6 +148,96 @@ FString UJsonParseLib_KMK::MakeConcertJson (const struct FConcertInfo& concert )
     }
 }
 
+FConcertInfo  UJsonParseLib_KMK::ParsecMyConcertInfo ( const FString& json )
+{
+    // 서버에서 가져온 json 파일 읽기
+    TSharedRef<TJsonReader<TCHAR>> reader = TJsonReaderFactory<TCHAR>::Create ( json );
+    // FJsonObject 형식으로 읽어온 json 데이터를 저장함 => 공유 포인터 형태로 객체 감싸기
+    TSharedPtr<FJsonObject> response = MakeShareable ( new FJsonObject ( ) );
+    TArray<struct FConcertInfo> concertInfoArray;
+     FConcertInfo con;
+    if ( FJsonSerializer::Deserialize(reader,response) )
+    {
+        int32 stageCount = response->GetIntegerField(TEXT("totalElements" ));
+        const TArray<TSharedPtr<FJsonValue>>* conecertArray;
+        if (response->TryGetArrayField ( TEXT ( "content" ) , conecertArray ))
+        {
+            
+            for ( const TSharedPtr<FJsonValue>& concert : *conecertArray )
+            {
+                FConcertInfo concertInfo;
+                TSharedPtr<FJsonObject> concertEle = concert->AsObject();
+                if ( concertEle.IsValid() )
+                { 
+                    concertInfo.name = concertEle->GetStringField ( TEXT ( "name" ) );
+                    concertInfo.img = concertEle->GetStringField ( TEXT ( "img" ) );
+                    concertInfo.userName = concertEle->GetStringField ( TEXT ( "userName" ) );
+                    FString price = concertEle->GetStringField ( TEXT ( "ticketPrice" ) );
+                    concertInfo.ticketPrice = FCString::Atoi ( *price );
+                    FString scale = concertEle->GetStringField ( TEXT ( "peopleScale" ) );
+                    concertInfo.peopleScale = FCString::Atoi ( *scale );
+                    concertInfo.stageId = concertEle->GetIntegerField ( TEXT ( "stageId" ) );
+
+                    concertInfo.appearedVFX = concertEle->GetIntegerField ( TEXT ( "appearedVFX" ) );
+                    concertInfo.feverVFX = concertEle->GetIntegerField ( TEXT ( "feverVFX" ) );
+
+                    int32 id = concertEle->GetIntegerField ( TEXT ( "id" ) );
+                    concertInfo.concertDate = concertEle->GetStringField ( TEXT ( "concertDate" ) );
+
+                    concertInfo.startTime = concertEle->GetStringField ( TEXT ( "startTime" ) );
+                    concertInfoArray.Add(concertInfo);
+                }
+            }
+        }
+
+    }
+    if(concertInfoArray.Num() <= 0) return con;
+    return concertInfoArray[0];
+}
+TArray<struct FConcertInfo>  UJsonParseLib_KMK::ParsecAllConcert ( const FString& json )
+{
+    // 서버에서 가져온 json 파일 읽기
+    TSharedRef<TJsonReader<TCHAR>> reader = TJsonReaderFactory<TCHAR>::Create ( json );
+    // FJsonObject 형식으로 읽어온 json 데이터를 저장함 => 공유 포인터 형태로 객체 감싸기
+    TSharedPtr<FJsonObject> response = MakeShareable ( new FJsonObject ( ) );
+    TArray<struct FConcertInfo> concertInfoArray;
+    if ( FJsonSerializer::Deserialize(reader,response) )
+    {
+        int32 stageCount = response->GetIntegerField(TEXT("totalElements" ));
+        const TArray<TSharedPtr<FJsonValue>>* conecertArray;
+        if (response->TryGetArrayField ( TEXT ( "content" ) , conecertArray ))
+        {
+            
+            for ( const TSharedPtr<FJsonValue>& concert : *conecertArray )
+            {
+                FConcertInfo concertInfo;
+                TSharedPtr<FJsonObject> concertEle = concert->AsObject();
+                if ( concertEle.IsValid() )
+                { 
+                    concertInfo.name = concertEle->GetStringField ( TEXT ( "name" ) );
+                    concertInfo.img = concertEle->GetStringField ( TEXT ( "img" ) );
+                    concertInfo.userName = concertEle->GetStringField ( TEXT ( "userName" ) );
+                    FString price = concertEle->GetStringField ( TEXT ( "ticketPrice" ) );
+                    concertInfo.ticketPrice = FCString::Atoi ( *price );
+                    FString scale = concertEle->GetStringField ( TEXT ( "peopleScale" ) );
+                    concertInfo.peopleScale = FCString::Atoi ( *scale );
+                    concertInfo.stageId = concertEle->GetIntegerField ( TEXT ( "stageId" ) );
+
+                    concertInfo.appearedVFX = concertEle->GetIntegerField ( TEXT ( "appearedVFX" ) );
+                    concertInfo.feverVFX = concertEle->GetIntegerField ( TEXT ( "feverVFX" ) );
+
+                    int32 id = concertEle->GetIntegerField ( TEXT ( "id" ) );
+                    concertInfo.concertDate = concertEle->GetStringField ( TEXT ( "concertDate" ) );
+
+                    concertInfo.startTime = concertEle->GetStringField ( TEXT ( "startTime" ) );
+                    concertInfoArray.Add(concertInfo);
+                }
+            }
+        }
+
+    }
+    return concertInfoArray;
+}
 #pragma endregion
 #pragma region Create Ticket
 FString UJsonParseLib_KMK::CreateTicketJson ( const TMap<FString , FString> ticketSetText )
@@ -145,84 +257,22 @@ FString UJsonParseLib_KMK::CreateTicketJson ( const TMap<FString , FString> tick
 	return json;
 
 }
-
-FString UJsonParseLib_KMK::ParsecTicketJson ( const FString& json )
-{
-
-    // 서버에서 가져온 json 파일 읽기
-    TSharedRef<TJsonReader<TCHAR>> reader = TJsonReaderFactory<TCHAR>::Create ( json );
-    // FJsonObject 형식으로 읽어온 json 데이터를 저장함 => 공유 포인터 형태로 객체 감싸기
-    TSharedPtr<FJsonObject> response = MakeShareable ( new FJsonObject ( ) );
-    FString image;
-    if (FJsonSerializer::Deserialize ( reader , response ))
-    {
-        // sonObject 형식으로 만든다.
-	   image  = response->GetStringField ( TEXT ( "image" ) );
-    }
-	// 반환한다.
-	return image;
-}
-
 #pragma endregion
-
-// Json으로 만들어서 데이터 전송
-FString UJsonParseLib_KMK::MakeJson ( const TMap<FString , FString> source )
-{
-	// source를 JsonObject 형식으로 만든다.
-	TSharedPtr<FJsonObject> jsonObject = MakeShareable ( new FJsonObject ( ) );
-
-	for (TPair<FString , FString> pair : source)
-	{
-		jsonObject->SetStringField ( pair.Key , pair.Value );
-	}
-
-	// writer를 만들어서 JsonObject를 인코딩해서 
-	FString json;
-	TSharedRef<TJsonWriter<TCHAR>> writer = TJsonWriterFactory<TCHAR>::Create ( &json );
-	FJsonSerializer::Serialize ( jsonObject.ToSharedRef ( ) , writer );
-	// 반환한다.
-	return json;
-}
-
-TMap<FString , FString> UJsonParseLib_KMK::ResultAlchemistParsec ( const FString& json )
-{
-    // 서버에서 가져온 json 파일 읽기
-    TSharedRef<TJsonReader<TCHAR>> reader = TJsonReaderFactory<TCHAR>::Create ( json );
-    // FJsonObject 형식으로 읽어온 json 데이터를 저장함 => 공유 포인터 형태로 객체 감싸기
-    TSharedPtr<FJsonObject> response = MakeShareable ( new FJsonObject ( ) );
-    TMap<FString , FString> result;
-    // 역직렬화 : josn 문자열을 FJsonObject로 변경하기
-    if (FJsonSerializer::Deserialize ( reader , response ))
-    {
-        // key값으로 문자열 읽기
-        FString stringValue = response->GetStringField ( TEXT ( "combinable" ) );
-        // key값이 존재한고 빈 값이 아닌경우
-        if (response->TryGetStringField ( TEXT ( "combinable" ) , stringValue ) && !stringValue.IsEmpty ( ))
-        {
-            // 내부는 비슷하게 파색함
-            bool isCreate = stringValue.Equals ( TEXT ( "true" ) , ESearchCase::IgnoreCase );
-            if (isCreate)
-            {
-                FString FinalEle = response->GetStringField ( TEXT ( "resultElement" ) );
-                FString EleName = response->GetStringField ( TEXT ( "fullName" ) );
-                FString UsingEle = response->GetStringField ( TEXT ( "uses" ) );
-
-                result.Add ( TEXT ( "Result" ) , FinalEle );
-                result.Add ( TEXT ( "Name" ) , EleName );
-                result.Add ( TEXT ( "Using" ) , UsingEle );
-            }
-        }
-        else result.IsEmpty ( );
-
-    }
-    return result;
-}
 
 UTexture2D* UJsonParseLib_KMK::MakeTexture(const TArray<uint8>& ImageData)
 {
+    if (ImageData.Num() == 0)
+    {
+        UE_LOG(LogTemp, Error, TEXT("Image data is empty."));
+        return nullptr;
+    }
     IImageWrapperModule& ImageWrapperModule = FModuleManager::LoadModuleChecked<IImageWrapperModule>(FName("ImageWrapper"));
     TSharedPtr<IImageWrapper> ImageWrapper = ImageWrapperModule.CreateImageWrapper(EImageFormat::PNG);
-
+    if (!ImageWrapper.IsValid() || !ImageWrapper->SetCompressed(ImageData.GetData(), ImageData.Num()))
+    {
+        UE_LOG(LogTemp, Error, TEXT("Failed to parse image data."));
+        return nullptr;
+    }
     if (ImageWrapper.IsValid() && ImageWrapper->SetCompressed(ImageData.GetData(), ImageData.Num()))
     {
         // Create a TArray to hold the raw image data
@@ -267,4 +317,14 @@ UTexture2D* UJsonParseLib_KMK::CreateTextureFromImage(int32 Width, int32 Height,
     NewTexture->UpdateResource();
 
     return NewTexture;
+}
+
+FString UJsonParseLib_KMK::ChangeString ( const FString& editText )
+{
+    FString s = editText;
+    if (s.Len ( ) == 1)
+    {
+        s = TEXT ( "0" ) + s;
+    }
+	return s;
 }

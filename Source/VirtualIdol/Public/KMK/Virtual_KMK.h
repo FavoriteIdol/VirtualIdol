@@ -27,13 +27,19 @@ public:
 	UPROPERTY ( EditAnywhere , BlueprintReadWrite )
 	class UAudience_KMK* virtualWidget;
 
+	UPROPERTY( )
+	class UVirtualGameInstance_KMK* gi;
+
 	UFUNCTION( )
 	FString GetTimeDifference ( const FString& SetTime );
-
+	FString diffTime;
 	bool bVis = false;
 	FString s;
 	UPROPERTY( EditAnywhere)
 	FString setConcertTime = "22:10:00";
+
+	UPROPERTY(EditAnywhere )
+	class AJJH_SelectManager* sm;
 
 	UFUNCTION( )
 	void SetVirtualChat(const FString& text );

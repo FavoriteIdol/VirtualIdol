@@ -66,4 +66,7 @@ public:
 	UPROPERTY( )
 	TArray<class USoundBase *> WavArray;
 
+	UFUNCTION( )
+	void OnPostLogin(APlayerController* NewPlayer);
+
 };
