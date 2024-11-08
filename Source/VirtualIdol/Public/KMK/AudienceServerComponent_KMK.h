@@ -92,8 +92,22 @@ public:
 	TArray< TSubclassOf<class AActor>> appearFact;
 
 	bool onReq = false;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UWidgetComponent* myNameComp;
+
+	UPROPERTY(ReplicatedUsing = OnRep_NickName );
+	FString userName;
+
+	UPROPERTY(EditDefaultsOnly )
+	TSubclassOf<class UMyNameWidget_KMK> nameWidgetFact;
+
+	UFUNCTION( )
+	void OnRep_NickName( );
+
+	void UpdateWidgetNick( );
 	UPROPERTY( )
-	class UMyNameWidget_KMK* myNameWid;
+	class UWidgetComponent* comp;
+	UFUNCTION(Server, Reliable)
+    void ServerRPC_SetNickName(const FString& name);
+
+	UFUNCTION(NetMulticast, Reliable )
+	void MultiRPC_SetNickName( );
 };

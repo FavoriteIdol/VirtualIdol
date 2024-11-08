@@ -86,6 +86,7 @@ void UVirtual_KMK::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
             if (virtualWidget)
             {
                 virtualWidget->BeforeStartConcertCount(diffTime);
+				virtualWidget->SetConcertName(gi->concerInfo.name );
             }
 		}
 	}

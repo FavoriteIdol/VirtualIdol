@@ -33,18 +33,21 @@ void UAudienceServerComponent_KMK::BeginPlay()
 
 	player = Cast<AHSW_ThirdPersonCharacter> (GetWorld()->GetFirstPlayerController()->GetPawn());
 	playerMesh = Cast<AHSW_ThirdPersonCharacter> (GetOwner());
+
 	if (playerMesh && playerMesh->HasAuthority())
 	{
 		
 		if (playerMesh->IsLocallyControlled())
         {
             playerMesh->SetActorLocation ( FVector ( 0, 0, 100 ) );
+
         }
         else
         {
             playerMesh->SetActorLocation ( FVector ( 3600.0f, 0.f, 300.f ) );
             playerMesh->SetActorRotation(FRotator(0, 180, 0));
         }
+		
 	}
 	else
 	{
@@ -58,16 +61,7 @@ void UAudienceServerComponent_KMK::BeginPlay()
 			// if(gi->playerMeshNum >= 0) playerMesh->GetMesh()->SetSkeletalMesh(audienceMesh[gi->playerMeshNum]);
 			// 클라이언트에서 서버로 RPC 호출
 			ServerRPC_ChangeMyMesh ( gi->playerMeshNum );
-			if (!playerMesh->HasAuthority ( ))
-			{
-				myNameComp = playerMesh->FindComponentByTag<UWidgetComponent>(TEXT("Name" ));
-				myNameWid = Cast<UMyNameWidget_KMK>(myNameComp->GetWidgetClass());
-				if (myNameWid)
-				{
-					UE_LOG(LogTemp, Warning, TEXT("!!!!!!!!!!!!" ));
-					myNameWid->SetMyName(*gi->GetMyInfo().userName);
-				}
-			}
+			ServerRPC_SetNickName(gi->GetMyInfo().userName); // 서버에서 닉네임 설정
 
         }
 		else
@@ -108,19 +102,47 @@ void UAudienceServerComponent_KMK::FindVirtualCharacter ( )
 		}
 	}
 }
+
+void UAudienceServerComponent_KMK::OnRep_NickName ( )
+{
+	UpdateWidgetNick();
+}
+
+void UAudienceServerComponent_KMK::UpdateWidgetNick ( )
+{
+	UWidgetComponent* myNameComp = GetOwner()->FindComponentByTag<UWidgetComponent>(TEXT("Name" ));
+	if (myNameComp)
+	{
+        UMyNameWidget_KMK* myNameWid = Cast<UMyNameWidget_KMK>(CreateWidget(GetWorld(), nameWidgetFact));
+		myNameComp->SetWidget(myNameWid);
+        if (myNameWid)
+        {
+            UVirtualGameInstance_KMK* gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance());
+            if (gi)
+            {
+                myNameWid->SetMyName(userName);
+                comp = myNameComp;
+            }
+		}
+	}
+}
+
+void UAudienceServerComponent_KMK::ServerRPC_SetNickName_Implementation ( const FString& name )
+{
+	userName = name;
+	MultiRPC_SetNickName();
+}
+
+
+void UAudienceServerComponent_KMK::MultiRPC_SetNickName_Implementation ( )
+{
+	UpdateWidgetNick ( );
+}
+
 // Called every frame
 void UAudienceServerComponent_KMK::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	if (myNameComp)
-	{
-		// 카메라 위치
-		FVector CamLoc = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0 )->GetCameraLocation();
-		FVector Direction = CamLoc - myNameComp->GetComponentLocation();
-		Direction.Z=0;
-
-		myNameComp->SetWorldRotation(Direction.GetSafeNormal().ToOrientationRotator());
-	}
 	if (!bVis)
 	{
 		//s = GetTimeDifference ( setConcertTime );
@@ -359,5 +381,6 @@ void UAudienceServerComponent_KMK::GetLifetimeReplicatedProps(TArray<FLifetimePr
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
     DOREPLIFETIME(UAudienceServerComponent_KMK, playerMeshNum);
+    DOREPLIFETIME(UAudienceServerComponent_KMK, userName);
 }
 

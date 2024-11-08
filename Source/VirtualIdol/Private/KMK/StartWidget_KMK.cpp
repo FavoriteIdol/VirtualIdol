@@ -256,7 +256,7 @@ void UStartWidget_KMK::StartConcertPanel ( )
 	if (gi)
 	{
 		gi->playerMeshNum = -1;
-		gi->CreateMySession(TEXT("조준혁"), 30);
+		gi->CreateMySession(gi->GetMyInfo().userName, gi->concerInfo.peopleScale);
 	}
 }
 
