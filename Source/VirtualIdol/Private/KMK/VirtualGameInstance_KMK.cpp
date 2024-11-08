@@ -23,6 +23,7 @@
 #include "SocketSubsystem.h"
 #include "Sockets.h"
 #include "IPAddress.h"
+#include "JJH/JJH_SelectManager.h"
 
 void UVirtualGameInstance_KMK::Init ( )
 {
@@ -49,7 +50,7 @@ void UVirtualGameInstance_KMK::CreateMySession ( FString RoomName, int32 PlayerC
     FOnlineSessionSettings settings;
     // 전용서버를 사용하는가? => 데디케이트 서버
     settings.bIsDedicated = false;
-
+    HostName = loginInfo.userName;
     // 랜선인가?
     FName subSystemName = IOnlineSubsystem::Get( )->GetSubsystemName();
     // 온라인 서브 시스템이 없는 경우에 LAN으로 연결, 아니라면 온라인 서브 시스템으로 연결
@@ -135,10 +136,18 @@ void UVirtualGameInstance_KMK::OnMyFindSessionComplete ( bool bSuccessful )
             FString room;
             result.Session.SessionSettings.Get(FName("ROOM_NAME" ), room );
             roomInfo.roomName = StringBase64Decode(room);
+
             // 호스트 이름
             FString host;
             result.Session.SessionSettings.Get(FName("HOST_NAME" ), host );
             roomInfo.hostName = StringBase64Decode(host);
+            for (auto& concert : allConcertInfoArray)
+            {
+                if (concert.userName == roomInfo.hostName)
+                {
+                    roomInfo.roomName = concert.name;
+                }
+            }
             // 최대 플레이어 수
             roomInfo.MaxPlayer = result.Session.SessionSettings.NumPublicConnections;
             // 핑정보
@@ -146,7 +155,7 @@ void UVirtualGameInstance_KMK::OnMyFindSessionComplete ( bool bSuccessful )
             if (OnSearchSignatureCompleteDelegate.IsBound ( ))
             {
                 OnSearchSignatureCompleteDelegate.Broadcast(roomInfo);
-                
+
                 PRINTLOG(TEXT("%s"), *roomInfo.ToString());
             }
         }
@@ -175,16 +184,24 @@ void UVirtualGameInstance_KMK::JoinRoom ( int32 ChooseRoomNum, int32 vipNum)
 
 void UVirtualGameInstance_KMK::JoinRoomComplete ( FName SessionName , EOnJoinSessionCompleteResult::Type result )
 {
-    if (EOnJoinSessionCompleteResult::Success == result)
+   
+    if (result == EOnJoinSessionCompleteResult::Success)
     {
-        auto* pc = GetWorld()->GetFirstPlayerController();
-
         FString url;
-        sessionInterface->GetResolvedConnectString(SessionName, url);
-        if (!url.IsEmpty ( ))
+        if (sessionInterface->GetResolvedConnectString(SessionName, url) && !url.IsEmpty())
         {
-            pc->ClientTravel(url , ETravelType::TRAVEL_Absolute);
+            PRINTLOG(TEXT("Successfully obtained URL: %s"), *url);
+            auto* pc = GetWorld()->GetFirstPlayerController();
+            pc->ClientTravel(url, ETravelType::TRAVEL_Absolute);
         }
+        else
+        {
+            PRINTLOG(TEXT("Failed to resolve connect string: URL is empty"));
+        }
+    }
+    else
+    {
+        PRINTLOG(TEXT("Failed to join session: %d"), (int32)result);
     }
 }
 
@@ -245,8 +262,8 @@ void UVirtualGameInstance_KMK::SetStartWidget ( class UStartWidget_KMK* startUi 
 void UVirtualGameInstance_KMK::SwitchStartUIWidget (int32 num )
 {
     SwitchWidget ( 4 );
-    widget->roomNum = num;
 }
+
 void UVirtualGameInstance_KMK::VisibleStartWidget (bool bVisible)
 {
     if (!bVisible)
@@ -276,6 +293,7 @@ void UVirtualGameInstance_KMK::LoginPanel ( )
 #pragma region Token
 void UVirtualGameInstance_KMK::SetMyInfo (const struct FLoginInfo& info )
 {
+    loginInfo.userId = info.userId;
     loginInfo.email = info.email;
     loginInfo.password = info.password;
     loginInfo.token = info.token;
@@ -290,6 +308,30 @@ FLoginInfo UVirtualGameInstance_KMK::GetMyInfo ( )
 void UVirtualGameInstance_KMK::SetConcertInfo ( const struct FConcertInfo& info )
 {
     concerInfo = info;
+    FDateTime currentDataTime = FDateTime::Now();
+    int32 year = currentDataTime.GetYear();
+    int32 mon = currentDataTime.GetMonth();
+    int32 day = currentDataTime.GetDay();
+
+    // FString start = FString::FromInt(year) + TEXT("-") + ChangeString(FString::FromInt(mon))+ TEXT("-") +ChangeString( FString::FromInt(day));
+    FString start = TEXT("2024-11-06" );
+    if (concerInfo.concertDate == start)
+    {
+        widget->SetButtEnable(true);
+    }
+}
+FString UVirtualGameInstance_KMK::ChangeString ( const FString& editText )
+{
+    FString s = editText;
+    if (s.Len ( ) == 1)
+    {
+        s = TEXT ( "0" ) + s;
+    }
+	return s;
+}
+FConcertInfo UVirtualGameInstance_KMK::GetConcertInfo ( )
+{
+    return concerInfo;
 }
 
 #pragma endregion
@@ -332,3 +374,41 @@ void UVirtualGameInstance_KMK::SendMulticastMessage ( )
 }
 
 
+void UVirtualGameInstance_KMK::OnJoinSessionButt( )
+{
+	SwitchStartUIWidget(roomNum);
+}
+// 무대 선택에서 무대선택한 경우
+void UVirtualGameInstance_KMK::OnSetStageButt ( )
+{
+	// 원래 보이던 위잿을 비활성화
+	UE_LOG(LogTemp, Warning, TEXT("Load Stage" ));
+	UE_LOG(LogTemp, Warning, TEXT("%s" ), *myStageInfo.name);
+	// 추가되어야하는것 : 저장된 무대를 로드
+	if (sm && !myStageInfo.name.IsEmpty())
+	{
+		VisibleStartWidget(false);
+		sm->CreateStage(myStageInfo);
+	}
+}
+
+void UVirtualGameInstance_KMK::SetMyProfile ( )
+{
+    widget->ChangeMyProfile();
+}
+
+void UVirtualGameInstance_KMK::ChangeTextureWidget ( UTexture2D* texture )
+{
+    widget->ChangeImageStage(texture);
+    UE_LOG(LogTemp, Warning, TEXT("%d" ), stageNum);
+}
+
+void UVirtualGameInstance_KMK::SetConcertStageInfo ( FStageInfo& info )
+{
+    concertStageInfo = info;
+}
+
+FStageInfo UVirtualGameInstance_KMK::GetConcertStageInfo ( )
+{
+    return concertStageInfo;
+}

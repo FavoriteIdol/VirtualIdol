@@ -227,12 +227,14 @@ void UAudienceServerComponent_KMK::SetVirtualVisible ( class AHSW_ThirdPersonCha
 void UAudienceServerComponent_KMK::StartCountDown ( )
 {
 	bTime = true;
+	
 	GetWorld ( )->GetTimerManager ( ).SetTimer ( startCountDownHandle , FTimerDelegate::CreateLambda ( [this]( )
 		{
 			playerMesh->audienceWidget->CountDownPanelVisible ( ESlateVisibility::Hidden );
 			bTime = false;
 			virtualCharacter->SetVirtualVisible(true);
-			if (appearFact.Num ( ) > 0) GetWorld ( )->SpawnActor<AActor> ( appearFact[0] , FTransform ( FVector ( 0 ) ) );
+			UVirtualGameInstance_KMK* gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance());
+			if (appearFact.Num ( ) > 0) GetWorld ( )->SpawnActor<AActor> ( gi->effectArray[gi->GetConcertInfo().appearedVFX] , FTransform ( FVector ( 0 ) ) );
 		} ) , 6 , false );
 }
 

@@ -32,7 +32,7 @@ public:
 	class UVirtualGameInstance_KMK* gi;
 
 	// httpactor
-	UPROPERTY( )
+	UPROPERTY( EditAnywhere, BlueprintReadWrite)
 	class AHttpActor_KMK* httpActor;
 	UPROPERTY(EditAnywhere, Category = Http )
 	TSubclassOf<class AHttpActor_KMK> httpFact;
@@ -48,7 +48,7 @@ public:
 
 	// 버튼
 	UPROPERTY(meta = (BindWidget))
-	class UButton* Butt_Login;
+    class UButton* Butt_Login;
 
 	// 텍스트 블럭
 	UPROPERTY(meta = (BindWidget))
@@ -80,6 +80,12 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* Butt_ComeInStage;
 
+	UFUNCTION( )
+	void SetButtEnable(bool bEnable = false);
+
+	UPROPERTY(BlueprintReadWrite )
+	bool isButtEanble = false;
+
 	// 버튼 연동 함수
 	UFUNCTION()
 	void CreateStagePanel();
@@ -96,19 +102,34 @@ public:
 // Stage Setting Widget Panel
 // ================================================================
 	// 추가 기능
-	UPROPERTY(EditAnywhere, Category="Particle" )
-	TArray<class UMaterial*> EffectParticles;
-	UPROPERTY(EditAnywhere, Category = "Particle")
-	TArray<class UMaterial*> FeversParticles;
 	// 텍스트
 	UPROPERTY(meta = (BindWidget))
-    class UTextBlock* Text_Title;	
+    class UTextBlock* Text_Title;
+	UPROPERTY(meta = (BindWidget))
+    class UTextBlock* Text_MyNick;	
+	UPROPERTY(meta = (BindWidget))
+    class UTextBlock* Text_MyCash;	
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UButton* Butt_Select;
-	
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UImage* Image_Profile;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UImage* Image_Load;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UImage* Image_Stage;
 	UFUNCTION( )
 	void PressSelectButt( );
 
+	UFUNCTION( )
+	void ChangeMyProfile( );
+
+	UPROPERTY(EditAnywhere, Category = load )
+	UMaterialInstance* loadMatFact;
+	UPROPERTY( )
+	UMaterialInstanceDynamic* loadMatInst;
+	UFUNCTION( )
+	void ChangeLoadMat(float num );
+	float matNum = 0;
 	int32 selectNum = 0;
 
 	UFUNCTION( )
@@ -119,7 +140,7 @@ public:
 #pragma region Set Day
 	// 공연일자 패널
 	UPROPERTY ( meta = ( BindWidget ) )
-	class UCanvasPanel* SetDayPanel;
+    class UCanvasPanel* SetDayPanel;
 	UPROPERTY ( meta = ( BindWidget ) )
     class UEditableText* EditText_StageName;
 	UPROPERTY ( meta = ( BindWidget ) )
@@ -142,6 +163,9 @@ public:
 
 	FString ChangeString(const FString& editText);
 
+	UFUNCTION( )
+	void ChangeImageStage(UTexture2D* texture );
+
 	bool EditTextDigit(const FString& editText );
 
 #pragma endregion
@@ -158,12 +182,17 @@ public:
 	UPROPERTY ( meta = ( BindWidget ) )
     class UButton* Butt_CreateTicket1;
 	UPROPERTY ( meta = ( BindWidget ) )
+    class UButton* Butt_Upload;
+	UPROPERTY ( meta = ( BindWidget ) )
 	class UMultiLineEditableText* EditMultiText_Ticket;
 	UFUNCTION( )
 	void PressCreateTicket();
 	UFUNCTION( )
 	void CreateTicketMaterial(UTexture2D* texture);
-
+	UFUNCTION( )
+	void PressUpload( );
+	UFUNCTION( )
+	bool OpenFileExample(TArray<FString>& FileNames, FString DialogueTitle, FString FileTypes, bool multiselect);
 	void ClearAllText( );
 #pragma endregion
 #pragma region Set Effect
@@ -197,7 +226,15 @@ public:
 	void PressSelect1Butt( );
 
 	void AddIndex( int32 num , TArray<class UMaterial*> meshArray , class UImage* image );
-	void MinusIndex( int32 num , TArray<class UMaterial*>  meshArray , class UImage* image );
+	void MinusIndex( int32 num , TArray<class UMaterial*>  meshArray , class UImage* image );	
+	UPROPERTY( BlueprintReadWrite , meta = ( BindWidget ) )
+    class UCanvasPanel* EffectPopUp;
+	UPROPERTY ( BlueprintReadWrite , meta = ( BindWidget ) )
+    class UCanvasPanel* EffectPopUp1;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UTextBlock* Text_Effect1;	
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UMultiLineEditableTextBox* MultiText_PopUp;
 #pragma endregion
 
 #pragma region Final Set Stage
@@ -246,8 +283,11 @@ public:
 	class UTextBlock* Text_Pay;	
 	UPROPERTY ( meta = ( BindWidget ) )
     class UButton* Butt_PayMoney;	
+
 	UFUNCTION( )
-	void PressPayMoney( );
+	void PressMoneyPay( );
+	UPROPERTY( )
+	bool bPayMoney = false;
 
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UCanvasPanel* PayPopUpPanel;
@@ -268,10 +308,6 @@ public:
 #pragma endregion
 
 #pragma region Select Stage
-	UPROPERTY(EditAnywhere, Category = SetConcert )
-	TArray<class UNiagaraSystem*> setConcert_Effects;
-	// 내 무대인지 확인
-	TArray<struct FStageInfo> myStageInfoArray;
 	// 전체 무대
 	TArray<struct FStageInfo> allStageInfoArray;
 	// 버튼
@@ -292,7 +328,7 @@ public:
 	UFUNCTION()
 	void PressMyStageButt( );
 	UFUNCTION()
-	void CreateStageWidget( const struct FStageInfo& stageInfo );
+	void CreateStageWidget( const struct FStageInfo& stageInfo, UTexture2D* image );
 	UFUNCTION( )
 	void ClearSB( );
 #pragma endregion
@@ -320,6 +356,10 @@ public:
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UButton* Butt_Back3;
 
+	UPROPERTY(meta = (BindWidget))
+    class UTextBlock* TEXT_VIP;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UMultiLineEditableTextBox* MultiText_VIP;
 	// 버튼 연동 함수
     UFUNCTION ( )
 	void PressYesButt( );
@@ -349,7 +389,8 @@ public:
 	
 #pragma endregion
 #pragma region FindRoom & Select Stage
-
+	UPROPERTY( )
+	bool bCreateTicket = false;
 #pragma endregion
 
 };
