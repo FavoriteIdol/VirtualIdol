@@ -13,6 +13,8 @@
 #include "HSW/HSW_AuditoriumGameMode.h"
 #include "Kismet/GameplayStatics.h"
 #include "KMK/Virtual_KMK.h"
+#include "Components/WidgetComponent.h"
+#include "KMK/MyNameWidget_KMK.h"
 // Sets default values for this component's properties
 UAudienceServerComponent_KMK::UAudienceServerComponent_KMK()
 {
@@ -56,7 +58,17 @@ void UAudienceServerComponent_KMK::BeginPlay()
 			// if(gi->playerMeshNum >= 0) playerMesh->GetMesh()->SetSkeletalMesh(audienceMesh[gi->playerMeshNum]);
 			// 클라이언트에서 서버로 RPC 호출
 			ServerRPC_ChangeMyMesh ( gi->playerMeshNum );
-			
+			if (!playerMesh->HasAuthority ( ))
+			{
+				myNameComp = playerMesh->FindComponentByTag<UWidgetComponent>(TEXT("Name" ));
+				myNameWid = Cast<UMyNameWidget_KMK>(myNameComp->GetWidgetClass());
+				if (myNameWid)
+				{
+					UE_LOG(LogTemp, Warning, TEXT("!!!!!!!!!!!!" ));
+					myNameWid->SetMyName(*gi->GetMyInfo().userName);
+				}
+			}
+
         }
 		else
 		{
@@ -100,6 +112,15 @@ void UAudienceServerComponent_KMK::FindVirtualCharacter ( )
 void UAudienceServerComponent_KMK::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	if (myNameComp)
+	{
+		// 카메라 위치
+		FVector CamLoc = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0 )->GetCameraLocation();
+		FVector Direction = CamLoc - myNameComp->GetComponentLocation();
+		Direction.Z=0;
+
+		myNameComp->SetWorldRotation(Direction.GetSafeNormal().ToOrientationRotator());
+	}
 	if (!bVis)
 	{
 		//s = GetTimeDifference ( setConcertTime );

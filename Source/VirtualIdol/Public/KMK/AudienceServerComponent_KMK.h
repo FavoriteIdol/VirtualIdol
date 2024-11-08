@@ -92,4 +92,8 @@ public:
 	TArray< TSubclassOf<class AActor>> appearFact;
 
 	bool onReq = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UWidgetComponent* myNameComp;
+	UPROPERTY( )
+	class UMyNameWidget_KMK* myNameWid;
 };

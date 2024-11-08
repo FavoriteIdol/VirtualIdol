@@ -7,7 +7,14 @@
 #include "Interfaces/OnlineSessionInterface.h"
 #include "HttpActor_KMK.h"
 #include "VirtualGameInstance_KMK.generated.h"
-
+USTRUCT ( BlueprintType )
+struct FDummyNames : public FTableRowBase
+{
+	GENERATED_BODY ( )
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Data" )
+	FString name;
+};
 // 세션을 위한 roomInfo 구조체
 USTRUCT ( BlueprintType )
 struct FRoomInfo
@@ -116,11 +123,11 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
     int32 playerMeshNum = 0;
 
 #pragma region Token
-	UPROPERTY( )
+	UPROPERTY(BlueprintReadWrite )
 	FLoginInfo loginInfo;
 	UFUNCTION( )
 	void SetMyInfo(const struct FLoginInfo& info  );
-	UFUNCTION( )
+	UFUNCTION(BlueprintCallable )
 	FLoginInfo GetMyInfo( );
 	UPROPERTY( )
 	FConcertInfo concerInfo;
@@ -189,7 +196,13 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 	UFUNCTION( )
 	FStageInfo GetConcertStageInfo( );
 
-	UPROPERTY( )
+	UPROPERTY ( )
 	TArray<struct FConcertInfo> allConcertInfoArray;
 
+	// 데이터 테이블을 블루프린트에 노출
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
+    UDataTable* NamesDataTable;
+
+	UFUNCTION(BlueprintCallable, Category = "Data")
+	FString GetRandomName();
 };

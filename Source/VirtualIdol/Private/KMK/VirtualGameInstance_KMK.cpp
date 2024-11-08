@@ -24,6 +24,7 @@
 #include "Sockets.h"
 #include "IPAddress.h"
 #include "JJH/JJH_SelectManager.h"
+#include "Kismet/KismetMathLibrary.h"
 
 void UVirtualGameInstance_KMK::Init ( )
 {
@@ -435,4 +436,33 @@ void UVirtualGameInstance_KMK::SetConcertStageInfo ( FStageInfo& info )
 FStageInfo UVirtualGameInstance_KMK::GetConcertStageInfo ( )
 {
     return concertStageInfo;
+}
+
+FString UVirtualGameInstance_KMK::GetRandomName()
+{
+    if (!NamesDataTable)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("NamesDataTable is not assigned!"));
+        return FString("No Data Table");
+    }
+
+    // 데이터 테이블의 모든 행을 가져오기
+    TArray<FName> RowNames = NamesDataTable->GetRowNames();
+    if (RowNames.Num() == 0)
+    {
+        return FString("No Names Available");
+    }
+
+    // 랜덤 인덱스 선택
+    int32 RandomIndex = UKismetMathLibrary::RandomIntegerInRange(0, RowNames.Num() - 1);
+    FName RandomRowName = RowNames[RandomIndex];
+
+    // 랜덤으로 선택된 행의 데이터 가져오기
+    FDummyNames* Row = NamesDataTable->FindRow<FDummyNames>(RandomRowName, TEXT("Random Lookup"));
+    if (Row)
+    {
+        return Row->name;
+    }
+
+    return FString("Name Not Found");
 }
