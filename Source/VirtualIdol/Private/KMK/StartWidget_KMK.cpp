@@ -492,7 +492,8 @@ void UStartWidget_KMK::PressUpload ( )
         for (const FString& FilePath : SelectedFiles)
         {
             UE_LOG(LogTemp, Warning, TEXT("Selected File: %s"), *FilePath);
-            FString FileName = FPaths::GetCleanFilename(FilePath);  // "Example.wav"
+            FString FileName = FPaths::GetCleanFilename(FilePath); 
+			httpActor->ReqMultipartCapturedWithAI(FileName, TEXT("https://singular-swine-deeply.ngrok-free.app/upload" ) );
         }
     }
     else
@@ -612,7 +613,7 @@ void UStartWidget_KMK::PressNextButt ( )
 	StageScalePanel->SetVisibility ( ESlateVisibility::Hidden );
 	Text_FinalCount->SetText ( EditText_ScaleNum->GetText() );
 	Text_FinalPay->SetText ( Text_Price->GetText() );
-	FString s = Text_FinalPay->GetText().ToString();
+	FString s = Text_Price->GetText().ToString();
 	gi->myCash -= FCString::Atoi(*s);
 	Butt_Next->SetVisibility ( ESlateVisibility::Hidden );
 	Butt_CreateTicket1->SetVisibility(ESlateVisibility::Visible);

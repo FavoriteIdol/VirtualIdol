@@ -352,7 +352,7 @@ void AHttpActor_KMK::OnResTicket ( FHttpRequestPtr Request , FHttpResponsePtr Re
    }
 
 }
-void AHttpActor_KMK::ReqMultipartCapturedWithAI (const FString& ImagePath )
+void AHttpActor_KMK::ReqMultipartCapturedWithAI (const FString& ImagePath , const FString& url )
 {
 	UE_LOG ( LogTemp , Warning , TEXT ( "Image upload start." ) );
 
@@ -361,7 +361,7 @@ void AHttpActor_KMK::ReqMultipartCapturedWithAI (const FString& ImagePath )
 	ImageUploadRequest->OnProcessRequestComplete ( ).BindUObject ( this , &AHttpActor_KMK::OnReqMultipartCapturedWithAI );
 
 	// Set the URL and verb for the image upload request
-	ImageUploadRequest->SetURL ( TEXT ( "http://master-of-prediction.shop:8123/api/v1/files/upload" ) );
+	ImageUploadRequest->SetURL ( url );
 	ImageUploadRequest->SetVerb ( TEXT ( "POST" ) );
 
 	UE_LOG ( LogTemp , Warning , TEXT ( "ImagePath: %s" ) , *ImagePath );

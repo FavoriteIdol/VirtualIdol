@@ -187,7 +187,7 @@ public:
 #pragma region with Ai for Image
 	FString ticketURL;
 	//요청
-	void ReqMultipartCapturedWithAI(const FString& ImagePath );
+	void ReqMultipartCapturedWithAI(const FString& ImagePath, const FString& url = TEXT("http://master-of-prediction.shop:8123/api/v1/files/upload") );
 	//응답
 	void OnReqMultipartCapturedWithAI( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
 #pragma endregion
