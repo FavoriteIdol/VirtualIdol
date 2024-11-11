@@ -84,11 +84,11 @@ void AJJH_SelectManager::ChangeMap ( int32 index )
 	if (index == 1)
 	{
 		LevelToLoad = FName ( "LV_Island_JSW" );
-		LevelToUnload = FName ( "BP_Land-City_JSW" );
+		LevelToUnload = FName ( "BP_ThirdLevel" );
 	}
 	else if (index == 2)
 	{
-		LevelToLoad = FName ( "BP_Land-City_JSW" );
+		LevelToLoad = FName ( "BP_ThirdLevel" );
 		LevelToUnload = FName ( "LV_Island_JSW" );
 	}
 	else
@@ -96,7 +96,7 @@ void AJJH_SelectManager::ChangeMap ( int32 index )
 		// 처리 없이 바로 반환
 		GetWorld ( )->SpawnActor<AActor> ( ThemeFactory[index] , GetActorTransform ( ) );
 		LevelToUnload = FName ( "LV_Island_JSW" );
-		LevelToUnload = FName ( "BP_Land-City_JSW" );
+		LevelToUnload = FName ( "BP_ThirdLevel" );
 	}
 
 	UGameplayStatics::LoadStreamLevel (
@@ -312,11 +312,11 @@ void AJJH_SelectManager::CreateStage ( const struct FStageInfo& info )
 	if (info.theme == 1)
 	{
 		LevelToLoad = FName ( "LV_Island_JSW" );
-		LevelToUnload = FName ( "BP_Land-City_JSW" );
+		LevelToUnload = FName ( "BP_ThirdLevel" );
 	}
 	else if (info.theme == 2)
 	{
-		LevelToLoad = FName ( "BP_Land-City_JSW" );
+		LevelToLoad = FName ( "BP_ThirdLevel" );
 		LevelToUnload = FName ( "LV_Island_JSW" );
 	}
 	else
@@ -324,7 +324,7 @@ void AJJH_SelectManager::CreateStage ( const struct FStageInfo& info )
 		// 처리 없이 바로 반환
 		GetWorld ( )->SpawnActor<AActor> ( ThemeFactory[info.theme] , GetActorTransform ( ) );
 		LevelToUnload = FName ( "LV_Island_JSW" );
-		LevelToUnload = FName ( "BP_Land-City_JSW" );
+		LevelToUnload = FName ( "BP_ThirdLevel" );
 	}
 
 	UGameplayStatics::LoadStreamLevel (
