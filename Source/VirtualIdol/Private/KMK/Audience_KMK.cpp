@@ -192,7 +192,7 @@ void UAudience_KMK::PressHiddenButt ( )
     else 
     {
         ButtPanel->SetVisibility(ESlateVisibility::Visible);
-        bHide = true;
+        bHide = false;
     }
 }
 
@@ -384,7 +384,7 @@ void UAudience_KMK::PressSendButt ( )
         {
             if (!EditText_Chat->GetText ( ).IsEmpty ( ))
             {
-                server->ServerRPCChat( EditText_Chat->GetText ( ).ToString ( ) );
+                server->ServerRPCChat(gi->GetMyInfo().userName, EditText_Chat->GetText ( ).ToString ( ) );
 
                 EditText_Chat->SetText ( FText::GetEmpty ( ) );
             }
@@ -397,17 +397,17 @@ void UAudience_KMK::PressSendButt ( )
         {
             if (!EditText_Chat->GetText ( ).IsEmpty ( ))
             {
-                gs->ServerRPCChat ( EditText_Chat->GetText ( ).ToString ( ) );
+                gs->ServerRPCChat (gi->GetMyInfo().userName, EditText_Chat->GetText ( ).ToString ( ) );
                 EditText_Chat->SetText ( FText::GetEmpty ( ) );
             }
         }
     }
 }
 
-void UAudience_KMK::CreateChatWidget ( const FString& chatText )
+void UAudience_KMK::CreateChatWidget (const FString& nickname, const FString& chatText )
 {
     auto* chat = CreateWidget<USendChat_KMK> ( this, chatWidgetFact );
-    chat->Text_Chat->SetText ( FText::FromString ( chatText ) );
+    chat->SetChatText(nickname, chatText);
     SB_ChatLog->AddChild ( chat );
     SB_ChatLog->ScrollToEnd();
 }

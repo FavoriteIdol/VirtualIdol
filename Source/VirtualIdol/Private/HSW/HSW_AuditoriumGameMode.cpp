@@ -65,12 +65,12 @@ void AHSW_AuditoriumGameMode::Multicast_FeverEffect_Implementation ( )
 	//UNiagaraFunctionLibrary::SpawnSystemAtLocation ( GetWorld ( ) , FeverEffect_Niagara , FeverEffectLocation.GetLocation() );
 }
 
-void AHSW_AuditoriumGameMode::BroadcastChatMessage ( const FString& Chat )
+void AHSW_AuditoriumGameMode::BroadcastChatMessage (const FString& nickName, const FString& Chat )
 {
     AHSW_GameState_Auditorium* gs = GetGameState<AHSW_GameState_Auditorium>();
     if (gs)
     {
-        gs->MultiRPCChat(Chat);
+        gs->MultiRPCChat(nickName, Chat);
     }
 }
 

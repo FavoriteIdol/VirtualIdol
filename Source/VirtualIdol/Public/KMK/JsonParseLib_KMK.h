@@ -34,6 +34,8 @@ public :
 #pragma endregion
 #pragma region CreateTicket
 	static FString CreateTicketJson( const TMap<FString , FString> ticketSetText);
+	static FString MakeChatTranslate( const FString& translateText);
+	static FString ParseChatTranslate(const FString& json );
 #pragma endregion
 
 public:
