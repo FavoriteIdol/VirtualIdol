@@ -42,7 +42,7 @@ public:
 	class AJJH_SelectManager* sm;
 
 	UFUNCTION( )
-	void SetVirtualChat(const FString& text );
+	void SetVirtualChat(const FString& nickName,const FString& text );
 	UFUNCTION(BlueprintCallable )
 	void SetVirtualVisible(bool bVisit = false );
 	UPROPERTY( )

@@ -129,7 +129,7 @@ public:
 #pragma region with BE for SettingStage
 	int32 count = 0;
 	// 요청
-	void ReqSetMyConcert(const FConcertInfo& concert );
+	void ReqSetMyConcert(FConcertInfo& concert );
 	// 응답
 	void OnResSetConcert( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
 #pragma endregion
@@ -184,8 +184,16 @@ public:
 	void OnResCheckAllOpenConcert( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
 #pragma endregion
 
-#pragma region with Ai for Text
-
+#pragma region with Ai for Image
+	FString ticketURL;
+	//요청
+	void ReqMultipartCapturedWithAI(const FString& ImagePath, const FString& url = TEXT("http://master-of-prediction.shop:8123/api/v1/files/upload") );
+	//응답
+	void OnReqMultipartCapturedWithAI( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
+#pragma endregion
+#pragma region Translate
+	void ReqTranslateChat(const FString& json );
+	void OnReqTranslateChat( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
 #pragma endregion
 
 
