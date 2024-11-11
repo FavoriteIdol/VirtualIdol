@@ -493,7 +493,7 @@ void UStartWidget_KMK::PressUpload ( )
         {
             UE_LOG(LogTemp, Warning, TEXT("Selected File: %s"), *FilePath);
             FString FileName = FPaths::GetCleanFilename(FilePath); 
-			httpActor->ReqMultipartCapturedWithAI(FileName, TEXT("https://singular-swine-deeply.ngrok-free.app/upload" ) );
+			httpActor->ReqMultipartCapturedWithAI(FilePath, TEXT("https://singular-swine-deeply.ngrok-free.app/upload" ) );
         }
     }
     else
