@@ -218,7 +218,7 @@ void UVirtual_KMK::SetInterviewee ( bool bInterview , APlayerState* interviewee,
 	{
 		//intervieweePlayer->CameraBoom->TargetArmLength = 0;
 		interviewee->GetPawn ( )->SetActorTransform ( StageLocation );
-		interviewee->GetPawn ( )->SetActorScale3D ( FVector ( 5.0 ) );
+		interviewee->GetPawn ( )->SetActorScale3D ( FVector ( 1.0 ) );
 
 		if (APawn* pawn = interviewee->GetPawn ( ))
 		{
@@ -232,7 +232,7 @@ void UVirtual_KMK::SetInterviewee ( bool bInterview , APlayerState* interviewee,
 	else
 	{
 		interviewee->GetPawn ( )->SetActorTransform ( preLoc );
-		interviewee->GetPawn ( )->SetActorScale3D ( FVector ( 2.0 ) );
+		interviewee->GetPawn ( )->SetActorScale3D ( FVector ( 1.0 ) );
 
 		if (APawn* pawn = interviewee->GetPawn ( ))
 		{

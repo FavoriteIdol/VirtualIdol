@@ -11,8 +11,9 @@ enum class DummyState
 	Idle,
 	Jump,
 	Move,
-	Imoji,
-	Fever
+	Emoji,
+	Fever,
+	Throw,
 };
 UCLASS()
 class VIRTUALIDOL_API ADummy_KMK : public ACharacter
@@ -42,7 +43,7 @@ public:
 	void IdleFucn(const float& DeltaTime );
 	void JumpFunc(const float& DeltaTime );
 	void MoveFucn(const float& DeltaTime );
-	void ImojiFucn(const float& DeltaTime );
+	void EmojiFucn(const float& DeltaTime );
 
 	void AppearImoji ( int32 num );
 	void DisappearImoji ( );
@@ -112,4 +113,37 @@ public:
 	UPROPERTY( EditAnywhere , BlueprintReadWrite , Category = FeverGauge )
 	UMaterialInstanceDynamic* FaceDynamicMat;
 
+	// Throwing =======================================================
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite )
+	class UArrowComponent* ThrowingArrow;
+
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadWrite )
+	class AHSW_ThrowingObject* ThrowingObject;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite )
+	TSubclassOf<class AHSW_ThrowingObject> ThrowingObjectFactory;
+
+	UPROPERTY(EditDefaultsOnly,BlueprintReadWrite )
+	float ThrowingSpeed = 8000000.0f;
+
+	UPROPERTY(Replicated, EditDefaultsOnly,BlueprintReadWrite )
+	FRotator ThrowingRotator;
+
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadWrite )
+	bool bCanThrow = false;
+
+	UPROPERTY( Replicated, EditDefaultsOnly , BlueprintReadWrite )
+	int32 ThrowingObjectIndex = 0;
+
+	UFUNCTION( )
+	void CreateThrowingObject( );
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastRPC_ThrowObject( );
+
+	UPROPERTY(Replicated, EditDefaultsOnly,BlueprintReadWrite )
+	bool bThrowing;
+
+	float ThrowTimer = 0.5;
 };
