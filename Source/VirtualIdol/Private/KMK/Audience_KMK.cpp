@@ -162,12 +162,12 @@ void UAudience_KMK::SetUpButtonInfo ( )
     for (int i = 1; i < buttonName.Num ( ); i++)
     {
         FName bName = FName(*FString::Printf(TEXT("Butt_") ) + buttonName[i]);
-        FName bImgName = FName(*FString::Printf(TEXT("Image_Back_")  )+ buttonName[i] );
+        // FName bImgName = FName(*FString::Printf(TEXT("Image_Back_")  )+ buttonName[i] );
         FName iName = FName(*FString::Printf(TEXT("Image_") )+ buttonName[i] );
         FName tName = FName(*FString::Printf(TEXT("Text_")  )+ buttonName[i] );
 
         UButton* butt = Cast<UButton>(GetWidgetFromName(bName));
-        UImage* bImg = Cast<UImage>(GetWidgetFromName(bImgName));
+        // UImage* bImg = Cast<UImage>(GetWidgetFromName(bImgName));
         UImage* img = Cast<UImage>(GetWidgetFromName(iName));
         UTextBlock* text = Cast<UTextBlock>(GetWidgetFromName(tName));
 
@@ -176,7 +176,7 @@ void UAudience_KMK::SetUpButtonInfo ( )
             FButtonInfo ButtonInfo;
             ButtonInfo.button = butt;
             ButtonInfo.image = img;
-            ButtonInfo.backImage = bImg;
+            //ButtonInfo.backImage = bImg;
             ButtonInfo.text = text;
             ButtonsInfoArray.Add(ButtonInfo);
         }
@@ -192,7 +192,7 @@ void UAudience_KMK::PressHiddenButt ( )
     else 
     {
         ButtPanel->SetVisibility(ESlateVisibility::Visible);
-        bHide = true;
+        bHide = false;
     }
 }
 
@@ -322,14 +322,14 @@ void UAudience_KMK::OnOffInfo ( FLinearColor color,  ESlateVisibility bVisib, in
         if (i == num)
         {
             ButtonsInfoArray[i].image->SetBrushTintColor(color);
-            ButtonsInfoArray[i].backImage->SetVisibility(ESlateVisibility::Visible);
+            //ButtonsInfoArray[i].backImage->SetVisibility(ESlateVisibility::Visible);
             ButtonsInfoArray[i].text->SetText(FText::FromString(textArray[i]));
         }
         else
         {
             if(bMyVip && i == ButtonsInfoArray.Num() - 1) continue;
             ButtonsInfoArray[i].button->SetVisibility ( bVisib );
-            ButtonsInfoArray[i].backImage->SetVisibility ( bVisib );
+            //ButtonsInfoArray[i].backImage->SetVisibility ( bVisib );
             ButtonsInfoArray[i].image->SetVisibility ( bVisib );
             ButtonsInfoArray[i].text->SetVisibility ( bVisib );
         }
@@ -339,7 +339,7 @@ void UAudience_KMK::VipAuthority ( )
 {
     bMyVip = true;
     ButtonsInfoArray[5].button->SetVisibility ( ESlateVisibility::Hidden );
-    ButtonsInfoArray[5].backImage->SetVisibility ( ESlateVisibility::Hidden );
+    // ButtonsInfoArray[5].backImage->SetVisibility ( ESlateVisibility::Hidden );
     ButtonsInfoArray[5].image->SetVisibility ( ESlateVisibility::Hidden );
     ButtonsInfoArray[5].text->SetVisibility ( ESlateVisibility::Hidden );
 }
@@ -384,7 +384,7 @@ void UAudience_KMK::PressSendButt ( )
         {
             if (!EditText_Chat->GetText ( ).IsEmpty ( ))
             {
-                server->ServerRPCChat( EditText_Chat->GetText ( ).ToString ( ) );
+                server->ServerRPCChat(gi->GetMyInfo().userName, EditText_Chat->GetText ( ).ToString ( ) );
 
                 EditText_Chat->SetText ( FText::GetEmpty ( ) );
             }
@@ -397,17 +397,17 @@ void UAudience_KMK::PressSendButt ( )
         {
             if (!EditText_Chat->GetText ( ).IsEmpty ( ))
             {
-                gs->ServerRPCChat ( EditText_Chat->GetText ( ).ToString ( ) );
+                gs->ServerRPCChat (gi->GetMyInfo().userName, EditText_Chat->GetText ( ).ToString ( ) );
                 EditText_Chat->SetText ( FText::GetEmpty ( ) );
             }
         }
     }
 }
 
-void UAudience_KMK::CreateChatWidget ( const FString& chatText )
+void UAudience_KMK::CreateChatWidget (const FString& nickname, const FString& chatText )
 {
     auto* chat = CreateWidget<USendChat_KMK> ( this, chatWidgetFact );
-    chat->Text_Chat->SetText ( FText::FromString ( chatText ) );
+    chat->SetChatText(nickname, chatText);
     SB_ChatLog->AddChild ( chat );
     SB_ChatLog->ScrollToEnd();
 }

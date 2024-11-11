@@ -257,6 +257,40 @@ FString UJsonParseLib_KMK::CreateTicketJson ( const TMap<FString , FString> tick
 	return json;
 
 }
+
+FString UJsonParseLib_KMK::MakeChatTranslate ( const FString& translateText )
+{
+	// 로그인 데이터를 JsonObject 형식으로 만든다.
+	TSharedPtr<FJsonObject> jsonObject = MakeShareable ( new FJsonObject ( ) );
+
+ //   jsonObject->SetStringField("email" , *id);
+	//jsonObject->SetStringField("password" , *pw);
+
+	// writer를 만들어서 JsonObject를 인코딩해서 
+	FString json;
+	TSharedRef<TJsonWriter<TCHAR>> writer = TJsonWriterFactory<TCHAR>::Create ( &json );
+	FJsonSerializer::Serialize ( jsonObject.ToSharedRef ( ) , writer );
+	// 반환한다.
+	return json;
+}
+
+FString UJsonParseLib_KMK::ParseChatTranslate ( const FString& json )
+{
+    // 서버에서 가져온 json 파일 읽기
+    TSharedRef<TJsonReader<TCHAR>> reader = TJsonReaderFactory<TCHAR>::Create ( json );
+    // FJsonObject 형식으로 읽어온 json 데이터를 저장함 => 공유 포인터 형태로 객체 감싸기
+    TSharedPtr<FJsonObject> response = MakeShareable ( new FJsonObject ( ) );
+    // 역직렬화 : josn 문자열을 FJsonObject로 변경하기
+    FString result;
+
+    if (FJsonSerializer::Deserialize ( reader , response ))
+    {
+        response->TryGetStringField ( TEXT ( "translated_text" ) , result);
+    }
+    UE_LOG ( LogTemp , Warning , TEXT ( "번역 : %s" ) , *result );
+    return result;
+}
+
 #pragma endregion
 
 UTexture2D* UJsonParseLib_KMK::MakeTexture(const TArray<uint8>& ImageData)

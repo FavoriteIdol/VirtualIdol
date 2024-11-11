@@ -344,7 +344,7 @@ public:
 	void InitializeAudienceWidget( TSubclassOf<class UAudience_KMK>  widgetFact );
 
 	UFUNCTION( )
-	void SetChatWidget(const FString& text );
+	void SetChatWidget(const FString& nickName, const FString& text );
 #pragma endregion
 
 

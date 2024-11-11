@@ -86,6 +86,7 @@ void UVirtual_KMK::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
             if (virtualWidget)
             {
                 virtualWidget->BeforeStartConcertCount(diffTime);
+				virtualWidget->SetConcertName(gi->concerInfo.name );
             }
 		}
 	}
@@ -158,9 +159,9 @@ FString UVirtual_KMK::GetTimeDifference ( const FString& SetTime )
 	return TimeDifference;
 }
 
-void UVirtual_KMK::SetVirtualChat ( const FString& text )
+void UVirtual_KMK::SetVirtualChat (const FString& nickName, const FString& text )
 {
-	if(virtualWidget)virtualWidget->CreateChatWidget(text);
+	if(virtualWidget)virtualWidget->CreateChatWidget(nickName, text);
 }
 
 void UVirtual_KMK::SetVirtualVisible ( bool bVisit /*= false */ )
@@ -217,7 +218,7 @@ void UVirtual_KMK::SetInterviewee ( bool bInterview , APlayerState* interviewee,
 	{
 		//intervieweePlayer->CameraBoom->TargetArmLength = 0;
 		interviewee->GetPawn ( )->SetActorTransform ( StageLocation );
-		interviewee->GetPawn ( )->SetActorScale3D ( FVector ( 5.0 ) );
+		interviewee->GetPawn ( )->SetActorScale3D ( FVector ( 1.0 ) );
 
 		if (APawn* pawn = interviewee->GetPawn ( ))
 		{
@@ -231,7 +232,7 @@ void UVirtual_KMK::SetInterviewee ( bool bInterview , APlayerState* interviewee,
 	else
 	{
 		interviewee->GetPawn ( )->SetActorTransform ( preLoc );
-		interviewee->GetPawn ( )->SetActorScale3D ( FVector ( 2.0 ) );
+		interviewee->GetPawn ( )->SetActorScale3D ( FVector ( 1.0 ) );
 
 		if (APawn* pawn = interviewee->GetPawn ( ))
 		{

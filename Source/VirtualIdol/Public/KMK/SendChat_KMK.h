@@ -17,7 +17,9 @@ public:
 	// 버튼
 	UPROPERTY(meta = (BindWidget))
     class UTextBlock* Text_Chat;
+	UPROPERTY(meta = (BindWidget))
+    class UTextBlock* Text_ChatName;
 
 	UFUNCTION( )
-	void SetChatText(const FString& chatText );
+	void SetChatText(const FString& nickname, const FString& chatText );
 };

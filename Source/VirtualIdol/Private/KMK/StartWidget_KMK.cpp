@@ -256,7 +256,7 @@ void UStartWidget_KMK::StartConcertPanel ( )
 	if (gi)
 	{
 		gi->playerMeshNum = -1;
-		gi->CreateMySession(TEXT("조준혁"), 30);
+		gi->CreateMySession(gi->GetMyInfo().userName, gi->concerInfo.peopleScale);
 	}
 }
 
@@ -468,6 +468,7 @@ void UStartWidget_KMK::PressCreateTicket ( )
 	FString concertString = TEXT("공연 명 : ") + EditText_StageName->GetText ( ).ToString ( ) + TEXT ( "\n" ) 
 						TEXT("공연 날짜 : " ) + year + TEXT ( "년" )+ mon + TEXT("월") + day + TEXT("일") + TEXT("\n") + TEXT("공연 시간 : " ) + sH +TEXT("시") + sM +TEXT("분");
 	data.Add(TEXT("description"), *concertString);
+	// 티켓 만들기
 	httpActor->ReqTicket(data);
 	// EditMultiText_Ticket->SetText ( FText::GetEmpty ( ) );
 }
@@ -491,7 +492,8 @@ void UStartWidget_KMK::PressUpload ( )
         for (const FString& FilePath : SelectedFiles)
         {
             UE_LOG(LogTemp, Warning, TEXT("Selected File: %s"), *FilePath);
-            FString FileName = FPaths::GetCleanFilename(FilePath);  // "Example.wav"
+            FString FileName = FPaths::GetCleanFilename(FilePath); 
+			httpActor->ReqMultipartCapturedWithAI(FilePath, TEXT("https://singular-swine-deeply.ngrok-free.app/upload" ) );
         }
     }
     else
@@ -611,7 +613,7 @@ void UStartWidget_KMK::PressNextButt ( )
 	StageScalePanel->SetVisibility ( ESlateVisibility::Hidden );
 	Text_FinalCount->SetText ( EditText_ScaleNum->GetText() );
 	Text_FinalPay->SetText ( Text_Price->GetText() );
-	FString s = Text_FinalPay->GetText().ToString();
+	FString s = Text_Price->GetText().ToString();
 	gi->myCash -= FCString::Atoi(*s);
 	Butt_Next->SetVisibility ( ESlateVisibility::Hidden );
 	Butt_CreateTicket1->SetVisibility(ESlateVisibility::Visible);
@@ -676,6 +678,7 @@ void UStartWidget_KMK::PressYesButt ( )
 {
 	if (gi && gi->roomNum >= 0)
 	{
+		httpActor->ReqCheckIdStage(gi->GetConcertInfo().stageId );
 		
 		if (TEXT_VIP->GetText ( ).ToString ( ).Contains ( TEXT ( "VIP" ) ))
         {
