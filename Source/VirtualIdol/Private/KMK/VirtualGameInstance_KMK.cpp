@@ -165,7 +165,7 @@ void UVirtualGameInstance_KMK::OnMyFindSessionComplete ( bool bSuccessful )
             FString host;
             result.Session.SessionSettings.Get(FName("HOST_NAME" ), host );
             roomInfo.hostName = StringBase64Decode(host);
-            for (auto& concert : allConcertInfoArray)
+            for (FConcertInfo& concert : allConcertInfoArray)
             {
                 if (concert.userName == roomInfo.hostName)
                 {
