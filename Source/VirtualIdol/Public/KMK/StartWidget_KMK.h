@@ -358,6 +358,8 @@ public:
 
 	UPROPERTY(meta = (BindWidget))
     class UTextBlock* TEXT_VIP;
+	UPROPERTY(meta = (BindWidget))
+    class UTextBlock* Text_TicketPrice;
 	UPROPERTY ( meta = ( BindWidget ) )
     class UMultiLineEditableTextBox* MultiText_VIP;
 	// 버튼 연동 함수
@@ -391,6 +393,8 @@ public:
 #pragma region FindRoom & Select Stage
 	UPROPERTY( )
 	bool bCreateTicket = false;
+	UFUNCTION( )
+	void SetLoadImage( );
 #pragma endregion
 
 };

@@ -31,6 +31,8 @@ struct FRoomInfo
 	int32 CurrentPlayer = 0;
 	UPROPERTY(BlueprintReadOnly)
 	int32 pingMS = 0;
+	UPROPERTY( )
+	int32 ticketPrice = -1;
 	UPROPERTY(BlueprintReadOnly )
 	class UTexture2D* texture = NULL;
 
