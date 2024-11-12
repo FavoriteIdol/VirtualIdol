@@ -210,7 +210,7 @@ void UVirtual_KMK::StartCountDown ( )
 			virtualWidget->CountDownPanelVisible ( ESlateVisibility::Hidden );
 			if(appearFact.Num() > 0) GetWorld ( )->SpawnActor<AActor> ( gi->effectArray[gi->GetConcertInfo().appearedVFX] , gi->spawnTrans );
 			UE_LOG(LogTemp, Warning, TEXT("%d" ), gi->GetConcertInfo().appearedVFX);
-        } ) , 6 , false );
+        } ) , 0 , false );
 
 }
 

@@ -205,7 +205,7 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 	{
 		gi->spawnTrans = FTransform(FVector(0,0,2000 ) );
 	}
-	MulticastFeverEffect( );
+	//MulticastFeverEffect( );
 #pragma endregion
 
 
@@ -671,7 +671,11 @@ void AHSW_ThirdPersonCharacter::MulticastFeverEffect_Implementation ( )
 // 	DamagedEffect->SetAutoDestroy ( true );
 	auto* gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance() );
 
+	if (gi->GetConcertInfo ( ).feverVFX >= 0)
+	{
 	FeverEffect_Actor = GetWorld ( )->SpawnActor<AActor> (  gi->effectArray[gi->GetConcertInfo().feverVFX] , gi->spawnTrans );
+
+	}
 	
 }
 

@@ -269,16 +269,19 @@ void UAudienceServerComponent_KMK::SetVirtualVisible ( class AHSW_ThirdPersonCha
 #pragma region StartConcert
 void UAudienceServerComponent_KMK::StartCountDown ( )
 {
-	bTime = true;
+	virtualCharacter->SetVirtualVisible ( true );
+	UE_LOG(LogTemp, Warning, TEXT("Client Virtual Find" ));
+	UVirtualGameInstance_KMK* gi = Cast<UVirtualGameInstance_KMK> ( GetWorld ( )->GetGameInstance ( ) );
+	if (appearFact.Num ( ) > 0 && gi->GetConcertInfo().appearedVFX >= 0) GetWorld ( )->SpawnActor<AActor> ( gi->effectArray[gi->GetConcertInfo ( ).appearedVFX] , gi->spawnTrans );
 	
-	GetWorld ( )->GetTimerManager ( ).SetTimer ( startCountDownHandle , FTimerDelegate::CreateLambda ( [this]( )
-		{
-			playerMesh->audienceWidget->CountDownPanelVisible ( ESlateVisibility::Hidden );
-			bTime = false;
-			virtualCharacter->SetVirtualVisible(true);
-			UVirtualGameInstance_KMK* gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance());
-			if (appearFact.Num ( ) > 0) GetWorld ( )->SpawnActor<AActor> ( gi->effectArray[gi->GetConcertInfo().appearedVFX] , gi->spawnTrans );
-		} ) , 6 , false );
+	//GetWorld ( )->GetTimerManager ( ).SetTimer ( startCountDownHandle , FTimerDelegate::CreateLambda ( [this]( )
+	//	{
+	//		playerMesh->audienceWidget->CountDownPanelVisible ( ESlateVisibility::Hidden );
+	//		bTime = false;
+	//		virtualCharacter->SetVirtualVisible(true);
+	//		UVirtualGameInstance_KMK* gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance());
+	//		if (appearFact.Num ( ) > 0) GetWorld ( )->SpawnActor<AActor> ( gi->effectArray[gi->GetConcertInfo().appearedVFX] , gi->spawnTrans );
+	//	} ) , 0 , false );
 }
 
 

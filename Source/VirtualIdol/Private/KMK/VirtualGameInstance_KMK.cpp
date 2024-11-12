@@ -109,7 +109,7 @@ void UVirtualGameInstance_KMK::OnMyCreateSessionComplete ( FName SessionName , b
 
         // 서버가 여행을 떠나고 싶다.
         //GetWorld ( )->ServerTravel ( TEXT ( "/Game/Project/Personal/KMK/Maps/KMK_TravelLevel?listen" ) );
-        GetWorld ( )->ServerTravel(TEXT("/Game/Project/Personal/JJH/BluePrints/LevelActor/ThirdLevel/LV_AlphaTest?listen"), ETravelType::TRAVEL_Absolute);
+        GetWorld ( )->ServerTravel(TEXT("/Game/Project/CommonFile/Maps/LV_ALPHA?listen"), ETravelType::TRAVEL_Absolute);
     }
     else
     {
@@ -257,7 +257,8 @@ void UVirtualGameInstance_KMK::OnMyDestroyRoomComplete ( FName RoomName , bool b
         // 로비로 돌아가고 싶다 = 클라이언트가 여행을 갈것이다.
         auto* pc = GetWorld()->GetFirstPlayerController();
         // pc->ClientTravel(TEXT("/Game/Project/Personal/KMK/Maps/KMK_Maps.KMK_Maps'?listen"), ETravelType::TRAVEL_Absolute);
-        pc->ClientTravel(TEXT("/Game/Project/Personal/JJH/BluePrints/LevelActor/ThirdLevel/LV_AlphaTest'?listen"), ETravelType::TRAVEL_Absolute);
+        pc->ClientTravel(TEXT("/Game/Project/CommonFile/Maps/LV_ALPHA'?listen"), ETravelType::TRAVEL_Absolute);
+
         // 방을 만들었다면 방을 부수고 아니라면 그냥 나감
     }
 }
