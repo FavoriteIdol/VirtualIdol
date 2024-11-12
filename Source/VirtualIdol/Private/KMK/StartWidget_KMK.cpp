@@ -22,6 +22,10 @@
 #include "Components/ScrollBox.h"
 #include "KMK/HttpActor_KMK.h"
 #include "JJH/JJH_SelectManager.h"
+#include "Components/MultiLineEditableTextBox.h"
+#include "Materials/MaterialInstanceDynamic.h"
+#include "IDesktopPlatform.h"
+#include "DesktopPlatformModule.h"
 
 void UStartWidget_KMK::NativeConstruct ( )
 {	
@@ -30,10 +34,17 @@ void UStartWidget_KMK::NativeConstruct ( )
 	gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance() );
 	httpActor = Cast<AHttpActor_KMK>(UGameplayStatics::GetActorOfClass(GetWorld() , httpFact));
 	selectManager = Cast<AJJH_SelectManager>(UGameplayStatics::GetActorOfClass(GetWorld() , selectFact));
-	
+	loadMatInst = UMaterialInstanceDynamic::Create ( loadMatFact, this );
+	if (Image_Load)
+	{
+		Image_Load->SetBrushFromMaterial(loadMatInst);
+		loadMatInst->SetScalarParameterValue ( TEXT ( "Gauge" ) , 0 );
+	}
 	if (gi->bLogin)
 	{
+		selectManager->DeleteStage ( );
 		StartSwitcher->SetActiveWidgetIndex ( 1 );
+		ChangeMyProfile ( );
 	}
 	else
 	{
@@ -60,6 +71,7 @@ void UStartWidget_KMK::NativeConstruct ( )
 	if (Butt_StartConcert)
 	{
 		Butt_StartConcert->OnClicked.AddDynamic ( this , &UStartWidget_KMK::StartConcertPanel );
+		Butt_StartConcert->bIsEnabled = false;
 	}
 	if (Butt_ComeInStage)
 	{
@@ -89,10 +101,11 @@ void UStartWidget_KMK::NativeConstruct ( )
 		Butt_AppearEffect->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressAppearEffect );
 		Butt_FeverEffect->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressFeverEffect );
 	}
-	if (Butt_Select &&Butt_Select1)
+	if (Butt_Select &&Butt_Select1 && Butt_Upload)
 	{
 		Butt_Select->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressSelectButt );
 		Butt_Select1->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressSelect1Butt );
+		Butt_Upload->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressUpload );
     }	
 	if (SetDayPanel && SetTicketPanel && StageChargePanel)
 	{
@@ -104,8 +117,7 @@ void UStartWidget_KMK::NativeConstruct ( )
 #pragma region Pay Moneny
 	if (Butt_PayMoney)
 	{
-		Butt_PayMoney->OnClicked.Clear();
-		Butt_PayMoney->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressPayMoney );
+		Butt_PayMoney->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressMoneyPay );
 	}
 	if (Butt_Next)
 	{
@@ -155,7 +167,7 @@ void UStartWidget_KMK::NativeConstruct ( )
 
 #pragma endregion
 
-
+	SetButtEnable( );
 }
 
 void UStartWidget_KMK::NativeTick ( const FGeometry& MyGeometry , float InDeltaTime )
@@ -167,8 +179,14 @@ void UStartWidget_KMK::NativeTick ( const FGeometry& MyGeometry , float InDeltaT
 		{
 			FString s = EditText_ScaleNum->GetText().ToString();
 			int a = FCString::Atoi(*s) * concertPrice;
+			concertInfo.ticketPrice = a;
 			Text_Price->SetText(FText::AsNumber(a));
 		}
+	}
+	if (!bCreateTicket)
+	{
+		matNum += 0.005f;
+		ChangeLoadMat( matNum);
 	}
 	
 }
@@ -176,6 +194,7 @@ void UStartWidget_KMK::NativeTick ( const FGeometry& MyGeometry , float InDeltaT
 #pragma region BackFunction
 void UStartWidget_KMK::GoBack ( )
 {
+	selectManager->DeleteStage ( );
     StartSwitcher->SetActiveWidgetIndex (1);
 	ClearSB( );
 }
@@ -192,6 +211,7 @@ void UStartWidget_KMK::OnMyLogin ( )
 	{
 		// 서버에 정보값 보내기
 		httpActor->ReqLogin(EditText_ID->GetText().ToString(), EditText_PW->GetText().ToString());
+		
 		//StartSwitcher->SetActiveWidgetIndex ( 1 );
 	}
 }
@@ -204,6 +224,18 @@ void UStartWidget_KMK::OnFailLogin ( )
 #pragma endregion
 
 #pragma region FourButtPanel
+void UStartWidget_KMK::ChangeMyProfile ( )
+{
+	Text_MyCash->SetText(FText::AsNumber(gi->myCash));
+	Text_MyNick->SetText(FText::FromString(gi->GetMyInfo().userName));
+}
+
+void UStartWidget_KMK::SetButtEnable ( bool bEnable /*= false*/ )
+{
+	Butt_StartConcert->SetIsEnabled(bEnable);
+	isButtEanble = bEnable;
+}
+
 // 무대 꾸미기 레벨로 이동
 void UStartWidget_KMK::CreateStagePanel ( )
 {
@@ -213,6 +245,9 @@ void UStartWidget_KMK::CreateStagePanel ( )
 void UStartWidget_KMK::SettingStagePanel ( )
 {
 	StartSwitcher->SetActiveWidgetIndex ( 3 );
+	Butt_UserStage->SetVisibility(ESlateVisibility::Visible);
+	Butt_MyStage->SetVisibility(ESlateVisibility::Visible);
+	Butt_Star->SetVisibility(ESlateVisibility::Visible);
 	httpActor->ReqCheckStage(this);
 }
 // 공연 시작 : 세션 생성
@@ -221,13 +256,18 @@ void UStartWidget_KMK::StartConcertPanel ( )
 	if (gi)
 	{
 		gi->playerMeshNum = -1;
-		gi->CreateMySession(TEXT("조준혁"), 30);
+		gi->CreateMySession(gi->GetMyInfo().userName, gi->concerInfo.peopleScale);
 	}
 }
 
 void UStartWidget_KMK::ComeInStagePanel ( )
 {	
 	// 세션 찾기
+	Butt_UserStage->SetVisibility(ESlateVisibility::Hidden);
+	Butt_MyStage->SetVisibility(ESlateVisibility::Hidden);
+	Butt_Star->SetVisibility(ESlateVisibility::Hidden);
+	// 무대 조회하기
+	httpActor->ReqCheckAllOpenConcert();
 	FindRoom();
 }
 
@@ -239,28 +279,24 @@ void UStartWidget_KMK::PressUserStageButt ( )
 {
 	ClearSB( );
 	// BE에서 스테이지 정보값 조회
-
-	for (int i = 0; i < allStageInfoArray.Num ( ); i++)
-	{
-		CreateStageWidget(allStageInfoArray[i]);
-	}
+	httpActor->ReqCheckStage(this);
 }
 
 void UStartWidget_KMK::PressMyStageButt ( )
 {
 	ClearSB( );
 	// BE에서 스테이지 정보값 조회 
-
+	httpActor->ReqCheckMyStage(this);
 }
 
-void UStartWidget_KMK::CreateStageWidget (const struct FStageInfo& stageInfo )
+void UStartWidget_KMK::CreateStageWidget (const struct FStageInfo& stageInfo, UTexture2D* image )
 {
 	// 이펙트를 고르기 위한
 	auto* wid = Cast<URoomWidget_KMK> ( CreateWidget ( GetWorld ( ) , roomWidgetFact ) );
 	if (wid)
 	{
-		wid->SetStageText ( stageInfo );
-		wid->sm = selectManager;
+		wid->SetStageText ( stageInfo, image );
+		gi->sm = selectManager;
 		SB_FindStage->AddChild(wid);
 	}
 }
@@ -282,8 +318,12 @@ void UStartWidget_KMK::PressSelectButt ( )
 {
 	if (selectNum == 0)
 	{
+		Text_Effect1->SetText(FText::FromString(TEXT("공연 설정을 완료해주세요")));
 		bool bNext = BEditTextEmpty ( );
-		if(!bNext) return;
+		if(!bNext) 
+		{
+			return;
+		}
 		SetTitleText ( TEXT ( "티켓" ) );
 		
 		SetPanelVisible( SetTicketPanel , SetDayPanel, StageChargePanel );
@@ -291,7 +331,12 @@ void UStartWidget_KMK::PressSelectButt ( )
 	}
 	else if (selectNum == 1)
 	{
-		if(EditText_Price->GetText().IsEmpty()) return;
+		Text_Effect1->SetText(FText::FromString(TEXT("VIP 가격 설정을 완료해주세요")));
+		if(EditText_Price->GetText().IsEmpty()) 
+		{
+			EffectPopUp1->SetVisibility(ESlateVisibility::Visible);
+			return;
+		}
 		SetTitleText ( TEXT ( "이펙트 설정" ) );
 		SetPanelVisible ( StageChargePanel , SetTicketPanel , SetDayPanel );
 		selectNum++;
@@ -304,6 +349,13 @@ void UStartWidget_KMK::PressSelectButt ( )
 		selectNum = 0;
 	}
 
+}
+
+
+void UStartWidget_KMK::ChangeLoadMat ( float num )
+{
+	if(matNum < 1)loadMatInst->SetScalarParameterValue ( TEXT ( "Gauge" ) , num );
+	else matNum = 0;
 }
 
 void UStartWidget_KMK::SetTitleText ( const FString& title )
@@ -339,7 +391,7 @@ bool UStartWidget_KMK::BEditTextEmpty ( )
 		Text_FinalDay->SetText(EditText_Day->GetText());
 
 		FString year = TEXT("20") + EditText_Year->GetText ( ).ToString ( );
-		FString mon = ChangeString(EditText_Day->GetText().ToString());
+		FString mon = ChangeString(EditText_Mon->GetText().ToString());
 		FString day = ChangeString(EditText_Day->GetText().ToString());
 
 		concertInfo.concertDate = year + TEXT("-") + mon + TEXT("-") + day;
@@ -365,7 +417,11 @@ bool UStartWidget_KMK::BEditTextEmpty ( )
 
 		return true;
 	}
-	else return false;
+	else 
+	{
+		EffectPopUp1->SetVisibility(ESlateVisibility::Visible);
+		return false;
+	}
 }
 
 FString UStartWidget_KMK::ChangeString ( const FString& editText )
@@ -376,6 +432,12 @@ FString UStartWidget_KMK::ChangeString ( const FString& editText )
         s = TEXT ( "0" ) + s;
     }
 	return s;
+}
+
+void UStartWidget_KMK::ChangeImageStage ( UTexture2D* texture )
+{
+	Image_Stage->SetBrushFromTexture(texture);
+	//Image_SetStage->SetBrushFromTexture(texture);
 }
 
 bool UStartWidget_KMK::EditTextDigit ( const FString& editText )
@@ -396,7 +458,17 @@ void UStartWidget_KMK::PressCreateTicket ( )
 	TMap<FString, FString> data;
 	data.Add(TEXT("prompt" ), EditMultiText_Ticket->GetText().ToString());
 	// 이 부분 정보는 BE에서 끌어와야함
-	data.Add(TEXT("description"), TEXT("안녕하세요!! 오랜만입니다!!" ));
+    FString year = TEXT ( "20" ) + EditText_Year->GetText ( ).ToString ( );
+    FString mon = ChangeString ( EditText_Day->GetText ( ).ToString ( ) );
+    FString day = ChangeString ( EditText_Day->GetText ( ).ToString ( ) );
+	
+    FString sH = EditText_SHour->GetText ( ).ToString ( );
+    FString sM = EditText_SMin->GetText ( ).ToString ( );
+
+	FString concertString = TEXT("공연 명 : ") + EditText_StageName->GetText ( ).ToString ( ) + TEXT ( "\n" ) 
+						TEXT("공연 날짜 : " ) + year + TEXT ( "년" )+ mon + TEXT("월") + day + TEXT("일") + TEXT("\n") + TEXT("공연 시간 : " ) + sH +TEXT("시") + sM +TEXT("분");
+	data.Add(TEXT("description"), *concertString);
+	// 티켓 만들기
 	httpActor->ReqTicket(data);
 	// EditMultiText_Ticket->SetText ( FText::GetEmpty ( ) );
 }
@@ -404,8 +476,54 @@ void UStartWidget_KMK::PressCreateTicket ( )
 void UStartWidget_KMK::CreateTicketMaterial ( UTexture2D* texture)
 {
 	Image_FinalStageImage->SetBrushFromTexture(texture);
+	Image_FinalConcert->SetBrushFromTexture(texture);
 }
 
+void UStartWidget_KMK::PressUpload ( )
+{
+    TArray<FString> SelectedFiles;
+    FString FileTypes = TEXT("이미지 파일 (*.png;*.jpg;*.jpeg)|*.png;*.jpg;*.jpeg|모든 파일 (*.*)|*.*");
+
+    // 파일 탐색기를 열고 사용자에게 파일 선택을 요청
+    bool bFileSelected =  OpenFileExample(SelectedFiles, TEXT("업로드할 이미지를 선택하세요"), FileTypes, true);
+
+    if (bFileSelected && SelectedFiles.Num() > 0)
+    {
+        for (const FString& FilePath : SelectedFiles)
+        {
+            UE_LOG(LogTemp, Warning, TEXT("Selected File: %s"), *FilePath);
+            FString FileName = FPaths::GetCleanFilename(FilePath); 
+			httpActor->ReqMultipartCapturedWithAI(FilePath, TEXT("https://singular-swine-deeply.ngrok-free.app/upload" ) );
+        }
+    }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("File Selected Failed!!!"))
+    }
+}
+// 파일 열기
+bool UStartWidget_KMK::OpenFileExample(TArray<FString>& FileNames, FString DialogueTitle, FString FileTypes, bool multiselect)
+{
+
+   IDesktopPlatform* DesktopPlatform = FDesktopPlatformModule::Get();
+   bool bOpened = false;
+   FString DefaultPath = FPaths::ProjectContentDir(); // 기본 경로를 프로젝트 콘텐츠 폴더로 설정
+
+   if (DesktopPlatform)
+   {
+      uint32 SelectionFlag = multiselect ? EFileDialogFlags::Multiple : EFileDialogFlags::None;
+      bOpened = DesktopPlatform->OpenFileDialog(
+         NULL,
+         DialogueTitle,
+         DefaultPath,
+         TEXT(""),
+         FileTypes,
+         SelectionFlag,
+         FileNames
+      );
+   }
+   return bOpened;
+}
 void UStartWidget_KMK::ClearAllText ( )
 {
 	
@@ -429,6 +547,7 @@ void UStartWidget_KMK::ClearAllText ( )
 	particleNum = 0;
 	feverNum = 0;
 	
+	bCreateTicket =false;
 }
 
 
@@ -451,7 +570,11 @@ void UStartWidget_KMK::PressFeverEffect ( )
 
 void UStartWidget_KMK::PressSelect1Butt ( )
 {
-	if(particleNum < 0 || feverNum < 0) return;
+	if (particleNum < 0 || feverNum < 0)
+	{
+		EffectPopUp->SetVisibility(ESlateVisibility::Visible);
+		return;
+	}
 	concertInfo.appearedVFX = particleNum;
 	concertInfo.feverVFX = feverNum;
 	StartSwitcher->SetActiveWidgetIndex(2);
@@ -477,7 +600,12 @@ void UStartWidget_KMK::MinusIndex ( int32 num , TArray<class UMaterial*>  meshAr
 
 void UStartWidget_KMK::PressNextButt ( )
 {
-	if(EditText_ScaleNum->GetText().IsEmpty()) return;
+	if (EditText_ScaleNum->GetText ( ).IsEmpty ( ))
+	{
+		Text_Effect1->SetText(FText::FromString(TEXT("수용인원 설정을 완료해주세요")));
+		EffectPopUp->SetVisibility(ESlateVisibility::Visible);
+		return;
+	}
 	concertInfo.peopleScale = FCString::Atoi(*EditText_ScaleNum->GetText().ToString());
 	StagePayPanel->SetVisibility ( ESlateVisibility::Visible );
 	Text_Pay->SetVisibility ( ESlateVisibility::Visible );
@@ -485,22 +613,44 @@ void UStartWidget_KMK::PressNextButt ( )
 	StageScalePanel->SetVisibility ( ESlateVisibility::Hidden );
 	Text_FinalCount->SetText ( EditText_ScaleNum->GetText() );
 	Text_FinalPay->SetText ( Text_Price->GetText() );
+	FString s = Text_Price->GetText().ToString();
+	gi->myCash -= FCString::Atoi(*s);
 	Butt_Next->SetVisibility ( ESlateVisibility::Hidden );
 	Butt_CreateTicket1->SetVisibility(ESlateVisibility::Visible);
 	Text_Price->SetText(FText::GetEmpty ( ) );
 	EditText_ScaleNum->SetText ( FText::GetEmpty ( ) );
 }
-void UStartWidget_KMK::PressPayMoney ( )
+
+void UStartWidget_KMK::PressMoneyPay ( )
 {
-	gi->SetConcertInfo(concertInfo);
-	httpActor->ReqSetConcert(concertInfo);
+	//if (!bCreateTicket)
+	//{
+	//	Text_Effect1->SetVisibility(ESlateVisibility::Hidden);
+	//	MultiText_PopUp->SetVisibility(ESlateVisibility::Visible);
+	//	EffectPopUp1->SetVisibility(ESlateVisibility::Visible);
+	//	return;
+	//}
+	//else
+	//{
+	//	Text_Effect1->SetVisibility(ESlateVisibility::Visible);
+	//	MultiText_PopUp->SetVisibility(ESlateVisibility::Hidden);
+	//	EffectPopUp1->SetVisibility(ESlateVisibility::Hidden);
+	//	Image_Load->SetVisibility(ESlateVisibility::Hidden);
+	//}
+	concertInfo.stageId = gi->stageNum;
+	UE_LOG(LogTemp, Warning, TEXT("%d" ), concertInfo.stageId);
+	
+	httpActor->ReqSetMyConcert(concertInfo);
 }
 
 void UStartWidget_KMK::PressOkayButt ( )
 {
+	Text_MyCash->SetText(FText::AsNumber(gi->myCash));
+
 	ClearSB ( );
 	StartSwitcher->SetActiveWidgetIndex ( 1 );
 	ResetWidget( );
+	httpActor->ReqCheckMyConcert();
 }
 
 void UStartWidget_KMK::ResetWidget ( )
@@ -526,21 +676,27 @@ void UStartWidget_KMK::ResetWidget ( )
 // vip 접속
 void UStartWidget_KMK::PressYesButt ( )
 {
-	if (gi && roomNum >= 0)
+	if (gi && gi->roomNum >= 0)
 	{
-		gi->JoinRoom(roomNum, 1);
-
+		httpActor->ReqCheckIdStage(gi->GetConcertInfo().stageId );
+		
+		if (TEXT_VIP->GetText ( ).ToString ( ).Contains ( TEXT ( "VIP" ) ))
+        {
+			gi->JoinRoom(gi->roomNum , 1);
+        }
+		else
+		{
+			gi->JoinRoom(gi->roomNum );
+		}
 		//ChangeAudienceMesh(0);
 	}
 }
 // 일반 접속
 void UStartWidget_KMK::PressNormalEntry ( )
 {
-	if (gi && roomNum >= 0)
-	{
-		gi->JoinRoom(roomNum);
-		//ChangeAudienceMesh(1);
-	}
+	TEXT_VIP->SetText(FText::FromString(TEXT("일반 입장하시겠습니까?" )));
+	MultiText_VIP->SetText(FText::FromString(TEXT("VIP 입장을 이용해보세요!\nVIP 입장시 더 많은 혜택을 누릴 수 있습니다" )));
+	VIPPopUpPanel->SetVisibility(ESlateVisibility::Visible);
 }
 void UStartWidget_KMK::PressNoButt ( )
 {
@@ -550,6 +706,8 @@ void UStartWidget_KMK::PressNoButt ( )
 // 세션 확인할 수 있는 UI 띄우기
 void UStartWidget_KMK::PressVipEntry ( )
 {
+	TEXT_VIP->SetText(FText::FromString(TEXT("VIP로 입장하시겠습니까?" )));
+	MultiText_VIP->SetText(FText::FromString(TEXT("VIP 입장시 앞열 관람, 티켓 콜렉션 수집이 가능하며,\n커스텀 응원봉으로 입장 등의 혜택이 있습니다" )));
 	VIPPopUpPanel->SetVisibility(ESlateVisibility::Visible);
 }
 
@@ -588,8 +746,6 @@ void UStartWidget_KMK::ClearChild ( )
 		SB_FindStage->ClearChildren();
 	}
 }
-
-
 #pragma endregion
 
 

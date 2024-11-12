@@ -56,24 +56,38 @@ public:
 	class UButton* AfternoonButton;
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UButton* NightButton;		
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* BatManSkyButton;
 
 	UFUNCTION ()
 	void OnAfternoonButtonClicked ( );	
 	UFUNCTION ( )
+	void OnBatManSkyButtonClicked ( );
+	UFUNCTION ( )
 	void OnNightButtonClicked ( );
 
 	//지면
+
 	UPROPERTY ( meta = ( BindWidget ) )
-	class UButton* FloorButton;	
-	
+	class UHorizontalBox* FloorHorizontal;
+
 	UPROPERTY ( meta = ( BindWidget ) )
-	class UButton* GroundButton;
+	class UButton* FloorButton;
+
+
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* FogButton;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* GroundButton;	
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* OceanButton;
 
 	UFUNCTION ( )
 	void OnFogButtonClicked ( );
 	UFUNCTION ( )
 	void OnGroundButtonClicked ( );
-
+	UFUNCTION ( )
+	void OnOceanButtonClicked ( );
 	//캡쳐
 	UPROPERTY(meta = (BindWidget))
 	class UImage* CapturedImage;
@@ -139,22 +153,19 @@ public:
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UButton* EffectButton1;	
 	UPROPERTY ( meta = ( BindWidget ) )
-	class UButton* EffectButton2;
-
-	//지면 바꾸기
-
+	class UButton* EffectButton2;	
 	UPROPERTY ( meta = ( BindWidget ) )
-	class UHorizontalBox* FloorHorizontal;
+	class UButton* EffectButton3;
 
-	UPROPERTY ( meta = ( BindWidget ) )
-	class UButton* FogButton;
-	//UPROPERTY ( meta = ( BindWidget ) )
-	//class UButton* EffectButton2;
-
+	
 	UFUNCTION( )
 	void OnEffectButton1Clicked ();
 	UFUNCTION( )
 	void OnEffectButton2Clicked ();
+	UFUNCTION( )
+	void OnEffectButton3Clicked ( );
+
+
 
 	//선택버튼 뒤에 배경
 	UPROPERTY ( meta = ( BindWidget ) )

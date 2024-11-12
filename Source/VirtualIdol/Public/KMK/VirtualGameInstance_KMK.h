@@ -7,7 +7,14 @@
 #include "Interfaces/OnlineSessionInterface.h"
 #include "HttpActor_KMK.h"
 #include "VirtualGameInstance_KMK.generated.h"
-
+USTRUCT ( BlueprintType )
+struct FDummyNames : public FTableRowBase
+{
+	GENERATED_BODY ( )
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Data" )
+	FString name;
+};
 // 세션을 위한 roomInfo 구조체
 USTRUCT ( BlueprintType )
 struct FRoomInfo
@@ -49,11 +56,14 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 	IOnlineSessionPtr sessionInterface;
 
 	// 호스트 이름은 서버에서 닉네임 받아올 예정
-	FString HostName = TEXT("미호짱");
+	FString HostName;
 
 	UPROPERTY( )
 	bool bLogin = false;
-
+	UPROPERTY(BlueprintReadWrite )
+	bool bPressSession = false;
+	UPROPERTY(BlueprintReadWrite )
+	bool bPressStage = false;
 	void CreateMySession(FString RoomName, int32 PlayerCount);
 
 	void OnMyCreateSessionComplete(FName SessionName, bool bSuccessful);
@@ -113,17 +123,19 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
     int32 playerMeshNum = 0;
 
 #pragma region Token
-	UPROPERTY( )
+	UPROPERTY(BlueprintReadWrite )
 	FLoginInfo loginInfo;
 	UFUNCTION( )
 	void SetMyInfo(const struct FLoginInfo& info  );
-	UFUNCTION( )
+	UFUNCTION(BlueprintCallable )
 	FLoginInfo GetMyInfo( );
 	UPROPERTY( )
 	FConcertInfo concerInfo;
 	UFUNCTION( )
 	void SetConcertInfo( const struct FConcertInfo& info );
-	
+	FString ChangeString ( const FString& editText );
+	UFUNCTION (BlueprintCallable)
+	FConcertInfo GetConcertInfo(  );
 #pragma endregion
 #pragma region Chat
 
@@ -139,4 +151,58 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 
 	UFUNCTION ( BlueprintCallable )
 	void SendMulticastMessage ( );
+
+	// StageInfo를 저장할 멤버 변수
+	UPROPERTY()
+	int32 roomNum = 0;
+	UPROPERTY()
+	FStageInfo myStageInfo;
+	UPROPERTY( )
+	int32 stageNum = 0;
+	UPROPERTY()
+	FRoomInfo mySessionInfo;
+	
+	UFUNCTION (BlueprintCallable)
+	void OnJoinSessionButt(  );
+	UFUNCTION(BlueprintCallable)
+	void OnSetStageButt(  );
+		
+	UPROPERTY( )
+	class AJJH_SelectManager* sm;
+
+	UPROPERTY( )
+	class URoomWidget_KMK* roomWidget;
+	UPROPERTY( )
+	class URoomWidget_KMK* sessionWidget;
+
+	UPROPERTY(EditAnywhere, Category = Cash )
+	int32 myCash = 50000;
+
+	UFUNCTION( )
+	void SetMyProfile( );
+
+	UFUNCTION( )
+	void ChangeTextureWidget(UTexture2D* texture );
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<TSubclassOf<AActor>>effectArray;
+	
+	UPROPERTY( )
+	FStageInfo concertStageInfo;
+
+	UFUNCTION( )
+	void SetConcertStageInfo(FStageInfo& info );
+
+	UFUNCTION( )
+	FStageInfo GetConcertStageInfo( );
+
+	UPROPERTY ( )
+	TArray<struct FConcertInfo> allConcertInfoArray;
+
+	// 데이터 테이블을 블루프린트에 노출
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Data")
+    UDataTable* NamesDataTable;
+
+	UFUNCTION(BlueprintCallable, Category = "Data")
+	FString GetRandomName();
 };

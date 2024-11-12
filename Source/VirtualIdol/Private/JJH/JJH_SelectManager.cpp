@@ -9,6 +9,7 @@
 #include "Engine/TextureRenderTarget2D.h"
 #include "ImageUtils.h"
 #include "Components/Image.h"
+#include "JJH_SetupPlayerController.h"
 
 // Sets default values
 AJJH_SelectManager::AJJH_SelectManager()
@@ -30,6 +31,8 @@ void AJJH_SelectManager::BeginPlay()
 	// SceneCaptureComponent2D를 생성
 	CaptureComponent2D = NewObject<USceneCaptureComponent2D> ( this );
 	CaptureComponent2D->RegisterComponent ( );
+	JJHPC = Cast<AJJH_SetupPlayerController>( GetWorld ( )->GetFirstPlayerController ( ) );
+
 	CaptureComponent2D->SetWorldLocation (GetWorld()->GetFirstPlayerController()->GetPawn ( )->GetActorLocation ( )); // 플레이어 위치 기준으로 캡처
 
 	// 렌더 타겟 생성
@@ -48,50 +51,73 @@ void AJJH_SelectManager::BeginPlay()
 void AJJH_SelectManager::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (JJHPC)
+	{
+		// 카메라 매니저에서 현재 카메라 위치와 회전 가져오기
+		FVector CameraLocation = JJHPC->PlayerCameraManager->GetCameraLocation ( );
+		FRotator CameraRotation = JJHPC->PlayerCameraManager->GetCameraRotation ( );
 
+		// CaptureComponent2D의 위치와 회전 설정
+		CaptureComponent2D->SetWorldLocation ( CameraLocation );
+		CaptureComponent2D->SetWorldRotation ( CameraRotation );
+	}
 }
 
-void AJJH_SelectManager::UpdateSunNightPosition ( bool isNight )
+void AJJH_SelectManager::UpdateSunNightPosition (int32 index)
 {
     FindActorAndDestroy ( TEXT ( "Skybox" ) );
-	if (isNight)
-	{
-		GetWorld()->SpawnActor<AActor>(SkyFactory[0], GetActorTransform ( ) );
-		Stage.sky = 0;
-	}
-	else
-	{
-        GetWorld()->SpawnActor<AActor>( SkyFactory[1] , GetActorTransform ());
-		Stage.sky = 1;
-	}
+
+	GetWorld()->SpawnActor<AActor>(SkyFactory[index], GetActorTransform ( ) );
+	Stage.sky = index;
+
 }
 
 void AJJH_SelectManager::ChangeMap ( int32 index )
 {
-	//케이스 나누어서 하기
-    FindActorAndDestroy(TEXT("Theme"));
+	// 케이스 나누어서 하기
+	FindActorAndDestroy ( TEXT ( "Theme" ) );
 	Stage.theme = index;
-  
+
+	FName LevelToLoad;
+	FName LevelToUnload;
+
 	if (index == 1)
 	{
-		UGameplayStatics::LoadStreamLevel (
-		GetWorld ( ) ,
-		FName ( "LV_Island_JSW" ) ,
-		true ,  // Whether to make the level visible
-		true ,  // Should block on load
-		FLatentActionInfo ( )
-			);
+		LevelToLoad = FName ( "LV_Island_JSW" );
+		LevelToUnload = FName ( "BP_ThirdLevel" );
+	}
+	else if (index == 2)
+	{
+		LevelToLoad = FName ( "BP_ThirdLevel" );
+		LevelToUnload = FName ( "LV_Island_JSW" );
 	}
 	else
 	{
-		UGameplayStatics::UnloadStreamLevel(
-		GetWorld ( ) ,
-		FName ( "LV_Island_JSW" ) ,
-		FLatentActionInfo ( ),	
-		true   // Should block on load
-		);
+		// 처리 없이 바로 반환
 		GetWorld ( )->SpawnActor<AActor> ( ThemeFactory[index] , GetActorTransform ( ) );
+		LevelToUnload = FName ( "LV_Island_JSW" );
+		LevelToUnload = FName ( "BP_ThirdLevel" );
 	}
+
+	UGameplayStatics::LoadStreamLevel (
+		GetWorld ( ) ,
+		LevelToLoad ,
+		true ,  // 레벨을 보이게 할지 여부
+		true ,  // 로드 시 블록할지 여부
+		FLatentActionInfo ( )
+	);
+
+	// 일정 시간 후 이전 레벨을 언로드하는 타이머 설정
+	FTimerHandle UnloadTimerHandle;
+	GetWorld ( )->GetTimerManager ( ).SetTimer ( UnloadTimerHandle , [this , LevelToUnload]( )
+	{
+		UGameplayStatics::UnloadStreamLevel (
+			GetWorld ( ) ,
+			LevelToUnload ,
+			FLatentActionInfo ( ) ,
+			true   // 언로드 시 블록할지 여부
+		);
+	} , 0.2f , false ); // 0.2초의 지연 시간
 }
 
 void AJJH_SelectManager::FindActorAndDestroy(FName tag)
@@ -258,28 +284,70 @@ void AJJH_SelectManager::SaveImage ( UTextureRenderTarget2D* RenderTarget2 )
 
 void AJJH_SelectManager::CreateStage ( const struct FStageInfo& info )
 {
-	DeleteStage();
 	GetWorld()->SpawnActor<AActor>(SkyFactory[info.sky], GetActorTransform ( ) );
+	//if (info.theme == 1)
+	//{
+	//	UGameplayStatics::LoadStreamLevel (
+	//	GetWorld ( ) ,
+	//	FName ( "LV_Island_JSW" ) ,
+	//	true ,  // Whether to make the level visible
+	//	true ,  // Should block on load
+	//	FLatentActionInfo ( )
+	//		);
+	//}
+	//else
+	//{
+	//	UGameplayStatics::UnloadStreamLevel(
+	//	GetWorld ( ) ,
+	//	FName ( "LV_Island_JSW" ) ,
+	//	FLatentActionInfo ( ),	
+	//	true   // Should block on load
+	//	);
+	//	GetWorld ( )->SpawnActor<AActor> ( ThemeFactory[info.theme] , GetActorTransform ( ) );
+	//}
+		// 케이스 나누어서 하기
+	FName LevelToLoad;
+	FName LevelToUnload;
+
 	if (info.theme == 1)
 	{
-		UGameplayStatics::LoadStreamLevel (
-		GetWorld ( ) ,
-		FName ( "LV_Island_JSW" ) ,
-		true ,  // Whether to make the level visible
-		true ,  // Should block on load
-		FLatentActionInfo ( )
-			);
+		LevelToLoad = FName ( "LV_Island_JSW" );
+		LevelToUnload = FName ( "BP_ThirdLevel" );
+	}
+	else if (info.theme == 2)
+	{
+		LevelToLoad = FName ( "BP_ThirdLevel" );
+		LevelToUnload = FName ( "LV_Island_JSW" );
 	}
 	else
 	{
-		UGameplayStatics::UnloadStreamLevel(
-		GetWorld ( ) ,
-		FName ( "LV_Island_JSW" ) ,
-		FLatentActionInfo ( ),	
-		true   // Should block on load
-		);
+		// 처리 없이 바로 반환
 		GetWorld ( )->SpawnActor<AActor> ( ThemeFactory[info.theme] , GetActorTransform ( ) );
+		LevelToUnload = FName ( "LV_Island_JSW" );
+		LevelToUnload = FName ( "BP_ThirdLevel" );
 	}
+
+	UGameplayStatics::LoadStreamLevel (
+		GetWorld ( ) ,
+		LevelToLoad ,
+		true ,  // 레벨을 보이게 할지 여부
+		true ,  // 로드 시 블록할지 여부
+		FLatentActionInfo ( )
+	);
+
+	// 일정 시간 후 이전 레벨을 언로드하는 타이머 설정
+	FTimerHandle UnloadTimerHandle;
+	GetWorld ( )->GetTimerManager ( ).SetTimer ( UnloadTimerHandle , [this , LevelToUnload]( )
+	{
+		UGameplayStatics::UnloadStreamLevel (
+			GetWorld ( ) ,
+			LevelToUnload ,
+			FLatentActionInfo ( ) ,
+			true   // 언로드 시 블록할지 여부
+		);
+	} , 0.2f , false ); // 0.2초의 지연 시간
+
+
 	GetWorld ( )->SpawnActor<AActor> (FloorFactory[info.terrain] , GetActorTransform ( ) );
 	GetWorld ( )->SpawnActor<AActor> (VFXFactory[info.specialEffect] , GetActorTransform ( ) );
 
@@ -292,7 +360,14 @@ void AJJH_SelectManager::DeleteStage ( )
 	for (int i = 0; i < tagName.Num ( ); i++)
 	{
 		FindActorAndDestroy(tagName[i] );
+
 	}
+	UGameplayStatics::UnloadStreamLevel(
+		GetWorld ( ) ,
+		FName ( "LV_Island_JSW" ) ,
+		FLatentActionInfo ( ),	
+		true   // Should block on load
+		);
 }
 
 #pragma endregion 

@@ -26,10 +26,10 @@ public:
 // 	UFUNCTION(Server, Reliable)
 // 	void ServerSetPlayerName(const FString& newName);
 	UFUNCTION(NetMulticast, Reliable )
-	void MultiRPCChat(const FString& chat );
+	void MultiRPCChat(const FString& nickName,const FString& chat );
 
 	UFUNCTION(Server, Reliable)
-    void ServerRPCChat(const FString& Chat);
+    void ServerRPCChat(const FString& nickName,const FString& Chat);
 
 	UFUNCTION(NetMulticast, Reliable )
 	void MultiRPCPlaySound(USoundBase* wavFile);
