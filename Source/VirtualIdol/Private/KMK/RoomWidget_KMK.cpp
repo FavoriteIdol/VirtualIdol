@@ -110,6 +110,7 @@ void URoomWidget_KMK::ChangeSessionOutSide ( )
 	gi->bPressSession = true;
     gi->sessionWidget = this;
     gi->mySessionInfo = mySessionInfo;
+	gi->concerInfo.feverVFX = mySessionInfo.feverNum;
 	gi->roomNum = mySessionInfo.index;
 	gi->HostName = mySessionInfo.hostName;
 	gi->ChangeTextureWidget(mySessionInfo.texture);

@@ -97,7 +97,7 @@ void UVirtualGameInstance_KMK::CreateMySession ( FString RoomName, int32 PlayerC
    // FUniqueNetIdPtr NetID = GetWorld()->GetFirstLocalPlayerFromController()->GetUniqueNetIdForPlatformUser().GetUniqueNetId();
 
     sessionInterface->CreateSession( *NetID, FName(*HostName) , settings);
-    
+
     PRINTLOG(TEXT("Create Session Start %s, Host Name : %s"), *RoomName, *HostName);
 }
 
@@ -108,7 +108,8 @@ void UVirtualGameInstance_KMK::OnMyCreateSessionComplete ( FName SessionName , b
         PRINTLOG(TEXT("OnMyCreateSessionComplete"));
 
         // 서버가 여행을 떠나고 싶다.
-        GetWorld ( )->ServerTravel ( TEXT ( "/Game/Project/Personal/KMK/Maps/KMK_TravelLevel?listen" ) );
+        //GetWorld ( )->ServerTravel ( TEXT ( "/Game/Project/Personal/KMK/Maps/KMK_TravelLevel?listen" ) );
+        GetWorld ( )->ServerTravel(TEXT("/Game/Project/Personal/JJH/BluePrints/LevelActor/ThirdLevel/LV_AlphaTest?listen"), ETravelType::TRAVEL_Absolute);
     }
     else
     {
@@ -173,6 +174,7 @@ void UVirtualGameInstance_KMK::OnMyFindSessionComplete ( bool bSuccessful )
                     concerInfo = concert;
                     roomInfo.texture = concert.texture;
                     roomInfo.ticketPrice = concert.ticketPrice;
+                    roomInfo.feverNum = concert.feverVFX;
                 }
             }
             // 최대 플레이어 수
@@ -254,7 +256,8 @@ void UVirtualGameInstance_KMK::OnMyDestroyRoomComplete ( FName RoomName , bool b
     {
         // 로비로 돌아가고 싶다 = 클라이언트가 여행을 갈것이다.
         auto* pc = GetWorld()->GetFirstPlayerController();
-        pc->ClientTravel(TEXT("/Game/Project/Personal/KMK/Maps/KMK_Maps.KMK_Maps'?listen"), ETravelType::TRAVEL_Absolute);
+        // pc->ClientTravel(TEXT("/Game/Project/Personal/KMK/Maps/KMK_Maps.KMK_Maps'?listen"), ETravelType::TRAVEL_Absolute);
+        pc->ClientTravel(TEXT("/Game/Project/Personal/JJH/BluePrints/LevelActor/ThirdLevel/LV_AlphaTest'?listen"), ETravelType::TRAVEL_Absolute);
         // 방을 만들었다면 방을 부수고 아니라면 그냥 나감
     }
 }
@@ -416,6 +419,16 @@ void UVirtualGameInstance_KMK::OnSetStageButt ( )
 	{
 		VisibleStartWidget(false);
 		sm->CreateStage(myStageInfo);
+        if (myStageInfo.theme == 3)
+        {
+            widget->spawnTrans = FTransform(FVector(0, 0, 2000 ) );
+            spawnTrans = FTransform(FVector(0, 0, 2000 ) );
+        }
+        else
+        {
+            widget->spawnTrans = FTransform(FVector(0 ) );
+            spawnTrans = FTransform(FVector(0 ) );
+        }
 	}
 }
 

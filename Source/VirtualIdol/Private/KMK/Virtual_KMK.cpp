@@ -56,8 +56,20 @@ void UVirtual_KMK::BeginPlay()
     if (sm)
     {
         sm->CreateStage ( gi->GetConcertStageInfo() );
-    }
+		if (gi->GetConcertStageInfo ( ).theme == 3)
+		{
+			gi->spawnTrans = FTransform(FVector(0, 0, 2000 ) );
+		}
+		else
+		{
+			gi->spawnTrans = FTransform(FVector(0) );
+		}
 
+    }
+	if (GetWorld ( )->GetCurrentLevel()->GetName ( ).Contains ( TEXT ( "Alpha" ) ))
+	{
+		gi->spawnTrans = FTransform(FVector(0,0,2000 ) );
+	}
 }
 
 
@@ -90,7 +102,6 @@ void UVirtual_KMK::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
             }
 		}
 	}
-
 }
 #pragma region Time
 FString UVirtual_KMK::GetTimeDifference ( const FString& SetTime )
@@ -197,7 +208,7 @@ void UVirtual_KMK::StartCountDown ( )
         {
             SetVirtualVisible ( true );
 			virtualWidget->CountDownPanelVisible ( ESlateVisibility::Hidden );
-			if(appearFact.Num() > 0) GetWorld ( )->SpawnActor<AActor> ( gi->effectArray[gi->GetConcertInfo().appearedVFX] , FTransform ( FVector ( 0 ) ) );
+			if(appearFact.Num() > 0) GetWorld ( )->SpawnActor<AActor> ( gi->effectArray[gi->GetConcertInfo().appearedVFX] , gi->spawnTrans );
 			UE_LOG(LogTemp, Warning, TEXT("%d" ), gi->GetConcertInfo().appearedVFX);
         } ) , 6 , false );
 

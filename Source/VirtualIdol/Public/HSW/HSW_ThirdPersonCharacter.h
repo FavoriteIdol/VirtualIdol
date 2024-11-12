@@ -346,6 +346,6 @@ public:
 	UFUNCTION( )
 	void SetChatWidget(const FString& nickName, const FString& text );
 #pragma endregion
-
+	int32 effectNum = -1;
 
 };

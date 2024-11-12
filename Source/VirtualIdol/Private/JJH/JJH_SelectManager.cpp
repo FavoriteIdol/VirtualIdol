@@ -10,6 +10,7 @@
 #include "ImageUtils.h"
 #include "Components/Image.h"
 #include "JJH_SetupPlayerController.h"
+#include "KMK/VirtualGameInstance_KMK.h"
 
 // Sets default values
 AJJH_SelectManager::AJJH_SelectManager()
@@ -359,8 +360,15 @@ void AJJH_SelectManager::CreateStage ( const struct FStageInfo& info )
 	//	);
 	//} , 0.2f , false ); // 0.2초의 지연 시간
 		// 각 인덱스에 대한 레벨 이름 정의
-
-
+	auto* gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance() );
+	if (gi)
+	{
+		gi->spawnTrans = FTransform(FVector(0,0, 2000 ) );
+	}
+	else
+	{
+		gi->spawnTrans = FTransform(FVector(0 ) );
+	}
 	// 인덱스에 따라 로드할 레벨 결정
 	if (info.theme >= 1 && info.theme <= Levels.Num ( ))
 	{

@@ -277,7 +277,7 @@ void UAudienceServerComponent_KMK::StartCountDown ( )
 			bTime = false;
 			virtualCharacter->SetVirtualVisible(true);
 			UVirtualGameInstance_KMK* gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance());
-			if (appearFact.Num ( ) > 0) GetWorld ( )->SpawnActor<AActor> ( gi->effectArray[gi->GetConcertInfo().appearedVFX] , FTransform ( FVector ( 0 ) ) );
+			if (appearFact.Num ( ) > 0) GetWorld ( )->SpawnActor<AActor> ( gi->effectArray[gi->GetConcertInfo().appearedVFX] , gi->spawnTrans );
 		} ) , 6 , false );
 }
 
