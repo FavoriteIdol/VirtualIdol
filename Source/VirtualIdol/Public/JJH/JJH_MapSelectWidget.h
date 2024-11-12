@@ -80,14 +80,20 @@ public:
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UButton* GroundButton;	
 	UPROPERTY ( meta = ( BindWidget ) )
-	class UButton* OceanButton;
+	class UButton* OceanButton;	
+	
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* DystopiaGroundButton;
+
 
 	UFUNCTION ( )
 	void OnFogButtonClicked ( );
 	UFUNCTION ( )
 	void OnGroundButtonClicked ( );
 	UFUNCTION ( )
-	void OnOceanButtonClicked ( );
+	void OnOceanButtonClicked ( );	
+	UFUNCTION ( )
+	void OnDystopiaGroundButtonClicked ( );
 	//캡쳐
 	UPROPERTY(meta = (BindWidget))
 	class UImage* CapturedImage;
@@ -137,13 +143,17 @@ public:
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UButton* NaturalButton;
 	UPROPERTY(meta = (BindWidget))
-	class UButton* SpaceButton;
+	class UButton* SpaceButton;	
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* DystopiaButton;
 
 	UFUNCTION( )
 	void OnNaturalButtonClicked( );
 	UFUNCTION( )
 	void OnSpaceButtonClicked ( );
 	UFUNCTION( )
+	void OnDystopiaButtonClicked ( );
+	UFUNCTION ( )
 	void OnCyberpunkButtonClicked ( );
 
 	//특수효과 바꾸기

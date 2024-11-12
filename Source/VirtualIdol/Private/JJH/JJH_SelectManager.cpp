@@ -74,50 +74,58 @@ void AJJH_SelectManager::UpdateSunNightPosition (int32 index)
 
 void AJJH_SelectManager::ChangeMap ( int32 index )
 {
-	// 케이스 나누어서 하기
+	// 이전 테마 액터 파괴
 	FindActorAndDestroy ( TEXT ( "Theme" ) );
 	Stage.theme = index;
 
-	FName LevelToLoad;
-	FName LevelToUnload;
+	// 인덱스에 따라 로드할 레벨 결정
+	if (index >= 1 && index <= Levels.Num ( ))
+	{
+		LevelToLoad = Levels[index - 1]; // 인덱스가 1부터 시작하므로 조정
 
-	if (index == 1)
-	{
-		LevelToLoad = FName ( "LV_Island_JSW" );
-		LevelToUnload = FName ( "BP_ThirdLevel" );
-	}
-	else if (index == 2)
-	{
-		LevelToLoad = FName ( "BP_ThirdLevel" );
-		LevelToUnload = FName ( "LV_Island_JSW" );
+		// 로드 중인 레벨을 제외한 모든 레벨을 언로드 목록에 추가
+		for (int32 i = 0; i < Levels.Num ( ); i++)
+		{
+			if (i != index - 1)
+			{
+				LevelsToUnload.Add ( Levels[i] );
+			}
+		}
 	}
 	else
 	{
-		// 처리 없이 바로 반환
+		// 인덱스가 범위를 벗어나면 새로운 테마 액터를 스폰하고 바로 반환
 		GetWorld ( )->SpawnActor<AActor> ( ThemeFactory[index] , GetActorTransform ( ) );
-		LevelToUnload = FName ( "LV_Island_JSW" );
-		LevelToUnload = FName ( "BP_ThirdLevel" );
+		return;
 	}
 
+	// 선택된 레벨 로드
 	UGameplayStatics::LoadStreamLevel (
 		GetWorld ( ) ,
 		LevelToLoad ,
-		true ,  // 레벨을 보이게 할지 여부
-		true ,  // 로드 시 블록할지 여부
+		true ,  // 로드 후 보이게 설정
+		true ,  // 로드 시 블록 여부 설정
 		FLatentActionInfo ( )
 	);
 
-	// 일정 시간 후 이전 레벨을 언로드하는 타이머 설정
-	FTimerHandle UnloadTimerHandle;
-	GetWorld ( )->GetTimerManager ( ).SetTimer ( UnloadTimerHandle , [this , LevelToUnload]( )
+	// 일정 시간 후 이전 레벨을 개별적으로 언로드하는 타이머 설정
+	for (int32 i = 0; i < LevelsToUnload.Num ( ); ++i)
 	{
-		UGameplayStatics::UnloadStreamLevel (
-			GetWorld ( ) ,
-			LevelToUnload ,
-			FLatentActionInfo ( ) ,
-			true   // 언로드 시 블록할지 여부
-		);
-	} , 0.2f , false ); // 0.2초의 지연 시간
+		const FName Level = LevelsToUnload[i];
+		FTimerHandle UnloadTimerHandle;
+
+		GetWorld ( )->GetTimerManager ( ).SetTimer ( UnloadTimerHandle , [this , Level]( )
+		{
+				UGameplayStatics::UnloadStreamLevel (
+					GetWorld ( ) ,
+					Level ,
+					FLatentActionInfo ( ) ,
+					true  // 언로드 시 블록 여부 설정
+				);
+				UE_LOG ( LogTemp , Warning , TEXT ( "Unloading level: %s" ) , *Level.ToString ( ) );
+
+		} , 0.2f * ( i + 1 ) , false );  // 첫 번째 레벨도 0.4초 지연 후 언로드 <- 비동기적이라 이거 해야함
+	}
 }
 
 void AJJH_SelectManager::FindActorAndDestroy(FName tag)
@@ -285,6 +293,7 @@ void AJJH_SelectManager::SaveImage ( UTextureRenderTarget2D* RenderTarget2 )
 void AJJH_SelectManager::CreateStage ( const struct FStageInfo& info )
 {
 	GetWorld()->SpawnActor<AActor>(SkyFactory[info.sky], GetActorTransform ( ) );
+	
 	//if (info.theme == 1)
 	//{
 	//	UGameplayStatics::LoadStreamLevel (
@@ -306,47 +315,79 @@ void AJJH_SelectManager::CreateStage ( const struct FStageInfo& info )
 	//	GetWorld ( )->SpawnActor<AActor> ( ThemeFactory[info.theme] , GetActorTransform ( ) );
 	//}
 		// 케이스 나누어서 하기
-	FName LevelToLoad;
-	FName LevelToUnload;
 
-	if (info.theme == 1)
+	//FName LevelToLoad;
+	//FName LevelToUnload;
+
+	//if (info.theme == 1)
+	//{
+	//	LevelToLoad = FName ( "LV_Island_JSW" );
+	//	LevelToUnload = FName ( "BP_ThirdLevel" );
+	//}
+	//else if (info.theme == 2)
+	//{
+	//	LevelToLoad = FName ( "BP_ThirdLevel" );
+	//	LevelToUnload = FName ( "LV_Island_JSW" );
+	//}
+	//else
+	//{
+	//	 처리 없이 바로 반환
+	//	GetWorld ( )->SpawnActor<AActor> ( ThemeFactory[info.theme] , GetActorTransform ( ) );
+	//	LevelToUnload = FName ( "LV_Island_JSW" );
+	//	LevelToUnload = FName ( "BP_ThirdLevel" );
+	//}
+
+	//UGameplayStatics::LoadStreamLevel (
+	//	GetWorld ( ) ,
+	//	LevelToLoad ,
+	//	true ,  // 레벨을 보이게 할지 여부
+	//	true ,  // 로드 시 블록할지 여부
+	//	FLatentActionInfo ( )
+	//);
+
+	//// 일정 시간 후 이전 레벨을 언로드하는 타이머 설정
+	//FTimerHandle UnloadTimerHandle;
+	//GetWorld ( )->GetTimerManager ( ).SetTimer ( UnloadTimerHandle , [this , LevelToUnload]( )
+	//{
+	//	UGameplayStatics::UnloadStreamLevel (
+	//		GetWorld ( ) ,
+	//		LevelToUnload ,
+	//		FLatentActionInfo ( ) ,
+	//		true   // 언로드 시 블록할지 여부
+	//	);
+	//} , 0.2f , false ); // 0.2초의 지연 시간
+		// 각 인덱스에 대한 레벨 이름 정의
+
+
+	// 인덱스에 따라 로드할 레벨 결정
+	if (info.theme >= 1 && info.theme <= Levels.Num ( ))
 	{
-		LevelToLoad = FName ( "LV_Island_JSW" );
-		LevelToUnload = FName ( "BP_ThirdLevel" );
-	}
-	else if (info.theme == 2)
-	{
-		LevelToLoad = FName ( "BP_ThirdLevel" );
-		LevelToUnload = FName ( "LV_Island_JSW" );
+		LevelToLoad = Levels[info.theme - 1]; // 인덱스가 1부터 시작하므로 조정
+
+		// 로드 중인 레벨을 제외한 모든 레벨을 언로드 목록에 추가
+		for (int32 i = 0; i < Levels.Num ( ); i++)
+		{
+			if (i != info.theme - 1)
+			{
+				LevelsToUnload.Add ( Levels[i] );
+			}
+		}
 	}
 	else
 	{
-		// 처리 없이 바로 반환
+		// 인덱스가 범위를 벗어나면 새로운 테마 액터를 스폰하고 바로 반환
 		GetWorld ( )->SpawnActor<AActor> ( ThemeFactory[info.theme] , GetActorTransform ( ) );
-		LevelToUnload = FName ( "LV_Island_JSW" );
-		LevelToUnload = FName ( "BP_ThirdLevel" );
+		return;
 	}
 
+	// 선택된 레벨 로드
 	UGameplayStatics::LoadStreamLevel (
 		GetWorld ( ) ,
 		LevelToLoad ,
-		true ,  // 레벨을 보이게 할지 여부
-		true ,  // 로드 시 블록할지 여부
+		true ,  // 로드 후 보이게 설정
+		true ,  // 로드 시 블록 여부 설정
 		FLatentActionInfo ( )
 	);
-
-	// 일정 시간 후 이전 레벨을 언로드하는 타이머 설정
-	FTimerHandle UnloadTimerHandle;
-	GetWorld ( )->GetTimerManager ( ).SetTimer ( UnloadTimerHandle , [this , LevelToUnload]( )
-	{
-		UGameplayStatics::UnloadStreamLevel (
-			GetWorld ( ) ,
-			LevelToUnload ,
-			FLatentActionInfo ( ) ,
-			true   // 언로드 시 블록할지 여부
-		);
-	} , 0.2f , false ); // 0.2초의 지연 시간
-
 
 	GetWorld ( )->SpawnActor<AActor> (FloorFactory[info.terrain] , GetActorTransform ( ) );
 	GetWorld ( )->SpawnActor<AActor> (VFXFactory[info.specialEffect] , GetActorTransform ( ) );
@@ -362,12 +403,31 @@ void AJJH_SelectManager::DeleteStage ( )
 		FindActorAndDestroy(tagName[i] );
 
 	}
-	UGameplayStatics::UnloadStreamLevel(
-		GetWorld ( ) ,
-		FName ( "LV_Island_JSW" ) ,
-		FLatentActionInfo ( ),	
-		true   // Should block on load
-		);
+	//UGameplayStatics::UnloadStreamLevel(
+	//	GetWorld ( ) ,
+	//	FName ( "LV_Island_JSW" ) ,
+	//	FLatentActionInfo ( ),	
+	//	true   // Should block on load
+	//	);
+
+	// 일정 시간 후 이전 레벨을 개별적으로 언로드하는 타이머 설정
+	for (int32 i = 0; i < LevelsToUnload.Num ( ); ++i)
+	{
+		const FName Level = LevelsToUnload[i];
+		FTimerHandle UnloadTimerHandle;
+
+		GetWorld ( )->GetTimerManager ( ).SetTimer ( UnloadTimerHandle , [this , Level]( )
+		{
+			UGameplayStatics::UnloadStreamLevel (
+				GetWorld ( ) ,
+				Level ,
+				FLatentActionInfo ( ) ,
+				true  // 언로드 시 블록 여부 설정
+			);
+			UE_LOG ( LogTemp , Warning , TEXT ( "Unloading level: %s" ) , *Level.ToString ( ) );
+
+		} , 0.2f * ( i + 1 ) , false );  // 첫 번째 레벨도 0.4초 지연 후 언로드 <- 비동기적이라 이거 해야함
+	}
 }
 
 #pragma endregion 

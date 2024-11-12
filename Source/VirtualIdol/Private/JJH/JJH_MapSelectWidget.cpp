@@ -40,7 +40,7 @@ void UJJH_MapSelectWidget::NativeConstruct ( )
 	CyberpunkButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnCyberpunkButtonClicked );
 	NaturalButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnNaturalButtonClicked );
 	SpaceButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnSpaceButtonClicked );
-
+	DystopiaButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnDystopiaButtonClicked );
 
 	//이펙트 바꾸기
 	EffectButton1->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnEffectButton1Clicked );
@@ -51,6 +51,7 @@ void UJJH_MapSelectWidget::NativeConstruct ( )
 	FogButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnFogButtonClicked );
 	GroundButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnGroundButtonClicked );
 	OceanButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnOceanButtonClicked );
+	DystopiaGroundButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnDystopiaGroundButtonClicked );
 
 	DayHorizontal->SetVisibility ( ESlateVisibility::Hidden );
 	ThemeHorizontal->SetVisibility ( ESlateVisibility::Hidden );
@@ -177,6 +178,14 @@ void UJJH_MapSelectWidget::OnSpaceButtonClicked ( )
 	}
 }
 
+void UJJH_MapSelectWidget::OnDystopiaButtonClicked ( )
+{
+	if (SM)
+	{
+		SM->ChangeMap ( 3 );
+	}
+}
+
 
 //지면 바꾸기
 void UJJH_MapSelectWidget::OnFogButtonClicked ( )
@@ -191,6 +200,11 @@ void UJJH_MapSelectWidget::OnGroundButtonClicked ( )
 void UJJH_MapSelectWidget::OnOceanButtonClicked ( )
 {
 	if (SM) SM->ChangeFloor ( 2 );
+}
+
+void UJJH_MapSelectWidget::OnDystopiaGroundButtonClicked ( )
+{
+	if (SM) SM->ChangeFloor ( 3 );
 }
 
 //이펙트 바꾸기
