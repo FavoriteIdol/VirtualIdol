@@ -35,6 +35,8 @@ struct FRoomInfo
 	int32 ticketPrice = -1;
 	UPROPERTY(BlueprintReadOnly )
 	class UTexture2D* texture = NULL;
+	UPROPERTY( )
+	int32 feverNum = -1;
 
 	int32 index = -1;
 
@@ -207,4 +209,7 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 
 	UFUNCTION(BlueprintCallable, Category = "Data")
 	FString GetRandomName();
+
+	UPROPERTY( )
+	FTransform spawnTrans = FTransform(FVector(0 ) );
 };

@@ -201,6 +201,11 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 		FInputModeGameAndUI inputMode;
 		GetController<APlayerController> ( )->SetInputMode(inputMode );
 	}
+	if (GetWorld ( )->GetCurrentLevel()->GetName ( ).Contains ( TEXT ( "Alpha" ) ))
+	{
+		gi->spawnTrans = FTransform(FVector(0,0,2000 ) );
+	}
+	MulticastFeverEffect( );
 #pragma endregion
 
 
@@ -220,6 +225,7 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 			TempMesh->SetMaterial ( 0 , FeverDynamicMat );
 		}
 	}
+
 }
 
 // Called every frame
@@ -251,6 +257,7 @@ void AHSW_ThirdPersonCharacter::Tick(float DeltaTime)
 			SetActorRotation ( ThrowingRotator );
 		}
 	}
+
 }
 
 void AHSW_ThirdPersonCharacter::OnRep_FeverGauge ( )
@@ -662,8 +669,9 @@ void AHSW_ThirdPersonCharacter::MulticastFeverEffect_Implementation ( )
 	//UGameplayStatics::SpawnEmitterAtLocation ( GetWorld ( ) , FeverEffect_Particle , FeverEffectLocation );
 // 	UNiagaraComponent* DamagedEffect = UNiagaraFunctionLibrary::SpawnSystemAtLocation ( this->GetWorld ( ) , this->FeverEffect_Niagara , FeverEffectLocation.GetLocation() , FRotator::ZeroRotator );
 // 	DamagedEffect->SetAutoDestroy ( true );
+	auto* gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance() );
 
-	FeverEffect_Actor = GetWorld ( )->SpawnActor<AActor> ( FeverEffectFactory , FeverEffectLocation );
+	FeverEffect_Actor = GetWorld ( )->SpawnActor<AActor> (  gi->effectArray[gi->GetConcertInfo().feverVFX] , gi->spawnTrans );
 	
 }
 
