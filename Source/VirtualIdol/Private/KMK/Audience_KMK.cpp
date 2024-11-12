@@ -338,6 +338,7 @@ void UAudience_KMK::OnOffInfo ( FLinearColor color,  ESlateVisibility bVisib, in
 void UAudience_KMK::VipAuthority ( )
 {
     bMyVip = true;
+
     ButtonsInfoArray[5].button->SetVisibility ( ESlateVisibility::Hidden );
     // ButtonsInfoArray[5].backImage->SetVisibility ( ESlateVisibility::Hidden );
     ButtonsInfoArray[5].image->SetVisibility ( ESlateVisibility::Hidden );
