@@ -36,6 +36,8 @@ struct FConcertInfo
 	int32 peopleScale = -1;
 	UPROPERTY( )
 	FString userName = TEXT("" );
+	UPROPERTY( )
+	class UTexture2D* texture = NULL;
 
 	void Clear ( )
 	{
@@ -163,7 +165,8 @@ public:
 
 	// 이미지 생성 및 다운
 	void DownloadImageFromUrl ( const FString& imageUrl , const FStageInfo& stageInfo );
-	void OnImageDownComplete ( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bWasSuccessful, FStageInfo stageInfo );
+	void OnImageDownComplete ( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bWasSuccessful , FStageInfo stageInfo );
+
 
 	// 특정 무대 요청
 	void ReqCheckIdStage( int32 num);
@@ -174,6 +177,9 @@ public:
 	// 내무대 확인
 	UPROPERTY( )
 	class UStartWidget_KMK* myStartWid;
+	
+	void DownloadImageConcert ( const FString& imageUrl , const FConcertInfo& concertInfo  );
+	void OnImageDownConcertComplete ( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bWasSuccessful , FConcertInfo concertInfo );
 	// 요청
 	void ReqCheckMyConcert( );
 	// 응답 

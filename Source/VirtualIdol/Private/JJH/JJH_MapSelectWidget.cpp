@@ -40,7 +40,7 @@ void UJJH_MapSelectWidget::NativeConstruct ( )
 	CyberpunkButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnCyberpunkButtonClicked );
 	NaturalButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnNaturalButtonClicked );
 	SpaceButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnSpaceButtonClicked );
-
+	DystopiaButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnDystopiaButtonClicked );
 
 	//이펙트 바꾸기
 	EffectButton1->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnEffectButton1Clicked );
@@ -51,6 +51,7 @@ void UJJH_MapSelectWidget::NativeConstruct ( )
 	FogButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnFogButtonClicked );
 	GroundButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnGroundButtonClicked );
 	OceanButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnOceanButtonClicked );
+	DystopiaGroundButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnDystopiaGroundButtonClicked );
 
 	DayHorizontal->SetVisibility ( ESlateVisibility::Hidden );
 	ThemeHorizontal->SetVisibility ( ESlateVisibility::Hidden );
@@ -75,12 +76,12 @@ void UJJH_MapSelectWidget::OnWeatherButtonClicked ( )
 	ThemeHorizontal->SetVisibility ( ESlateVisibility::Hidden );
 	VFXHorizontal->SetVisibility ( ESlateVisibility::Hidden );
 	FloorHorizontal->SetVisibility ( ESlateVisibility::Hidden );
-	ChooseBackground->SetBrushColor(FLinearColor::Green);
-
-	WeatherButton->SetBackgroundColor( FLinearColor::Green);
-	ThemeButton->SetBackgroundColor ( FLinearColor::Gray );
-	EffectButton->SetBackgroundColor ( FLinearColor::Gray );
-	FloorButton->SetBackgroundColor ( FLinearColor::Gray );
+// 	ChooseBackground->SetBrushColor(FLinearColor::Green);
+// 
+// 	WeatherButton->SetBackgroundColor( FLinearColor::Green);
+// 	ThemeButton->SetBackgroundColor ( FLinearColor::Gray );
+// 	EffectButton->SetBackgroundColor ( FLinearColor::Gray );
+// 	FloorButton->SetBackgroundColor ( FLinearColor::Gray );
 }
 
 void UJJH_MapSelectWidget::OnThemeButtonClicked ( )
@@ -89,12 +90,12 @@ void UJJH_MapSelectWidget::OnThemeButtonClicked ( )
 	ThemeHorizontal->SetVisibility(ESlateVisibility::Visible );
 	VFXHorizontal->SetVisibility(ESlateVisibility::Hidden);
 	FloorHorizontal->SetVisibility ( ESlateVisibility::Hidden );
-	ChooseBackground->SetBrushColor(FLinearColor::Blue);
+// 	ChooseBackground->SetBrushColor(FLinearColor::Blue);
 
-	ThemeButton->SetBackgroundColor ( FLinearColor::Blue );
-	WeatherButton->SetBackgroundColor ( FLinearColor::Gray );
-	EffectButton->SetBackgroundColor ( FLinearColor::Gray );
-	FloorButton->SetBackgroundColor ( FLinearColor::Gray );
+// 	ThemeButton->SetBackgroundColor ( FLinearColor::Blue );
+// 	WeatherButton->SetBackgroundColor ( FLinearColor::Gray );
+// 	EffectButton->SetBackgroundColor ( FLinearColor::Gray );
+// 	FloorButton->SetBackgroundColor ( FLinearColor::Gray );
 }
 
 void UJJH_MapSelectWidget::OnEffectButtonClicked ( )
@@ -103,12 +104,12 @@ void UJJH_MapSelectWidget::OnEffectButtonClicked ( )
 	ThemeHorizontal->SetVisibility ( ESlateVisibility::Hidden );
 	VFXHorizontal->SetVisibility ( ESlateVisibility::Visible );
 	FloorHorizontal->SetVisibility ( ESlateVisibility::Hidden );
-	ChooseBackground->SetBrushColor ( FLinearColor::Red);
+/*	ChooseBackground->SetBrushColor ( FLinearColor::Red);*/
 
-	EffectButton->SetBackgroundColor ( FLinearColor::Red );
-	ThemeButton->SetBackgroundColor ( FLinearColor::Gray );
-	WeatherButton->SetBackgroundColor ( FLinearColor::Gray );
-	FloorButton->SetBackgroundColor ( FLinearColor::Gray );
+// 	EffectButton->SetBackgroundColor ( FLinearColor::Red );
+// 	ThemeButton->SetBackgroundColor ( FLinearColor::Gray );
+// 	WeatherButton->SetBackgroundColor ( FLinearColor::Gray );
+// 	FloorButton->SetBackgroundColor ( FLinearColor::Gray );
 }
 
 void UJJH_MapSelectWidget::OnFloorButtonClicked ( )
@@ -117,12 +118,12 @@ void UJJH_MapSelectWidget::OnFloorButtonClicked ( )
 	ThemeHorizontal->SetVisibility ( ESlateVisibility::Hidden );
 	VFXHorizontal->SetVisibility ( ESlateVisibility::Hidden );
 	FloorHorizontal->SetVisibility ( ESlateVisibility::Visible );
-	ChooseBackground->SetBrushColor ( FLinearColor::Yellow );
-
-	FloorButton->SetBackgroundColor ( FLinearColor::Yellow );
-	EffectButton->SetBackgroundColor ( FLinearColor::Gray );
-	ThemeButton->SetBackgroundColor ( FLinearColor::Gray );
-	WeatherButton->SetBackgroundColor ( FLinearColor::Gray );
+// 	ChooseBackground->SetBrushColor ( FLinearColor::Yellow );
+// 
+// 	FloorButton->SetBackgroundColor ( FLinearColor::Yellow );
+// 	EffectButton->SetBackgroundColor ( FLinearColor::Gray );
+// 	ThemeButton->SetBackgroundColor ( FLinearColor::Gray );
+// 	WeatherButton->SetBackgroundColor ( FLinearColor::Gray );
 }
 
 // 낮밤 바꾸기
@@ -177,6 +178,14 @@ void UJJH_MapSelectWidget::OnSpaceButtonClicked ( )
 	}
 }
 
+void UJJH_MapSelectWidget::OnDystopiaButtonClicked ( )
+{
+	if (SM)
+	{
+		SM->ChangeMap ( 3 );
+	}
+}
+
 
 //지면 바꾸기
 void UJJH_MapSelectWidget::OnFogButtonClicked ( )
@@ -191,6 +200,11 @@ void UJJH_MapSelectWidget::OnGroundButtonClicked ( )
 void UJJH_MapSelectWidget::OnOceanButtonClicked ( )
 {
 	if (SM) SM->ChangeFloor ( 2 );
+}
+
+void UJJH_MapSelectWidget::OnDystopiaGroundButtonClicked ( )
+{
+	if (SM) SM->ChangeFloor ( 3 );
 }
 
 //이펙트 바꾸기

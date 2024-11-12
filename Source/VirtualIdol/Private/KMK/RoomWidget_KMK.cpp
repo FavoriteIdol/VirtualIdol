@@ -29,8 +29,14 @@ void URoomWidget_KMK::SetImageAndText (const struct FRoomInfo& info)
 	//Image_Stage->SetBrushFromTexture( newTexture );
 	if(!gi) gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance());
 	if(!gi->sm)gi->sm = sm;
-	Image_Stage->SetColorAndOpacity(FLinearColor::Blue);
+	
+	if (info.texture)
+	{
+		Image_Stage->SetBrushFromTexture( info.texture );
+	}
+	else Image_Stage->SetColorAndOpacity(FLinearColor::Blue);
 	mySessionInfo = info;
+
 	Butt_JoinSession->SetVisibility ( ESlateVisibility::Visible );
 	Butt_SetStage->SetVisibility(ESlateVisibility::Hidden);
 	Text_Name->SetText( FText::FromString( info.roomName ));
@@ -106,6 +112,7 @@ void URoomWidget_KMK::ChangeSessionOutSide ( )
     gi->mySessionInfo = mySessionInfo;
 	gi->roomNum = mySessionInfo.index;
 	gi->HostName = mySessionInfo.hostName;
+	gi->ChangeTextureWidget(mySessionInfo.texture);
     Image_StageOut->SetVisibility ( ESlateVisibility::Visible );
 }
 
