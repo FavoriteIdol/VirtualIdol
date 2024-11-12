@@ -171,6 +171,8 @@ void UVirtualGameInstance_KMK::OnMyFindSessionComplete ( bool bSuccessful )
                 {
                     roomInfo.roomName = concert.name;
                     concerInfo = concert;
+                    roomInfo.texture = concert.texture;
+                    roomInfo.ticketPrice = concert.ticketPrice;
                 }
             }
             // 최대 플레이어 수
@@ -338,8 +340,8 @@ void UVirtualGameInstance_KMK::SetConcertInfo ( const struct FConcertInfo& info 
     int32 mon = currentDataTime.GetMonth();
     int32 day = currentDataTime.GetDay();
 
-    // FString start = FString::FromInt(year) + TEXT("-") + ChangeString(FString::FromInt(mon))+ TEXT("-") +ChangeString( FString::FromInt(day));
-    FString start = TEXT("2024-11-07" );
+    FString start = FString::FromInt(year) + TEXT("-") + ChangeString(FString::FromInt(mon))+ TEXT("-") +ChangeString( FString::FromInt(day));
+    // FString start = TEXT("2024-11-07" );
     if (concerInfo.concertDate == start)
     {
         widget->SetButtEnable(true);

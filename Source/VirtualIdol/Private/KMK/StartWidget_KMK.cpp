@@ -35,6 +35,12 @@ void UStartWidget_KMK::NativeConstruct ( )
 	httpActor = Cast<AHttpActor_KMK>(UGameplayStatics::GetActorOfClass(GetWorld() , httpFact));
 	selectManager = Cast<AJJH_SelectManager>(UGameplayStatics::GetActorOfClass(GetWorld() , selectFact));
 	loadMatInst = UMaterialInstanceDynamic::Create ( loadMatFact, this );
+	if (httpActor)
+	{
+		httpActor->sw = this;
+		// 무대 조회하기
+		httpActor->ReqCheckAllOpenConcert();
+	}
 	if (Image_Load)
 	{
 		Image_Load->SetBrushFromMaterial(loadMatInst);
@@ -188,7 +194,7 @@ void UStartWidget_KMK::NativeTick ( const FGeometry& MyGeometry , float InDeltaT
 		matNum += 0.005f;
 		ChangeLoadMat( matNum);
 	}
-	
+
 }
 
 #pragma region BackFunction
@@ -266,9 +272,9 @@ void UStartWidget_KMK::ComeInStagePanel ( )
 	Butt_UserStage->SetVisibility(ESlateVisibility::Hidden);
 	Butt_MyStage->SetVisibility(ESlateVisibility::Hidden);
 	Butt_Star->SetVisibility(ESlateVisibility::Hidden);
-	// 무대 조회하기
-	httpActor->ReqCheckAllOpenConcert();
+
 	FindRoom();
+
 }
 
 #pragma endregion
@@ -623,20 +629,20 @@ void UStartWidget_KMK::PressNextButt ( )
 
 void UStartWidget_KMK::PressMoneyPay ( )
 {
-	//if (!bCreateTicket)
-	//{
-	//	Text_Effect1->SetVisibility(ESlateVisibility::Hidden);
-	//	MultiText_PopUp->SetVisibility(ESlateVisibility::Visible);
-	//	EffectPopUp1->SetVisibility(ESlateVisibility::Visible);
-	//	return;
-	//}
-	//else
-	//{
-	//	Text_Effect1->SetVisibility(ESlateVisibility::Visible);
-	//	MultiText_PopUp->SetVisibility(ESlateVisibility::Hidden);
-	//	EffectPopUp1->SetVisibility(ESlateVisibility::Hidden);
-	//	Image_Load->SetVisibility(ESlateVisibility::Hidden);
-	//}
+    if (!bCreateTicket)
+    {
+        Text_Effect1->SetVisibility ( ESlateVisibility::Hidden );
+        MultiText_PopUp->SetVisibility ( ESlateVisibility::Visible );
+        EffectPopUp1->SetVisibility ( ESlateVisibility::Visible );
+        return;
+    }
+    else
+    {
+        Text_Effect1->SetVisibility ( ESlateVisibility::Visible );
+        MultiText_PopUp->SetVisibility ( ESlateVisibility::Hidden );
+        EffectPopUp1->SetVisibility ( ESlateVisibility::Hidden );
+        Image_Load->SetVisibility ( ESlateVisibility::Hidden );
+    }
 	concertInfo.stageId = gi->stageNum;
 	UE_LOG(LogTemp, Warning, TEXT("%d" ), concertInfo.stageId);
 	
@@ -695,6 +701,7 @@ void UStartWidget_KMK::PressYesButt ( )
 void UStartWidget_KMK::PressNormalEntry ( )
 {
 	TEXT_VIP->SetText(FText::FromString(TEXT("일반 입장하시겠습니까?" )));
+	Text_TicketPrice->SetText(FText::AsNumber(0));
 	MultiText_VIP->SetText(FText::FromString(TEXT("VIP 입장을 이용해보세요!\nVIP 입장시 더 많은 혜택을 누릴 수 있습니다" )));
 	VIPPopUpPanel->SetVisibility(ESlateVisibility::Visible);
 }
@@ -707,6 +714,7 @@ void UStartWidget_KMK::PressNoButt ( )
 void UStartWidget_KMK::PressVipEntry ( )
 {
 	TEXT_VIP->SetText(FText::FromString(TEXT("VIP로 입장하시겠습니까?" )));
+	Text_TicketPrice->SetText(FText::AsNumber(gi->mySessionInfo.ticketPrice));
 	MultiText_VIP->SetText(FText::FromString(TEXT("VIP 입장시 앞열 관람, 티켓 콜렉션 수집이 가능하며,\n커스텀 응원봉으로 입장 등의 혜택이 있습니다" )));
 	VIPPopUpPanel->SetVisibility(ESlateVisibility::Visible);
 }
@@ -746,6 +754,12 @@ void UStartWidget_KMK::ClearChild ( )
 		SB_FindStage->ClearChildren();
 	}
 }
+
+void UStartWidget_KMK::SetLoadImage ( )
+{
+	Image_Load->SetVisibility(ESlateVisibility::Hidden);
+}
+
 #pragma endregion
 
 

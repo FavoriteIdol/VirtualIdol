@@ -231,6 +231,7 @@ void AHttpActor_KMK::DownloadImageFromUrl(const FString& imageUrl, const FStageI
     req->ProcessRequest();
 }
 
+
 void AHttpActor_KMK::OnImageDownComplete ( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bWasSuccessful, FStageInfo stageInfo  )
 {
 	if (bWasSuccessful&& Response.IsValid())
@@ -328,6 +329,7 @@ void AHttpActor_KMK::OnResTicket ( FHttpRequestPtr Request , FHttpResponsePtr Re
             {
                 UE_LOG(LogTemp, Log, TEXT("Texture successfully created from downloaded image"));
 				sw->bCreateTicket = true;
+				sw->SetLoadImage();
                 // Use the texture as needed, e.g., apply it to a material or widget
                 OnTextureCreated(Texture);  // Custom method to handle the texture
             }
@@ -473,6 +475,66 @@ void AHttpActor_KMK::OnReqTranslateChat ( FHttpRequestPtr Request , FHttpRespons
 #pragma endregion
 
 #pragma region BE for CheckConcert
+// 이미지 다운로드 코드 작성
+
+void AHttpActor_KMK::DownloadImageConcert ( const FString& imageUrl, const FConcertInfo& concertInfo )
+{
+	FHttpModule* http = &FHttpModule::Get();
+    TSharedRef<IHttpRequest> req = http->CreateRequest();
+    req->SetURL(imageUrl);
+    req->SetVerb("GET");
+    req->OnProcessRequestComplete ( ).BindUObject ( this , &AHttpActor_KMK::OnImageDownConcertComplete , concertInfo );
+    req->ProcessRequest ( );
+}
+
+
+void AHttpActor_KMK::OnImageDownConcertComplete ( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bWasSuccessful , FConcertInfo concertInfo )
+{
+if (bWasSuccessful&& Response.IsValid())
+	{
+		if (Response->GetResponseCode() != 200)
+        {
+            UE_LOG ( LogTemp , Error , TEXT ( "Failed to get image. Response Code: %d" ) , Response->GetResponseCode ( ) );
+            return;
+        }
+		FString ContentType = Response->GetContentType();
+        UE_LOG ( LogTemp , Log , TEXT ( "Content-Type: %s" ) , *ContentType );
+
+        if (!ContentType.Contains ( "image" ))
+        {
+            UE_LOG ( LogTemp , Error , TEXT ( "Unexpected Content-Type: %s" ) , *ContentType );
+            return;
+        }
+        // 다운로드 받은 PNG 데이터를 파일로 저장
+        const TArray<uint8>& ImageData = Response->GetContent();
+
+		UTexture2D* texture = UJsonParseLib_KMK::MakeTexture(ImageData);
+        if (texture)
+        {
+            UE_LOG(LogTemp, Log, TEXT("Image downloaded and texture created successfully!"));
+            // 예: 다운로드한 텍스처를 위젯이나 다른 액터에 할당
+			concertInfo.texture = texture;
+			gi->allConcertInfoArray.Add(concertInfo);
+        }
+        else
+        {
+            UE_LOG(LogTemp, Error, TEXT("Failed to create texture from downloaded image data."));
+        }
+    }
+   else
+   {
+       if (Response.IsValid())
+       {
+           UE_LOG(LogTemp, Error, TEXT("Failed to download image. Response code: %d"), Response->GetResponseCode());
+       }
+       else
+       {
+           UE_LOG(LogTemp, Error, TEXT("Response is invalid"));
+		   if(ticketData.Num() > 0) ReqTicket(ticketData );
+       }
+   }
+}
+
 void AHttpActor_KMK::ReqCheckMyConcert ( )
 {
 	// HTTP 모듈 생성
@@ -503,8 +565,11 @@ void AHttpActor_KMK::OnResqCheckMyConcert ( FHttpRequestPtr Request , FHttpRespo
 			FConcertInfo info = UJsonParseLib_KMK::ParsecMyConcertInfo(respon);
 			if (!info.name.IsEmpty())
 			{
-				gi->SetConcertInfo(info);
-				ReqCheckIdStage(info.stageId);
+				if (info.texture == nullptr)
+				{
+					gi->SetConcertInfo(info);
+					ReqCheckIdStage(info.stageId);
+                }
 			}
 		}
 		else
@@ -537,7 +602,7 @@ void AHttpActor_KMK::ReqCheckAllOpenConcert ( )
 
 void AHttpActor_KMK::OnResCheckAllOpenConcert ( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully )
 {
-if (bConnectedSuccessfully)
+	if (bConnectedSuccessfully)
 	{
 		// 성공
 		FString respon = Response->GetContentAsString();
@@ -548,7 +613,12 @@ if (bConnectedSuccessfully)
 			// 사진 관련된 항목
 			if (allConcertInfoArray.Num ( ) > 0)
 			{
-				gi->allConcertInfoArray = allConcertInfoArray;
+				for (auto& concert : allConcertInfoArray)
+				{
+					DownloadImageConcert(concert.img, concert);
+
+				}
+				
 			}
 		}
 		else
@@ -603,6 +673,7 @@ void AHttpActor_KMK::OnResCheckIdStage ( FHttpRequestPtr Request , FHttpResponse
 		UE_LOG ( LogTemp , Warning , TEXT ( "Failed myStage" ) );
 	}
 }
+
 
 #pragma endregion
 
