@@ -126,6 +126,8 @@ void AJJH_SelectManager::ChangeMap ( int32 index )
 
 		} , 0.2f * ( i + 1 ) , false );  // 첫 번째 레벨도 0.4초 지연 후 언로드 <- 비동기적이라 이거 해야함
 	}
+
+	LevelsToUnload.Reset();
 }
 
 void AJJH_SelectManager::FindActorAndDestroy(FName tag)
@@ -388,6 +390,7 @@ void AJJH_SelectManager::CreateStage ( const struct FStageInfo& info )
 		true ,  // 로드 시 블록 여부 설정
 		FLatentActionInfo ( )
 	);
+	UE_LOG ( LogTemp , Warning , TEXT ( "loading level: %s" ) , *LevelToLoad.ToString ( ) );
 
 	GetWorld ( )->SpawnActor<AActor> (FloorFactory[info.terrain] , GetActorTransform ( ) );
 	GetWorld ( )->SpawnActor<AActor> (VFXFactory[info.specialEffect] , GetActorTransform ( ) );
@@ -410,10 +413,10 @@ void AJJH_SelectManager::DeleteStage ( )
 	//	true   // Should block on load
 	//	);
 
-	// 일정 시간 후 이전 레벨을 개별적으로 언로드하는 타이머 설정
-	for (int32 i = 0; i < LevelsToUnload.Num ( ); ++i)
+	//모든 레벨 내리기
+	for (int32 i = 0; i < Levels.Num ( ); ++i)
 	{
-		const FName Level = LevelsToUnload[i];
+		const FName Level = Levels[i];
 		FTimerHandle UnloadTimerHandle;
 
 		GetWorld ( )->GetTimerManager ( ).SetTimer ( UnloadTimerHandle , [this , Level]( )
@@ -428,6 +431,7 @@ void AJJH_SelectManager::DeleteStage ( )
 
 		} , 0.2f * ( i + 1 ) , false );  // 첫 번째 레벨도 0.4초 지연 후 언로드 <- 비동기적이라 이거 해야함
 	}
+	LevelsToUnload.Reset ( );
 }
 
 #pragma endregion 
