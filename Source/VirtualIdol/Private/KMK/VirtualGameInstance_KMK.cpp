@@ -97,7 +97,7 @@ void UVirtualGameInstance_KMK::CreateMySession ( FString RoomName, int32 PlayerC
    // FUniqueNetIdPtr NetID = GetWorld()->GetFirstLocalPlayerFromController()->GetUniqueNetIdForPlatformUser().GetUniqueNetId();
 
     sessionInterface->CreateSession( *NetID, FName(*HostName) , settings);
-    
+
     PRINTLOG(TEXT("Create Session Start %s, Host Name : %s"), *RoomName, *HostName);
 }
 
@@ -174,6 +174,7 @@ void UVirtualGameInstance_KMK::OnMyFindSessionComplete ( bool bSuccessful )
                     concerInfo = concert;
                     roomInfo.texture = concert.texture;
                     roomInfo.ticketPrice = concert.ticketPrice;
+                    roomInfo.feverNum = concert.feverVFX;
                 }
             }
             // 최대 플레이어 수
@@ -418,6 +419,16 @@ void UVirtualGameInstance_KMK::OnSetStageButt ( )
 	{
 		VisibleStartWidget(false);
 		sm->CreateStage(myStageInfo);
+        if (myStageInfo.theme == 3)
+        {
+            widget->spawnTrans = FTransform(FVector(0, 0, 2000 ) );
+            spawnTrans = FTransform(FVector(0, 0, 2000 ) );
+        }
+        else
+        {
+            widget->spawnTrans = FTransform(FVector(0 ) );
+            spawnTrans = FTransform(FVector(0 ) );
+        }
 	}
 }
 

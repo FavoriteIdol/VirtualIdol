@@ -395,6 +395,9 @@ public:
 	bool bCreateTicket = false;
 	UFUNCTION( )
 	void SetLoadImage( );
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite )
+	FTransform spawnTrans = FTransform(FVector(0 ) );
 #pragma endregion
 
 };
