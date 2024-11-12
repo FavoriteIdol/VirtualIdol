@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Interfaces/IHttpRequest.h"
 #include "Interfaces/IHttpResponse.h"
+#include "IImageWrapper.h"
 #include "HttpActor_KMK.generated.h"
 // 세션을 위한 roomInfo 구조체
 USTRUCT ( BlueprintType )
@@ -28,11 +29,13 @@ struct FConcertInfo
 	UPROPERTY(BlueprintReadOnly)
 	int32 feverVFX = -1;
 	UPROPERTY ( BlueprintReadOnly )
-    int32 stageId = -1;
+    int32 stageId = 1;
 	UPROPERTY(BlueprintReadOnly)
     int32 ticketPrice = -1;
 	UPROPERTY(BlueprintReadOnly)
 	int32 peopleScale = -1;
+	UPROPERTY( )
+	FString userName = TEXT("" );
 
 	void Clear ( )
 	{
@@ -56,6 +59,8 @@ struct FLoginInfo
 	GENERATED_BODY ( )
 
 	UPROPERTY(BlueprintReadOnly)
+	int32 userId = -1;
+	UPROPERTY(BlueprintReadOnly)
 	FString email= TEXT("");
 	UPROPERTY(BlueprintReadOnly)
 	FString password= TEXT("");
@@ -75,13 +80,15 @@ struct FStageInfo
 	UPROPERTY(BlueprintReadOnly)
 	FString name= TEXT("");
 	UPROPERTY(BlueprintReadOnly)
-	int32 terrain = -1;
+	int32 terrain = 0;
 	UPROPERTY(BlueprintReadOnly)
-	int32 sky = -1;
+	int32 sky = 0;
 	UPROPERTY(BlueprintReadOnly)
-	int32 theme = -1;
+	int32 theme = 0;
 	UPROPERTY(BlueprintReadOnly)
-	int32 specialEffect = -1;
+	int32 specialEffect = 0;
+	UPROPERTY( )
+	int32 stageID = -1;
 	UPROPERTY(BlueprintReadOnly)
 	FString img= TEXT("");
 
@@ -104,6 +111,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TArray<TSubclassOf<AActor>> effectArray;
+
 #pragma region with BE for Login
 	UPROPERTY( )
 	class UVirtualGameInstance_KMK* gi;
@@ -119,7 +129,7 @@ public:
 #pragma region with BE for SettingStage
 	int32 count = 0;
 	// 요청
-	void ReqSetConcert(const FConcertInfo& concert );
+	void ReqSetMyConcert(FConcertInfo& concert );
 	// 응답
 	void OnResSetConcert( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
 #pragma endregion
@@ -138,17 +148,52 @@ public:
 	void ReqCheckStage(class UStartWidget_KMK* startWidget );
 	// 응답 
 	void OnResCheckStage( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
-	// 내 무대인지 확인
-	TArray<struct FStageInfo> myStageInfoArray;
 	// 전체 무대
 	TArray<struct FStageInfo> allStageInfoArray;
+	TArray<struct FStageInfo> myStageInfoArray;
 	
 	UPROPERTY( )
 	class UStartWidget_KMK* sw;
+
+	// 내무대 확인
+	// 요청
+	void ReqCheckMyStage(class UStartWidget_KMK* startWidget );
+	// 응답 
+	void OnResCheckMyStage( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
+
+	// 이미지 생성 및 다운
+	void DownloadImageFromUrl ( const FString& imageUrl , const FStageInfo& stageInfo );
+	void OnImageDownComplete ( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bWasSuccessful, FStageInfo stageInfo );
+
+	// 특정 무대 요청
+	void ReqCheckIdStage( int32 num);
+	void OnResCheckIdStage(FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
+
+#pragma endregion
+#pragma region Check My Concert
+	// 내무대 확인
+	UPROPERTY( )
+	class UStartWidget_KMK* myStartWid;
+	// 요청
+	void ReqCheckMyConcert( );
+	// 응답 
+	void OnResqCheckMyConcert( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
+	TArray<struct FConcertInfo> allConcertInfoArray;
+		// 열린 무대 확인
+	void ReqCheckAllOpenConcert( );
+	void OnResCheckAllOpenConcert( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
 #pragma endregion
 
-#pragma region with Ai for Text
-
+#pragma region with Ai for Image
+	FString ticketURL;
+	//요청
+	void ReqMultipartCapturedWithAI(const FString& ImagePath, const FString& url = TEXT("http://master-of-prediction.shop:8123/api/v1/files/upload") );
+	//응답
+	void OnReqMultipartCapturedWithAI( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
+#pragma endregion
+#pragma region Translate
+	void ReqTranslateChat(const FString& json );
+	void OnReqTranslateChat( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
 #pragma endregion
 
 

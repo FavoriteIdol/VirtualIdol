@@ -13,10 +13,13 @@
 void URoomWidget_KMK::NativeConstruct ( )
 {
 	gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance());
-	if (Butt_JoinSession && Butt_SetStage)
+	if (Butt_JoinSession && Butt_SetStage && Image_StageOut)
 	{
 		Butt_JoinSession->OnClicked.AddDynamic ( this , &URoomWidget_KMK::PressJoinSessionButt );
 		Butt_SetStage->OnClicked.AddDynamic ( this , &URoomWidget_KMK::PressSetStageButt );
+		Image_StageOut->SetVisibility(ESlateVisibility::Hidden);
+		gi->bPressSession = false;
+		gi->bPressStage = false;
 	}
 }
 // 세션에 들어가는 버튼에 이미지와 텍스트를 변경함
@@ -24,41 +27,85 @@ void URoomWidget_KMK::SetImageAndText (const struct FRoomInfo& info)
 {
 	// 이미지 설정
 	//Image_Stage->SetBrushFromTexture( newTexture );
+	if(!gi) gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance());
+	if(!gi->sm)gi->sm = sm;
 	Image_Stage->SetColorAndOpacity(FLinearColor::Blue);
+	mySessionInfo = info;
 	Butt_JoinSession->SetVisibility ( ESlateVisibility::Visible );
 	Butt_SetStage->SetVisibility(ESlateVisibility::Hidden);
-	Text_Name->SetText( FText::FromString( info.hostName + TEXT ( "의 콘서트" ) ));
-	roomNum = info.index;
+	Text_Name->SetText( FText::FromString( info.roomName ));
+	
 }
 
-void URoomWidget_KMK::SetStageText( const struct FStageInfo& stageInfo)
+void URoomWidget_KMK::SetStageText( const struct FStageInfo& stageInfo, UTexture2D* image)
 {
+	if(!gi) gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance());
+	if(gi && gi->sm && !sm)gi->sm = sm;
 	myStageInfo = stageInfo;
-	Image_Stage->SetColorAndOpacity(FLinearColor::Yellow);
+	if(image)Image_Stage->SetBrushFromTexture(image);
+	myTexture = image;
 	Butt_JoinSession->SetVisibility ( ESlateVisibility::Hidden );
     Butt_SetStage->SetVisibility ( ESlateVisibility::Visible );
 	Text_Name->SetText( FText::FromString( stageInfo.name ));
 }
 
-void URoomWidget_KMK::PressJoinSessionButt( )
+void URoomWidget_KMK::PressJoinSessionButt ( )
 {
-	if (gi)
+	if (gi->bPressSession && gi->sessionWidget != this)
 	{
-		gi->SwitchStartUIWidget(roomNum);
+		gi->sessionWidget->Image_StageOut->SetVisibility(ESlateVisibility::Hidden);
+		gi->sessionWidget = nullptr;
+		gi->bPressSession = false;
 	}
-
+	if(!gi->bPressSession)
+	{
+		ChangeSessionOutSide( );
+	}
+	else
+	{
+		gi->bPressSession = false;
+		gi->sessionWidget = nullptr;
+		Image_StageOut->SetVisibility(ESlateVisibility::Hidden);
+	}
 }
-// 무대 선택에서 무대선택한 경우
+
 void URoomWidget_KMK::PressSetStageButt ( )
 {
-	// 원래 보이던 위잿을 비활성화
-	UE_LOG(LogTemp, Warning, TEXT("Load Stage" ));
-	UE_LOG(LogTemp, Warning, TEXT("%s" ), *myStageInfo.name);
-	// 추가되어야하는것 : 저장된 무대를 로드
-	if (gi && sm)
+	if (gi->roomWidget && gi->roomWidget != this)
 	{
-		gi->VisibleStartWidget(false);
-		sm->CreateStage(myStageInfo);
+		gi->roomWidget->Image_StageOut->SetVisibility(ESlateVisibility::Hidden);
+		gi->roomWidget = nullptr;
+		gi->bPressStage = false;
 	}
+	if(!gi->bPressStage)
+	{
+		ChangeMyOutSide( );
+	}
+	else
+	{
+		gi->bPressStage = false;
+		gi->roomWidget = nullptr;
+		Image_StageOut->SetVisibility(ESlateVisibility::Hidden);
+	}
+}
+
+void URoomWidget_KMK::ChangeMyOutSide ( )
+{
+	gi->bPressStage = true;
+    gi->roomWidget = this;
+    gi->myStageInfo = myStageInfo;
+	gi->stageNum = myStageInfo.stageID;
+	gi->ChangeTextureWidget(myTexture);
+    Image_StageOut->SetVisibility ( ESlateVisibility::Visible );
+}
+
+void URoomWidget_KMK::ChangeSessionOutSide ( )
+{
+	gi->bPressSession = true;
+    gi->sessionWidget = this;
+    gi->mySessionInfo = mySessionInfo;
+	gi->roomNum = mySessionInfo.index;
+	gi->HostName = mySessionInfo.hostName;
+    Image_StageOut->SetVisibility ( ESlateVisibility::Visible );
 }
 

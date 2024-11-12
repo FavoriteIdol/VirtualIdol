@@ -16,6 +16,8 @@ public:
 	// Sets default values for this actor's properties
 	AJJH_SelectManager();
 
+
+	class AJJH_SetupPlayerController* JJHPC;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -26,7 +28,7 @@ public:
 
 	//태양 위치 바꾸기
     UFUNCTION(BlueprintCallable, Category = "Time")
-    void UpdateSunNightPosition(bool isNight);
+    void UpdateSunNightPosition(int32 index);
 
 	UPROPERTY(EditAnywhere)
 	TArray<TSubclassOf<AActor>> SkyFactory;

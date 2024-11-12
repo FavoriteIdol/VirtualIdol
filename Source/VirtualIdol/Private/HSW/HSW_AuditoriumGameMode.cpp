@@ -65,12 +65,12 @@ void AHSW_AuditoriumGameMode::Multicast_FeverEffect_Implementation ( )
 	//UNiagaraFunctionLibrary::SpawnSystemAtLocation ( GetWorld ( ) , FeverEffect_Niagara , FeverEffectLocation.GetLocation() );
 }
 
-void AHSW_AuditoriumGameMode::BroadcastChatMessage ( const FString& Chat )
+void AHSW_AuditoriumGameMode::BroadcastChatMessage (const FString& nickName, const FString& Chat )
 {
     AHSW_GameState_Auditorium* gs = GetGameState<AHSW_GameState_Auditorium>();
     if (gs)
     {
-        gs->MultiRPCChat(Chat);
+        gs->MultiRPCChat(nickName, Chat);
     }
 }
 
@@ -100,6 +100,49 @@ void AHSW_AuditoriumGameMode::BroadcastCountDown ( )
 		gs->MultiRPC_ShowCountDown();
 	}
 }
+APawn* FindPawnByTag(UWorld* World, FName Tag)
+{
+    // 월드의 모든 Pawn을 순회하면서 특정 태그를 가진 Pawn 찾기
+    for (TActorIterator<APawn> It(World); It; ++It)
+    {
+        APawn* FoundPawn = *It;
+        if (FoundPawn && FoundPawn->ActorHasTag(Tag))
+        {
+            return FoundPawn; // 태그가 일치하는 Pawn을 반환
+        }
+    }
+    
+    return nullptr; // 태그가 일치하는 Pawn이 없으면 nullptr 반환
+}
+void AHSW_AuditoriumGameMode::OnPostLogin(APlayerController* NewPlayer)
+{
+    Super::OnPostLogin(NewPlayer);
+	UE_LOG(LogTemp, Log, TEXT("OnPostLogin called for player: %s"), *NewPlayer->GetName());
+    // 호스트 클라이언트라면 태그로 Pawn을 검색하고 소유
+    if (GameState->PlayerArray.Num() == 1)
+    {
+        APawn* HostPawn = FindPawnByTag(GetWorld(), FName("Virtual"));
+        if (HostPawn)
+        {
+            NewPlayer->Possess(HostPawn);
+            UE_LOG(LogTemp, Log, TEXT("Host client possessed Pawn with 'HostPawn' tag: %s"), *HostPawn->GetName());
+        }
+        else
+        {
+            UE_LOG(LogTemp, Warning, TEXT("No Pawn with 'HostPawn' tag found."));
+        }
+    }
+    else
+    {
+        // 나머지 클라이언트용 Pawn 생성 및 소유
+        APawn* NewPawn = GetWorld()->SpawnActor<APawn>(DefaultPawnClass, FVector::ZeroVector, FRotator::ZeroRotator);
+        if (NewPawn)
+        {
+            NewPlayer->Possess(NewPawn);
+        }
+    }
+}
+
 void AHSW_AuditoriumGameMode::ServerPlayMusic_Implementation ( class UAudioComponent* selectedMusic )
 {
 	for (FConstPlayerControllerIterator It = GetWorld ( )->GetPlayerControllerIterator ( ); It; ++It)

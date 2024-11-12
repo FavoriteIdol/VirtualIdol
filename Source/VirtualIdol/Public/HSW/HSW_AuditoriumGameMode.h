@@ -48,7 +48,7 @@ public:
 	void Multicast_FeverEffect( );
 
 	UFUNCTION( )
-	void BroadcastChatMessage ( const FString& Chat );
+	void BroadcastChatMessage (const FString& nickName, const FString& Chat );
 
 	UFUNCTION( )
 	void BroadcastPlayMusic( USoundBase* wavFile);
@@ -65,5 +65,8 @@ public:
 
 	UPROPERTY( )
 	TArray<class USoundBase *> WavArray;
+
+	UFUNCTION( )
+	void OnPostLogin(APlayerController* NewPlayer);
 
 };

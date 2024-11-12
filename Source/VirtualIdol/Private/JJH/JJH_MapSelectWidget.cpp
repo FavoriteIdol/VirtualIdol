@@ -34,6 +34,7 @@ void UJJH_MapSelectWidget::NativeConstruct ( )
 	//낮밤 바꾸기
 	NightButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnNightButtonClicked );
 	AfternoonButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnAfternoonButtonClicked );
+	BatManSkyButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnBatManSkyButtonClicked );
 
 	//맵 바꾸기
 	CyberpunkButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnCyberpunkButtonClicked );
@@ -44,10 +45,12 @@ void UJJH_MapSelectWidget::NativeConstruct ( )
 	//이펙트 바꾸기
 	EffectButton1->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnEffectButton1Clicked );
 	EffectButton2->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnEffectButton2Clicked );
+	EffectButton3->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnEffectButton3Clicked );
 
 	//지면 바꾸기
 	FogButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnFogButtonClicked );
 	GroundButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnGroundButtonClicked );
+	OceanButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnOceanButtonClicked );
 
 	DayHorizontal->SetVisibility ( ESlateVisibility::Hidden );
 	ThemeHorizontal->SetVisibility ( ESlateVisibility::Hidden );
@@ -127,14 +130,26 @@ void UJJH_MapSelectWidget::OnNightButtonClicked ( )
 {
 	if(SM) 
 	{
-		SM->UpdateSunNightPosition(true);
+		SM->UpdateSunNightPosition(0);
 	}
 }
 
 void UJJH_MapSelectWidget::OnAfternoonButtonClicked ( )
 {
-	if (SM) SM->UpdateSunNightPosition ( false );
+	if (SM)
+	{
+		SM->UpdateSunNightPosition (1);
+	}
 }
+
+void UJJH_MapSelectWidget::OnBatManSkyButtonClicked ( )
+{
+	if (SM)
+	{
+		SM->UpdateSunNightPosition (2);
+	}
+}
+
 
 //테마
 
@@ -173,6 +188,10 @@ void UJJH_MapSelectWidget::OnGroundButtonClicked ( )
 {
 	if (SM) SM->ChangeFloor (1);
 }
+void UJJH_MapSelectWidget::OnOceanButtonClicked ( )
+{
+	if (SM) SM->ChangeFloor ( 2 );
+}
 
 //이펙트 바꾸기
 void UJJH_MapSelectWidget::OnEffectButton1Clicked ( )
@@ -190,6 +209,13 @@ void UJJH_MapSelectWidget::OnEffectButton2Clicked ( )
 		SM->ChangeEffect (1);
 	}
 }
+void UJJH_MapSelectWidget::OnEffectButton3Clicked ( )
+{
+	if (SM)
+	{
+		SM->ChangeEffect ( 2 );
+	}
+}
 
 
 
@@ -203,6 +229,7 @@ void UJJH_MapSelectWidget::OnCaptureButtonClicked ( )
 		CaptureButton->SetVisibility(ESlateVisibility::Hidden);
 		ReturnButton->SetVisibility ( ESlateVisibility::Hidden );
 		ReturnToMenuButton->SetVisibility ( ESlateVisibility::Hidden );
+		SetUpFinishBorder->SetVisibility ( ESlateVisibility::Hidden );
 	}
 
 	// 0.3초 후에 SetImageWithCapturedImage 함수 호출
