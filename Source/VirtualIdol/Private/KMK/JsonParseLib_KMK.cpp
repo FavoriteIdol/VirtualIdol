@@ -177,7 +177,7 @@ FConcertInfo  UJsonParseLib_KMK::ParsecMyConcertInfo ( const FString& json )
                     FString scale = concertEle->GetStringField ( TEXT ( "peopleScale" ) );
                     concertInfo.peopleScale = FCString::Atoi ( *scale );
                     concertInfo.stageId = concertEle->GetIntegerField ( TEXT ( "stageId" ) );
-
+                    concertInfo.concertId = concertEle->GetIntegerField(TEXT("id" ));
                     concertInfo.appearedVFX = concertEle->GetIntegerField ( TEXT ( "appearedVFX" ) );
                     concertInfo.feverVFX = concertEle->GetIntegerField ( TEXT ( "feverVFX" ) );
 
@@ -222,6 +222,7 @@ TArray<struct FConcertInfo>  UJsonParseLib_KMK::ParsecAllConcert ( const FString
                     FString scale = concertEle->GetStringField ( TEXT ( "peopleScale" ) );
                     concertInfo.peopleScale = FCString::Atoi ( *scale );
                     concertInfo.stageId = concertEle->GetIntegerField ( TEXT ( "stageId" ) );
+                    concertInfo.concertId = concertEle->GetIntegerField(TEXT("id" ));
 
                     concertInfo.appearedVFX = concertEle->GetIntegerField ( TEXT ( "appearedVFX" ) );
                     concertInfo.feverVFX = concertEle->GetIntegerField ( TEXT ( "feverVFX" ) );
