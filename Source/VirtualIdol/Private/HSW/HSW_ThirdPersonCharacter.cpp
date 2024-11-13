@@ -77,7 +77,7 @@ AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent> ( TEXT ( "CameraBoom" ) );
 	CameraBoom->SetupAttachment ( RootComponent );
-	CameraBoom->SetRelativeLocation(FVector(0.0f,0.0f,120.f));
+	CameraBoom->SetRelativeLocation(FVector(140.0f,0.0f,130.f));
 	CameraBoom->TargetArmLength = 250; // The camera follows at this distance behind the character
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 
