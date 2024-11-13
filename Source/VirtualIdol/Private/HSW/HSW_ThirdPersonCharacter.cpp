@@ -202,10 +202,10 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 		FInputModeGameAndUI inputMode;
 		GetController<APlayerController> ( )->SetInputMode(inputMode );
 	}
-	if (GetWorld ( )->GetCurrentLevel()->GetName ( ).Contains ( TEXT ( "Alpha" ) ))
-	{
-		gi->spawnTrans = FTransform(FVector(0,0,2000 ) );
-	}
+	//if (GetWorld ( )->GetCurrentLevel()->GetName ( ).Contains ( TEXT ( "Alpha" ) ))
+	//{
+	//	gi->spawnTrans = FTransform(FVector(0,0,2000 ) );
+	//}
 	//MulticastFeverEffect( );
 #pragma endregion
 

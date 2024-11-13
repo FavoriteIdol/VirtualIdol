@@ -1,1 +1,1 @@
-"C:\Program Files\Epic Games\UE_5.4\Engine\Binaries\Win64\UnrealEditor.exe" "C:\Project\Unreal\FirstProject\VirtualIdol\VirtualIdol.uproject" -game -log -vr
+"C:\Program Files\Epic Games\UE_5.4\Engine\Binaries\Win64\UnrealEditor.exe" "C:\Project\Unreal\FirstProject\VirtualIdol\VirtualIdol.uproject" -ExecCmds="t.maxfps 30" -game -log -vr
