@@ -78,30 +78,30 @@ void UVirtual_KMK::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (bTime)
-	{
-		remainTime = GetWorld ( )->GetTimerManager ( ).GetTimerRemaining ( startCountDownHandle );
-		if (virtualWidget)
-		{
-			if (remainTime >= 0.0f)
-			{
-				// 남은 시간을 위젯에 표시
-				virtualWidget->CountDownText ( FString::FromInt ( remainTime ) );
-			}
-		}
-	}
-	else
-	{
-		if (pc->HasAuthority ( ) && pc->IsLocalController ( ))
-		{
-			diffTime = GetTimeDifference ( setConcertTime );
-            if (virtualWidget)
-            {
-                virtualWidget->BeforeStartConcertCount(diffTime);
-				virtualWidget->SetConcertName(gi->concerInfo.name );
-            }
-		}
-	}
+	//if (bTime)
+	//{
+	//	remainTime = GetWorld ( )->GetTimerManager ( ).GetTimerRemaining ( startCountDownHandle );
+	//	if (virtualWidget)
+	//	{
+	//		if (remainTime >= 0.0f)
+	//		{
+	//			// 남은 시간을 위젯에 표시
+	//			virtualWidget->CountDownText ( FString::FromInt ( remainTime ) );
+	//		}
+	//	}
+	//}
+	//else
+	//{
+	//	if (pc->HasAuthority ( ) && pc->IsLocalController ( ))
+	//	{
+	//		diffTime = GetTimeDifference ( setConcertTime );
+ //           if (virtualWidget)
+ //           {
+ //               virtualWidget->BeforeStartConcertCount(diffTime);
+	//			virtualWidget->SetConcertName(gi->concerInfo.name );
+ //           }
+	//	}
+	//}
 }
 #pragma region Time
 FString UVirtual_KMK::GetTimeDifference ( const FString& SetTime )
@@ -203,14 +203,10 @@ void UVirtual_KMK::CallGMShowServer ( )
 
 void UVirtual_KMK::StartCountDown ( )
 {
-	bTime = true;
-	GetWorld ( )->GetTimerManager ( ).SetTimer ( startCountDownHandle , FTimerDelegate::CreateLambda ( [this]( )
-        {
-            SetVirtualVisible ( true );
-			virtualWidget->CountDownPanelVisible ( ESlateVisibility::Hidden );
-			if(appearFact.Num() > 0) GetWorld ( )->SpawnActor<AActor> ( gi->effectArray[gi->GetConcertInfo().appearedVFX] , gi->spawnTrans );
-			UE_LOG(LogTemp, Warning, TEXT("%d" ), gi->GetConcertInfo().appearedVFX);
-        } ) , 0 , false );
+    SetVirtualVisible ( true );
+    virtualWidget->CountDownPanelVisible ( ESlateVisibility::Hidden );
+    if (gi->effectArray.Num ( ) > 0) GetWorld ( )->SpawnActor<AActor> ( gi->effectArray[gi->GetConcertInfo ( ).appearedVFX] , gi->spawnTrans );
+    UE_LOG ( LogTemp , Warning , TEXT ( "%d" ) , gi->GetConcertInfo ( ).appearedVFX );
 
 }
 
