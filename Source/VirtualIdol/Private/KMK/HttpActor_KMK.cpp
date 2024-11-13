@@ -797,4 +797,45 @@ void AHttpActor_KMK::OnReqStageInfo ( FHttpRequestPtr Request , FHttpResponsePtr
 	}
 
 }
+
 #pragma endregion
+
+void AHttpActor_KMK::ReqCollcetionConcert ( int32 concertIndex )
+{
+	// HTTP 모듈 생성
+	FHttpModule& httpModule = FHttpModule::Get ( );
+	TSharedRef<IHttpRequest> req = httpModule.CreateRequest ( );
+	// 요청할 정보를 설정
+	FString authHeader = FString::Printf ( TEXT ( "Bearer %s" ) , *gi->loginInfo.token );
+    req->SetHeader(TEXT("Authorization"), *( authHeader ));
+	req->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
+	FString url = TEXT("http://master-of-prediction.shop:8123/api/user-activity/collect-concert");
+	req->SetURL(url );
+	req->SetVerb ( TEXT ( "POST" ) );
+
+	req->SetContentAsString(UJsonParseLib_KMK::MakeMyCollection(concertIndex));
+	req->ProcessRequest ( );
+	// 응답받을 함수를 연결
+	req->OnProcessRequestComplete ( ).BindUObject ( this , &AHttpActor_KMK::OnReqMultiCollectionConcert );
+}
+
+void AHttpActor_KMK::OnReqMultiCollectionConcert ( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully )
+{
+	if (bConnectedSuccessfully)
+	{
+		// 성공
+		FString respon = Response->GetContentAsString();
+		if (Response->GetResponseCode() == 200)
+		{
+			UE_LOG ( LogTemp , Warning , TEXT ( "Collcet concert" ) );
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Failed to download image. Response code: %d"), Response->GetResponseCode());
+		}
+	}
+	else
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "Failed Collcet concert" ) );
+	}
+}

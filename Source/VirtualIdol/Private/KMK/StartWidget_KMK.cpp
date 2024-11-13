@@ -629,20 +629,20 @@ void UStartWidget_KMK::PressNextButt ( )
 
 void UStartWidget_KMK::PressMoneyPay ( )
 {
-    if (!bCreateTicket)
-    {
-        Text_Effect1->SetVisibility ( ESlateVisibility::Hidden );
-        MultiText_PopUp->SetVisibility ( ESlateVisibility::Visible );
-        EffectPopUp1->SetVisibility ( ESlateVisibility::Visible );
-        return;
-    }
-    else
-    {
-        Text_Effect1->SetVisibility ( ESlateVisibility::Visible );
-        MultiText_PopUp->SetVisibility ( ESlateVisibility::Hidden );
-        EffectPopUp1->SetVisibility ( ESlateVisibility::Hidden );
-        Image_Load->SetVisibility ( ESlateVisibility::Hidden );
-    }
+    //if (!bCreateTicket)
+    //{
+    //    Text_Effect1->SetVisibility ( ESlateVisibility::Hidden );
+    //    MultiText_PopUp->SetVisibility ( ESlateVisibility::Visible );
+    //    EffectPopUp1->SetVisibility ( ESlateVisibility::Visible );
+    //    return;
+    //}
+    //else
+    //{
+    //    Text_Effect1->SetVisibility ( ESlateVisibility::Visible );
+    //    MultiText_PopUp->SetVisibility ( ESlateVisibility::Hidden );
+    //    EffectPopUp1->SetVisibility ( ESlateVisibility::Hidden );
+    //    Image_Load->SetVisibility ( ESlateVisibility::Hidden );
+    //}
 	concertInfo.stageId = gi->stageNum;
 	UE_LOG(LogTemp, Warning, TEXT("%d" ), concertInfo.stageId);
 	
@@ -693,6 +693,7 @@ void UStartWidget_KMK::PressYesButt ( )
 		else
 		{
 			gi->JoinRoom(gi->roomNum );
+			httpActor->ReqCollcetionConcert(gi->GetConcertInfo().concertId);
 		}
 		//ChangeAudienceMesh(0);
 	}
