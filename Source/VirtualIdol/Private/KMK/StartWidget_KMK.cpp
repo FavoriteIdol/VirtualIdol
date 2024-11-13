@@ -693,7 +693,7 @@ void UStartWidget_KMK::PressYesButt ( )
 		else
 		{
 			gi->JoinRoom(gi->roomNum );
-			httpActor->ReqCollcetionConcert(gi->GetConcertInfo().concertId);
+			httpActor->ReqCollcetionConcert(4);
 		}
 		//ChangeAudienceMesh(0);
 	}
