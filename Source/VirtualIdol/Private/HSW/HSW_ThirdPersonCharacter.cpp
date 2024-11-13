@@ -674,8 +674,8 @@ void AHSW_ThirdPersonCharacter::MulticastFeverEffect_Implementation ( )
 
 	if (gi->GetConcertInfo ( ).feverVFX >= 0)
 	{
-	FeverEffect_Actor = GetWorld ( )->SpawnActor<AActor> (  gi->effectArray[gi->GetConcertInfo().feverVFX] , gi->spawnTrans );
-
+	//FeverEffect_Actor = GetWorld ( )->SpawnActor<AActor> (  gi->effectArray[gi->GetConcertInfo().feverVFX] , gi->spawnTrans );
+		FeverEffect_Actor = GetWorld ( )->SpawnActor<AActor> (  gi->effectArray[2] , FTransform(FVector(0)) );
 	}
 	
 }

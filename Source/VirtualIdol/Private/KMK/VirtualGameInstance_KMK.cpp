@@ -345,8 +345,8 @@ void UVirtualGameInstance_KMK::SetConcertInfo ( const struct FConcertInfo& info 
     int32 mon = currentDataTime.GetMonth();
     int32 day = currentDataTime.GetDay();
 
-    FString start = FString::FromInt(year) + TEXT("-") + ChangeString(FString::FromInt(mon))+ TEXT("-") +ChangeString( FString::FromInt(day));
-    // FString start = TEXT("2024-11-07" );
+    // FString start = FString::FromInt(year) + TEXT("-") + ChangeString(FString::FromInt(mon))+ TEXT("-") +ChangeString( FString::FromInt(day));
+    FString start = TEXT("2024-11-14" );
     if (concerInfo.concertDate == start)
     {
         widget->SetButtEnable(true);
