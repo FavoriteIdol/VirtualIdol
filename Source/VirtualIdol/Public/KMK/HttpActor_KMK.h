@@ -31,6 +31,8 @@ struct FConcertInfo
 	UPROPERTY ( BlueprintReadOnly )
     int32 stageId = 1;
 	UPROPERTY(BlueprintReadOnly)
+	int32 concertId = -1;
+	UPROPERTY(BlueprintReadOnly)
     int32 ticketPrice = -1;
 	UPROPERTY(BlueprintReadOnly)
 	int32 peopleScale = -1;
@@ -213,6 +215,7 @@ public:
 	//응답
 	void OnReqStageInfo( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
 #pragma endregion
-
+	void ReqCollcetionConcert(int32 concertIndex );
+	void OnReqMultiCollectionConcert(FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully  );
 
 };
