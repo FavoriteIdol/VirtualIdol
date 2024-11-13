@@ -60,16 +60,16 @@ void UVirtual_KMK::BeginPlay()
 		{
 			gi->spawnTrans = FTransform(FVector(0, 0, 2000 ) );
 		}
-		else
+		else if(gi->GetConcertStageInfo ( ).theme != 3)
 		{
 			gi->spawnTrans = FTransform(FVector(0) );
 		}
 
     }
-	if (GetWorld ( )->GetCurrentLevel()->GetName ( ).Contains ( TEXT ( "Alpha" ) ))
-	{
-		gi->spawnTrans = FTransform(FVector(0,0,2000 ) );
-	}
+	//if (GetWorld ( )->GetCurrentLevel()->GetName ( ).Contains ( TEXT ( "Alpha" ) ))
+	//{
+	//	gi->spawnTrans = FTransform(FVector(0,0,2000 ) );
+	//}
 }
 
 
