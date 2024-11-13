@@ -39,6 +39,7 @@
 #include "KMK/Virtual_KMK.h"
 #include "KMK/AudienceServerComponent_KMK.h"
 #include "Components/AudioComponent.h"
+#include "Components/TextBlock.h"
 
 // Sets default values
 AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
@@ -791,6 +792,11 @@ void AHSW_ThirdPersonCharacter::OnMyThorwHold ( const FInputActionValue& value )
 	{
 		FTransform t = ThrowingArrow->GetComponentTransform ( );
 		ServerRPCThrowHold(t);
+
+		UVirtualGameInstance_KMK* gi = Cast<UVirtualGameInstance_KMK> ( GetWorld ( )->GetGameInstance ( ) );
+		gi->myCash -= 500;
+		audienceWidget->Text_MyCash->SetText ( FText::AsNumber ( gi->myCash ) );
+
 	}
 }
 
