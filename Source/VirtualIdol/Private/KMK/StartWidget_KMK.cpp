@@ -185,7 +185,7 @@ void UStartWidget_KMK::NativeTick ( const FGeometry& MyGeometry , float InDeltaT
 		{
 			FString s = EditText_ScaleNum->GetText().ToString();
 			int a = FCString::Atoi(*s) * concertPrice;
-			concertInfo.ticketPrice = a;
+			
 			Text_Price->SetText(FText::AsNumber(a));
 		}
 	}
@@ -343,6 +343,7 @@ void UStartWidget_KMK::PressSelectButt ( )
 			EffectPopUp1->SetVisibility(ESlateVisibility::Visible);
 			return;
 		}
+		concertInfo.ticketPrice = FCString::Atoi(*EditText_Price->GetText().ToString());
 		SetTitleText ( TEXT ( "이펙트 설정" ) );
 		SetPanelVisible ( StageChargePanel , SetTicketPanel , SetDayPanel );
 		selectNum++;
@@ -541,8 +542,6 @@ void UStartWidget_KMK::ClearAllText ( )
 	EditText_SMin->SetText( FText::GetEmpty ( ) );
 	EditText_H->SetText( FText::GetEmpty ( ) );
 	EditText_M->SetText( FText::GetEmpty ( ) );
-
-	concertInfo.ticketPrice = FCString::Atoi(*EditText_Price->GetText().ToString());
 
 	EditText_Price->SetText( FText::GetEmpty ( ) );
 	EditMultiText_Ticket->SetText( FText::GetEmpty ( ) );
