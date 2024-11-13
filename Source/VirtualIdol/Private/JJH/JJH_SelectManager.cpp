@@ -361,11 +361,11 @@ void AJJH_SelectManager::CreateStage ( const struct FStageInfo& info )
 	//} , 0.2f , false ); // 0.2초의 지연 시간
 		// 각 인덱스에 대한 레벨 이름 정의
 	auto* gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance() );
-	if (gi)
+	if (info.theme == 3)
 	{
 		gi->spawnTrans = FTransform(FVector(0,0, 2000 ) );
 	}
-	else
+	else if(info.theme != 3)
 	{
 		gi->spawnTrans = FTransform(FVector(0 ) );
 	}
