@@ -39,6 +39,7 @@
 #include "KMK/Virtual_KMK.h"
 #include "KMK/AudienceServerComponent_KMK.h"
 #include "Components/AudioComponent.h"
+#include "Components/TextBlock.h"
 
 // Sets default values
 AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
@@ -77,7 +78,7 @@ AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent> ( TEXT ( "CameraBoom" ) );
 	CameraBoom->SetupAttachment ( RootComponent );
-	CameraBoom->SetRelativeLocation(FVector(0.0f,0.0f,120.f));
+	CameraBoom->SetRelativeLocation(FVector(140.0f,0.0f,130.f));
 	CameraBoom->TargetArmLength = 250; // The camera follows at this distance behind the character
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 
@@ -561,7 +562,7 @@ void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value 
 	if (!HasAuthority ( ) && IsLocallyControlled())
 	{
 		PersonalGauge++;
-		ServerRPCFeverGauge (CurrentGauge, 5*0.02);
+		ServerRPCFeverGauge (CurrentGauge, 2*0.02);
 		PrintFeverGaugeLogOnHead ( );
 
 		//MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
@@ -588,7 +589,7 @@ void AHSW_ThirdPersonCharacter::ServerRPCFeverGauge_Implementation ( float fever
 		}
 	}
 
-	if (FeverBright <= 5)
+	if (FeverBright <= 2)
 	{
 		FeverBright += brightValue;
 		MulticastRPCBrightness(1 );
@@ -791,6 +792,11 @@ void AHSW_ThirdPersonCharacter::OnMyThorwHold ( const FInputActionValue& value )
 	{
 		FTransform t = ThrowingArrow->GetComponentTransform ( );
 		ServerRPCThrowHold(t);
+
+		UVirtualGameInstance_KMK* gi = Cast<UVirtualGameInstance_KMK> ( GetWorld ( )->GetGameInstance ( ) );
+		gi->myCash -= 500;
+		audienceWidget->Text_MyCash->SetText ( FText::AsNumber ( gi->myCash ) );
+
 	}
 }
 
