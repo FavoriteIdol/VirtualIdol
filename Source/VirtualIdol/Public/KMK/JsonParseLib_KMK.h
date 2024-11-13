@@ -43,5 +43,4 @@ public:
 	static UTexture2D* CreateTextureFromImage(int32 Width, int32 Height, const TArray<uint8>& RawData);
 	FString ChangeString ( const FString& editText );
 
-	static FString MakeMyCollection(const int32 index);
 };

@@ -363,18 +363,3 @@ FString UJsonParseLib_KMK::ChangeString ( const FString& editText )
     }
 	return s;
 }
-
-FString UJsonParseLib_KMK::MakeMyCollection ( const int32 index )
-{
-	// 로그인 데이터를 JsonObject 형식으로 만든다.
-	TSharedPtr<FJsonObject> jsonObject = MakeShareable ( new FJsonObject ( ) );
-
-    jsonObject->SetNumberField(TEXT("concertId" ) , index);
-
-	// writer를 만들어서 JsonObject를 인코딩해서 
-	FString json;
-	TSharedRef<TJsonWriter<TCHAR>> writer = TJsonWriterFactory<TCHAR>::Create ( &json );
-	FJsonSerializer::Serialize ( jsonObject.ToSharedRef ( ) , writer );
-	// 반환한다.
-	return json;
-}

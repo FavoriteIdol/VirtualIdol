@@ -806,6 +806,7 @@ void AHttpActor_KMK::ReqCollcetionConcert ( int32 concertIndex )
 	FHttpModule& httpModule = FHttpModule::Get ( );
 	TSharedRef<IHttpRequest> req = httpModule.CreateRequest ( );
 	// 요청할 정보를 설정
+	req->SetContentAsString(FString::FromInt(concertIndex));
 	FString authHeader = FString::Printf ( TEXT ( "Bearer %s" ) , *gi->loginInfo.token );
     req->SetHeader(TEXT("Authorization"), *( authHeader ));
 	req->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
@@ -813,7 +814,6 @@ void AHttpActor_KMK::ReqCollcetionConcert ( int32 concertIndex )
 	req->SetURL(url );
 	req->SetVerb ( TEXT ( "POST" ) );
 
-	req->SetContentAsString(UJsonParseLib_KMK::MakeMyCollection(concertIndex));
 	req->ProcessRequest ( );
 	// 응답받을 함수를 연결
 	req->OnProcessRequestComplete ( ).BindUObject ( this , &AHttpActor_KMK::OnReqMultiCollectionConcert );
