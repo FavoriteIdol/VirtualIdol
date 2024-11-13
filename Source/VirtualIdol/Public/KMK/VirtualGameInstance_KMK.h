@@ -80,6 +80,7 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 	// 방찾기 응답
 	void OnMyFindSessionComplete(bool bSuccessful);
 
+
 	FSearchSignature OnSearchSignatureCompleteDelegate;
 	FFindSignature OnFindRoomCompDelegate;
 

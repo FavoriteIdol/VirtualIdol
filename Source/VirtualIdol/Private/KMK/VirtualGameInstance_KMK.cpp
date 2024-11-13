@@ -98,6 +98,7 @@ void UVirtualGameInstance_KMK::CreateMySession ( FString RoomName, int32 PlayerC
 
     sessionInterface->CreateSession( *NetID, FName(*HostName) , settings);
 
+
     PRINTLOG(TEXT("Create Session Start %s, Host Name : %s"), *RoomName, *HostName);
 }
 

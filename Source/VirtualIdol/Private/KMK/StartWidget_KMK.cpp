@@ -475,7 +475,7 @@ void UStartWidget_KMK::PressCreateTicket ( )
 						TEXT("공연 날짜 : " ) + year + TEXT ( "년" )+ mon + TEXT("월") + day + TEXT("일") + TEXT("\n") + TEXT("공연 시간 : " ) + sH +TEXT("시") + sM +TEXT("분");
 	data.Add(TEXT("description"), *concertString);
 	// 티켓 만들기
-	httpActor->ReqTicket(data);
+	// httpActor->ReqTicket(data);
 	// EditMultiText_Ticket->SetText ( FText::GetEmpty ( ) );
 }
 
