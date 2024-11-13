@@ -467,7 +467,7 @@ void UAudience_KMK::CountDownText (const FString& time )
 
 void UAudience_KMK::CountDownPanelVisible ( ESlateVisibility visiblePanel )
 {
-    if(CountDownPanel)CountDownPanel->SetVisibility(visiblePanel);
+    if(CountDownPanel)CountDownPanel->SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UAudience_KMK::SetCountDownTextVisible ( )
