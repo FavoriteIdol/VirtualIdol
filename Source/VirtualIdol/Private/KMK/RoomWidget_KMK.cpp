@@ -30,11 +30,11 @@ void URoomWidget_KMK::SetImageAndText (const struct FRoomInfo& info)
 	if(!gi) gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance());
 	if(!gi->sm)gi->sm = sm;
 	
-	if (info.texture)
-	{
-		Image_Stage->SetBrushFromTexture( info.texture );
-	}
-	else Image_Stage->SetColorAndOpacity(FLinearColor::Blue);
+	//if (info.texture)
+	//{
+	//	Image_Stage->SetBrushFromTexture( info.texture );
+	//}
+	//else Image_Stage->SetColorAndOpacity(FLinearColor::Blue);
 	mySessionInfo = info;
 
 	Butt_JoinSession->SetVisibility ( ESlateVisibility::Visible );
@@ -113,7 +113,8 @@ void URoomWidget_KMK::ChangeSessionOutSide ( )
 	gi->concerInfo.feverVFX = mySessionInfo.feverNum;
 	gi->roomNum = mySessionInfo.index;
 	gi->HostName = mySessionInfo.hostName;
-	gi->ChangeTextureWidget(mySessionInfo.texture);
+	//gi->ChangeTextureWidget(mySessionInfo.texture);
+	gi->ChangeTextureWidget(dummyText);
     Image_StageOut->SetVisibility ( ESlateVisibility::Visible );
 }
 

@@ -62,4 +62,7 @@ public :
 
 	void ChangeMyOutSide( );
 	void ChangeSessionOutSide( );
+
+	UPROPERTY(EditAnywhere )
+	class UTexture2D* dummyText;
 };
