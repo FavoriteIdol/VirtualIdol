@@ -38,8 +38,7 @@ void UStartWidget_KMK::NativeConstruct ( )
 	if (httpActor)
 	{
 		httpActor->sw = this;
-		// 무대 조회하기
-		httpActor->ReqCheckAllOpenConcert();
+
 	}
 	if (Image_Load)
 	{
@@ -217,7 +216,8 @@ void UStartWidget_KMK::OnMyLogin ( )
 	{
 		// 서버에 정보값 보내기
 		httpActor->ReqLogin(EditText_ID->GetText().ToString(), EditText_PW->GetText().ToString());
-		
+		// 무대 조회하기
+		httpActor->ReqCheckAllOpenConcert();
 		//StartSwitcher->SetActiveWidgetIndex ( 1 );
 	}
 }
