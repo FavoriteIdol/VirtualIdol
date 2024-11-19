@@ -80,6 +80,7 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 	// 방찾기 응답
 	void OnMyFindSessionComplete(bool bSuccessful);
 
+
 	FSearchSignature OnSearchSignatureCompleteDelegate;
 	FFindSignature OnFindRoomCompDelegate;
 
@@ -137,6 +138,8 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 	FConcertInfo concerInfo;
 	UFUNCTION( )
 	void SetConcertInfo( const struct FConcertInfo& info );
+	UPROPERTY(EditAnywhere )
+	FString start = TEXT("2024-9-14" );
 	FString ChangeString ( const FString& editText );
 	UFUNCTION (BlueprintCallable)
 	FConcertInfo GetConcertInfo(  );

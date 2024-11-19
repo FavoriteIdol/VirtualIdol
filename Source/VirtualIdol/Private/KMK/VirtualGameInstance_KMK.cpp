@@ -98,6 +98,7 @@ void UVirtualGameInstance_KMK::CreateMySession ( FString RoomName, int32 PlayerC
 
     sessionInterface->CreateSession( *NetID, FName(*HostName) , settings);
 
+
     PRINTLOG(TEXT("Create Session Start %s, Host Name : %s"), *RoomName, *HostName);
 }
 
@@ -344,8 +345,8 @@ void UVirtualGameInstance_KMK::SetConcertInfo ( const struct FConcertInfo& info 
     int32 mon = currentDataTime.GetMonth();
     int32 day = currentDataTime.GetDay();
 
-    FString start = FString::FromInt(year) + TEXT("-") + ChangeString(FString::FromInt(mon))+ TEXT("-") +ChangeString( FString::FromInt(day));
-    // FString start = TEXT("2024-11-07" );
+    // FString start = FString::FromInt(year) + TEXT("-") + ChangeString(FString::FromInt(mon))+ TEXT("-") +ChangeString( FString::FromInt(day));
+    
     if (concerInfo.concertDate == start)
     {
         widget->SetButtEnable(true);

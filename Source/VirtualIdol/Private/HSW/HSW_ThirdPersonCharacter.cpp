@@ -198,7 +198,7 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 			}
 		}
 		UE_LOG ( LogTemp , Warning , TEXT ( "StartTalk" ) );
-		GetController<APlayerController> ( )->StartTalking ( );
+		//GetController<APlayerController> ( )->StartTalking ( );
 		FInputModeGameAndUI inputMode;
 		GetController<APlayerController> ( )->SetInputMode(inputMode );
 	}
@@ -316,7 +316,7 @@ void AHSW_ThirdPersonCharacter::SetInterviewee ( bool bInterview, APlayerState* 
 		{
 			if (AHSW_ThirdPersonCharacter* Character = Cast<AHSW_ThirdPersonCharacter> ( pawn ))
 			{
-				Character->StartVoiceChat();
+				//Character->StartVoiceChat();
 			}
 		}
 		//AHSW_ThirdPersonCharacter* localPlayer = Cast<AHSW_ThirdPersonCharacter> ( interviewee->GetPawn ( ) );
@@ -674,8 +674,8 @@ void AHSW_ThirdPersonCharacter::MulticastFeverEffect_Implementation ( )
 
 	if (gi->GetConcertInfo ( ).feverVFX >= 0)
 	{
-	FeverEffect_Actor = GetWorld ( )->SpawnActor<AActor> (  gi->effectArray[gi->GetConcertInfo().feverVFX] , gi->spawnTrans );
-
+	//FeverEffect_Actor = GetWorld ( )->SpawnActor<AActor> (  gi->effectArray[gi->GetConcertInfo().feverVFX] , gi->spawnTrans );
+		FeverEffect_Actor = GetWorld ( )->SpawnActor<AActor> (  gi->effectArray[2] , FTransform(FVector(0)) );
 	}
 	
 }
@@ -771,14 +771,14 @@ void AHSW_ThirdPersonCharacter::ChooseInterviwee ( )
 			{
 				UE_LOG ( LogTemp , Warning , TEXT ( "TargetArmLength = 250" ) );
 				localPlayer->CameraBoom->TargetArmLength = 250;
-				CancleVoiceChat();
+				//CancleVoiceChat();
 			}
 			// 인터뷰 중일때 실행
 			else
 			{
 				UE_LOG ( LogTemp , Warning , TEXT ( "TargetArmLength = 0" ) );
 				localPlayer->CameraBoom->TargetArmLength = 0;
-				StartVoiceChat( );
+				//StartVoiceChat( );
 			}
 		}
 	}

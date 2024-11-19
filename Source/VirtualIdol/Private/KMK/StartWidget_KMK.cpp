@@ -185,7 +185,7 @@ void UStartWidget_KMK::NativeTick ( const FGeometry& MyGeometry , float InDeltaT
 		{
 			FString s = EditText_ScaleNum->GetText().ToString();
 			int a = FCString::Atoi(*s) * concertPrice;
-			concertInfo.ticketPrice = a;
+			
 			Text_Price->SetText(FText::AsNumber(a));
 		}
 	}
@@ -343,6 +343,7 @@ void UStartWidget_KMK::PressSelectButt ( )
 			EffectPopUp1->SetVisibility(ESlateVisibility::Visible);
 			return;
 		}
+		concertInfo.ticketPrice = FCString::Atoi(*EditText_Price->GetText().ToString());
 		SetTitleText ( TEXT ( "이펙트 설정" ) );
 		SetPanelVisible ( StageChargePanel , SetTicketPanel , SetDayPanel );
 		selectNum++;
@@ -475,7 +476,7 @@ void UStartWidget_KMK::PressCreateTicket ( )
 						TEXT("공연 날짜 : " ) + year + TEXT ( "년" )+ mon + TEXT("월") + day + TEXT("일") + TEXT("\n") + TEXT("공연 시간 : " ) + sH +TEXT("시") + sM +TEXT("분");
 	data.Add(TEXT("description"), *concertString);
 	// 티켓 만들기
-	httpActor->ReqTicket(data);
+	// httpActor->ReqTicket(data);
 	// EditMultiText_Ticket->SetText ( FText::GetEmpty ( ) );
 }
 
@@ -541,8 +542,6 @@ void UStartWidget_KMK::ClearAllText ( )
 	EditText_SMin->SetText( FText::GetEmpty ( ) );
 	EditText_H->SetText( FText::GetEmpty ( ) );
 	EditText_M->SetText( FText::GetEmpty ( ) );
-
-	concertInfo.ticketPrice = FCString::Atoi(*EditText_Price->GetText().ToString());
 
 	EditText_Price->SetText( FText::GetEmpty ( ) );
 	EditMultiText_Ticket->SetText( FText::GetEmpty ( ) );
@@ -693,7 +692,7 @@ void UStartWidget_KMK::PressYesButt ( )
 		else
 		{
 			gi->JoinRoom(gi->roomNum );
-			httpActor->ReqCollcetionConcert(gi->GetConcertInfo().concertId);
+			httpActor->ReqCollcetionConcert(4);
 		}
 		//ChangeAudienceMesh(0);
 	}
