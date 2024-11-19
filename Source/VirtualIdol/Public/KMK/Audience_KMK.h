@@ -43,13 +43,17 @@ public :
 	void SetVirtualWBP( );
 #pragma region StructButt
 	TArray<FButtonInfo> ButtonsInfoArray;
+	UPROPERTY(EditAnywhere )
+	TArray<UTexture2D*> normalImageArray;
+	UPROPERTY(EditAnywhere )
+	TArray<UTexture2D*> changeImageArray;
 	void SetUpButtonInfo( );
 
 	TArray<FString> buttonName = {TEXT("Hidden"), TEXT("Mode"), TEXT("Mike"), TEXT("Chat"), TEXT("Emotion")};
 	UPROPERTY(EditAnywhere )
 	TArray<FString> currentText = {TEXT("숨기기"), TEXT("1인 모드"), TEXT("마이크"), TEXT("채팅"), TEXT("이모티콘")};
 	UPROPERTY(EditAnywhere )
-	TArray<FString> changeText = {TEXT("보이기"), TEXT("다인 vip모드"), TEXT("음소거"), TEXT("채팅"), TEXT("이모티콘")};
+	TArray<FString> changeText = {TEXT("보이기"), TEXT("다인 모드"), TEXT("음소거"), TEXT("채팅"), TEXT("이모티콘")};
 	
 	void OnOffInfo(FLinearColor color,  ESlateVisibility bVisib, int32 num, TArray<FString> textArray );
 

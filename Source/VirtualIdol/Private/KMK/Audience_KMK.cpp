@@ -145,6 +145,8 @@ void UAudience_KMK::NativeConstruct ( )
             }
         }
     }
+
+
 }
 
 
@@ -180,6 +182,7 @@ void UAudience_KMK::SetUpButtonInfo ( )
             ButtonInfo.text = text;
             ButtonsInfoArray.Add(ButtonInfo);
         }
+        
     }
 }
 void UAudience_KMK::PressHiddenButt ( )
@@ -205,11 +208,13 @@ void UAudience_KMK::PressModeButt ( )
     {
         bMondeOn = false;
         SetVisibleActor (bMondeOn);
+        ButtonsInfoArray[0].image->SetBrushFromTexture ( changeImageArray[0] );
     }
     else
     {
         bMondeOn = true;
         SetVisibleActor (bMondeOn );
+        ButtonsInfoArray[0].image->SetBrushFromTexture ( normalImageArray[0] );
     }
 }
 void UAudience_KMK::SetVisibleActor ( bool bActive )
@@ -244,11 +249,13 @@ void UAudience_KMK::PressMikeButt ( )
     if (bMikeOn)
     {
         StartVoiceChat ( );
+        ButtonsInfoArray[1].image->SetBrushFromTexture( changeImageArray[1]);
         bMikeOn = false;
     }
     else
     {
         StopVoiceChat ( );
+        ButtonsInfoArray[1].image->SetBrushFromTexture ( normalImageArray[1] );
         bMikeOn = true;
     }
 }
