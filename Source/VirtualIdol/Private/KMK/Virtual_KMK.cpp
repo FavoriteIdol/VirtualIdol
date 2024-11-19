@@ -232,14 +232,14 @@ void UVirtual_KMK::SetInterviewee ( bool bInterview , APlayerState* interviewee,
 	{
 		//intervieweePlayer->CameraBoom->TargetArmLength = 0;
 		interviewee->GetPawn ( )->SetActorTransform ( StageLocation );
-		interviewee->GetPawn ( )->SetActorScale3D ( FVector ( 1.0 ) );
+		interviewee->GetPawn ( )->SetActorScale3D ( FVector ( 3.0 ) );
 
 		if (APawn* pawn = interviewee->GetPawn ( ))
 		{
 			if (AHSW_ThirdPersonCharacter* Character = Cast<AHSW_ThirdPersonCharacter> ( pawn ))
 			{
-				UE_LOG ( LogTemp , Warning , TEXT ( "character name: %s" ) , *( Character->GetName() ) );
-				Character->StartVoiceChat ( );
+				//UE_LOG ( LogTemp , Warning , TEXT ( "character name: %s" ) , *( Character->GetName() ) );
+				//Character->StartVoiceChat ( );
 			}
 		}
 	}
@@ -252,8 +252,8 @@ void UVirtual_KMK::SetInterviewee ( bool bInterview , APlayerState* interviewee,
 		{
 			if (AHSW_ThirdPersonCharacter* Character = Cast<AHSW_ThirdPersonCharacter> ( pawn ))
 			{
-				UE_LOG ( LogTemp , Warning , TEXT ( "character name: %s" ) , *( Character->GetName ( ) ) );
-				Character->CancleVoiceChat ( );
+				//UE_LOG ( LogTemp , Warning , TEXT ( "character name: %s" ) , *( Character->GetName ( ) ) );
+				//Character->CancleVoiceChat ( );
 			}
 		}
 	}
