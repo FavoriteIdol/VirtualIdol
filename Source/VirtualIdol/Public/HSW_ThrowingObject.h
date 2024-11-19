@@ -39,6 +39,9 @@ public:
 	UFUNCTION( )
 	void ChangeMesh( int32 meshIndex );
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite )
+	int32 index = 0;
+
 	UPROPERTY( EditAnywhere, BlueprintReadWrite )
 	float DisappearTime = 3.0f;
 
