@@ -73,6 +73,7 @@ void AHSW_ThrowingObject::Tick(float DeltaTime)
 
 void AHSW_ThrowingObject::ChangeMesh ( int32 meshIndex )
 {
+	index = meshIndex;
 	MeshComp->SetStaticMesh( MeshArray[meshIndex] );
 }
 
