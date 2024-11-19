@@ -13,6 +13,7 @@
 #include "HSW/HSW_ThirdPersonCharacter.h"
 #include "JJH/JJH_SelectManager.h"
 #include "KMK/VirtualGameInstance_KMK.h"
+#include "GameFramework/SpringArmComponent.h"
 
 // Sets default values for this component's properties
 UVirtual_KMK::UVirtual_KMK()
@@ -238,6 +239,7 @@ void UVirtual_KMK::SetInterviewee ( bool bInterview , APlayerState* interviewee,
 		{
 			if (AHSW_ThirdPersonCharacter* Character = Cast<AHSW_ThirdPersonCharacter> ( pawn ))
 			{
+				Character->GetCameraBoom( )->TargetArmLength = 0;
 				//UE_LOG ( LogTemp , Warning , TEXT ( "character name: %s" ) , *( Character->GetName() ) );
 				//Character->StartVoiceChat ( );
 			}
@@ -252,6 +254,7 @@ void UVirtual_KMK::SetInterviewee ( bool bInterview , APlayerState* interviewee,
 		{
 			if (AHSW_ThirdPersonCharacter* Character = Cast<AHSW_ThirdPersonCharacter> ( pawn ))
 			{
+				Character->GetCameraBoom ( )->TargetArmLength = 250;
 				//UE_LOG ( LogTemp , Warning , TEXT ( "character name: %s" ) , *( Character->GetName ( ) ) );
 				//Character->CancleVoiceChat ( );
 			}

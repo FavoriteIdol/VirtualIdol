@@ -85,6 +85,7 @@ public:
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom ( ) const { return CameraBoom; }
+	//FORCEINLINE void SetCameraBoom ( float value) { CameraBoom->TargetArmLength = value; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera ( ) const { return FollowCamera; }
 
