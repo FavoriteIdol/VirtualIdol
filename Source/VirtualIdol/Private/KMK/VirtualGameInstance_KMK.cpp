@@ -337,20 +337,25 @@ FLoginInfo UVirtualGameInstance_KMK::GetMyInfo ( )
     return loginInfo;
 }
 
-void UVirtualGameInstance_KMK::SetConcertInfo ( const struct FConcertInfo& info )
+void UVirtualGameInstance_KMK::SetConcertInfo ( const TArray<FConcertInfo> info, class AHttpActor_KMK* http )
 {
-    concerInfo = info;
+    
     FDateTime currentDataTime = FDateTime::Now();
     int32 year = currentDataTime.GetYear();
     int32 mon = currentDataTime.GetMonth();
     int32 day = currentDataTime.GetDay();
+    for (int i = 0; i < info.Num ( ); i++)
+    {
+        if (info[i].concertDate == start)
+        {
+            http->ReqCheckIdStage(info[i].stageId );
+            widget->SetButtEnable(true);
+        }
+    }
 
     // FString start = FString::FromInt(year) + TEXT("-") + ChangeString(FString::FromInt(mon))+ TEXT("-") +ChangeString( FString::FromInt(day));
     
-    if (concerInfo.concertDate == start)
-    {
-        widget->SetButtEnable(true);
-    }
+   
 }
 FString UVirtualGameInstance_KMK::ChangeString ( const FString& editText )
 {

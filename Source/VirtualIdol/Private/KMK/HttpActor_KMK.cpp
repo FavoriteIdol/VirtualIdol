@@ -562,14 +562,10 @@ void AHttpActor_KMK::OnResqCheckMyConcert ( FHttpRequestPtr Request , FHttpRespo
 		FString respon = Response->GetContentAsString();
 		if (Response.IsValid() && Response->GetResponseCode() == 200)
 		{
-			FConcertInfo info = UJsonParseLib_KMK::ParsecMyConcertInfo(respon);
-			if (!info.name.IsEmpty())
+			TArray<FConcertInfo> info = UJsonParseLib_KMK::ParsecAllConcert(respon);
+			if (info.Num() > 0)
 			{
-				if (info.texture == nullptr)
-				{
-					gi->SetConcertInfo(info);
-					ReqCheckIdStage(info.stageId);
-                }
+				gi->SetConcertInfo(info, this);
 			}
 		}
 		else
@@ -662,6 +658,7 @@ void AHttpActor_KMK::OnResCheckIdStage ( FHttpRequestPtr Request , FHttpResponse
 		{
 			FStageInfo info = UJsonParseLib_KMK::ParsecMyStageInfo(respon);
 			gi->SetConcertStageInfo(info);
+			sw->SetButtEnable(true);
 		}
 		else
 		{

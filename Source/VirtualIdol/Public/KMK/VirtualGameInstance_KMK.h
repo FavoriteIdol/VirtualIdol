@@ -137,7 +137,7 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 	UPROPERTY( )
 	FConcertInfo concerInfo;
 	UFUNCTION( )
-	void SetConcertInfo( const struct FConcertInfo& info );
+	void SetConcertInfo( const TArray<FConcertInfo> info, class AHttpActor_KMK* http );
 	UPROPERTY(EditAnywhere )
 	FString start = TEXT("2024-9-14" );
 	FString ChangeString ( const FString& editText );
