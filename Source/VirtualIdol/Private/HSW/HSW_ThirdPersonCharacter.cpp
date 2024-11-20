@@ -233,15 +233,15 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 void AHSW_ThirdPersonCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (ImojiComp && ImojiComp->GetVisibleFlag ( ))
-	{
-		// 카메라 위치
-		FVector CamLoc = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0 )->GetCameraLocation();
-		FVector Direction = CamLoc - ImojiComp->GetComponentLocation();
-		Direction.Z=0;
+	//if (ImojiComp && ImojiComp->GetVisibleFlag ( ))
+	//{
+	//	// 카메라 위치
+	//	FVector CamLoc = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0 )->GetCameraLocation();
+	//	FVector Direction = CamLoc - ImojiComp->GetComponentLocation();
+	//	Direction.Z=0;
 
-		ImojiComp->SetWorldRotation(Direction.GetSafeNormal().ToOrientationRotator());
-	}
+	//	ImojiComp->SetWorldRotation(Direction.GetSafeNormal().ToOrientationRotator());
+	//}
 
 	if (bThrowing)
 	{
@@ -554,6 +554,7 @@ void AHSW_ThirdPersonCharacter::AppearImoji (  )
 void AHSW_ThirdPersonCharacter::DisappearImoji ( )
 {
 	imojiWidget->PlayFadeOutImoji ( );
+	if(audienceWidget) audienceWidget->SetSImojiVisible(ESlateVisibility::Hidden);
 }
 
 // FeverGauge ======================================================================================

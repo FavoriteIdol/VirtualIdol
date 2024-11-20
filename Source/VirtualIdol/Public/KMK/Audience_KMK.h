@@ -232,6 +232,7 @@ public :
 
 	UFUNCTION( )
 	void BeforeStartConcertCount(const FString& time );
+
 #pragma endregion
 #pragma region Virtual
 
@@ -273,6 +274,12 @@ public :
 
 #pragma endregion
 #pragma region Audience
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UImage* Image_SImoji;
+	UFUNCTION( )
+	void SetSImojiVisible(ESlateVisibility visible, int32 index = -1 );
+	UPROPERTY(EditAnywhere )
+	TArray<class UTexture2D *> sImojiArray;
 	UPROPERTY(meta = (BindWidget))
     class UHorizontalBox* ImojiBox;
 	UPROPERTY ( meta = ( BindWidget ) )

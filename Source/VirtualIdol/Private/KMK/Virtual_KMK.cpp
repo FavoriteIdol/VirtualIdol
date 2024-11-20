@@ -80,8 +80,10 @@ void UVirtual_KMK::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 	if (pc->HasAuthority ( ) && pc->IsLocalController ( ))
     {
+		diffTime = GetTimeDifference ( setConcertTime );
         if (virtualWidget)
         {
+			virtualWidget->BeforeStartConcertCount(diffTime);
             virtualWidget->SetConcertName ( gi->concerInfo.name );
         }
     }

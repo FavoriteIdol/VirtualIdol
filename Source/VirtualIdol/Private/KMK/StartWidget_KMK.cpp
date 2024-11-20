@@ -55,6 +55,7 @@ void UStartWidget_KMK::NativeConstruct ( )
 	{
 		gi->bLogin = true;
 	}
+	//StartSwitcher->SetActiveWidgetIndex(5);
 #pragma region LoginPanel
 	if (Butt_Login && Butt_FailLogin && FailLoginPanel)
 	{
