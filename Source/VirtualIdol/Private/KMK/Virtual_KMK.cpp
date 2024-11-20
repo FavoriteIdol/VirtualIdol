@@ -233,13 +233,14 @@ void UVirtual_KMK::SetInterviewee ( bool bInterview , APlayerState* interviewee,
 	{
 		//intervieweePlayer->CameraBoom->TargetArmLength = 0;
 		interviewee->GetPawn ( )->SetActorTransform ( StageLocation );
-		interviewee->GetPawn ( )->SetActorScale3D ( FVector ( 3.0 ) );
+		interviewee->GetPawn ( )->SetActorScale3D ( FVector ( 2.5 ) );
 
 		if (APawn* pawn = interviewee->GetPawn ( ))
 		{
 			if (AHSW_ThirdPersonCharacter* Character = Cast<AHSW_ThirdPersonCharacter> ( pawn ))
 			{
 				Character->GetCameraBoom( )->TargetArmLength = 0;
+				//Character->GetCameraBoom ( )->SetRelativeLocation(FVector(140,0,70));
 				//UE_LOG ( LogTemp , Warning , TEXT ( "character name: %s" ) , *( Character->GetName() ) );
 				//Character->StartVoiceChat ( );
 			}
