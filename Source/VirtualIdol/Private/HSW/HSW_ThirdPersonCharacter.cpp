@@ -566,6 +566,18 @@ void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value 
 		ServerRPCFeverGauge (CurrentGauge, 8*0.02);
 		PrintFeverGaugeLogOnHead ( );
 
+		if (CurrentGauge <= 0.3)
+		{
+			UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge <= 0.3 : %f" ) , CurrentGauge );
+		}
+		else if (CurrentGauge <= 0.6)
+		{
+			UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge <= 0.6 : %f" ) , CurrentGauge );
+		}
+		else
+		{
+			UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge else!!!! :%f" ) , CurrentGauge );
+		}
 		//MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
 		//UGameplayStatics::SpawnEmitterAtLocation ( GetWorld ( ) , FeverEffect_Particle , FeverEffectLocation );
 	}
@@ -608,7 +620,7 @@ void AHSW_ThirdPersonCharacter::MulticastRPCFeverGauge_Implementation (float Add
 
 void AHSW_ThirdPersonCharacter::MulticastRPCBrightness_Implementation ( int index )
 {
-	UE_LOG ( LogTemp , Warning , TEXT ( "%f" ) , FeverBright );
+	// UE_LOG ( LogTemp , Warning , TEXT ( "%f" ) , FeverBright );
 	FeverDynamicMat->SetScalarParameterValue ( TEXT ( "jswEmissivePower-A" ) , FeverBright );
 }
 
