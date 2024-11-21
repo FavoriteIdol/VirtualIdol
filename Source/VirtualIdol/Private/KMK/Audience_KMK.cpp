@@ -53,6 +53,10 @@ void UAudience_KMK::NativeConstruct ( )
         Butt_No->OnClicked.AddDynamic ( this , &UAudience_KMK::PressNoButt );
 
     }
+    if (Image_SImoji)
+    {
+        SetSImojiVisible(ESlateVisibility::Hidden);
+    }
 #pragma region Chat
     if (Butt_Send)
     {
@@ -491,24 +495,38 @@ void UAudience_KMK::BeforeStartConcertCount (const FString& time )
 
 #pragma endregion
 #pragma region Audience
+void UAudience_KMK::SetSImojiVisible ( ESlateVisibility visible, int32 index )
+{
+    Image_SImoji->SetVisibility(visible);
+    if (Image_SImoji->GetVisibility ( ) == ESlateVisibility::Visible)
+    {
+        Image_SImoji->SetBrushFromTexture(sImojiArray[index] );
+    }
+}
+
+
 void UAudience_KMK::OnMyImoji01 ( )
 {
 	Player->Imoji (0);
+    SetSImojiVisible(ESlateVisibility::Visible, 0);
 }
 
 void UAudience_KMK::OnMyImoji02 ( )
 {
 	Player->Imoji ( 1 );
+    SetSImojiVisible(ESlateVisibility::Visible, 1);
 }
 
 void UAudience_KMK::OnMyImoji03 ( )
 {
 	Player->Imoji ( 2 );
+    SetSImojiVisible(ESlateVisibility::Visible, 2);
 }
 
 void UAudience_KMK::OnMyImoji04 ( )
 {
 	Player->Imoji ( 3 );
+    SetSImojiVisible(ESlateVisibility::Visible, 3);
 }
 #pragma endregion
 
