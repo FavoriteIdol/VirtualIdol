@@ -227,6 +227,8 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 		}
 	}
 
+	// UAudioComponent
+	// AmbientSoundCo`mponent01->
 }
 
 // Called every frame
@@ -566,13 +568,21 @@ void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value 
 		ServerRPCFeverGauge (CurrentGauge, 8*0.02);
 		PrintFeverGaugeLogOnHead ( );
 
-		if (CurrentGauge <= 0.3)
+		if (CurrentGauge <= 0.2)
 		{
-			UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge <= 0.3 : %f" ) , CurrentGauge );
+			UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge <= 0.2 : %f" ) , CurrentGauge );
+		}
+		else if (CurrentGauge <= 0.4)
+		{
+			UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge <= 0.4 : %f" ) , CurrentGauge );
 		}
 		else if (CurrentGauge <= 0.6)
 		{
 			UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge <= 0.6 : %f" ) , CurrentGauge );
+		}
+		else if (CurrentGauge <= 0.8)
+		{
+			UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge <= 0.8 : %f" ) , CurrentGauge );
 		}
 		else
 		{
