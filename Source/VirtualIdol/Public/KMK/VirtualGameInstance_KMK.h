@@ -61,7 +61,8 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 
 	// 호스트 이름은 서버에서 닉네임 받아올 예정
 	FString HostName;
-
+	UPROPERTY(EditAnywhere )
+	FString leaveURL = TEXT("/Game/Project/CommonFile/Maps/LV_ALPHA" );
 	UPROPERTY( )
 	bool bLogin = false;
 	UPROPERTY(BlueprintReadWrite )
