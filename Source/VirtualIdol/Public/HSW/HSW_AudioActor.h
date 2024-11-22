@@ -28,10 +28,19 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
     class USoundCue* SoundCue01;
+
+	UPROPERTY( EditDefaultsOnly, BlueprintReadWrite, Category = "Audio" )
+	class UAudioComponent* AmbientSoundComponent02;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+    class USoundCue* SoundCue02;
     
 	UFUNCTION(BlueprintCallable, Category = "Audio")
 	void PlaySound0(float SoundVolume );
 
     UFUNCTION(BlueprintCallable, Category = "Audio")
     void PlaySound1( float SoundVolume );
+
+    UFUNCTION(BlueprintCallable, Category = "Audio")
+    void PlaySound2( float SoundVolume );
 };

@@ -12,7 +12,8 @@ AHSW_AudioActor::AHSW_AudioActor()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-    AmbientSoundComponent01 = CreateDefaultSubobject<UAudioComponent> ( TEXT ( "AudioComponent" ) );
+    AmbientSoundComponent01 = CreateDefaultSubobject<UAudioComponent> ( TEXT ( "AudioComponent01" ) );
+	AmbientSoundComponent02 = CreateDefaultSubobject<UAudioComponent> ( TEXT ( "AudioComponent02" ) );
 
 //     ConstructorHelpers::FObjectFinder<USoundCue> SoundCueAsset ( TEXT ( "SoundCue'/Game/Audio/MySoundCue.MySoundCue'" ) );
 //     if (SoundCueAsset.Succeeded ( ))
@@ -49,9 +50,28 @@ void AHSW_AudioActor::PlaySound1 ( float SoundVolume )
 {
 	if (AmbientSoundComponent01 && SoundCue01 && !AmbientSoundComponent01->IsPlaying())
 	{
+		
 		AmbientSoundComponent01->SetSound( SoundCue01 );
 		AmbientSoundComponent01->SetVolumeMultiplier ( SoundVolume ); // 음량 조절
 		AmbientSoundComponent01->Play ( ); // 사운드 재생
 	}
+	else if(AmbientSoundComponent01->IsPlaying ( ))
+	{
+		AmbientSoundComponent01->SetVolumeMultiplier ( SoundVolume );
+	}
 }
 
+void AHSW_AudioActor::PlaySound2 ( float SoundVolume )
+{
+	if (AmbientSoundComponent02 && SoundCue02 && !AmbientSoundComponent02->IsPlaying ( ))
+	{
+
+		AmbientSoundComponent02->SetSound ( SoundCue02 );
+		AmbientSoundComponent02->SetVolumeMultiplier ( SoundVolume ); // 음량 조절
+		AmbientSoundComponent02->Play ( ); // 사운드 재생
+	}
+	else if (AmbientSoundComponent02->IsPlaying ( ))
+	{
+		AmbientSoundComponent02->SetVolumeMultiplier ( SoundVolume );
+	}
+}
