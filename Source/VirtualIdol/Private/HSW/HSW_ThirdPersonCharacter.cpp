@@ -420,8 +420,8 @@ void AHSW_ThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* Playe
 		EnhancedInputComponent->BindAction ( FeverGaugeAction , ETriggerEvent::Started , this , &AHSW_ThirdPersonCharacter::OnMyFeverGauge );
 
 		//Throwing
-		EnhancedInputComponent->BindAction ( ThrowAction , ETriggerEvent::Started , this , &AHSW_ThirdPersonCharacter::OnMyThorwHold );
-		EnhancedInputComponent->BindAction ( ThrowAction , ETriggerEvent::Completed , this , &AHSW_ThirdPersonCharacter::OnMyThorwPitch );
+		//EnhancedInputComponent->BindAction ( ThrowAction , ETriggerEvent::Started , this , &AHSW_ThirdPersonCharacter::OnMyThorwHold );
+		//EnhancedInputComponent->BindAction ( ThrowAction , ETriggerEvent::Completed , this , &AHSW_ThirdPersonCharacter::OnMyThorwPitch );
 
 		//Interview
 		EnhancedInputComponent->BindAction ( InterviewAction , ETriggerEvent::Started , this , &AHSW_ThirdPersonCharacter::OnMyInterview );
@@ -809,7 +809,7 @@ void AHSW_ThirdPersonCharacter::ChooseInterviwee ( )
 
 // 오브젝트 생성하기 ==========================================================================================
 
-void AHSW_ThirdPersonCharacter::OnMyThorwHold ( const FInputActionValue& value )
+void AHSW_ThirdPersonCharacter::OnMyThorwHold ( )
 {
 	if (!( HasAuthority ( ) && IsLocallyControlled ( ) ))
 	{
@@ -817,7 +817,7 @@ void AHSW_ThirdPersonCharacter::OnMyThorwHold ( const FInputActionValue& value )
 		ServerRPCThrowHold(t);
 
 		UVirtualGameInstance_KMK* gi = Cast<UVirtualGameInstance_KMK> ( GetWorld ( )->GetGameInstance ( ) );
-		gi->myCash -= 500;
+		//gi->myCash -= 500;
 		audienceWidget->Text_MyCash->SetText ( FText::AsNumber ( gi->myCash ) );
 
 	}
@@ -837,6 +837,7 @@ void AHSW_ThirdPersonCharacter::MulticastRPCThrowHold_Implementation ( FTransfor
 	{
 		ThrowingObject->ChangeMesh(ThrowingObjectIndex);
 		ThrowingObject->AttachToComponent ( ThrowingArrow , FAttachmentTransformRules::KeepWorldTransform );
+		
 	}
 	else
 	{
@@ -846,7 +847,7 @@ void AHSW_ThirdPersonCharacter::MulticastRPCThrowHold_Implementation ( FTransfor
 
 // 오브젝트 던지기 ====================================================================================================
 
-void AHSW_ThirdPersonCharacter::OnMyThorwPitch ( const FInputActionValue& value )
+void AHSW_ThirdPersonCharacter::OnMyThorwPitch (  )
 {
 	if (!( HasAuthority ( ) && IsLocallyControlled ( ) ))
 	{

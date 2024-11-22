@@ -454,6 +454,8 @@ void UAudience_KMK::PressObjectButt ( )
     Text_MyCash->SetText(FText::AsNumber(gi->myCash));
     // 오브젝트 생성
     Player->ThrowingObjectIndex = 0;
+    Player->OnMyThorwHold();
+    Player->OnMyThorwPitch ( );
     UE_LOG(LogTemp,Warning,TEXT("ObjectButton_0" ) );
 }
 void UAudience_KMK::PressObject1Butt ( )

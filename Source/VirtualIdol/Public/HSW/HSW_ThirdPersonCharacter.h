@@ -62,7 +62,7 @@ protected:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-protected:
+public:
 	/** Called for movement input */
 	void Move ( const FInputActionValue& Value );
 
@@ -71,9 +71,9 @@ protected:
 
 	void OnMyFeverGauge ( const FInputActionValue& value );
 	
-	void OnMyThorwHold ( const FInputActionValue& value );
+	void OnMyThorwHold (  );
 
-	void OnMyThorwPitch ( const FInputActionValue& value );
+	void OnMyThorwPitch (  );
 
 	void OnMyInterview ( const FInputActionValue& value );
 
