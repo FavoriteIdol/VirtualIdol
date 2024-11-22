@@ -574,23 +574,30 @@ void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value 
 
 		if (CurrentGauge <= 0.2 )
 		{
-			AudioActor->PlaySound1(100);
+			AudioActor->PlaySound1(0.5);
 			//UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge <= 0.2 : %f" ) , CurrentGauge );
 		}
 		else if (CurrentGauge <= 0.4)
 		{
+			AudioActor->PlaySound1 ( 0.7 );
 			UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge <= 0.4 : %f" ) , CurrentGauge );
 		}
 		else if (CurrentGauge <= 0.6)
 		{
+			AudioActor->PlaySound1 ( 0.9 );
+			AudioActor->PlaySound2 (0.5 );
 			UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge <= 0.6 : %f" ) , CurrentGauge );
 		}
 		else if (CurrentGauge <= 0.8)
 		{
+			AudioActor->PlaySound1 ( 1.1 );
+			AudioActor->PlaySound2 ( 0.7 );
 			UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge <= 0.8 : %f" ) , CurrentGauge );
 		}
 		else
 		{
+			AudioActor->PlaySound1 ( 1.3 );
+			AudioActor->PlaySound2 ( 1.0 );
 			UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge else!!!! :%f" ) , CurrentGauge );
 		}
 		//MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
