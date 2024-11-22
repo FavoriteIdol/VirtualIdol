@@ -22,7 +22,7 @@ void UJJH_MapSelectWidget::NativeConstruct ( )
 	
 	Borders = { Border_0, Border_1, Border_2, Border_3, Border_4, Border_5,
 			   Border_6, Border_7, Border_8, Border_9, Border_10, Border_11,
-			   Border_12, Border_13 };
+			   Border_12, Border_13, Border_14, Border_15 };
 
 	// 디버깅: Borders 배열 확인
 	for (int32 i = 0; i < Borders.Num ( ); i++)
@@ -35,7 +35,7 @@ void UJJH_MapSelectWidget::NativeConstruct ( )
 		{
 			UE_LOG ( LogTemp , Warning , TEXT ( "Border_%d is nullptr" ) , i );
 		}
-
+	}
 	WeatherButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnWeatherButtonClicked );
 	ThemeButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnThemeButtonClicked );
 	EffectButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnEffectButtonClicked );
@@ -56,6 +56,7 @@ void UJJH_MapSelectWidget::NativeConstruct ( )
 	NaturalButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnNaturalButtonClicked );
 	SpaceButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnSpaceButtonClicked );
 	DystopiaButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnDystopiaButtonClicked );
+	FairytaleButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnFairytaleButtonClicked );
 
 	//이펙트 바꾸기
 	EffectButton1->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnEffectButton1Clicked );
@@ -67,8 +68,9 @@ void UJJH_MapSelectWidget::NativeConstruct ( )
 	GroundButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnGroundButtonClicked );
 	OceanButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnOceanButtonClicked );
 	DystopiaGroundButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnDystopiaGroundButtonClicked );
+	BookButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnBookButtonClicked );
 
-	DayHorizontal->SetVisibility ( ESlateVisibility::Hidden );
+	FloorHorizontal->SetVisibility ( ESlateVisibility::Hidden );
 	ThemeHorizontal->SetVisibility ( ESlateVisibility::Hidden );
 	VFXHorizontal->SetVisibility ( ESlateVisibility::Hidden );
 
@@ -81,10 +83,9 @@ void UJJH_MapSelectWidget::NativeConstruct ( )
 	SetUpFinishBorder->SetVisibility ( ESlateVisibility::Hidden );
 	MakeStageCompleteButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnMakeStageCompleteButtonClicked );
 	SetUpFinishBorder_1->SetVisibility ( ESlateVisibility::Hidden );
+	
 	//4팝업
 	ReturnToMenuButton_1->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnReturnToMenuButtonClicked );
-
-	}
 }
 
 void UJJH_MapSelectWidget::ChangeBorder ( int32 BorderNum )
@@ -251,6 +252,14 @@ void UJJH_MapSelectWidget::OnDystopiaButtonClicked ( )
 	}
 	ChangeBorder ( 13 );
 }
+void UJJH_MapSelectWidget::OnFairytaleButtonClicked ( )
+{
+	if (SM)
+	{
+		SM->ChangeMap ( 4 );
+	}
+	ChangeBorder ( 14 );
+}
 
 
 //지면 바꾸기
@@ -275,6 +284,12 @@ void UJJH_MapSelectWidget::OnDystopiaGroundButtonClicked ( )
 {
 	if (SM) SM->ChangeFloor ( 3 );
 	ChangeBorder ( 6 );
+}
+
+void UJJH_MapSelectWidget::OnBookButtonClicked ( )
+{
+	if (SM) SM->ChangeFloor ( 4 );
+	ChangeBorder ( 15 );
 }
 
 //이펙트 바꾸기
