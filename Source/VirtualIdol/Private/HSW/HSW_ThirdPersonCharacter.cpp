@@ -40,6 +40,7 @@
 #include "KMK/AudienceServerComponent_KMK.h"
 #include "Components/AudioComponent.h"
 #include "Components/TextBlock.h"
+#include "HSW/HSW_AudioActor.h"
 
 // Sets default values
 AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
@@ -175,6 +176,9 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 			FeverEffectLocation = Actor->GetTransform ( );
 		}
 	}
+	
+	AudioActor = Cast<AHSW_AudioActor>(UGameplayStatics::GetActorOfClass ( GetWorld ( ) , AHSW_AudioActor::StaticClass ( ) ));
+	//AudioActor->PlaySound0 ( );
 
 #pragma region KMK
 	pc = GetWorld()->GetFirstPlayerController();
@@ -568,9 +572,10 @@ void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value 
 		ServerRPCFeverGauge (CurrentGauge, 8*0.02);
 		PrintFeverGaugeLogOnHead ( );
 
-		if (CurrentGauge <= 0.2)
+		if (CurrentGauge <= 0.2 )
 		{
-			UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge <= 0.2 : %f" ) , CurrentGauge );
+			AudioActor->PlaySound1(100);
+			//UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge <= 0.2 : %f" ) , CurrentGauge );
 		}
 		else if (CurrentGauge <= 0.4)
 		{

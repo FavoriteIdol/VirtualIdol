@@ -104,11 +104,15 @@ public:
 	UPROPERTY( )
 	class USoundBase* soundFile;
 
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+
+	UPROPERTY ( EditDefaultsOnly , BlueprintReadWrite )
 	class USoundBase* AmbientSound01;
-	UPROPERTY( EditDefaultsOnly)
+	UPROPERTY ( EditDefaultsOnly )
 	class UAudioComponent* AmbientSoundComponent01;
+
+	UPROPERTY( )
+	class AHSW_AudioActor* AudioActor;
+
 
 	// 피버게이지 --------------------------------------------------------------
 	UPROPERTY(EditDefaultsOnly , Category = FeverGauge )
