@@ -194,11 +194,17 @@ void UAudience_KMK::PressHiddenButt ( )
     if (!bHide)
     {
         ButtPanel->SetVisibility(ESlateVisibility::Hidden);
+        FWidgetTransform Transform = Butt_Hidden->RenderTransform; // 현재 Transform 가져오기
+        Transform.Angle = 180.0f; // 각도를 0으로 설정
+        Butt_Hidden->SetRenderTransform ( Transform ); // 수정된 Transform 적용
         bHide = true;
     }
     else 
     {
         ButtPanel->SetVisibility(ESlateVisibility::Visible);
+        FWidgetTransform Transform = Butt_Hidden->RenderTransform; // 현재 Transform 가져오기
+        Transform.Angle = 0.0f; // 각도를 0으로 설정
+        Butt_Hidden->SetRenderTransform ( Transform ); // 수정된 Transform 적용
         bHide = false;
     }
 }
