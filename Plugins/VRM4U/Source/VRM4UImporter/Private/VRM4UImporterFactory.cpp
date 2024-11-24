@@ -281,7 +281,7 @@ UObject* UVRM4UImporterFactory::FactoryCreateBinary(UClass* InClass, UObject* In
 				ImportUI->bSingleUAssetFile = true;
 			}
 #else
-			// 5.2‚Å‚à“®‚­‚ªAƒfƒtƒHƒ‹ƒg‚ðOFF‚É‚·‚é
+			// 5.2ï¿½Å‚ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Aï¿½fï¿½tï¿½Hï¿½ï¿½ï¿½gï¿½ï¿½OFFï¿½É‚ï¿½ï¿½ï¿½
 #endif
 
 
