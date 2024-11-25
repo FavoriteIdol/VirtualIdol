@@ -84,7 +84,8 @@ void UVirtual_KMK::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
         if (virtualWidget)
         {
 			virtualWidget->BeforeStartConcertCount(diffTime);
-            virtualWidget->SetConcertName ( gi->concerInfo.name );
+            // virtualWidget->SetConcertName ( gi->concerInfo.name );
+            virtualWidget->SetConcertName ( TEXT("STARLIGHT ARIN" ) );
         }
     }
 	//if (bTime)
@@ -215,7 +216,7 @@ void UVirtual_KMK::StartCountDown ( )
     SetVirtualVisible ( true );
     virtualWidget->CountDownPanelVisible ( ESlateVisibility::Hidden );
     /*if (gi->effectArray.Num ( ) > 0) GetWorld ( )->SpawnActor<AActor> ( gi->effectArray[gi->GetConcertInfo ( ).appearedVFX] , gi->spawnTrans );*/
-	if (gi->effectArray.Num ( ) > 0) GetWorld ( )->SpawnActor<AActor> ( gi->effectArray[3] ,FTransform(FVector(0, 0, 2000 )) );
+	//if (gi->effectArray.Num ( ) > 0) GetWorld ( )->SpawnActor<AActor> ( gi->effectArray[3] ,FTransform(FVector(0, 0, 2000 )) );
     UE_LOG ( LogTemp , Warning , TEXT ( "%d" ) , gi->GetConcertInfo ( ).appearedVFX );
 
 }
