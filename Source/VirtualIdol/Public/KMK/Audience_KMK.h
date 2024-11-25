@@ -242,10 +242,7 @@ public :
     class UButton* Butt_Model;
 	UPROPERTY ( meta = ( BindWidget ) )
     class UButton* Butt_MP3;
-	UPROPERTY ( meta = ( BindWidget ) )
-	class UVerticalBox* VB_SingList;
-	UPROPERTY ( meta = ( BindWidget ) )
-	class UVerticalBox* VB_SingList1;
+
 	UPROPERTY ( meta = ( BindWidget ) )
     class UTextBlock* TEXT_Min;
 	UPROPERTY ( meta = ( BindWidget ) )
@@ -256,8 +253,7 @@ public :
 	TSubclassOf<class USingWidget_KMK> singWidget;
 	UFUNCTION( )
 	void ChangeTextClock(const FString& text );
-	UFUNCTION( )
-	void PressButtMp3( );
+
 	UFUNCTION( )
 	void PressButtModel( );
 	UFUNCTION( )
