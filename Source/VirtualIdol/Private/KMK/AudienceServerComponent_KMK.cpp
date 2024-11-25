@@ -44,8 +44,8 @@ void UAudienceServerComponent_KMK::BeginPlay()
         }
         else
         {
-            playerMesh->SetActorLocation ( FVector ( 1570.0f, 230.f, 2373.f ) );
-            playerMesh->SetActorRotation(FRotator(0, 180, 0));
+            playerMesh->SetActorLocation ( FVector ( -4330, -150 , 730) );
+            playerMesh->SetActorRotation(FRotator(0, 0, 0));
         }
 		
 	}
