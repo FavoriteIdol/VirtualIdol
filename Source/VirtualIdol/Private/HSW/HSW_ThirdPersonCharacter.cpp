@@ -178,7 +178,7 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 	}
 	
 	AudioActor = Cast<AHSW_AudioActor>(UGameplayStatics::GetActorOfClass ( GetWorld ( ) , AHSW_AudioActor::StaticClass ( ) ));
-	//AudioActor->PlaySound0 ( );
+	AudioActor->PlaySound0 (0.3 );
 
 #pragma region KMK
 	pc = GetWorld()->GetFirstPlayerController();
@@ -574,31 +574,43 @@ void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value 
 
 		if (CurrentGauge <= 0.2 )
 		{
-			AudioActor->PlaySound1(0.5);
+			AudioActor->PlaySound0(0.5);
 			//UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge <= 0.2 : %f" ) , CurrentGauge );
 		}
 		else if (CurrentGauge <= 0.4)
 		{
-			AudioActor->PlaySound1 ( 0.7 );
+			AudioActor->PlaySound0 ( 0.8 );
+			AudioActor->PlaySound1 ( 0.5 );
 			UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge <= 0.4 : %f" ) , CurrentGauge );
 		}
 		else if (CurrentGauge <= 0.6)
 		{
-			AudioActor->PlaySound1 ( 0.9 );
-			AudioActor->PlaySound2 (0.5 );
-			UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge <= 0.6 : %f" ) , CurrentGauge );
+			AudioActor->PlaySound0 ( 1.0 );
+			AudioActor->PlaySound1 ( 0.8 );
+			//AudioActor->PlaySound2 ( 0.5);
+			//UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge <= 0.6 : %f" ) , CurrentGauge );
 		}
 		else if (CurrentGauge <= 0.8)
 		{
-			AudioActor->PlaySound1 ( 1.1 );
-			AudioActor->PlaySound2 ( 0.7 );
-			UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge <= 0.8 : %f" ) , CurrentGauge );
+			AudioActor->PlaySound0 ( 1.3 );
+			AudioActor->PlaySound1 ( 1.0 );
+// 			AudioActor->PlaySound2 ( 0.7 );
+// 			AudioActor->PlaySound3 ( 0.5 );
+			//UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge <= 0.8 : %f" ) , CurrentGauge );
+		}
+		else if (CurrentGauge < 1)
+		{
+			AudioActor->PlaySound0 ( 1.5 );
+			AudioActor->PlaySound1 ( 1.3 );
 		}
 		else
 		{
-			AudioActor->PlaySound1 ( 1.3 );
-			AudioActor->PlaySound2 ( 1.0 );
-			UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge else!!!! :%f" ) , CurrentGauge );
+			AudioActor->PlaySound0 ( 1.5 );
+			AudioActor->PlaySound1 ( 1.5 );
+			AudioActor->PlaySound2 ( 0.9 );
+			AudioActor->PlaySound3 ( 0.7 );
+			AudioActor->PlaySound4 ( 0.5 );
+			//UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge else!!!! :%f" ) , CurrentGauge );
 		}
 		//MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
 		//UGameplayStatics::SpawnEmitterAtLocation ( GetWorld ( ) , FeverEffect_Particle , FeverEffectLocation );
