@@ -110,7 +110,7 @@ void UVirtualGameInstance_KMK::OnMyCreateSessionComplete ( FName SessionName , b
 
         // 서버가 여행을 떠나고 싶다.
         //GetWorld ( )->ServerTravel ( TEXT ( "/Game/Project/Personal/KMK/Maps/KMK_TravelLevel?listen" ) );
-        FString url = leaveURL + TEXT("?listen");
+        FString url = TEXT("/Game/Project") + leaveURL + TEXT ( "?listen" );
         GetWorld ( )->ServerTravel(url, ETravelType::TRAVEL_Absolute);
     }
     else
