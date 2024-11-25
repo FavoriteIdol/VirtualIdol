@@ -40,6 +40,7 @@
 #include "KMK/AudienceServerComponent_KMK.h"
 #include "Components/AudioComponent.h"
 #include "Components/TextBlock.h"
+#include "HSW/HSW_AudioActor.h"
 
 // Sets default values
 AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
@@ -175,6 +176,9 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 			FeverEffectLocation = Actor->GetTransform ( );
 		}
 	}
+	
+	AudioActor = Cast<AHSW_AudioActor>(UGameplayStatics::GetActorOfClass ( GetWorld ( ) , AHSW_AudioActor::StaticClass ( ) ));
+	AudioActor->PlaySound0 (0.3 );
 
 #pragma region KMK
 	pc = GetWorld()->GetFirstPlayerController();
@@ -227,6 +231,8 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 		}
 	}
 
+	// UAudioComponent
+	// AmbientSoundCo`mponent01->
 }
 
 // Called every frame
@@ -418,8 +424,8 @@ void AHSW_ThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* Playe
 		EnhancedInputComponent->BindAction ( FeverGaugeAction , ETriggerEvent::Started , this , &AHSW_ThirdPersonCharacter::OnMyFeverGauge );
 
 		//Throwing
-		EnhancedInputComponent->BindAction ( ThrowAction , ETriggerEvent::Started , this , &AHSW_ThirdPersonCharacter::OnMyThorwHold );
-		EnhancedInputComponent->BindAction ( ThrowAction , ETriggerEvent::Completed , this , &AHSW_ThirdPersonCharacter::OnMyThorwPitch );
+		//EnhancedInputComponent->BindAction ( ThrowAction , ETriggerEvent::Started , this , &AHSW_ThirdPersonCharacter::OnMyThorwHold );
+		//EnhancedInputComponent->BindAction ( ThrowAction , ETriggerEvent::Completed , this , &AHSW_ThirdPersonCharacter::OnMyThorwPitch );
 
 		//Interview
 		EnhancedInputComponent->BindAction ( InterviewAction , ETriggerEvent::Started , this , &AHSW_ThirdPersonCharacter::OnMyInterview );
@@ -566,6 +572,46 @@ void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value 
 		ServerRPCFeverGauge (CurrentGauge, 8*0.02);
 		PrintFeverGaugeLogOnHead ( );
 
+		if (CurrentGauge <= 0.2 )
+		{
+			AudioActor->PlaySound0(0.5);
+			//UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge <= 0.2 : %f" ) , CurrentGauge );
+		}
+		else if (CurrentGauge <= 0.4)
+		{
+			AudioActor->PlaySound0 ( 0.8 );
+			AudioActor->PlaySound1 ( 0.5 );
+			UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge <= 0.4 : %f" ) , CurrentGauge );
+		}
+		else if (CurrentGauge <= 0.6)
+		{
+			AudioActor->PlaySound0 ( 1.0 );
+			AudioActor->PlaySound1 ( 0.8 );
+			//AudioActor->PlaySound2 ( 0.5);
+			//UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge <= 0.6 : %f" ) , CurrentGauge );
+		}
+		else if (CurrentGauge <= 0.8)
+		{
+			AudioActor->PlaySound0 ( 1.3 );
+			AudioActor->PlaySound1 ( 1.0 );
+// 			AudioActor->PlaySound2 ( 0.7 );
+// 			AudioActor->PlaySound3 ( 0.5 );
+			//UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge <= 0.8 : %f" ) , CurrentGauge );
+		}
+		else if (CurrentGauge < 1)
+		{
+			AudioActor->PlaySound0 ( 1.5 );
+			AudioActor->PlaySound1 ( 1.3 );
+		}
+		else
+		{
+			AudioActor->PlaySound0 ( 1.5 );
+			AudioActor->PlaySound1 ( 1.5 );
+			AudioActor->PlaySound2 ( 0.9 );
+			AudioActor->PlaySound3 ( 0.7 );
+			AudioActor->PlaySound4 ( 0.5 );
+			//UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge else!!!! :%f" ) , CurrentGauge );
+		}
 		//MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
 		//UGameplayStatics::SpawnEmitterAtLocation ( GetWorld ( ) , FeverEffect_Particle , FeverEffectLocation );
 	}
@@ -608,7 +654,7 @@ void AHSW_ThirdPersonCharacter::MulticastRPCFeverGauge_Implementation (float Add
 
 void AHSW_ThirdPersonCharacter::MulticastRPCBrightness_Implementation ( int index )
 {
-	UE_LOG ( LogTemp , Warning , TEXT ( "%f" ) , FeverBright );
+	// UE_LOG ( LogTemp , Warning , TEXT ( "%f" ) , FeverBright );
 	FeverDynamicMat->SetScalarParameterValue ( TEXT ( "jswEmissivePower-A" ) , FeverBright );
 }
 
@@ -787,7 +833,7 @@ void AHSW_ThirdPersonCharacter::ChooseInterviwee ( )
 
 // 오브젝트 생성하기 ==========================================================================================
 
-void AHSW_ThirdPersonCharacter::OnMyThorwHold ( const FInputActionValue& value )
+void AHSW_ThirdPersonCharacter::OnMyThorwHold ( )
 {
 	if (!( HasAuthority ( ) && IsLocallyControlled ( ) ))
 	{
@@ -795,7 +841,7 @@ void AHSW_ThirdPersonCharacter::OnMyThorwHold ( const FInputActionValue& value )
 		ServerRPCThrowHold(t);
 
 		UVirtualGameInstance_KMK* gi = Cast<UVirtualGameInstance_KMK> ( GetWorld ( )->GetGameInstance ( ) );
-		gi->myCash -= 500;
+		//gi->myCash -= 500;
 		audienceWidget->Text_MyCash->SetText ( FText::AsNumber ( gi->myCash ) );
 
 	}
@@ -815,6 +861,7 @@ void AHSW_ThirdPersonCharacter::MulticastRPCThrowHold_Implementation ( FTransfor
 	{
 		ThrowingObject->ChangeMesh(ThrowingObjectIndex);
 		ThrowingObject->AttachToComponent ( ThrowingArrow , FAttachmentTransformRules::KeepWorldTransform );
+		
 	}
 	else
 	{
@@ -824,7 +871,7 @@ void AHSW_ThirdPersonCharacter::MulticastRPCThrowHold_Implementation ( FTransfor
 
 // 오브젝트 던지기 ====================================================================================================
 
-void AHSW_ThirdPersonCharacter::OnMyThorwPitch ( const FInputActionValue& value )
+void AHSW_ThirdPersonCharacter::OnMyThorwPitch (  )
 {
 	if (!( HasAuthority ( ) && IsLocallyControlled ( ) ))
 	{
