@@ -54,7 +54,11 @@ public:
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UBorder* Border_12; 
 	UPROPERTY ( meta = ( BindWidget ) )
-	class UBorder* Border_13;
+	class UBorder* Border_13;	
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UBorder* Border_14;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UBorder* Border_15;
 
 	UFUNCTION()
 	void ChangeBorder(int32 BorderNum);
@@ -126,7 +130,9 @@ public:
 	class UButton* OceanButton;	
 	
 	UPROPERTY ( meta = ( BindWidget ) )
-	class UButton* DystopiaGroundButton;
+	class UButton* DystopiaGroundButton;	
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* BookButton;
 
 
 	UFUNCTION ( )
@@ -136,7 +142,11 @@ public:
 	UFUNCTION ( )
 	void OnOceanButtonClicked ( );	
 	UFUNCTION ( )
-	void OnDystopiaGroundButtonClicked ( );
+	void OnDystopiaGroundButtonClicked ( );	
+	UFUNCTION ( )
+	void OnBookButtonClicked ( );
+
+
 	//캡쳐
 	UPROPERTY(meta = (BindWidget))
 	class UImage* CapturedImage;
@@ -188,7 +198,9 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* SpaceButton;	
 	UPROPERTY ( meta = ( BindWidget ) )
-	class UButton* DystopiaButton;
+	class UButton* DystopiaButton;	
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* FairytaleButton;
 
 	UFUNCTION( )
 	void OnNaturalButtonClicked( );
@@ -196,6 +208,8 @@ public:
 	void OnSpaceButtonClicked ( );
 	UFUNCTION( )
 	void OnDystopiaButtonClicked ( );
+	UFUNCTION ( )
+	void OnFairytaleButtonClicked ( );
 	UFUNCTION ( )
 	void OnCyberpunkButtonClicked ( );
 
