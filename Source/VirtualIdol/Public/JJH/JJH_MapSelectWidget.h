@@ -248,6 +248,7 @@ public:
 	UFUNCTION ( )
 	void OnMakeStageCompleteButtonClicked ( );
 
+	void MakeSetUpFinishBorder_1Visible ( );
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UEditableText* StageName;
 

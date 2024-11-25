@@ -395,8 +395,7 @@ void UJJH_MapSelectWidget::OnMakeStageCompleteButtonClicked ( )
 	}
 	//이미지 저장
 	//작업 마무리
-	SetUpFinishBorder->SetVisibility(ESlateVisibility::Hidden);
-	SetUpFinishBorder_1->SetVisibility(ESlateVisibility::Visible);
+
 
 	if (HttpActor)
 	{
@@ -404,3 +403,8 @@ void UJJH_MapSelectWidget::OnMakeStageCompleteButtonClicked ( )
 	}
 }
 
+void UJJH_MapSelectWidget::MakeSetUpFinishBorder_1Visible ( )
+{
+	SetUpFinishBorder->SetVisibility ( ESlateVisibility::Hidden );
+	SetUpFinishBorder_1->SetVisibility ( ESlateVisibility::Visible );
+}
