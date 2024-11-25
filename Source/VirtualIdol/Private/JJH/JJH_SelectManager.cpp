@@ -154,6 +154,7 @@ void AJJH_SelectManager::ChangeEffect ( int32 index )
 
 void AJJH_SelectManager::ChangeFloor (int32 index)
 {
+	if(index > FloorFactory.Num()) return;
     FindActorAndDestroy ( TEXT ( "Floor" ) );
 	Stage.terrain = index;
     GetWorld ( )->SpawnActor<AActor> (FloorFactory[index] , GetActorTransform ( ) );
