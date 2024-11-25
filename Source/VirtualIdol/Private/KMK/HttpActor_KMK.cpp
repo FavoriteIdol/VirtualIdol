@@ -11,13 +11,16 @@
 #include "JsonObjectConverter.h"
 #include "Kismet/KismetRenderingLibrary.h"
 #include "IImageWrapper.h"
+#include "JJH/JJH_MapSelectWidget.h"
+#include "Kismet/GameplayStatics.h"
+#include "JJH/JJH_SelectManager.h"
 
 // Sets default values
 AHttpActor_KMK::AHttpActor_KMK()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
-
+	
 }
 
 // Called when the game starts or when spawned
@@ -33,7 +36,7 @@ void AHttpActor_KMK::BeginPlay()
 	 {
 		 gi->effectArray = effectArray;
 	 }
-
+	 SelectManager = Cast<AJJH_SelectManager>(UGameplayStatics::GetActorOfClass(this, AJJH_SelectManager::StaticClass()));
 }
 
 // Called every frame
@@ -785,8 +788,8 @@ void AHttpActor_KMK::OnReqStageInfo ( FHttpRequestPtr Request , FHttpResponsePtr
 
 	if (Response->GetResponseCode ( ) == 201)
 	{
-		UE_LOG ( LogTemp , Error , TEXT ( "Uploaded" ));
-
+		UE_LOG ( LogTemp , Error , TEXT ( "Uploaded" )); 
+		SelectManager->MapSelectWidget->MakeSetUpFinishBorder_1Visible();
 	}
 	else
 	{
