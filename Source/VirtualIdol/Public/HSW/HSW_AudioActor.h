@@ -24,6 +24,12 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY( EditDefaultsOnly, BlueprintReadWrite, Category = "Audio" )
+	class UAudioComponent* AmbientSoundComponent00;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+    class USoundCue* SoundCue00;
+
+	UPROPERTY( EditDefaultsOnly, BlueprintReadWrite, Category = "Audio" )
 	class UAudioComponent* AmbientSoundComponent01;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
@@ -34,6 +40,30 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
     class USoundCue* SoundCue02;
+
+	UPROPERTY( EditDefaultsOnly, BlueprintReadWrite, Category = "Audio" )
+	class UAudioComponent* AmbientSoundComponent03;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+    class USoundCue* SoundCue03;
+
+	UPROPERTY( EditDefaultsOnly, BlueprintReadWrite, Category = "Audio" )
+	class UAudioComponent* AmbientSoundComponent04;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+    class USoundCue* SoundCue04;
+
+	UPROPERTY( EditDefaultsOnly, BlueprintReadWrite, Category = "Audio" )
+	class UAudioComponent* AmbientSoundComponent05;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+    class USoundCue* SoundCue05;
+
+	UPROPERTY( EditDefaultsOnly, BlueprintReadWrite, Category = "Audio" )
+	class UAudioComponent* AmbientSoundComponent_start;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+    class USoundCue* SoundCue_start;
     
 	UFUNCTION(BlueprintCallable, Category = "Audio")
 	void PlaySound0(float SoundVolume );
@@ -43,4 +73,16 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Audio")
     void PlaySound2( float SoundVolume );
+
+	UFUNCTION(BlueprintCallable, Category = "Audio")
+	void PlaySound3(float SoundVolume );
+
+    UFUNCTION(BlueprintCallable, Category = "Audio")
+    void PlaySound4( float SoundVolume );
+
+    UFUNCTION(BlueprintCallable, Category = "Audio")
+    void PlaySound5( float SoundVolume );
+
+    UFUNCTION(BlueprintCallable, Category = "Audio")
+    void PlaySound_start( float SoundVolume );
 };
