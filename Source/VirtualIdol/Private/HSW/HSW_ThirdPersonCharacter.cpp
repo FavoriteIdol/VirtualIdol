@@ -178,7 +178,10 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 	}
 	
 	AudioActor = Cast<AHSW_AudioActor>(UGameplayStatics::GetActorOfClass ( GetWorld ( ) , AHSW_AudioActor::StaticClass ( ) ));
-	AudioActor->PlaySound0 (0.3 );
+	if (AudioActor)
+	{
+		AudioActor->PlaySound0 (0.3 );
+	}
 
 #pragma region KMK
 	pc = GetWorld()->GetFirstPlayerController();
@@ -194,13 +197,13 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 			gi->SetWidget(audienceWidget);
         }
 
-		if (gi)
-		{
-			if (audienceWidget && gi->playerMeshNum == 1)
-			{
-				audienceWidget->VipAuthority ( );
-			}
-		}
+		//if (gi)
+		//{
+		//	if (audienceWidget && gi->playerMeshNum == 1)
+		//	{
+		//		audienceWidget->VipAuthority ( );
+		//	}
+		//}
 		UE_LOG ( LogTemp , Warning , TEXT ( "StartTalk" ) );
 		//GetController<APlayerController> ( )->StartTalking ( );
 		FInputModeGameAndUI inputMode;
@@ -220,8 +223,8 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 	}
 	else
 	{
-		int32 my = 0;
-		if( gi->playerMeshNum >= 0) my =  gi->playerMeshNum;
+		int32 my = 10;
+		if( my > 5 ) my =  gi->playerMeshNum;
 		FeverDynamicMat = UMaterialInstanceDynamic::Create ( FeverCharactMat[my] , this );
 
 		USkeletalMeshComponent* TempMesh = GetMesh ( );
@@ -571,7 +574,7 @@ void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value 
 		PersonalGauge++;
 		ServerRPCFeverGauge (CurrentGauge, 8*0.02);
 		PrintFeverGaugeLogOnHead ( );
-
+		if(!AudioActor) return;
 		if (CurrentGauge <= 0.2 )
 		{
 			AudioActor->PlaySound0(0.5);
@@ -722,7 +725,7 @@ void AHSW_ThirdPersonCharacter::MulticastFeverEffect_Implementation ( )
 	if (gi->GetConcertInfo ( ).feverVFX >= 0)
 	{
 	//FeverEffect_Actor = GetWorld ( )->SpawnActor<AActor> (  gi->effectArray[gi->GetConcertInfo().feverVFX] , gi->spawnTrans );
-		FeverEffect_Actor = GetWorld ( )->SpawnActor<AActor> (  gi->effectArray[2] , FTransform(FVector(0)) );
+		//FeverEffect_Actor = GetWorld ( )->SpawnActor<AActor> (  gi->effectArray[2] , FTransform(FVector(0)) );
 	}
 	
 }
