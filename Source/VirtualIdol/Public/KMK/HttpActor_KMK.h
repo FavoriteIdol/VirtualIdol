@@ -136,6 +136,8 @@ public:
 	void ReqSetMyConcert(FConcertInfo& concert );
 	// 응답
 	void OnResSetConcert( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
+
+
 #pragma endregion
 #pragma region with Ai for Ticket
 	// 티켓 정보 저장
@@ -214,6 +216,9 @@ public:
 	void ReqStageInfo( const FStageInfo& Stage);
 	//응답
 	void OnReqStageInfo( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
+
+	UPROPERTY(EditAnywhere)
+	class AJJH_SelectManager* SelectManager;
 #pragma endregion
 	void ReqCollcetionConcert(int32 concertIndex );
 	void OnReqMultiCollectionConcert(FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully  );
