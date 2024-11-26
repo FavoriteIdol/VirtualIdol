@@ -39,7 +39,7 @@ void URoomWidget_KMK::SetImageAndText (const struct FRoomInfo& info)
 
 	Butt_JoinSession->SetVisibility ( ESlateVisibility::Visible );
 	Butt_SetStage->SetVisibility(ESlateVisibility::Hidden);
-	Text_Name->SetText( FText::FromString( TEXT("PURPLELAR" ) ));
+	Text_Name->SetText( FText::FromString( TEXT("STARLIGHT ARIN" ) ));
 	
 }
 

@@ -263,7 +263,7 @@ void UStartWidget_KMK::StartConcertPanel ( )
 	if (gi)
 	{
 		gi->playerMeshNum = -1;
-		gi->CreateMySession(gi->GetMyInfo().userName, gi->concerInfo.peopleScale);
+		gi->CreateMySession(gi->concerInfo.name, gi->concerInfo.peopleScale);
 	}
 }
 
@@ -693,7 +693,8 @@ void UStartWidget_KMK::PressYesButt ( )
 		else
 		{
 			gi->JoinRoom(gi->roomNum );
-			httpActor->ReqCollcetionConcert(4);
+			//httpActor->ReqCollcetionConcert(gi->concerInfo.concertId);
+			httpActor->ReqCollcetionConcert(5);
 		}
 		//ChangeAudienceMesh(0);
 	}

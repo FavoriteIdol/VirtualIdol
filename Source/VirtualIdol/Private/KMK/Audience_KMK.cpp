@@ -264,10 +264,10 @@ void UAudience_KMK::ChangeTextAndImage ( FLinearColor color , int32 num , TArray
 {
     ButtonsInfoArray[num].image->SetBrushTintColor ( color );
     ButtonsInfoArray[num].text->SetText ( FText::FromString ( textArray[num + 1] ) );
-    if (bMyAuth)
-    {
-        VipAuthority ( );
-    }
+    //if (bMyAuth)
+    //{
+    //    VipAuthority ( );
+    //}
 }
 
 void UAudience_KMK::SetVirtualWBP ( )
@@ -331,11 +331,6 @@ void UAudience_KMK::OnOffInfo ( FLinearColor color,  ESlateVisibility bVisib, in
 void UAudience_KMK::VipAuthority ( )
 {
     bMyVip = true;
-
-    ButtonsInfoArray[5].button->SetVisibility ( ESlateVisibility::Hidden );
-    // ButtonsInfoArray[5].backImage->SetVisibility ( ESlateVisibility::Hidden );
-    ButtonsInfoArray[5].image->SetVisibility ( ESlateVisibility::Hidden );
-    ButtonsInfoArray[5].text->SetVisibility ( ESlateVisibility::Hidden );
 }
 
 void UAudience_KMK::PressStartConcertButt ( )
@@ -445,6 +440,8 @@ void UAudience_KMK::PressObject1Butt ( )
     gi->myCash -= 1000;
     Text_MyCash->SetText(FText::AsNumber(gi->myCash));
     Player->ThrowingObjectIndex = 1;
+    Player->OnMyThorwHold ( );
+    Player->OnMyThorwPitch ( );
     UE_LOG ( LogTemp , Warning , TEXT ( "ObjectButton_1" ) );
 }
 void UAudience_KMK::PressObject2Butt ( )
@@ -452,6 +449,8 @@ void UAudience_KMK::PressObject2Butt ( )
     gi->myCash -= 5000;
     Text_MyCash->SetText(FText::AsNumber(gi->myCash));
     Player->ThrowingObjectIndex = 2;
+    Player->OnMyThorwHold ( );
+    Player->OnMyThorwPitch ( );
     UE_LOG ( LogTemp , Warning , TEXT ( "ObjectButton_2" ) );
 }
 

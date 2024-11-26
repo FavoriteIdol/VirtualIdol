@@ -110,8 +110,8 @@ void UVirtualGameInstance_KMK::OnMyCreateSessionComplete ( FName SessionName , b
 
         // 서버가 여행을 떠나고 싶다.
         //GetWorld ( )->ServerTravel ( TEXT ( "/Game/Project/Personal/KMK/Maps/KMK_TravelLevel?listen" ) );
-        FString url = TEXT("/Game/Project") + leaveURL + TEXT ( "?listen" );
-        GetWorld ( )->ServerTravel(url, ETravelType::TRAVEL_Absolute);
+        GetWorld ( )->ServerTravel(TEXT("/Game/Project/CommonFile/Maps/BetaMain?listen"), ETravelType::TRAVEL_Absolute);
+        PRINTLOG(TEXT("Server successfully created session: %s"), *SessionName.ToString());
     }
     else
     {
@@ -161,6 +161,9 @@ void UVirtualGameInstance_KMK::OnMyFindSessionComplete ( bool bSuccessful )
             roomInfo.index = i;
             // 방이름
             FString room;
+            if (result.Session.SessionSettings.Get ( FName ( "Room_Name" ) , room )) {
+                PRINTLOG ( TEXT ( "Found Room Name: %s" ) , *StringBase64Decode ( room ) );
+            }
             result.Session.SessionSettings.Get(FName("ROOM_NAME" ), room );
             roomInfo.roomName = StringBase64Decode(room);
 
@@ -177,6 +180,7 @@ void UVirtualGameInstance_KMK::OnMyFindSessionComplete ( bool bSuccessful )
                     roomInfo.texture = concert.texture;
                     roomInfo.ticketPrice = concert.ticketPrice;
                     roomInfo.feverNum = concert.feverVFX;
+
                 }
             }
             // 최대 플레이어 수
@@ -209,6 +213,7 @@ void UVirtualGameInstance_KMK::JoinRoom ( int32 ChooseRoomNum, int32 vipNum)
 {
     playerMeshNum = vipNum;
     auto res = sessionSearch->SearchResults[ChooseRoomNum];
+
     sessionInterface->JoinSession(0, FName(HostName), res);
 }
 
@@ -224,6 +229,7 @@ void UVirtualGameInstance_KMK::JoinRoomComplete ( FName SessionName , EOnJoinSes
             PRINTLOG(TEXT("Successfully obtained URL: %s"), *url);
             auto* pc = GetWorld()->GetFirstPlayerController();
             pc->ClientTravel(url, ETravelType::TRAVEL_Absolute);
+
         }
         else
         {
@@ -259,7 +265,9 @@ void UVirtualGameInstance_KMK::OnMyDestroyRoomComplete ( FName RoomName , bool b
         // 로비로 돌아가고 싶다 = 클라이언트가 여행을 갈것이다.
         auto* pc = GetWorld()->GetFirstPlayerController();
         // pc->ClientTravel(TEXT("/Game/Project/Personal/KMK/Maps/KMK_Maps.KMK_Maps'?listen"), ETravelType::TRAVEL_Absolute);
-        pc->ClientTravel(TEXT("/Game/Project/CommonFile/Maps/LV_ALPHA'?listen"), ETravelType::TRAVEL_Absolute);
+        //pc->ClientTravel(TEXT("/Game/Project/CommonFile/Maps/BetaMain?listen"), ETravelType::TRAVEL_Absolute);
+        FString url = TEXT ( "/Game/Project" ) + leaveURL + TEXT ( "'?listen" );
+        pc->ClientTravel ( url , ETravelType::TRAVEL_Absolute );
 
         // 방을 만들었다면 방을 부수고 아니라면 그냥 나감
     }
@@ -350,6 +358,7 @@ void UVirtualGameInstance_KMK::SetConcertInfo ( const TArray<FConcertInfo> info,
         if (info[i].concertDate == start)
         {
             http->ReqCheckIdStage(info[i].stageId );
+            concerInfo = info[i];
             widget->SetButtEnable(true);
         }
     }
@@ -429,13 +438,13 @@ void UVirtualGameInstance_KMK::OnSetStageButt ( )
 		sm->CreateStage(myStageInfo);
         if (myStageInfo.theme == 3)
         {
-            widget->spawnTrans = FTransform(FVector(0, 0, 2000 ) );
-            spawnTrans = FTransform(FVector(0, 0, 2000 ) );
+            widget->spawnTrans = FTransform(FVector(0, 0, 3000 ) );
+            spawnTrans = FTransform(FVector(0, 0, 3000 ) );
         }
         else
         {
-            widget->spawnTrans = FTransform(FVector(0 ) );
-            spawnTrans = FTransform(FVector(0 ) );
+            widget->spawnTrans = FTransform(FVector(0, 0, 1000  ) );
+            spawnTrans = FTransform(FVector(0, 0, 1000 ) );
         }
 	}
 }
