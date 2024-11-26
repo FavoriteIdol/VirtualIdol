@@ -264,10 +264,10 @@ void UAudience_KMK::ChangeTextAndImage ( FLinearColor color , int32 num , TArray
 {
     ButtonsInfoArray[num].image->SetBrushTintColor ( color );
     ButtonsInfoArray[num].text->SetText ( FText::FromString ( textArray[num + 1] ) );
-    if (bMyAuth)
-    {
-        VipAuthority ( );
-    }
+    //if (bMyAuth)
+    //{
+    //    VipAuthority ( );
+    //}
 }
 
 void UAudience_KMK::SetVirtualWBP ( )
@@ -331,11 +331,6 @@ void UAudience_KMK::OnOffInfo ( FLinearColor color,  ESlateVisibility bVisib, in
 void UAudience_KMK::VipAuthority ( )
 {
     bMyVip = true;
-
-    ButtonsInfoArray[5].button->SetVisibility ( ESlateVisibility::Hidden );
-    // ButtonsInfoArray[5].backImage->SetVisibility ( ESlateVisibility::Hidden );
-    ButtonsInfoArray[5].image->SetVisibility ( ESlateVisibility::Hidden );
-    ButtonsInfoArray[5].text->SetVisibility ( ESlateVisibility::Hidden );
 }
 
 void UAudience_KMK::PressStartConcertButt ( )

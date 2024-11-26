@@ -517,12 +517,13 @@ if (bWasSuccessful&& Response.IsValid())
             UE_LOG(LogTemp, Log, TEXT("Image downloaded and texture created successfully!"));
             // 예: 다운로드한 텍스처를 위젯이나 다른 액터에 할당
 			concertInfo.texture = texture;
-			gi->allConcertInfoArray.Add(concertInfo);
+			
         }
         else
         {
             UE_LOG(LogTemp, Error, TEXT("Failed to create texture from downloaded image data."));
         }
+		gi->allConcertInfoArray.Add(concertInfo);
     }
    else
    {
@@ -612,11 +613,12 @@ void AHttpActor_KMK::OnResCheckAllOpenConcert ( FHttpRequestPtr Request , FHttpR
 			// 사진 관련된 항목
 			if (allConcertInfoArray.Num ( ) > 0)
 			{
-				for (auto& concert : allConcertInfoArray)
+				gi->allConcertInfoArray = allConcertInfoArray;
+				/*for (auto& concert : allConcertInfoArray)
 				{
 					DownloadImageConcert(concert.img, concert);
-
-				}
+					gi->allConcertInfoArray.Add(concert);
+				}*/
 				
 			}
 		}

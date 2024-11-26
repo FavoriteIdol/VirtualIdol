@@ -273,7 +273,7 @@ void UAudienceServerComponent_KMK::StartCountDown ( )
 	UE_LOG(LogTemp, Warning, TEXT("Client Virtual Find" ));
 	UVirtualGameInstance_KMK* gi = Cast<UVirtualGameInstance_KMK> ( GetWorld ( )->GetGameInstance ( ) );
 	//if (gi->effectArray.Num ( ) > 0 && gi->GetConcertInfo().appearedVFX >= 0) GetWorld ( )->SpawnActor<AActor> ( gi->effectArray[gi->GetConcertInfo ( ).appearedVFX] , FTransform(FVector(0, 0, 2000 )));
-	if (gi->effectArray.Num ( ) > 0) GetWorld ( )->SpawnActor<AActor> ( gi->effectArray[3] , FTransform(FVector(0, 0, 2000 ) ));
+	//if (gi->effectArray.Num ( ) > 0) GetWorld ( )->SpawnActor<AActor> ( gi->effectArray[3] , FTransform(FVector(0, 0, 2000 ) ));
 	
 	//GetWorld ( )->GetTimerManager ( ).SetTimer ( startCountDownHandle , FTimerDelegate::CreateLambda ( [this]( )
 	//	{
