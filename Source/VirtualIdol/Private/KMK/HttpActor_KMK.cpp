@@ -789,7 +789,10 @@ void AHttpActor_KMK::OnReqStageInfo ( FHttpRequestPtr Request , FHttpResponsePtr
 	if (Response->GetResponseCode ( ) == 201)
 	{
 		UE_LOG ( LogTemp , Error , TEXT ( "Uploaded" )); 
-		SelectManager->MapSelectWidget->MakeSetUpFinishBorder_1Visible();
+		if (SelectManager && SelectManager->MapSelectWidget)
+		{
+			SelectManager->MapSelectWidget->MakeSetUpFinishBorder_1Visible();
+		}
 	}
 	else
 	{
