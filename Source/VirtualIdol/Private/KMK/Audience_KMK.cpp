@@ -440,6 +440,8 @@ void UAudience_KMK::PressObject1Butt ( )
     gi->myCash -= 1000;
     Text_MyCash->SetText(FText::AsNumber(gi->myCash));
     Player->ThrowingObjectIndex = 1;
+    Player->OnMyThorwHold ( );
+    Player->OnMyThorwPitch ( );
     UE_LOG ( LogTemp , Warning , TEXT ( "ObjectButton_1" ) );
 }
 void UAudience_KMK::PressObject2Butt ( )
@@ -447,6 +449,8 @@ void UAudience_KMK::PressObject2Butt ( )
     gi->myCash -= 5000;
     Text_MyCash->SetText(FText::AsNumber(gi->myCash));
     Player->ThrowingObjectIndex = 2;
+    Player->OnMyThorwHold ( );
+    Player->OnMyThorwPitch ( );
     UE_LOG ( LogTemp , Warning , TEXT ( "ObjectButton_2" ) );
 }
 

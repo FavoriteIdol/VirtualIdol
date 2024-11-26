@@ -271,12 +271,12 @@ void ADummy_KMK::CreateThrowingObject ( )
 
          if (ThrowingObjectIndex == 1)
          {
-            ThrowingObject->MeshComp->SetMassOverrideInKg(NAME_None,250.f,true);
+            ThrowingObject->MeshComp->SetMassOverrideInKg(NAME_None,200.f,true);
 
          }
          else if (ThrowingObjectIndex == 2)
          {
-            ThrowingObject->MeshComp->SetMassOverrideInKg ( NAME_None , 300.f , true );
+            ThrowingObject->MeshComp->SetMassOverrideInKg ( NAME_None , 200.f , true );
 
          }
 
