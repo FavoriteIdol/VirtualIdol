@@ -33,26 +33,6 @@ void UAudienceServerComponent_KMK::BeginPlay()
 
 	player = Cast<AHSW_ThirdPersonCharacter> (GetWorld()->GetFirstPlayerController()->GetPawn());
 	playerMesh = Cast<AHSW_ThirdPersonCharacter> (GetOwner());
-
-	if (playerMesh && playerMesh->HasAuthority())
-	{
-		
-		if (playerMesh->IsLocallyControlled())
-        {
-            playerMesh->SetActorLocation ( FVector ( 0, 0, 100 ) );
-
-        }
-        else
-        {
-            playerMesh->SetActorLocation ( FVector ( -4330, -150 , 730) );
-            playerMesh->SetActorRotation(FRotator(0, 0, 0));
-        }
-		
-	}
-	else
-	{
-		FindVirtualCharacter ( );
-	}
 	if (gi && playerMesh)
 	{
 		// 플레이어가 로컬 플레이어 일때
@@ -85,22 +65,48 @@ void UAudienceServerComponent_KMK::BeginPlay()
 		}
 	}
 
+	if (playerMesh && playerMesh->HasAuthority())
+	{
+		
+		if (playerMesh->IsLocallyControlled())
+        {
+            playerMesh->SetActorLocation ( FVector ( 0, 0, 100 ) );
+
+        }
+        else
+        {
+            playerMesh->SetActorLocation ( FVector ( -4330, -150 , 730) );
+            playerMesh->SetActorRotation(FRotator(0, 0, 0));
+        }
+		
+	}
+	else
+	{
+		FindVirtualCharacter ( );
+	}
+
 
 }
 
 void UAudienceServerComponent_KMK::FindVirtualCharacter ( )
 {
-	TArray<AActor*> actorArray;
-	UGameplayStatics::GetAllActorsWithTag ( GetWorld ( ) , TEXT ( "Virtual" ) , actorArray );
-	for (AActor* actor : actorArray)
-	{
-		if (actor->FindComponentByTag < USkeletalMeshComponent > ( TEXT ( "Mesh" ) ))
-		{
-			virtualCharacter = actor->FindComponentByClass<UVirtual_KMK > ( );
-			UE_LOG(LogTemp, Warning, TEXT("Find!!!!!!!!" ) );
-			if (virtualCharacter) virtualCharacter->SetVirtualVisible ( false );
-		}
-	}
+ TArray<AActor*> actorArray;
+    UGameplayStatics::GetAllActorsWithTag(GetWorld(), TEXT("Virtual"), actorArray);
+    for (AActor* actor : actorArray)
+    {
+        UVirtual_KMK* virtualComp = actor->FindComponentByClass<UVirtual_KMK>();
+        if (virtualComp)
+        {
+            virtualCharacter = virtualComp;
+            virtualCharacter->SetVirtualVisible(false);
+            UE_LOG(LogTemp, Warning, TEXT("Found Virtual Character: %s"), *actor->GetName());
+			GEngine->AddOnScreenDebugMessage(0, 5, FColor::White, FString::Printf(TEXT("Found Virtual Character: %s"), *actor->GetName()));
+            return; // 성공적으로 찾았으므로 종료
+        }
+    }
+    UE_LOG(LogTemp, Warning, TEXT("Virtual Character not found, retrying..."));
+    // 일정 시간 후 다시 시도
+    GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UAudienceServerComponent_KMK::FindVirtualCharacter);
 }
 
 void UAudienceServerComponent_KMK::OnRep_NickName ( )

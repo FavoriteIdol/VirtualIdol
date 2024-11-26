@@ -187,11 +187,16 @@ void UVirtual_KMK::SetVirtualChat (const FString& nickName, const FString& text 
 
 void UVirtual_KMK::SetVirtualVisible ( bool bVisit /*= false */ )
 {
+	meshComp = GetOwner()->FindComponentByTag<USkeletalMeshComponent>(FName(TEXT("Mesh")));
 	if (meshComp)
 	{
 		meshComp->SetRenderInMainPass ( bVisit );
 		meshComp->SetRenderInDepthPass ( bVisit );
 		meshComp->CastShadow = bVisit;
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(1, 5, FColor::White, FString::Printf(TEXT("No Mesh")));
 	}
 }
 
