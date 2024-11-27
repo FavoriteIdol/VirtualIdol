@@ -41,6 +41,11 @@ public:
 	class AJJH_SelectManager* selectManager;
 	UPROPERTY(EditAnywhere, Category = select )
 	TSubclassOf<class AJJH_SelectManager> selectFact;
+
+	// 사운드
+	UPROPERTY(EditAnywhere, Category = Sound )
+	class USoundBase* PopUpSFV;
+
 #pragma region Login Widget Panel
 // ================================================================
 // Login Widget Panel

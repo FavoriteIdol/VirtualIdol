@@ -355,6 +355,7 @@ void UJJH_MapSelectWidget::OnReCaptureButtonClicked ( )
 void UJJH_MapSelectWidget::OnSetThumbnailButtonClicked ( )
 {
 	SetUpFinishBorder->SetVisibility(ESlateVisibility::Visible);
+	UGameplayStatics::PlaySound2D ( GetWorld ( ) , PopUpSFV );
 	StageNameText->SetText( StageName->GetText ( ) );
 	SetupWidgetSwitcher->SetActiveWidgetIndex(2);
 
@@ -407,4 +408,5 @@ void UJJH_MapSelectWidget::MakeSetUpFinishBorder_1Visible ( )
 {
 	SetUpFinishBorder->SetVisibility ( ESlateVisibility::Hidden );
 	SetUpFinishBorder_1->SetVisibility ( ESlateVisibility::Visible );
+	UGameplayStatics::PlaySound2D ( GetWorld ( ) , PopUpSFV );
 }
