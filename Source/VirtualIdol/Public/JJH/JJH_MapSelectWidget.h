@@ -27,6 +27,10 @@ public:
 	UPROPERTY(EditAnywhere)
 	TArray<class UBorder*> Borders;
 
+	// 사운드
+	UPROPERTY(EditAnywhere, Category = Sound )
+	class USoundBase* PopUpSFV;
+
 	UPROPERTY(meta = (BindWidget))
 	class UBorder* Border_0;	
 	UPROPERTY(meta = (BindWidget))
