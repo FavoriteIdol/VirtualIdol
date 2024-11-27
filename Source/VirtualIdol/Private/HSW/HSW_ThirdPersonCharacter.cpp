@@ -576,43 +576,42 @@ void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value 
 		if(!AudioActor) return;
 		if (CurrentGauge <= 0.2 )
 		{
-			AudioActor->PlaySound0(0.5);
+			AudioActor->PlaySound0(0.2);
 			//UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge <= 0.2 : %f" ) , CurrentGauge );
 		}
 		else if (CurrentGauge <= 0.4)
 		{
-			AudioActor->PlaySound0 ( 0.6 );
-			AudioActor->PlaySound1 ( 0.6 );
+			AudioActor->PlaySound0 ( 0.3 );
+			AudioActor->PlaySound1 ( 0.2 );
 			UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge <= 0.4 : %f" ) , CurrentGauge );
 		}
 		else if (CurrentGauge <= 0.6)
 		{
-			AudioActor->PlaySound0 ( 0.8 );
-			AudioActor->PlaySound1 ( 0.7 );
+			AudioActor->PlaySound0 ( 0.4 );
+			AudioActor->PlaySound1 ( 0.2 );
 			AudioActor->PlaySound2 ( 0.1);
 			//UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge <= 0.6 : %f" ) , CurrentGauge );
 		}
 		else if (CurrentGauge <= 0.8)
 		{
-			AudioActor->PlaySound0 ( 1.0 );
-			AudioActor->PlaySound1 ( 0.9 );
-			AudioActor->PlaySound2 ( 0.1 );
+			AudioActor->PlaySound0 ( 0.5 );
+			AudioActor->PlaySound1 ( 0.4 );
+			AudioActor->PlaySound2 ( 0.2 );
 			//UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge <= 0.8 : %f" ) , CurrentGauge );
 		}
 		else if (CurrentGauge < 1)
 		{
-			AudioActor->PlaySound0 ( 1.0 );
-			AudioActor->PlaySound1 ( 0.9 );
+			AudioActor->PlaySound0 ( 0.5 );
+			AudioActor->PlaySound1 ( 0.5 );
 			AudioActor->PlaySound2 ( 0.2 );
-			AudioActor->PlaySound3 ( 0.2 );
 		}
 		else
 		{
-			AudioActor->PlaySound0 ( 1.0 );
-			AudioActor->PlaySound1 ( 0.9 );
-			AudioActor->PlaySound2 ( 0.3 );
-			AudioActor->PlaySound3 ( 0.3 );
-			AudioActor->PlaySound4 ( 0.3 );
+			AudioActor->PlaySound0 ( 0.5 );
+			AudioActor->PlaySound1 ( 0.5 );
+			AudioActor->PlaySound2 ( 0.2 );
+			AudioActor->PlaySound3 ( 0.1 );
+			AudioActor->PlaySound4 ( 0.1 );
 			//UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge else!!!! :%f" ) , CurrentGauge );
 		}
 		//MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
