@@ -342,6 +342,7 @@ void UStartWidget_KMK::PressSelectButt ( )
 		if(EditText_Price->GetText().IsEmpty()) 
 		{
 			EffectPopUp1->SetVisibility(ESlateVisibility::Visible);
+			UGameplayStatics::PlaySound2D ( GetWorld ( ) , PopUpSFV );
 			return;
 		}
 		concertInfo.ticketPrice = FCString::Atoi(*EditText_Price->GetText().ToString());
@@ -428,6 +429,7 @@ bool UStartWidget_KMK::BEditTextEmpty ( )
 	else 
 	{
 		EffectPopUp1->SetVisibility(ESlateVisibility::Visible);
+		UGameplayStatics::PlaySound2D ( GetWorld ( ) , PopUpSFV );
 		return false;
 	}
 }
@@ -579,6 +581,7 @@ void UStartWidget_KMK::PressSelect1Butt ( )
 	if (particleNum < 0 || feverNum < 0)
 	{
 		EffectPopUp->SetVisibility(ESlateVisibility::Visible);
+		UGameplayStatics::PlaySound2D ( GetWorld ( ) , PopUpSFV );
 		return;
 	}
 	concertInfo.appearedVFX = particleNum;
@@ -610,6 +613,7 @@ void UStartWidget_KMK::PressNextButt ( )
 	{
 		Text_Effect1->SetText(FText::FromString(TEXT("수용인원 설정을 완료해주세요")));
 		EffectPopUp->SetVisibility(ESlateVisibility::Visible);
+		UGameplayStatics::PlaySound2D ( GetWorld ( ) , PopUpSFV );
 		return;
 	}
 	concertInfo.peopleScale = FCString::Atoi(*EditText_ScaleNum->GetText().ToString());
@@ -706,6 +710,7 @@ void UStartWidget_KMK::PressNormalEntry ( )
 	Text_TicketPrice->SetText(FText::AsNumber(0));
 	MultiText_VIP->SetText(FText::FromString(TEXT("VIP 입장을 이용해보세요!\nVIP 입장시 더 많은 혜택을 누릴 수 있습니다" )));
 	VIPPopUpPanel->SetVisibility(ESlateVisibility::Visible);
+	UGameplayStatics::PlaySound2D ( GetWorld ( ) , PopUpSFV );
 }
 void UStartWidget_KMK::PressNoButt ( )
 {
@@ -719,6 +724,7 @@ void UStartWidget_KMK::PressVipEntry ( )
 	Text_TicketPrice->SetText(FText::AsNumber(gi->mySessionInfo.ticketPrice));
 	MultiText_VIP->SetText(FText::FromString(TEXT("VIP 입장시 앞열 관람, 티켓 콜렉션 수집이 가능하며,\n커스텀 응원봉으로 입장 등의 혜택이 있습니다" )));
 	VIPPopUpPanel->SetVisibility(ESlateVisibility::Visible);
+	UGameplayStatics::PlaySound2D ( GetWorld ( ) , PopUpSFV );
 }
 
 
