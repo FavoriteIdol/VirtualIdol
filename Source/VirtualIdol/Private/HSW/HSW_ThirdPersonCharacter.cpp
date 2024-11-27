@@ -572,7 +572,7 @@ void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value 
 	{
 		PersonalGauge++;
 		ServerRPCFeverGauge (CurrentGauge, 8*0.02);
-		PrintFeverGaugeLogOnHead ( );
+		//PrintFeverGaugeLogOnHead ( );
 		if(!AudioActor) return;
 		if (CurrentGauge <= 0.2 )
 		{
