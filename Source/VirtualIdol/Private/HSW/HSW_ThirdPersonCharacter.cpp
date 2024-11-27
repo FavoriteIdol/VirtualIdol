@@ -180,7 +180,8 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 	AudioActor = Cast<AHSW_AudioActor>(UGameplayStatics::GetActorOfClass ( GetWorld ( ) , AHSW_AudioActor::StaticClass ( ) ));
 	if (AudioActor)
 	{
-		AudioActor->PlaySound0 (0.3 );
+		AudioActor->PlaySound0 (0.2 
+		);
 	}
 
 #pragma region KMK
@@ -581,37 +582,37 @@ void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value 
 		}
 		else if (CurrentGauge <= 0.4)
 		{
-			AudioActor->PlaySound0 ( 0.3 );
-			AudioActor->PlaySound1 ( 0.2 );
+			AudioActor->PlaySound0 ( 0.2 );
+			AudioActor->PlaySound1 ( 0.1 );
 			UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge <= 0.4 : %f" ) , CurrentGauge );
 		}
 		else if (CurrentGauge <= 0.6)
 		{
-			AudioActor->PlaySound0 ( 0.4 );
+			AudioActor->PlaySound0 ( 0.3 );
 			AudioActor->PlaySound1 ( 0.2 );
 			AudioActor->PlaySound2 ( 0.1);
 			//UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge <= 0.6 : %f" ) , CurrentGauge );
 		}
 		else if (CurrentGauge <= 0.8)
 		{
-			AudioActor->PlaySound0 ( 0.5 );
-			AudioActor->PlaySound1 ( 0.4 );
-			AudioActor->PlaySound2 ( 0.2 );
+			AudioActor->PlaySound0 ( 0.3 );
+			AudioActor->PlaySound1 ( 0.3 );
+			AudioActor->PlaySound2 ( 0.1 );
 			//UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge <= 0.8 : %f" ) , CurrentGauge );
 		}
 		else if (CurrentGauge < 1)
 		{
-			AudioActor->PlaySound0 ( 0.5 );
-			AudioActor->PlaySound1 ( 0.5 );
+			AudioActor->PlaySound0 ( 0.3 );
+			AudioActor->PlaySound1 ( 0.3 );
 			AudioActor->PlaySound2 ( 0.2 );
 		}
 		else
 		{
-			AudioActor->PlaySound0 ( 0.5 );
-			AudioActor->PlaySound1 ( 0.5 );
-			AudioActor->PlaySound2 ( 0.2 );
-			AudioActor->PlaySound3 ( 0.1 );
-			AudioActor->PlaySound4 ( 0.1 );
+			AudioActor->PlaySound0 ( 0.3 );
+			AudioActor->PlaySound1 ( 0.3 );
+			AudioActor->PlaySound2 ( 0.3 );
+			AudioActor->PlaySound3 ( 0.2 );
+			AudioActor->PlaySound4 ( 0.2 );
 			//UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge else!!!! :%f" ) , CurrentGauge );
 		}
 		//MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
