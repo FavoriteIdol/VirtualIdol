@@ -113,21 +113,40 @@ void ADummy_KMK::GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& OutLife
 
 void ADummy_KMK::IdleFucn ( const float& DeltaTime )
 {
-   int32 rand = FMath::RandRange ( 0 , 80 );
-   if(bCanThrow) rand = FMath::RandRange ( 0 , 81 );
+    int32 rand = 0;
+    
+    if (!bCanThrow)
+    {
+        if(!bStart)
+        {
+            rand = FMath::RandRange ( 5 , 80 );
+        }
+        else 
+        {
+            rand = FMath::RandRange ( 0 , 80 );
+        }
+    }
+    else 
+    {
+        rand = FMath::RandRange ( 0 , 81 );
+    }
+
    if (isJump) isJump = false;
-   if (( rand == 1 ) && isImoji == true)
+
+   // 이모지가 True인데, rand가 이모지 값인 경우
+   if (( rand == 6 ) && isImoji == true)
    {
-      rand = 0;
+   // rand를 점프로 바꾼다.
+      rand = 5;
    }
 
    switch (rand)
    {
    case 0:
-      state = DummyState::Jump;
+      state = DummyState::Fever;
       break;
    case 1:
-      state = DummyState::Emoji;
+      state = DummyState::Fever;
       break;
    case 2:
       state = DummyState::Fever;
@@ -139,10 +158,10 @@ void ADummy_KMK::IdleFucn ( const float& DeltaTime )
       state = DummyState::Fever;
       break;
    case 5:
-      state = DummyState::Fever;
+      state = DummyState::Jump;
       break;
    case 6:
-      state = DummyState::Fever;
+      state = DummyState::Emoji;
       break;
    case 81:
       state = DummyState::Throw;
@@ -271,12 +290,12 @@ void ADummy_KMK::CreateThrowingObject ( )
 
          if (ThrowingObjectIndex == 1)
          {
-            ThrowingObject->MeshComp->SetMassOverrideInKg(NAME_None,250.f,true);
+            ThrowingObject->MeshComp->SetMassOverrideInKg(NAME_None,200.f,true);
 
          }
          else if (ThrowingObjectIndex == 2)
          {
-            ThrowingObject->MeshComp->SetMassOverrideInKg ( NAME_None , 300.f , true );
+            ThrowingObject->MeshComp->SetMassOverrideInKg ( NAME_None , 200.f , true );
 
          }
 

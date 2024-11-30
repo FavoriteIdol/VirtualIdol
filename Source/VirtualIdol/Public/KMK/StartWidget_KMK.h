@@ -39,8 +39,14 @@ public:
 
 	UPROPERTY( )
 	class AJJH_SelectManager* selectManager;
+
 	UPROPERTY(EditAnywhere, Category = select )
 	TSubclassOf<class AJJH_SelectManager> selectFact;
+
+	// 사운드
+	UPROPERTY(EditAnywhere, Category = Sound )
+	class USoundBase* PopUpSFV;
+
 #pragma region Login Widget Panel
 // ================================================================
 // Login Widget Panel
@@ -224,8 +230,6 @@ public:
 	UFUNCTION( )
 	void PressSelect1Butt( );
 
-	void AddIndex( int32 num , TArray<class UMaterial*> meshArray , class UImage* image );
-	void MinusIndex( int32 num , TArray<class UMaterial*>  meshArray , class UImage* image );	
 	UPROPERTY( BlueprintReadWrite , meta = ( BindWidget ) )
     class UCanvasPanel* EffectPopUp;
 	UPROPERTY ( BlueprintReadWrite , meta = ( BindWidget ) )

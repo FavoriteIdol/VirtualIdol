@@ -16,6 +16,57 @@ class VIRTUALIDOL_API UJJH_MapSelectWidget : public UUserWidget
 	
 
 public:
+	// 보더 골랐을 때
+	UPROPERTY(EditAnywhere)
+	UTexture2D* SelectedBox;	
+	
+	// 안골라진 보더
+	UPROPERTY(EditAnywhere)
+	UTexture2D* SelectBox;
+
+	UPROPERTY(EditAnywhere)
+	TArray<class UBorder*> Borders;
+
+	// 사운드
+	UPROPERTY(EditAnywhere, Category = Sound )
+	class USoundBase* PopUpSFV;
+
+	UPROPERTY(meta = (BindWidget))
+	class UBorder* Border_0;	
+	UPROPERTY(meta = (BindWidget))
+	class UBorder* Border_1;	
+	UPROPERTY(meta = (BindWidget))
+	class UBorder* Border_2;	
+	UPROPERTY(meta = (BindWidget))
+	class UBorder* Border_3;	
+	UPROPERTY(meta = (BindWidget))
+	class UBorder* Border_4;	
+	UPROPERTY(meta = (BindWidget))
+	class UBorder* Border_5;	
+	UPROPERTY(meta = (BindWidget))
+	class UBorder* Border_6;	
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UBorder* Border_7;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UBorder* Border_8;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UBorder* Border_9;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UBorder* Border_10;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UBorder* Border_11; 
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UBorder* Border_12; 
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UBorder* Border_13;	
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UBorder* Border_14;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UBorder* Border_15;
+
+	UFUNCTION()
+	void ChangeBorder(int32 BorderNum);
+
 	// httpactor
 	UPROPERTY( )
 	class AHttpActor_KMK* HttpActor;
@@ -83,7 +134,9 @@ public:
 	class UButton* OceanButton;	
 	
 	UPROPERTY ( meta = ( BindWidget ) )
-	class UButton* DystopiaGroundButton;
+	class UButton* DystopiaGroundButton;	
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* BookButton;
 
 
 	UFUNCTION ( )
@@ -93,7 +146,11 @@ public:
 	UFUNCTION ( )
 	void OnOceanButtonClicked ( );	
 	UFUNCTION ( )
-	void OnDystopiaGroundButtonClicked ( );
+	void OnDystopiaGroundButtonClicked ( );	
+	UFUNCTION ( )
+	void OnBookButtonClicked ( );
+
+
 	//캡쳐
 	UPROPERTY(meta = (BindWidget))
 	class UImage* CapturedImage;
@@ -145,7 +202,9 @@ public:
 	UPROPERTY(meta = (BindWidget))
 	class UButton* SpaceButton;	
 	UPROPERTY ( meta = ( BindWidget ) )
-	class UButton* DystopiaButton;
+	class UButton* DystopiaButton;	
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* FairytaleButton;
 
 	UFUNCTION( )
 	void OnNaturalButtonClicked( );
@@ -153,6 +212,8 @@ public:
 	void OnSpaceButtonClicked ( );
 	UFUNCTION( )
 	void OnDystopiaButtonClicked ( );
+	UFUNCTION ( )
+	void OnFairytaleButtonClicked ( );
 	UFUNCTION ( )
 	void OnCyberpunkButtonClicked ( );
 
@@ -191,6 +252,7 @@ public:
 	UFUNCTION ( )
 	void OnMakeStageCompleteButtonClicked ( );
 
+	void MakeSetUpFinishBorder_1Visible ( );
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UEditableText* StageName;
 

@@ -84,7 +84,8 @@ void UVirtual_KMK::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
         if (virtualWidget)
         {
 			virtualWidget->BeforeStartConcertCount(diffTime);
-            virtualWidget->SetConcertName ( gi->concerInfo.name );
+            // virtualWidget->SetConcertName ( gi->concerInfo.name );
+            virtualWidget->SetConcertName ( TEXT("STARLIGHT ARIN" ) );
         }
     }
 	//if (bTime)
@@ -186,11 +187,16 @@ void UVirtual_KMK::SetVirtualChat (const FString& nickName, const FString& text 
 
 void UVirtual_KMK::SetVirtualVisible ( bool bVisit /*= false */ )
 {
+	meshComp = GetOwner()->FindComponentByTag<USkeletalMeshComponent>(FName(TEXT("Mesh")));
 	if (meshComp)
 	{
 		meshComp->SetRenderInMainPass ( bVisit );
 		meshComp->SetRenderInDepthPass ( bVisit );
 		meshComp->CastShadow = bVisit;
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(1, 5, FColor::White, FString::Printf(TEXT("No Mesh")));
 	}
 }
 
@@ -215,7 +221,7 @@ void UVirtual_KMK::StartCountDown ( )
     SetVirtualVisible ( true );
     virtualWidget->CountDownPanelVisible ( ESlateVisibility::Hidden );
     /*if (gi->effectArray.Num ( ) > 0) GetWorld ( )->SpawnActor<AActor> ( gi->effectArray[gi->GetConcertInfo ( ).appearedVFX] , gi->spawnTrans );*/
-	if (gi->effectArray.Num ( ) > 0) GetWorld ( )->SpawnActor<AActor> ( gi->effectArray[3] ,FTransform(FVector(0, 0, 2000 )) );
+	//if (gi->effectArray.Num ( ) > 0) GetWorld ( )->SpawnActor<AActor> ( gi->effectArray[3] ,FTransform(FVector(0, 0, 2000 )) );
     UE_LOG ( LogTemp , Warning , TEXT ( "%d" ) , gi->GetConcertInfo ( ).appearedVFX );
 
 }
@@ -235,13 +241,14 @@ void UVirtual_KMK::SetInterviewee ( bool bInterview , APlayerState* interviewee,
 	{
 		//intervieweePlayer->CameraBoom->TargetArmLength = 0;
 		interviewee->GetPawn ( )->SetActorTransform ( StageLocation );
-		interviewee->GetPawn ( )->SetActorScale3D ( FVector ( 3.0 ) );
+		interviewee->GetPawn ( )->SetActorScale3D ( FVector ( 2.5 ) );
 
 		if (APawn* pawn = interviewee->GetPawn ( ))
 		{
 			if (AHSW_ThirdPersonCharacter* Character = Cast<AHSW_ThirdPersonCharacter> ( pawn ))
 			{
 				Character->GetCameraBoom( )->TargetArmLength = 0;
+				//Character->GetCameraBoom ( )->SetRelativeLocation(FVector(140,0,70));
 				//UE_LOG ( LogTemp , Warning , TEXT ( "character name: %s" ) , *( Character->GetName() ) );
 				//Character->StartVoiceChat ( );
 			}

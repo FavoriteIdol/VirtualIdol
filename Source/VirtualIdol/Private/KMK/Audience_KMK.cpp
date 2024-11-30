@@ -66,7 +66,7 @@ void UAudience_KMK::NativeConstruct ( )
 #pragma region ButtonInfoSetting
      if (Butt_Hidden && Butt_Mode && Butt_Mike && Butt_Chat && Butt_Emotion)
     {
-    Butt_Hidden->OnClicked.AddDynamic ( this , &UAudience_KMK::PressHiddenButt);
+        Butt_Hidden->OnClicked.AddDynamic ( this , &UAudience_KMK::PressHiddenButt);
         Butt_Mode->OnClicked.AddDynamic ( this , &UAudience_KMK::PressModeButt);
         Butt_Mike->OnClicked.AddDynamic ( this , &UAudience_KMK::PressMikeButt);
         Butt_Chat->OnClicked.AddDynamic ( this , &UAudience_KMK::PressChatButt);
@@ -110,7 +110,6 @@ void UAudience_KMK::NativeConstruct ( )
 #pragma region BeforeConcerForVirtual
     if (Butt_MP3 && Butt_Model)
     {
-        Butt_MP3->OnClicked.AddDynamic ( this , &UAudience_KMK::PressButtMp3);
         Butt_Model->OnClicked.AddDynamic ( this , &UAudience_KMK::PressButtModel);
     }
 #pragma endregion
@@ -131,24 +130,7 @@ void UAudience_KMK::NativeConstruct ( )
 	Player = Cast<AHSW_ThirdPersonCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn() );
 	if(Player)ImojiComponent = Player->GetComponentByClass<UHSW_ImojiConponent>();
 #pragma endregion
-    if (singWidget)
-    {
 
-        auto* musicWidget = Cast<USingWidget_KMK> ( CreateWidget ( GetWorld ( ) , singWidget ) );
-        auto* musicWidget1 = Cast<USingWidget_KMK> ( CreateWidget ( GetWorld ( ) , singWidget ) );
-
-        if (musicWidget && musicWidget1)
-        {
-            musicWidget->SetTextMusic ( TEXT ( "뉴진스 - How Sweet" ) );
-            musicWidget1->SetTextMusic ( TEXT ( "뉴진스 - How Sweet" ) );
-
-            if (VB_SingList && VB_SingList1)
-            {
-                VB_SingList->AddChild ( musicWidget );
-                VB_SingList1->AddChild ( musicWidget1 );
-            }
-        }
-    }
 
 
 }
@@ -288,10 +270,10 @@ void UAudience_KMK::ChangeTextAndImage ( FLinearColor color , int32 num , TArray
 {
     ButtonsInfoArray[num].image->SetBrushTintColor ( color );
     ButtonsInfoArray[num].text->SetText ( FText::FromString ( textArray[num + 1] ) );
-    if (bMyAuth)
-    {
-        VipAuthority ( );
-    }
+    //if (bMyAuth)
+    //{
+    //    VipAuthority ( );
+    //}
 }
 
 void UAudience_KMK::SetVirtualWBP ( )
@@ -355,11 +337,6 @@ void UAudience_KMK::OnOffInfo ( FLinearColor color,  ESlateVisibility bVisib, in
 void UAudience_KMK::VipAuthority ( )
 {
     bMyVip = true;
-
-    ButtonsInfoArray[5].button->SetVisibility ( ESlateVisibility::Hidden );
-    // ButtonsInfoArray[5].backImage->SetVisibility ( ESlateVisibility::Hidden );
-    ButtonsInfoArray[5].image->SetVisibility ( ESlateVisibility::Hidden );
-    ButtonsInfoArray[5].text->SetVisibility ( ESlateVisibility::Hidden );
 }
 
 void UAudience_KMK::PressStartConcertButt ( )
@@ -460,6 +437,8 @@ void UAudience_KMK::PressObjectButt ( )
     Text_MyCash->SetText(FText::AsNumber(gi->myCash));
     // 오브젝트 생성
     Player->ThrowingObjectIndex = 0;
+    Player->OnMyThorwHold();
+    Player->OnMyThorwPitch ( );
     UE_LOG(LogTemp,Warning,TEXT("ObjectButton_0" ) );
 }
 void UAudience_KMK::PressObject1Butt ( )
@@ -467,6 +446,8 @@ void UAudience_KMK::PressObject1Butt ( )
     gi->myCash -= 1000;
     Text_MyCash->SetText(FText::AsNumber(gi->myCash));
     Player->ThrowingObjectIndex = 1;
+    Player->OnMyThorwHold ( );
+    Player->OnMyThorwPitch ( );
     UE_LOG ( LogTemp , Warning , TEXT ( "ObjectButton_1" ) );
 }
 void UAudience_KMK::PressObject2Butt ( )
@@ -474,6 +455,8 @@ void UAudience_KMK::PressObject2Butt ( )
     gi->myCash -= 5000;
     Text_MyCash->SetText(FText::AsNumber(gi->myCash));
     Player->ThrowingObjectIndex = 2;
+    Player->OnMyThorwHold ( );
+    Player->OnMyThorwPitch ( );
     UE_LOG ( LogTemp , Warning , TEXT ( "ObjectButton_2" ) );
 }
 
@@ -542,54 +525,6 @@ void UAudience_KMK::ChangeTextClock ( const FString& text )
 {
     TEXT_Min->SetText(FText::FromString(text));
     TEXT_Min1->SetText(FText::FromString(text));
-}
-
-void UAudience_KMK::PressButtMp3 ( )
-{
-    TArray<FString> SelectedFiles;
-    FString FileTypes = TEXT("Audio Files (*.mp3;*.wav)|*.mp3;*.wav|All Files (*.*)|*.*");
-
-    // 파일 탐색기를 열고 사용자에게 파일 선택을 요청
-    bool bFileSelected = OpenFileExample(SelectedFiles, TEXT("Select an Image to Upload"), FileTypes, true);
-
-    if (bFileSelected && SelectedFiles.Num() > 0)
-    {
-        for (const FString& FilePath : SelectedFiles)
-        {
-            UE_LOG(LogTemp, Warning, TEXT("Selected File: %s"), *FilePath);
-            FString FileName = FPaths::GetCleanFilename(FilePath);  // "Example.wav"
-            USoundWave* SoundWave = LoadWavFromFile(FilePath);
-            if (SoundWave)
-            {
-                UAudioComponent* AudioComponent = NewObject<UAudioComponent>(GetWorld(), UAudioComponent::StaticClass());
-                AudioComponent->bAutoActivate = false;
-                auto* musicWidget = Cast<USingWidget_KMK>(CreateWidget(GetWorld(), singWidget));
-                auto* musicWidget1 = Cast<USingWidget_KMK>(CreateWidget(GetWorld(), singWidget));
-                if (AudioComponent && SoundWave && musicWidget)
-                {
-                    AudioComponent->SetSound(SoundWave);
-                    musicWidget->SetTextMusic(FileName);
-                    musicWidget1->SetTextMusic(FileName);
-                    musicWidget->SetMusic(AudioComponent, SoundWave );
-                    musicWidget1->SetMusic(AudioComponent, SoundWave );
-                    if (VB_SingList && VB_SingList1)
-                    {
-                        VB_SingList->AddChild(musicWidget);
-                        VB_SingList1->AddChild(musicWidget1);
-                    }
-                }
-            }
-            else
-            {
-                UE_LOG(LogTemp, Error, TEXT("Failed to load audio: %s"), *FilePath);
-            }
-        }
-    }
-    else
-    {
-        UE_LOG(LogTemp, Warning, TEXT("File Selected Failed!!!"))
-    }
-
 }
 
 

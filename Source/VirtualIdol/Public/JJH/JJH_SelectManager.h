@@ -84,11 +84,13 @@ public:
 	TArray<FName> Levels = {
 		FName ( "LV_Island_JSW" ),
 		FName ( "BP_ThirdLevel" ),
-		FName ( "BP_Land-Dystopia_JSW" )
+		FName ( "BP_Land-Dystopia_JSW" ),
+		FName ( "LV_Forest_JSW" )
 	};
 
 	FName LevelToLoad;
 	TArray<FName> LevelsToUnload;
+
 
 #pragma region LoadStage
 	void CreateStage(const struct FStageInfo& info );

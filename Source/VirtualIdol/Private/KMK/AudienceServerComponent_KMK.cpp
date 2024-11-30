@@ -33,26 +33,6 @@ void UAudienceServerComponent_KMK::BeginPlay()
 
 	player = Cast<AHSW_ThirdPersonCharacter> (GetWorld()->GetFirstPlayerController()->GetPawn());
 	playerMesh = Cast<AHSW_ThirdPersonCharacter> (GetOwner());
-
-	if (playerMesh && playerMesh->HasAuthority())
-	{
-		
-		if (playerMesh->IsLocallyControlled())
-        {
-            playerMesh->SetActorLocation ( FVector ( 0, 0, 100 ) );
-
-        }
-        else
-        {
-            playerMesh->SetActorLocation ( FVector ( 1570.0f, 230.f, 2373.f ) );
-            playerMesh->SetActorRotation(FRotator(0, 180, 0));
-        }
-		
-	}
-	else
-	{
-		FindVirtualCharacter ( );
-	}
 	if (gi && playerMesh)
 	{
 		// 플레이어가 로컬 플레이어 일때
@@ -66,43 +46,80 @@ void UAudienceServerComponent_KMK::BeginPlay()
         }
 		else
 		{
-			 //로컬이 아닌 경우에 플레이어의 playerMeshNum에 따라 
+			 //로컬이 아닌 경우에 플레이어의 playerMeshNum에 따라 메쉬 상태 변경
+			 // 관객 : 0 또는 1
+			 // 버츄얼 : -1 또는 2
 			if (playerMeshNum < 0)
 			{
+				// 버츄얼이 안보이는 상태
 				SetVirtualVisible ( playerMesh , false );
 			}
 			else if (playerMeshNum > 1)
 			{
+				// 버추얼이 보이는 상태
 				SetVirtualVisible ( playerMesh , true );
 			}
 			else
 			{
+				// 관객인 경우
+				// 내 모습을 보이게 만들고
 				SetVirtualVisible ( playerMesh , true );
+				// vip 여부에 따라 mesh를 변경함
 				playerMesh->GetMesh ( )->SetSkeletalMesh ( audienceMesh[playerMeshNum] );
+				// 승우가 만든 dynamic Material로 변경
 				UMaterialInstanceDynamic* meshMat = playerMesh->ChangeMyMeshMat ( playerMeshNum );
 				playerMesh->GetMesh()->SetMaterial(0, meshMat);
 			}
 		}
 	}
 
+	if (playerMesh && playerMesh->HasAuthority())
+	{
+		// 관객의 초기 셋팅값 변경
+		if (playerMesh->IsLocallyControlled())
+        {
+            playerMesh->SetActorLocation ( FVector ( 0, 0, 100 ) );
+
+        }
+        else
+        {
+            playerMesh->SetActorLocation ( FVector ( -4330, -150 , 730) );
+            playerMesh->SetActorRotation(FRotator(0, 0, 0));
+        }
+		
+	}
+	else
+	{
+		// 버츄얼 찾고 할당하는 함수
+		FindVirtualCharacter ( );
+	}
+
 
 }
-
+// 월드상에서 버츄얼 찾기
 void UAudienceServerComponent_KMK::FindVirtualCharacter ( )
 {
 	TArray<AActor*> actorArray;
-	UGameplayStatics::GetAllActorsWithTag ( GetWorld ( ) , TEXT ( "Virtual" ) , actorArray );
-	for (AActor* actor : actorArray)
-	{
-		if (actor->FindComponentByTag < USkeletalMeshComponent > ( TEXT ( "Mesh" ) ))
-		{
-			virtualCharacter = actor->FindComponentByClass<UVirtual_KMK > ( );
-			UE_LOG(LogTemp, Warning, TEXT("Find!!!!!!!!" ) );
-			if (virtualCharacter) virtualCharacter->SetVirtualVisible ( false );
-		}
-	}
+	// 태그로 검색
+    UGameplayStatics::GetAllActorsWithTag(GetWorld(), TEXT("Virtual"), actorArray);
+    for (AActor* actor : actorArray)
+    {
+		// 버츄얼을 찾았다면 버츄얼에 달린 component를 검색함
+        UVirtual_KMK* virtualComp = actor->FindComponentByClass<UVirtual_KMK>();
+        if (virtualComp)
+        {
+			// 버츄얼 캐릭터가 있다면 안보이게 만듦
+            virtualCharacter = virtualComp;
+            virtualCharacter->SetVirtualVisible(false);
+            UE_LOG(LogTemp, Warning, TEXT("Found Virtual Character: %s"), *actor->GetName());
+            return; // 성공적으로 찾았으므로 종료
+        }
+    }
+    UE_LOG(LogTemp, Warning, TEXT("Virtual Character not found, retrying..."));
+    // 버츄얼을 못찾았다면, 일정 시간 후 다시 시도
+    GetWorld()->GetTimerManager().SetTimerForNextTick(this, &UAudienceServerComponent_KMK::FindVirtualCharacter);
 }
-
+// 닉네임 변경
 void UAudienceServerComponent_KMK::OnRep_NickName ( )
 {
 	UpdateWidgetNick();
@@ -110,13 +127,16 @@ void UAudienceServerComponent_KMK::OnRep_NickName ( )
 
 void UAudienceServerComponent_KMK::UpdateWidgetNick ( )
 {
+	// 나에게 달린 컴포넌트중 Name이란 태그를 찾아 mynameComp에 할당
 	UWidgetComponent* myNameComp = GetOwner()->FindComponentByTag<UWidgetComponent>(TEXT("Name" ));
 	if (myNameComp)
 	{
         UMyNameWidget_KMK* myNameWid = Cast<UMyNameWidget_KMK>(CreateWidget(GetWorld(), nameWidgetFact));
 		myNameComp->SetWidget(myNameWid);
+		// 위잿을 찾았다면
         if (myNameWid)
         {
+			// gi에 있는 정보값 중 내 닉네임을 찾아 보여줌
             UVirtualGameInstance_KMK* gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance());
             if (gi)
             {
@@ -126,7 +146,7 @@ void UAudienceServerComponent_KMK::UpdateWidgetNick ( )
 		}
 	}
 }
-
+// 다른 사람에게 내 이름을 뿌리는 부분
 void UAudienceServerComponent_KMK::ServerRPC_SetNickName_Implementation ( const FString& name )
 {
 	userName = name;
@@ -185,6 +205,7 @@ void UAudienceServerComponent_KMK::TickComponent(float DeltaTime, ELevelTick Tic
 #pragma region Chat
 void UAudienceServerComponent_KMK::ServerRPCChat_Implementation (const FString& nickName, const FString& chat )
 {
+	// 게임 스테이트를 찾아 채팅을 rpc로 전송
 	 AHSW_GameState_Auditorium* gs = GetWorld()->GetGameState<AHSW_GameState_Auditorium>();
     if ( gs)
     {
@@ -194,6 +215,7 @@ void UAudienceServerComponent_KMK::ServerRPCChat_Implementation (const FString& 
 
 void UAudienceServerComponent_KMK::MultiRPCChat_Implementation (const FString& nickName, const FString& chat )
 {
+	// 다른 관객이라면 찾아서 위잿 생성
 	auto* p = Cast<AHSW_ThirdPersonCharacter> ( GetWorld ( )->GetFirstPlayerController ( )->GetPawn ( ) );
 	if (p->audienceWidget)
 	{
@@ -202,7 +224,7 @@ void UAudienceServerComponent_KMK::MultiRPCChat_Implementation (const FString& n
 
 }
 #pragma endregion
-
+// 나를 제외한 다른 관객에게 나의 메쉬를 변경하라고 보내기
 void UAudienceServerComponent_KMK::ServerRPC_ChangeMyMesh_Implementation ( int32 num)
 {
     UE_LOG(LogTemp, Warning, TEXT("Server is setting playerMeshNum to: %d"), num);
@@ -229,6 +251,7 @@ void UAudienceServerComponent_KMK::MultiRPC_ChangeMyMesh_Implementation ( int32 
     }
 	else
 	{
+		// 이곳만 관객 관련 내용임
 		SetVirtualVisible ( TargetMesh , true );
 		TargetMesh->GetMesh ( )->SetSkeletalMesh ( audienceMesh[num] );
 		UMaterialInstanceDynamic* meshMat = TargetMesh->ChangeMyMeshMat ( num );
@@ -273,7 +296,7 @@ void UAudienceServerComponent_KMK::StartCountDown ( )
 	UE_LOG(LogTemp, Warning, TEXT("Client Virtual Find" ));
 	UVirtualGameInstance_KMK* gi = Cast<UVirtualGameInstance_KMK> ( GetWorld ( )->GetGameInstance ( ) );
 	//if (gi->effectArray.Num ( ) > 0 && gi->GetConcertInfo().appearedVFX >= 0) GetWorld ( )->SpawnActor<AActor> ( gi->effectArray[gi->GetConcertInfo ( ).appearedVFX] , FTransform(FVector(0, 0, 2000 )));
-	if (gi->effectArray.Num ( ) > 0) GetWorld ( )->SpawnActor<AActor> ( gi->effectArray[3] , FTransform(FVector(0, 0, 2000 ) ));
+	//if (gi->effectArray.Num ( ) > 0) GetWorld ( )->SpawnActor<AActor> ( gi->effectArray[3] , FTransform(FVector(0, 0, 2000 ) ));
 	
 	//GetWorld ( )->GetTimerManager ( ).SetTimer ( startCountDownHandle , FTimerDelegate::CreateLambda ( [this]( )
 	//	{
@@ -285,7 +308,7 @@ void UAudienceServerComponent_KMK::StartCountDown ( )
 	//	} ) , 0 , false );
 }
 
-
+// 콘서트가 시작됨을 알리는 코드
 void UAudienceServerComponent_KMK::ServerRPC_StartConcert_Implementation ( )
 {
 	MultiRPC_StartConcert( durationTime );

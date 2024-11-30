@@ -11,13 +11,16 @@
 #include "JsonObjectConverter.h"
 #include "Kismet/KismetRenderingLibrary.h"
 #include "IImageWrapper.h"
+#include "JJH/JJH_MapSelectWidget.h"
+#include "Kismet/GameplayStatics.h"
+#include "JJH/JJH_SelectManager.h"
 
 // Sets default values
 AHttpActor_KMK::AHttpActor_KMK()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
-
+	
 }
 
 // Called when the game starts or when spawned
@@ -33,7 +36,7 @@ void AHttpActor_KMK::BeginPlay()
 	 {
 		 gi->effectArray = effectArray;
 	 }
-
+	 SelectManager = Cast<AJJH_SelectManager>(UGameplayStatics::GetActorOfClass(this, AJJH_SelectManager::StaticClass()));
 }
 
 // Called every frame
@@ -43,6 +46,7 @@ void AHttpActor_KMK::Tick(float DeltaTime)
 
 }
 #pragma region Login
+// 로그인 관련 서버 연결
 void AHttpActor_KMK::ReqLogin ( const FString& id , const FString& pw )
 {
 	// HTTP 모듈 생성
@@ -514,12 +518,13 @@ if (bWasSuccessful&& Response.IsValid())
             UE_LOG(LogTemp, Log, TEXT("Image downloaded and texture created successfully!"));
             // 예: 다운로드한 텍스처를 위젯이나 다른 액터에 할당
 			concertInfo.texture = texture;
-			gi->allConcertInfoArray.Add(concertInfo);
+			
         }
         else
         {
             UE_LOG(LogTemp, Error, TEXT("Failed to create texture from downloaded image data."));
         }
+		gi->allConcertInfoArray.Add(concertInfo);
     }
    else
    {
@@ -609,11 +614,12 @@ void AHttpActor_KMK::OnResCheckAllOpenConcert ( FHttpRequestPtr Request , FHttpR
 			// 사진 관련된 항목
 			if (allConcertInfoArray.Num ( ) > 0)
 			{
-				for (auto& concert : allConcertInfoArray)
+				gi->allConcertInfoArray = allConcertInfoArray;
+				/*for (auto& concert : allConcertInfoArray)
 				{
 					DownloadImageConcert(concert.img, concert);
-
-				}
+					gi->allConcertInfoArray.Add(concert);
+				}*/
 				
 			}
 		}
@@ -785,8 +791,11 @@ void AHttpActor_KMK::OnReqStageInfo ( FHttpRequestPtr Request , FHttpResponsePtr
 
 	if (Response->GetResponseCode ( ) == 201)
 	{
-		UE_LOG ( LogTemp , Error , TEXT ( "Uploaded" ));
-
+		UE_LOG ( LogTemp , Error , TEXT ( "Uploaded" )); 
+		if (SelectManager && SelectManager->MapSelectWidget)
+		{
+			SelectManager->MapSelectWidget->MakeSetUpFinishBorder_1Visible();
+		}
 	}
 	else
 	{

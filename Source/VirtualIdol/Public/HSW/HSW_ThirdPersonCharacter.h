@@ -50,6 +50,9 @@ class VIRTUALIDOL_API AHSW_ThirdPersonCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* InterviewAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* MuteAction;
+
 public:
 	// Sets default values for this character's properties
 	AHSW_ThirdPersonCharacter();
@@ -62,7 +65,7 @@ protected:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-protected:
+public:
 	/** Called for movement input */
 	void Move ( const FInputActionValue& Value );
 
@@ -71,11 +74,13 @@ protected:
 
 	void OnMyFeverGauge ( const FInputActionValue& value );
 	
-	void OnMyThorwHold ( const FInputActionValue& value );
+	void OnMyThorwHold (  );
 
-	void OnMyThorwPitch ( const FInputActionValue& value );
+	void OnMyThorwPitch (  );
 
 	void OnMyInterview ( const FInputActionValue& value );
+
+	void OnMyMute( );
 
 
 public:	
@@ -103,6 +108,16 @@ public:
 
 	UPROPERTY( )
 	class USoundBase* soundFile;
+
+
+	UPROPERTY ( EditDefaultsOnly , BlueprintReadWrite )
+	class USoundBase* AmbientSound01;
+	UPROPERTY ( EditDefaultsOnly )
+	class UAudioComponent* AmbientSoundComponent01;
+
+	UPROPERTY( )
+	class AHSW_AudioActor* AudioActor;
+
 
 	// 피버게이지 --------------------------------------------------------------
 	UPROPERTY(EditDefaultsOnly , Category = FeverGauge )

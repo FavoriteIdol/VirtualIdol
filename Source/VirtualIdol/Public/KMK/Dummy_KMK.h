@@ -133,6 +133,10 @@ public:
    UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadWrite )
    bool bCanThrow = false;
 
+   UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadWrite )
+   bool bStart = false;
+
+
    UPROPERTY( Replicated, EditDefaultsOnly , BlueprintReadWrite )
    int32 ThrowingObjectIndex = 0;
 
