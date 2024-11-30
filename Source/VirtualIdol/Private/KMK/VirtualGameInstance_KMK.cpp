@@ -25,7 +25,9 @@
 #include "IPAddress.h"
 #include "JJH/JJH_SelectManager.h"
 #include "Kismet/KismetMathLibrary.h"
-
+/*
+* 이동할 레벨 변경시에 : ?listen으로 검색 후, 모두 변경 : 총 3개 변경해야함
+*/
 void UVirtualGameInstance_KMK::Init ( )
 {
     Super::Init();
@@ -171,10 +173,13 @@ void UVirtualGameInstance_KMK::OnMyFindSessionComplete ( bool bSuccessful )
             FString host;
             result.Session.SessionSettings.Get(FName("HOST_NAME" ), host );
             roomInfo.hostName = StringBase64Decode(host);
+            // 서버에 올라간 예약 정보중에
             for (FConcertInfo& concert : allConcertInfoArray)
             {
+                // 열린 세션과 예약정보에 있는 유저 이름이 같다면
                 if (concert.userName == roomInfo.hostName)
                 {
+                    // roomInfo와 concertInfo에 각각의 정보값들을 저장함
                     roomInfo.roomName = concert.name;
                     concerInfo = concert;
                     roomInfo.texture = concert.texture;
@@ -211,9 +216,10 @@ void UVirtualGameInstance_KMK::OnMyFindSessionComplete ( bool bSuccessful )
 
 void UVirtualGameInstance_KMK::JoinRoom ( int32 ChooseRoomNum, int32 vipNum)
 {
+    // vip인 경우 여기에 1이 할당됨
     playerMeshNum = vipNum;
     auto res = sessionSearch->SearchResults[ChooseRoomNum];
-
+    // 내가 선택한 방으로 입장
     sessionInterface->JoinSession(0, FName(HostName), res);
 }
 
@@ -332,6 +338,7 @@ void UVirtualGameInstance_KMK::LoginPanel ( )
 
 #pragma endregion
 #pragma region Token
+// 내 정보를 저장함
 void UVirtualGameInstance_KMK::SetMyInfo (const struct FLoginInfo& info )
 {
     loginInfo.userId = info.userId;
@@ -340,24 +347,27 @@ void UVirtualGameInstance_KMK::SetMyInfo (const struct FLoginInfo& info )
     loginInfo.token = info.token;
     loginInfo.userName = info.userName;
 }
-
+// 저장된 내 정보 값을 반환함
 FLoginInfo UVirtualGameInstance_KMK::GetMyInfo ( )
 {
     return loginInfo;
 }
-
+// 콘서트 셋팅함
 void UVirtualGameInstance_KMK::SetConcertInfo ( const TArray<FConcertInfo> info, class AHttpActor_KMK* http )
 {
-    
+    // 현재시간을 끌고오는 곳
     FDateTime currentDataTime = FDateTime::Now();
     int32 year = currentDataTime.GetYear();
     int32 mon = currentDataTime.GetMonth();
     int32 day = currentDataTime.GetDay();
     for (int i = 0; i < info.Num ( ); i++)
     {
+        // 만약, 서버에 예약된 콘서트장 중에 오늘 날짜가 있다면,
         if (info[i].concertDate == start)
         {
+            // 콘서트장 내부에 들어간 공연장 셋팅 정보를 불러오고
             http->ReqCheckIdStage(info[i].stageId );
+            // concertInfo에 내가 연 콘서트장을 입력함
             concerInfo = info[i];
             widget->SetButtEnable(true);
         }
@@ -378,6 +388,7 @@ FString UVirtualGameInstance_KMK::ChangeString ( const FString& editText )
 }
 FConcertInfo UVirtualGameInstance_KMK::GetConcertInfo ( )
 {
+    // 내가 연 콘서트장을 반환
     return concerInfo;
 }
 
@@ -436,6 +447,7 @@ void UVirtualGameInstance_KMK::OnSetStageButt ( )
 	{
 		VisibleStartWidget(false);
 		sm->CreateStage(myStageInfo);
+        // 이펙트 생성 위치 조절 부분
         if (myStageInfo.theme == 3)
         {
             widget->spawnTrans = FTransform(FVector(0, 0, 3000 ) );
@@ -470,6 +482,7 @@ FStageInfo UVirtualGameInstance_KMK::GetConcertStageInfo ( )
     return concertStageInfo;
 }
 
+ // 더미 이름 생성
 FString UVirtualGameInstance_KMK::GetRandomName()
 {
     if (!NamesDataTable)
