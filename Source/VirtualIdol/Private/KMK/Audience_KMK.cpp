@@ -305,6 +305,7 @@ void UAudience_KMK::PressEmotionButt ( )
         bEmotion = true;
         ChangeTextAndImage ( FLinearColor::Yellow , 3 , changeText );
         ImojiBox->SetVisibility(ESlateVisibility::Visible);
+        HB_CamPanel->SetVisibility(ESlateVisibility::Hidden );
     }
     else
     {
@@ -431,12 +432,27 @@ void UAudience_KMK::PressCancelButt ( )
 }
 
 #pragma region Cash
+
+void UAudience_KMK::ObjectButtEnable ( )
+{
+    Butt_Object0->SetIsEnabled ( false );
+    Butt_Object1->SetIsEnabled ( false );
+    Butt_Object2->SetIsEnabled ( false );
+}
+
 void UAudience_KMK::PressObjectButt ( )
 {
     gi->myCash -= 500;
     Text_MyCash->SetText(FText::AsNumber(gi->myCash));
+    if (gi->myCash <= 0)
+    {
+        gi->myCash = 0;
+        ObjectButtEnable ( );
+        return;
+    }
     // 오브젝트 생성
     Player->ThrowingObjectIndex = 0;
+
     Player->OnMyThorwHold();
     Player->OnMyThorwPitch ( );
     UE_LOG(LogTemp,Warning,TEXT("ObjectButton_0" ) );
@@ -444,7 +460,15 @@ void UAudience_KMK::PressObjectButt ( )
 void UAudience_KMK::PressObject1Butt ( )
 {
     gi->myCash -= 1000;
-    Text_MyCash->SetText(FText::AsNumber(gi->myCash));
+    Text_MyCash->SetText ( FText::AsNumber ( gi->myCash ) );
+    if (gi->myCash <= 0)
+    {
+        gi->myCash = 0;
+        ObjectButtEnable ( );
+        return;
+    }
+
+
     Player->ThrowingObjectIndex = 1;
     Player->OnMyThorwHold ( );
     Player->OnMyThorwPitch ( );
@@ -453,7 +477,14 @@ void UAudience_KMK::PressObject1Butt ( )
 void UAudience_KMK::PressObject2Butt ( )
 {
     gi->myCash -= 5000;
-    Text_MyCash->SetText(FText::AsNumber(gi->myCash));
+    Text_MyCash->SetText ( FText::AsNumber ( gi->myCash ) );
+    if (gi->myCash <= 0)
+    {
+        gi->myCash = 0;
+        ObjectButtEnable ( );
+        return;
+    }
+
     Player->ThrowingObjectIndex = 2;
     Player->OnMyThorwHold ( );
     Player->OnMyThorwPitch ( );
@@ -493,6 +524,11 @@ void UAudience_KMK::SetSImojiVisible ( ESlateVisibility visible, int32 index )
     }
 }
 
+
+void UAudience_KMK::SetImojiBox ( )
+{
+    ImojiBox->SetVisibility ( ESlateVisibility::Hidden );
+}
 
 void UAudience_KMK::OnMyImoji01 ( )
 {

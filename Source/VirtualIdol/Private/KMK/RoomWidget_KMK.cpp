@@ -34,10 +34,10 @@ void URoomWidget_KMK::SetImageAndText (const struct FRoomInfo& info)
 	if(!gi) gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance());
 	if(!gi->sm)gi->sm = sm;
 	
-	//if (info.texture)
-	//{
-	//	Image_Stage->SetBrushFromTexture( info.texture );
-	//}
+	if (info.texture)
+	{
+		Image_Stage->SetBrushFromTexture( info.texture );
+	}
 	
 	// 세션정보를 할당하는 ㅂ분
 	mySessionInfo = info;
@@ -46,8 +46,8 @@ void URoomWidget_KMK::SetImageAndText (const struct FRoomInfo& info)
 	Butt_SetStage->SetVisibility(ESlateVisibility::Hidden);
 
 	// 세션의 roomName이 작성되는 부분
-	Text_Name->SetText( FText::FromString( TEXT("STARLIGHT ARIN" ) ));
-	// Text_Name->SetText( FText::FromString ( *mySessionInfo.roomName ) );
+	//Text_Name->SetText( FText::FromString( TEXT("STARLIGHT ARIN" ) ));
+	Text_Name->SetText( FText::FromString ( *mySessionInfo.roomName ) );
 }
 
 // 스테이지 정보값을 불러와 셋팅하는 부분
@@ -135,9 +135,9 @@ void URoomWidget_KMK::ChangeSessionOutSide ( )
 	gi->concerInfo.feverVFX = mySessionInfo.feverNum;
 	gi->roomNum = mySessionInfo.index;
 	gi->HostName = mySessionInfo.hostName;
-	//gi->ChangeTextureWidget(mySessionInfo.texture);
+	gi->ChangeTextureWidget(mySessionInfo.texture);
 	// 더미 이름 변경
-	gi->ChangeTextureWidget(dummyText);
+	//gi->ChangeTextureWidget(dummyText);
 	// 아웃라인 생성
     Image_StageOut->SetVisibility ( ESlateVisibility::Visible );
 }

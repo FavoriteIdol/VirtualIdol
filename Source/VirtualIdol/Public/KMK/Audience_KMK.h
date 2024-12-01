@@ -60,6 +60,8 @@ public :
 	bool bMyVip = false;
 	// 1. Hidden
 	bool bHide = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (BindWidget))
+	class UHorizontalBox* HB_CamPanel;
 	UPROPERTY(meta = (BindWidget))
     class UButton* Butt_Hidden;
 	UPROPERTY(meta = (BindWidget))
@@ -208,7 +210,8 @@ public :
 
 	UPROPERTY(EditAnywhere, Category = Object )
 	TArray<AActor*> objects;
-
+	UFUNCTION( )
+	void ObjectButtEnable( );
 	UFUNCTION( )
 	void PressObjectButt( );
 	UFUNCTION( )
@@ -278,6 +281,10 @@ public :
 	TArray<class UTexture2D *> sImojiArray;
 	UPROPERTY(meta = (BindWidget))
     class UHorizontalBox* ImojiBox;
+
+	UFUNCTION(BlueprintCallable)
+	void SetImojiBox( );
+
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UHSW_FeverGaugeWidget* FeverGauge;
 

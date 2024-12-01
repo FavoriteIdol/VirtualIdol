@@ -183,6 +183,8 @@ public:
 	UPROPERTY ( meta = ( BindWidget ) )
     class UImage* Image_SetStage;
 	UPROPERTY ( meta = ( BindWidget ) )
+    class UImage* Image_Coin;
+	UPROPERTY ( meta = ( BindWidget ) )
     class UButton* Butt_CreateTicket;
 	UPROPERTY ( meta = ( BindWidget ) )
     class UButton* Butt_CreateTicket1;
@@ -286,6 +288,8 @@ public:
 	class UTextBlock* Text_Pay;	
 	UPROPERTY ( meta = ( BindWidget ) )
     class UButton* Butt_PayMoney;	
+	UFUNCTION( )
+	void SetTicketButton( );
 
 	UFUNCTION( )
 	void PressMoneyPay( );

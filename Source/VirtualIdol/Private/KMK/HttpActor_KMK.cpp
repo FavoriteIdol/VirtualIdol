@@ -419,7 +419,7 @@ void AHttpActor_KMK::OnReqMultipartCapturedWithAI ( FHttpRequestPtr Request , FH
 		{
 			// 응답 바디를 가져와 Stage의 img에 설정합니다.
 			ticketURL = Response->GetContentAsString ( );
-
+			gi->widget->SetTicketButton();
 			UE_LOG ( LogTemp , Warning , TEXT ( "Image URL set to: %s" ) , *ticketURL );
 		}
 	}
@@ -614,12 +614,12 @@ void AHttpActor_KMK::OnResCheckAllOpenConcert ( FHttpRequestPtr Request , FHttpR
 			// 사진 관련된 항목
 			if (allConcertInfoArray.Num ( ) > 0)
 			{
-				gi->allConcertInfoArray = allConcertInfoArray;
-				/*for (auto& concert : allConcertInfoArray)
+				// gi->allConcertInfoArray = allConcertInfoArray;
+				for (auto& concert : allConcertInfoArray)
 				{
 					DownloadImageConcert(concert.img, concert);
 					gi->allConcertInfoArray.Add(concert);
-				}*/
+				}
 				
 			}
 		}
