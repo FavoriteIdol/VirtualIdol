@@ -14,6 +14,8 @@
 #include "JJH/JJH_MapSelectWidget.h"
 #include "Kismet/GameplayStatics.h"
 #include "JJH/JJH_SelectManager.h"
+#include "KMK/AudienceServerComponent_KMK.h"
+#include "HSW/HSW_GameState_Auditorium.h"
 
 // Sets default values
 AHttpActor_KMK::AHttpActor_KMK()
@@ -68,30 +70,48 @@ void AHttpActor_KMK::OnResLogin ( FHttpRequestPtr Request , FHttpResponsePtr Res
 {
 	if (bConnectedSuccessfully)
 	{
+		// 로그인에 성공한 경우
 		loginInfo = UJsonParseLib_KMK::ParsecMyInfo(Response->GetContentAsString());
-		// 토큰이 존재한다면 => 모든 정보값이 존재함
-		if ( gi && !loginInfo.email.IsEmpty()) 
+		// 로그인 이미지에 http://~~~라는 주소값이 오면
+		if (loginInfo.userImg.Contains(TEXT("http" )))
 		{
-			gi->SetMyInfo(loginInfo);
-			UE_LOG ( LogTemp , Log , TEXT ( "%s" ) , *loginInfo.token );
-            gi->SwitchWidget ( 1 );
-			gi->SetMyProfile();
-			ReqCheckMyConcert();
+			// 주소값을 통해 이미지를 생성함
+			DownloadImageFromUrl(loginInfo.userImg, loginInfo);
 		}
 		else
 		{
+			// 프로필이 없다면 다음 페이지로 넘어감
+			gi->SwitchWidget ( 1 );
+		}
+		
+		// 토큰이 존재한다면 => 모든 정보값이 존재함
+		if ( gi && !loginInfo.email.IsEmpty()) 
+		{
+			// 내 정보를 gi에 셋팅
+			gi->SetMyInfo(loginInfo);
+			// 위잿을 업데이트
+			gi->SetMyProfile();
+			// 내가 예약한 콘서트가 있는지 확인
+			ReqCheckMyConcert();
+			UE_LOG ( LogTemp , Log , TEXT ( "%s" ) , *loginInfo.token );
+		}
+		else
+		{
+			// 로그인 실패시 팝업 생성
 			gi->LoginPanel();
 		}
 	}
 	else 
 	{
 		// 실패
+		gi->LoginPanel ( );
 		UE_LOG ( LogTemp , Warning , TEXT ( "OnResLogin Failed..." ) );
 	}
 	FString authHeader = FString::Printf ( TEXT ( "Bearer %s" ) , *loginInfo.token );
 }
 #pragma endregion
 #pragma region Concert
+// 콘서트장 예약하는 부분
 void AHttpActor_KMK::ReqSetMyConcert (FConcertInfo& concert )
 {
 	// HTTP 모듈 생성
@@ -131,7 +151,7 @@ void AHttpActor_KMK::OnResSetConcert ( FHttpRequestPtr Request , FHttpResponsePt
         }
         else
         {
-            UE_LOG ( LogTemp , Warning , TEXT ( "응답 코드: %d - %s" ) , StatusCode , *ResponseBody );
+			// 콘서트 예약을 성공한 경우, 성공했다는 팝업을 띄움
             gi->PopUpVisible ( );
         }
 	}
@@ -163,10 +183,11 @@ void AHttpActor_KMK::OnResCheckStage ( FHttpRequestPtr Request , FHttpResponsePt
 		UE_LOG ( LogTemp , Error , TEXT ( "CheckStage Successed" ));
 		// 성공
 		FString respon = Response->GetContentAsString();
-		// gi에 있는 닉네임 파악
+		// 서버에 올라가 있는 전체 무대 확인
 		allStageInfoArray = UJsonParseLib_KMK::ParsecStageInfos(respon, gi->GetMyInfo().userName);
 		for (int i = 0; i < allStageInfoArray.Num ( ); i++)
 		{
+			// 무대 정보에 있는 img값을 texture 로 변환
 			DownloadImageFromUrl(allStageInfoArray[i].img, allStageInfoArray[i] );
 			//sw->CreateStageWidget(allStageInfoArray[i] , texture );
 		}
@@ -224,7 +245,7 @@ void AHttpActor_KMK::OnResCheckMyStage ( FHttpRequestPtr Request , FHttpResponse
 		UE_LOG ( LogTemp , Warning , TEXT ( "Failed myStage" ) );
 	}
 }
-// 백엔드에서 링크를 가져온다
+// 백엔드에서 무대와 관련된 이미지를 생성하는 함수
 void AHttpActor_KMK::DownloadImageFromUrl(const FString& imageUrl, const FStageInfo& stageInfo)
 {
 	FHttpModule* http = &FHttpModule::Get();
@@ -235,7 +256,17 @@ void AHttpActor_KMK::DownloadImageFromUrl(const FString& imageUrl, const FStageI
     req->ProcessRequest();
 }
 
-
+// 백엔드에서 내 프로필과 관련된 이미지를 생성하는 함수 => StartWidget에서 4개의 선택지에 나오는 프로필 사진
+void AHttpActor_KMK::DownloadImageFromUrl ( const FString& imageUrl , const FLoginInfo& Info )
+{
+	FHttpModule* http = &FHttpModule::Get ( );
+	TSharedRef<IHttpRequest> req = http->CreateRequest ( );
+	req->SetURL ( imageUrl );
+	req->SetVerb ( "GET" );
+	req->OnProcessRequestComplete ( ).BindUObject ( this , &AHttpActor_KMK::OnImageDownComplete , Info );
+	req->ProcessRequest ( );
+}
+//  백엔드에서 무대와 관련된 이미지가 생성된 경우
 void AHttpActor_KMK::OnImageDownComplete ( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bWasSuccessful, FStageInfo stageInfo  )
 {
 	if (bWasSuccessful&& Response.IsValid())
@@ -255,14 +286,13 @@ void AHttpActor_KMK::OnImageDownComplete ( FHttpRequestPtr Request , FHttpRespon
         }
         // 다운로드 받은 PNG 데이터를 파일로 저장
         const TArray<uint8>& ImageData = Response->GetContent();
-
+		// 받은 이미지를 texture로 변경
 		UTexture2D* texture = UJsonParseLib_KMK::MakeTexture(ImageData);
         if (texture)
         {
             UE_LOG(LogTemp, Log, TEXT("Image downloaded and texture created successfully!"));
-            // 예: 다운로드한 텍스처를 위젯이나 다른 액터에 할당
+            // 무대 이미지를 넣은 RoomWidget 생성
 			sw->CreateStageWidget(stageInfo, texture);
-
         }
         else
         {
@@ -278,12 +308,51 @@ void AHttpActor_KMK::OnImageDownComplete ( FHttpRequestPtr Request , FHttpRespon
        else
        {
            UE_LOG(LogTemp, Error, TEXT("Response is invalid"));
+		   // 실패시 다시 시도
 		   if(ticketData.Num() > 0) ReqTicket(ticketData );
        }
    }
     
 }
 
+//  백엔드에서 프로필과 관련된 이미지가 생성된 경우
+void AHttpActor_KMK::OnImageDownComplete ( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bWasSuccessful , FLoginInfo Info )
+{
+	if (bWasSuccessful && Response.IsValid ( ))
+	{
+		if (Response->GetResponseCode ( ) != 200)
+		{
+			UE_LOG ( LogTemp , Error , TEXT ( "Failed to get image. Response Code: %d" ) , Response->GetResponseCode ( ) );
+			return;
+		}
+		FString ContentType = Response->GetContentType ( );
+		UE_LOG ( LogTemp , Log , TEXT ( "Content-Type: %s" ) , *ContentType );
+
+		if (!ContentType.Contains ( "image" ))
+		{
+			UE_LOG ( LogTemp , Error , TEXT ( "Unexpected Content-Type: %s" ) , *ContentType );
+			return;
+		}
+		// 다운로드 받은 PNG 데이터를 파일로 저장
+		const TArray<uint8>& ImageData = Response->GetContent ( );
+		// 이미지에서 texture로 생성
+		UTexture2D* texture = UJsonParseLib_KMK::MakeTexture ( ImageData );
+		if (texture)
+		{
+			UE_LOG ( LogTemp , Log , TEXT ( "Image downloaded and texture created successfully!" ) );
+			// 내 정보에 texture 넣기
+			Info.texture = texture;
+			// 4개의 선택지 창에 있는 프로필 변경
+			gi->widget->SetImageProfile(texture);
+			// 4개의 선택지 창으로 이동
+			gi->SwitchWidget ( 1 );
+		}
+		else
+		{
+			UE_LOG ( LogTemp , Error , TEXT ( "Failed to create texture from downloaded image data." ) );
+		}
+	}
+}
 
 #pragma endregion
 
@@ -327,14 +396,18 @@ void AHttpActor_KMK::OnResTicket ( FHttpRequestPtr Request , FHttpResponsePtr Re
 
         if (FFileHelper::SaveArrayToFile(ImageData, *FullPath))
         {
+			// 받은 이미지를 서버를 통해 경로를 받아놓음 => 서버에 올리기 위해 필요
 			ReqMultipartCapturedWithAI(FullPath);
+			// 이미지 => 텍스쳐 변경
             UTexture2D* Texture = UJsonParseLib_KMK::MakeTexture(ImageData);
             if (Texture)
             {
                 UE_LOG(LogTemp, Log, TEXT("Texture successfully created from downloaded image"));
+				// 티켓이 생성되면 true로 변경하여 로딩바가 사라지게 만듦
 				sw->bCreateTicket = true;
+				// 로딩바 hidden처리
 				sw->SetLoadImage();
-                // Use the texture as needed, e.g., apply it to a material or widget
+                // 만들어진 텍스처를 위젯에 넣기
                 OnTextureCreated(Texture);  // Custom method to handle the texture
             }
             else
@@ -436,7 +509,7 @@ void AHttpActor_KMK::OnTextureCreated(UTexture2D* texture)
 #pragma endregion
 #pragma region Translate
 
-void AHttpActor_KMK::ReqTranslateChat ( const FString& json )
+void AHttpActor_KMK::ReqTranslateChat ( const FString& json , class UAudienceServerComponent_KMK* server )
 {
 	// HTTP 모듈 생성
 	FHttpModule& httpModule = FHttpModule::Get ( );
@@ -445,24 +518,24 @@ void AHttpActor_KMK::ReqTranslateChat ( const FString& json )
 	req->SetURL(TEXT("https://singular-swine-deeply.ngrok-free.app/translate") );
 	req->SetVerb(TEXT("POST"));
 	req->SetHeader(TEXT("content-type") , TEXT("application/json"));
-
 	FString s = UJsonParseLib_KMK::MakeChatTranslate(json);
     req->SetContentAsString (s);
 
-	req->OnProcessRequestComplete().BindUObject(this , &AHttpActor_KMK::OnReqTranslateChat);
+	req->OnProcessRequestComplete().BindUObject(this , &AHttpActor_KMK::OnReqTranslateChat, server);
 
 	req->ProcessRequest();
 }
 
-void AHttpActor_KMK::OnReqTranslateChat ( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully )
+void AHttpActor_KMK::OnReqTranslateChat ( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully , class UAudienceServerComponent_KMK* server )
 {
 	if (bConnectedSuccessfully)
 	{
 		// 성공
-		FString respon = Response->GetContentAsString();
+		FString transLateString = UJsonParseLib_KMK::ParseChatTranslate ( Response->GetContentAsString ( ) );
+		
 		if (Response.IsValid() && Response->GetResponseCode() == 200)
 		{
-
+			server->ServerRPCChat(gi->GetMyInfo().userName, transLateString );
 		}
 		else
 		{
@@ -476,6 +549,45 @@ void AHttpActor_KMK::OnReqTranslateChat ( FHttpRequestPtr Request , FHttpRespons
 	}
 }
 
+void AHttpActor_KMK::ReqTranslateChat ( const FString& json , class AHSW_GameState_Auditorium* gs )
+{
+	// HTTP 모듈 생성
+	FHttpModule& httpModule = FHttpModule::Get ( );
+	TSharedRef<IHttpRequest> req = httpModule.CreateRequest ( );
+
+	req->SetURL ( TEXT ( "https://singular-swine-deeply.ngrok-free.app/translate" ) );
+	req->SetVerb ( TEXT ( "POST" ) );
+	req->SetHeader ( TEXT ( "content-type" ) , TEXT ( "application/json" ) );
+	FString s = UJsonParseLib_KMK::MakeChatTranslate ( json );
+	req->SetContentAsString ( s );
+
+	req->OnProcessRequestComplete ( ).BindUObject ( this , &AHttpActor_KMK::OnReqTranslateChat , gs );
+
+	req->ProcessRequest ( );
+}
+
+void AHttpActor_KMK::OnReqTranslateChat ( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully , class AHSW_GameState_Auditorium* gs )
+{
+	if (bConnectedSuccessfully)
+	{
+		// 성공
+		FString transLateString = UJsonParseLib_KMK::ParseChatTranslate ( Response->GetContentAsString ( ) );
+
+		if (Response.IsValid ( ) && Response->GetResponseCode ( ) == 200)
+		{
+			gs->ServerRPCChat (gi->GetMyInfo().userName, transLateString );
+		}
+		else
+		{
+			UE_LOG ( LogTemp , Error , TEXT ( "Failed to download image. Response code: %d" ) , Response->GetResponseCode ( ) );
+		}
+
+	}
+	else
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "Failed myStage" ) );
+	}
+}
 #pragma endregion
 
 #pragma region BE for CheckConcert

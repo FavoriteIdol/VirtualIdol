@@ -30,7 +30,11 @@ public :
 	virtual void NativeConstruct ( ) override;
 	
 	virtual void NativePreConstruct() override;
-
+	// httpactor
+	UPROPERTY( EditAnywhere, BlueprintReadWrite)
+	class AHttpActor_KMK* httpActor;
+	UPROPERTY(EditAnywhere, Category = Http )
+	TSubclassOf<class AHttpActor_KMK> httpFact;
 	UPROPERTY( )
 	class UVirtualGameInstance_KMK* gi;
 	UPROPERTY( )

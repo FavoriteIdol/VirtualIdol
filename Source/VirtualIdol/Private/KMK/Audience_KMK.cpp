@@ -42,6 +42,8 @@ void UAudience_KMK::NativeConstruct ( )
     Super::NativeConstruct( );
     SetUpButtonInfo();
     gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance());
+    // 월드에 배치된 httpActor 찾기
+    httpActor = Cast<AHttpActor_KMK> ( UGameplayStatics::GetActorOfClass ( GetWorld ( ) , httpFact ) );
     if (Text_MyCash)
     {
         Text_MyCash->SetText(FText::AsNumber(gi->myCash));
@@ -380,7 +382,7 @@ void UAudience_KMK::PressSendButt ( )
         {
             if (!EditText_Chat->GetText ( ).IsEmpty ( ))
             {
-                server->ServerRPCChat(gi->GetMyInfo().userName, EditText_Chat->GetText ( ).ToString ( ) );
+                httpActor->ReqTranslateChat( EditText_Chat->GetText ( ).ToString ( ), server);
 
                 EditText_Chat->SetText ( FText::GetEmpty ( ) );
             }
@@ -393,7 +395,8 @@ void UAudience_KMK::PressSendButt ( )
         {
             if (!EditText_Chat->GetText ( ).IsEmpty ( ))
             {
-                gs->ServerRPCChat (gi->GetMyInfo().userName, EditText_Chat->GetText ( ).ToString ( ) );
+                httpActor->ReqTranslateChat ( EditText_Chat->GetText ( ).ToString ( ) , gs );
+                
                 EditText_Chat->SetText ( FText::GetEmpty ( ) );
             }
         }

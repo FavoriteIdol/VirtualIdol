@@ -124,6 +124,8 @@ public:
     class UImage* Image_Stage;
 	UFUNCTION( )
 	void PressSelectButt( );
+	UFUNCTION( )
+	void SetImageProfile(class UTexture2D* texture );
 
 	UFUNCTION( )
 	void ChangeMyProfile( );

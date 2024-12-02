@@ -258,6 +258,7 @@ void UStartWidget_KMK::OnMyLogin ( )
 		httpActor->ReqLogin(EditText_ID->GetText().ToString(), EditText_PW->GetText().ToString());
 		// 무대 조회하기
 		httpActor->ReqCheckAllOpenConcert();
+		
 
 	}
 }
@@ -272,7 +273,10 @@ void UStartWidget_KMK::OnFailLogin ( )
 #pragma region FourButtPanel
 void UStartWidget_KMK::ChangeMyProfile ( )
 {
-
+	if (gi->GetMyInfo ( ).texture != nullptr)
+	{
+		Image_Profile->SetBrushFromTexture( gi->GetMyInfo ( ).texture );
+	}
 	Text_MyCash->SetText(FText::AsNumber(gi->myCash));
 	Text_MyNick->SetText(FText::FromString(gi->GetMyInfo().userName));
 }
@@ -417,6 +421,11 @@ void UStartWidget_KMK::PressSelectButt ( )
 
 }
 
+
+void UStartWidget_KMK::SetImageProfile ( class UTexture2D* texture )
+{
+	Image_Profile->SetBrushFromTexture(texture);
+}
 
 void UStartWidget_KMK::ChangeLoadMat ( float num )
 {
