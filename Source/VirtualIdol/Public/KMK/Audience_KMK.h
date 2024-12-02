@@ -245,10 +245,6 @@ public :
 
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UWidgetSwitcher* WS_Concert;
-	UPROPERTY ( meta = ( BindWidget ) )
-    class UButton* Butt_Model;
-	UPROPERTY ( meta = ( BindWidget ) )
-    class UButton* Butt_MP3;
 
 	UPROPERTY ( meta = ( BindWidget ) )
     class UTextBlock* TEXT_Min;
@@ -261,14 +257,8 @@ public :
 	UFUNCTION( )
 	void ChangeTextClock(const FString& text );
 
-	UFUNCTION( )
-	void PressButtModel( );
-	UFUNCTION( )
-	bool OpenFileExample(TArray<FString>& FileNames, FString DialogueTitle, FString FileTypes, bool multiselect);
-	UFUNCTION(BlueprintCallable )
-	void SetConcertName(const FString& text );
-	UFUNCTION( )
-	USoundWaveProcedural* LoadWavFromFile ( const FString& FilePath );
+    UFUNCTION ( BlueprintCallable )
+    void SetConcertName ( const FString& text );
 
 	UPROPERTY( )
 	float soundGain = 2;

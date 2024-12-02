@@ -92,7 +92,7 @@ void URoomWidget_KMK::PressJoinSessionButt ( )
 		Image_StageOut->SetVisibility(ESlateVisibility::Hidden);
 	}
 }
-
+// 위와 버튼 종류만 다름
 void URoomWidget_KMK::PressSetStageButt ( )
 {
 	if (gi->roomWidget && gi->roomWidget != this)

@@ -109,12 +109,6 @@ void UAudience_KMK::NativeConstruct ( )
         CountDownPanel->SetVisibility ( ESlateVisibility::Hidden );
     }
 #pragma endregion
-#pragma region BeforeConcerForVirtual
-    if (Butt_MP3 && Butt_Model)
-    {
-        Butt_Model->OnClicked.AddDynamic ( this , &UAudience_KMK::PressButtModel);
-    }
-#pragma endregion
 #pragma region Imoji
     if (ImojiBox)
     {
@@ -149,6 +143,7 @@ void UAudience_KMK::NativePreConstruct ( )
 
 void UAudience_KMK::SetUpButtonInfo ( )
 {
+    // 
     for (int i = 1; i < buttonName.Num ( ); i++)
     {
         FName bName = FName(*FString::Printf(TEXT("Butt_") ) + buttonName[i]);
@@ -567,134 +562,11 @@ void UAudience_KMK::ChangeTextClock ( const FString& text )
 }
 
 
-void UAudience_KMK::PressButtModel ( )
-{
-
-}
-// 파일 열기
-bool UAudience_KMK::OpenFileExample(TArray<FString>& FileNames, FString DialogueTitle, FString FileTypes, bool multiselect)
-{
-
-   IDesktopPlatform* DesktopPlatform = FDesktopPlatformModule::Get();
-   bool bOpened = false;
-   FString DefaultPath = FPaths::ProjectContentDir(); // 기본 경로를 프로젝트 콘텐츠 폴더로 설정
-
-   if (DesktopPlatform)
-   {
-      uint32 SelectionFlag = multiselect ? EFileDialogFlags::Multiple : EFileDialogFlags::None;
-      bOpened = DesktopPlatform->OpenFileDialog(
-         NULL,
-         DialogueTitle,
-         DefaultPath,
-         TEXT(""),
-         FileTypes,
-         SelectionFlag,
-         FileNames
-      );
-   }
-   return bOpened;
-}
-
 void UAudience_KMK::SetConcertName ( const FString& text )
 {
     if(TEXT_ConcertName) TEXT_ConcertName->SetText(FText::FromString(text));
 }
 
-// 오디오 파일을 불러와 USoundWave로 변환
-USoundWaveProcedural* UAudience_KMK::LoadWavFromFile(const FString& FilePath)
-{
-    TArray<uint8> RawFileData;
-
-    // 파일 데이터를 메모리로 로드
-    if (!FFileHelper::LoadFileToArray ( RawFileData , *FilePath ))
-    {
-        UE_LOG ( LogTemp , Error , TEXT ( "Failed to load file: %s" ) , *FilePath );
-        return nullptr;
-    }
-
-    // WAV 파일 헤더 정보 추출
-    FWaveModInfo WaveInfo;
-    if (!WaveInfo.ReadWaveInfo ( RawFileData.GetData ( ) , RawFileData.Num ( ) ))
-    {
-        UE_LOG ( LogTemp , Error , TEXT ( "Invalid WAV format: %s" ) , *FilePath );
-        return nullptr;
-    }
-
-    int32 BitsPerSample = *WaveInfo.pBitsPerSample;
-    int32 SampleRate = *WaveInfo.pSamplesPerSec;
-
-    USoundWaveProcedural* SoundWave = NewObject<USoundWaveProcedural> ( );
-    if (!SoundWave)
-    {
-        UE_LOG ( LogTemp , Error , TEXT ( "Failed to create SoundWave object." ) );
-        return nullptr;
-    }
-
-    SoundWave->NumChannels = *WaveInfo.pChannels;
-    SoundWave->SetSampleRate ( SampleRate );
-
-    uint32 BytesPerSample = ( *WaveInfo.pChannels ) * ( BitsPerSample / 8 );
-    uint32 TotalSamples = WaveInfo.SampleDataSize / BytesPerSample;
-    SoundWave->Duration = static_cast<float>( TotalSamples ) / static_cast<float>( SampleRate );
-
-    // 비트 깊이에 따른 필터 적용
-
-    // 비트 깊이에 따른 필터 적용 및 증폭
-    if (BitsPerSample == 16)
-    {
-        const int16* PCMDataStart = reinterpret_cast<const int16*>( WaveInfo.SampleDataStart );
-        TArray<int16> PCMData;
-        PCMData.Append ( PCMDataStart , WaveInfo.SampleDataSize / sizeof ( int16 ) );
-
-        SoundWave->QueueAudio ( reinterpret_cast<const uint8*>( PCMData.GetData ( ) ) , PCMData.Num ( ) * sizeof ( int16 ) );
-    }
-    else if (BitsPerSample == 24)
-    {
-        const uint8* PCMDataStart = reinterpret_cast<const uint8*>( WaveInfo.SampleDataStart );
-        if (!PCMDataStart)
-        {
-            UE_LOG ( LogTemp , Error , TEXT ( "Failed to cast SampleDataStart to uint8 for file: %s" ) , *FilePath );
-            return nullptr;
-        }
-
-        TArray<int32> PCMData;
-        PCMData.Reserve ( WaveInfo.SampleDataSize / 3 );
-
-        // 24비트 PCM 데이터를 32비트로 변환
-        for (uint32 i = 0; i < WaveInfo.SampleDataSize; i += 3)
-        {
-            int32 Sample = ( PCMDataStart[i] << 16 ) | ( PCMDataStart[i + 1] << 8 ) | PCMDataStart[i + 2];
-            PCMData.Add ( Sample );
-        }
-
-        // 다시 24비트로 저장 (필터링된 데이터를 3바이트로 다시 압축)
-        TArray<uint8> FilteredPCMData;
-        FilteredPCMData.Reserve ( PCMData.Num ( ) * 3 );
-        for (int32 Sample : PCMData)
-        {
-            FilteredPCMData.Add ( ( Sample >> 16 ) & 0xFF );
-            FilteredPCMData.Add ( ( Sample >> 8 ) & 0xFF );
-            FilteredPCMData.Add ( Sample & 0xFF );
-        }
-
-        // SoundWave에 24비트 데이터를 다시 3바이트 단위로 큐잉
-        SoundWave->QueueAudio ( FilteredPCMData.GetData ( ) , FilteredPCMData.Num ( ) );
-    }
-    else if (BitsPerSample == 32)
-    {
-        const float* PCMDataStart = reinterpret_cast<const float*>( WaveInfo.SampleDataStart );
-        TArray<float> PCMData;
-        PCMData.Append ( PCMDataStart , WaveInfo.SampleDataSize / sizeof ( float ) );
-
-        SoundWave->QueueAudio ( reinterpret_cast<const uint8*>( PCMData.GetData ( ) ) , PCMData.Num ( ) * sizeof ( float ) );
-    }
-    SoundWave->bLooping = false;
-    SoundWave->bProcedural = true;
-    SoundWave->SoundGroup = SOUNDGROUP_Default;
-    SoundWave->bStreaming = false;
-
-    return SoundWave;
-}
 
 void UAudience_KMK::ChangeVirtualWidget ( )
 {

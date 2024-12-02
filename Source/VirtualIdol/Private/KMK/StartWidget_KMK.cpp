@@ -258,8 +258,6 @@ void UStartWidget_KMK::OnMyLogin ( )
 		httpActor->ReqLogin(EditText_ID->GetText().ToString(), EditText_PW->GetText().ToString());
 		// 무대 조회하기
 		httpActor->ReqCheckAllOpenConcert();
-		
-
 	}
 }
 
@@ -316,7 +314,7 @@ void UStartWidget_KMK::StartConcertPanel ( )
 
 void UStartWidget_KMK::ComeInStagePanel ( )
 {	
-	// 세션 찾기
+	
 	Butt_UserStage->SetVisibility(ESlateVisibility::Hidden);
 	Butt_MyStage->SetVisibility(ESlateVisibility::Hidden);
 	Butt_Star->SetVisibility(ESlateVisibility::Hidden);
