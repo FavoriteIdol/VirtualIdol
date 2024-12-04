@@ -7,7 +7,7 @@
 
 void UHSW_FeverGaugeWidget::NativeConstruct ( )
 {
-	SetFeverGauge(0);
+	//SetFeverGauge();
 }
 
 void UHSW_FeverGaugeWidget::SetFeverGauge ( float value)
