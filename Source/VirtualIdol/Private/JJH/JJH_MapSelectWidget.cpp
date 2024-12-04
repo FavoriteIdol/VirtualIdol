@@ -238,7 +238,7 @@ void UJJH_MapSelectWidget::OnOceanThemeButtonClicked ( )
 	{
 		SM->ChangeMap ( 5 );
 	}
-	ChangeBorder ( 17 );
+	ChangeBorder ( 18 );
 }
 
 void UJJH_MapSelectWidget::OnSkyThemeButtonClicked ( )
@@ -247,7 +247,7 @@ void UJJH_MapSelectWidget::OnSkyThemeButtonClicked ( )
 	{
 		SM->ChangeMap ( 6 );
 	}
-	ChangeBorder ( 18 );
+	ChangeBorder ( 19 );
 }
 
 void UJJH_MapSelectWidget::OnNaturalButtonClicked ( )
@@ -348,7 +348,7 @@ void UJJH_MapSelectWidget::OnEffectButton4Clicked ( )
 	{
 		SM->ChangeEffect ( 3 );
 	}
-	ChangeBorder ( 18 );
+	ChangeBorder ( 16 );
 }
 void UJJH_MapSelectWidget::OnEffectButton5Clicked ( )
 {
@@ -356,7 +356,7 @@ void UJJH_MapSelectWidget::OnEffectButton5Clicked ( )
 	{
 		SM->ChangeEffect ( 4 );
 	}
-	ChangeBorder ( 19 );
+	ChangeBorder ( 17 );
 }
 
 
