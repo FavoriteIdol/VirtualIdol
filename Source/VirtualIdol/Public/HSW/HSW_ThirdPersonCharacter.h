@@ -50,6 +50,9 @@ class VIRTUALIDOL_API AHSW_ThirdPersonCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* InterviewAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* MuteAction;
+
 public:
 	// Sets default values for this character's properties
 	AHSW_ThirdPersonCharacter();
@@ -76,6 +79,8 @@ public:
 	void OnMyThorwPitch (  );
 
 	void OnMyInterview ( const FInputActionValue& value );
+
+	void OnMyMute( );
 
 
 public:	

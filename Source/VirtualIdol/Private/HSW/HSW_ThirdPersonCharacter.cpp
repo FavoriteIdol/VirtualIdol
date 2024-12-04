@@ -180,7 +180,7 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 	AudioActor = Cast<AHSW_AudioActor>(UGameplayStatics::GetActorOfClass ( GetWorld ( ) , AHSW_AudioActor::StaticClass ( ) ));
 	if (AudioActor)
 	{
-		AudioActor->PlaySound0 (0.3 );
+		AudioActor->PlaySound0 ( 0.1 );
 	}
 
 #pragma region KMK
@@ -432,6 +432,9 @@ void AHSW_ThirdPersonCharacter::SetupPlayerInputComponent(UInputComponent* Playe
 		//Interview
 		EnhancedInputComponent->BindAction ( InterviewAction , ETriggerEvent::Started , this , &AHSW_ThirdPersonCharacter::OnMyInterview );
 
+		//Mute
+		EnhancedInputComponent->BindAction ( MuteAction , ETriggerEvent::Started , this , &AHSW_ThirdPersonCharacter::OnMyMute );
+
 	}
 }
 
@@ -576,42 +579,41 @@ void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value 
 		if(!AudioActor) return;
 		if (CurrentGauge <= 0.2 )
 		{
-			AudioActor->PlaySound0(0.2);
+			AudioActor->PlaySound0(0.02);
 			//UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge <= 0.2 : %f" ) , CurrentGauge );
 		}
 		else if (CurrentGauge <= 0.4)
 		{
-			AudioActor->PlaySound0 ( 0.3 );
-			AudioActor->PlaySound1 ( 0.2 );
+			AudioActor->PlaySound0 ( 0.02 );
+			AudioActor->PlaySound1 ( 0.02 );
 			UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge <= 0.4 : %f" ) , CurrentGauge );
 		}
 		else if (CurrentGauge <= 0.6)
 		{
-			AudioActor->PlaySound0 ( 0.4 );
-			AudioActor->PlaySound1 ( 0.2 );
-			AudioActor->PlaySound2 ( 0.1);
+			AudioActor->PlaySound0 ( 0.02);
+			AudioActor->PlaySound1 ( 0.02);
 			//UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge <= 0.6 : %f" ) , CurrentGauge );
 		}
 		else if (CurrentGauge <= 0.8)
 		{
-			AudioActor->PlaySound0 ( 0.5 );
-			AudioActor->PlaySound1 ( 0.4 );
-			AudioActor->PlaySound2 ( 0.2 );
+			AudioActor->PlaySound0 ( 0.03 );
+			AudioActor->PlaySound1 ( 0.03 );
+			AudioActor->PlaySound2 ( 0.02 );
 			//UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge <= 0.8 : %f" ) , CurrentGauge );
 		}
 		else if (CurrentGauge < 1)
 		{
-			AudioActor->PlaySound0 ( 0.5 );
-			AudioActor->PlaySound1 ( 0.5 );
-			AudioActor->PlaySound2 ( 0.2 );
+			AudioActor->PlaySound0 ( 0.03 );
+			AudioActor->PlaySound1 ( 0.03 );
+			AudioActor->PlaySound2 ( 0.01 );
 		}
 		else
 		{
-			AudioActor->PlaySound0 ( 0.5 );
-			AudioActor->PlaySound1 ( 0.5 );
-			AudioActor->PlaySound2 ( 0.2 );
-			AudioActor->PlaySound3 ( 0.1 );
-			AudioActor->PlaySound4 ( 0.1 );
+			AudioActor->PlaySound0 ( 0.05 );
+			AudioActor->PlaySound1 ( 0.05 );
+			AudioActor->PlaySound2 ( 0.02 );
+			AudioActor->PlaySound3 ( 0.01 );
+			AudioActor->PlaySound4 ( 0.01 );
 			//UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge else!!!! :%f" ) , CurrentGauge );
 		}
 		//MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
@@ -734,6 +736,13 @@ void AHSW_ThirdPersonCharacter::MulticastFeverEffect_Implementation ( )
 void AHSW_ThirdPersonCharacter::OnMyInterview ( const FInputActionValue& value )
 {
 	if(HasAuthority()&&IsLocallyControlled())	ServerRPCInterview( );
+}
+
+void AHSW_ThirdPersonCharacter::OnMyMute ( )
+{
+	AudioActor->PlaySound2 ( 0);
+	AudioActor->PlaySound3 ( 0);
+	AudioActor->PlaySound4 ( 0);
 }
 
 void AHSW_ThirdPersonCharacter::ServerRPCInterview_Implementation (  )
