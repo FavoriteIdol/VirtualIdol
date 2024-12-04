@@ -22,7 +22,9 @@ void UJJH_MapSelectWidget::NativeConstruct ( )
 	
 	Borders = { Border_0, Border_1, Border_2, Border_3, Border_4, Border_5,
 			   Border_6, Border_7, Border_8, Border_9, Border_10, Border_11,
-			   Border_12, Border_13, Border_14, Border_15 };
+			   Border_12, Border_13, Border_14, Border_15, Border_20, Border_21, Border_22, Border_23 };
+
+	CategoryBorders = { Border_16, Border_17, Border_18, Border_19 };
 
 	// 디버깅: Borders 배열 확인
 	for (int32 i = 0; i < Borders.Num ( ); i++)
@@ -57,11 +59,15 @@ void UJJH_MapSelectWidget::NativeConstruct ( )
 	SpaceButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnSpaceButtonClicked );
 	DystopiaButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnDystopiaButtonClicked );
 	FairytaleButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnFairytaleButtonClicked );
+	OceanThemeButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnOceanThemeButtonClicked );
+	SkyThemeButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnSkyThemeButtonClicked );
 
 	//이펙트 바꾸기
 	EffectButton1->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnEffectButton1Clicked );
 	EffectButton2->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnEffectButton2Clicked );
 	EffectButton3->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnEffectButton3Clicked );
+	EffectButton4->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnEffectButton4Clicked );
+	EffectButton5->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnEffectButton5Clicked );
 
 	//지면 바꾸기
 	FogButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnFogButtonClicked );
@@ -226,6 +232,24 @@ void UJJH_MapSelectWidget::OnCyberpunkButtonClicked ( )
 	//안쓰고있긴해
 }
 
+void UJJH_MapSelectWidget::OnOceanThemeButtonClicked ( )
+{
+	if (SM)
+	{
+		SM->ChangeMap ( 5 );
+	}
+	ChangeBorder ( 17 );
+}
+
+void UJJH_MapSelectWidget::OnSkyThemeButtonClicked ( )
+{
+	if (SM)
+	{
+		SM->ChangeMap ( 6 );
+	}
+	ChangeBorder ( 18 );
+}
+
 void UJJH_MapSelectWidget::OnNaturalButtonClicked ( )
 {
 	if (SM)
@@ -317,6 +341,22 @@ void UJJH_MapSelectWidget::OnEffectButton3Clicked ( )
 		SM->ChangeEffect ( 2 );
 	}
 	ChangeBorder ( 9 );
+}
+void UJJH_MapSelectWidget::OnEffectButton4Clicked ( )
+{
+	if (SM)
+	{
+		SM->ChangeEffect ( 3 );
+	}
+	ChangeBorder ( 18 );
+}
+void UJJH_MapSelectWidget::OnEffectButton5Clicked ( )
+{
+	if (SM)
+	{
+		SM->ChangeEffect ( 4 );
+	}
+	ChangeBorder ( 19 );
 }
 
 

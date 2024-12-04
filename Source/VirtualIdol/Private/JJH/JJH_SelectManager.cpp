@@ -66,6 +66,7 @@ void AJJH_SelectManager::Tick(float DeltaTime)
 
 void AJJH_SelectManager::UpdateSunNightPosition (int32 index)
 {
+	if(index >= SkyFactory.Num() && SkyFactory[index] != nullptr) return;
     FindActorAndDestroy ( TEXT ( "Skybox" ) );
 
 	GetWorld()->SpawnActor<AActor>(SkyFactory[index], GetActorTransform ( ) );
@@ -79,53 +80,55 @@ void AJJH_SelectManager::ChangeMap ( int32 index )
 	FindActorAndDestroy ( TEXT ( "Theme" ) );
 	Stage.theme = index;
 
-	// 인덱스에 따라 로드할 레벨 결정
-	if (index >= 1 && index <= Levels.Num ( ))
+	// 현재 로드된 모든 레벨을 언로드 목록에 추가
+	for (const FName& Level : Levels)
 	{
-		LevelToLoad = Levels[index - 1]; // 인덱스가 1부터 시작하므로 조정
-
-		// 로드 중인 레벨을 제외한 모든 레벨을 언로드 목록에 추가
-		for (int32 i = 0; i < Levels.Num ( ); i++)
-		{
-			if (i != index - 1)
-			{
-				LevelsToUnload.Add ( Levels[i] );
-			}
-		}
+		LevelsToUnload.Add ( Level );
 	}
-	else
+
+	if (index >= 1 && index <= Levels.Num()) // 레벨을 로드하는 경우
 	{
-		// 인덱스가 범위를 벗어나면 새로운 테마 액터를 스폰하고 바로 반환
+		LevelToLoad = Levels[index - 1];
+
+		// 로드할 레벨은 언로드 목록에서 제외
+		LevelsToUnload.Remove ( LevelToLoad );
+
+		// 새 레벨 로드
+		UGameplayStatics::LoadStreamLevel (
+			GetWorld ( ) ,
+			LevelToLoad ,
+			true ,
+			true ,
+			FLatentActionInfo ( )
+		);
+	}
+	else // 액터만 스폰하는 경우
+	{
+		// 새로운 테마 액터 스폰
 		GetWorld ( )->SpawnActor<AActor> ( ThemeFactory[index] , GetActorTransform ( ) );
-		return;
 	}
 
-	// 선택된 레벨 로드
-	UGameplayStatics::LoadStreamLevel (
-		GetWorld ( ) ,
-		LevelToLoad ,
-		true ,  // 로드 후 보이게 설정
-		true ,  // 로드 시 블록 여부 설정
-		FLatentActionInfo ( )
-	);
-
-	// 일정 시간 후 이전 레벨을 개별적으로 언로드하는 타이머 설정
-	for (int32 i = 0; i < LevelsToUnload.Num ( ); ++i)
+	// 모든 언로드 대상 레벨에 대해 지연 언로드 수행
+	float UnloadDelay = 0.4f;
+	for (const FName& LevelName : LevelsToUnload)
 	{
-		const FName Level = LevelsToUnload[i];
 		FTimerHandle UnloadTimerHandle;
-
-		GetWorld ( )->GetTimerManager ( ).SetTimer ( UnloadTimerHandle , [this , Level]( )
-		{
-				UGameplayStatics::UnloadStreamLevel (
-					GetWorld ( ) ,
-					Level ,
-					FLatentActionInfo ( ) ,
-					true  // 언로드 시 블록 여부 설정
-				);
-				UE_LOG ( LogTemp , Warning , TEXT ( "Unloading level: %s" ) , *Level.ToString ( ) );
-
-		} , 0.2f * ( i + 1 ) , false );  // 첫 번째 레벨도 0.4초 지연 후 언로드 <- 비동기적이라 이거 해야함
+		GetWorld ( )->GetTimerManager ( ).SetTimer (
+			UnloadTimerHandle ,
+			[this , LevelName]( )
+			{
+					UGameplayStatics::UnloadStreamLevel (
+						GetWorld ( ) ,
+						LevelName ,
+						FLatentActionInfo ( ) ,
+						true
+					);
+					UE_LOG ( LogTemp , Warning , TEXT ( "Unloading level: %s" ) , *LevelName.ToString ( ) );
+			} ,
+			UnloadDelay ,
+			false
+		);
+		UnloadDelay += 0.2f;
 	}
 
 	LevelsToUnload.Reset();
@@ -146,6 +149,7 @@ void AJJH_SelectManager::FindActorAndDestroy(FName tag)
 
 void AJJH_SelectManager::ChangeEffect ( int32 index )
 {
+	if(index >= VFXFactory.Num() && VFXFactory[index] != nullptr) return;
     FindActorAndDestroy ( TEXT ( "VFX" ) );
 	Stage.specialEffect = index;
     GetWorld ( )->SpawnActor<AActor> (VFXFactory[index] , GetActorTransform ( ) );
@@ -154,7 +158,7 @@ void AJJH_SelectManager::ChangeEffect ( int32 index )
 
 void AJJH_SelectManager::ChangeFloor (int32 index)
 {
-	if(index > FloorFactory.Num()) return;
+	if(index >= FloorFactory.Num() && FloorFactory[index] != nullptr) return;
     FindActorAndDestroy ( TEXT ( "Floor" ) );
 	Stage.terrain = index;
     GetWorld ( )->SpawnActor<AActor> (FloorFactory[index] , GetActorTransform ( ) );
