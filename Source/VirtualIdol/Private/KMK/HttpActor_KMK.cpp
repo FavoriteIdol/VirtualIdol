@@ -46,6 +46,7 @@ void AHttpActor_KMK::Tick(float DeltaTime)
 
 }
 #pragma region Login
+// 로그인 관련 서버 연결
 void AHttpActor_KMK::ReqLogin ( const FString& id , const FString& pw )
 {
 	// HTTP 모듈 생성
