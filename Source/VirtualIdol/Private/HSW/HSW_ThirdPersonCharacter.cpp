@@ -288,7 +288,7 @@ void AHSW_ThirdPersonCharacter::SetFeverGaugeMulti ( float feverValue )
 	if (IsLocallyControlled ( ) && audienceWidget)
 	{
 		CurrentGauge = feverValue;
-		audienceWidget->FeverGauge->SetFeverGauge ( CurrentGauge );
+		//audienceWidget->FeverGauge->SetFeverGauge ( CurrentGauge );
 
 	}
 	// 로컬 컨트롤을 하는 캐릭터가 내가 아닌 상황이라 나는 MainUI가 없다. 그러니 나의 MainUI를 갱신해주자
