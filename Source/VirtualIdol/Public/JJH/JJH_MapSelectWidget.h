@@ -25,7 +25,11 @@ public:
 	UTexture2D* SelectBox;
 
 	UPROPERTY(EditAnywhere)
-	TArray<class UBorder*> Borders;
+	TArray<class UBorder*> Borders;	
+	
+	//카테고리 버튼 보더
+	UPROPERTY ( EditAnywhere )
+	TArray<class UButton*> CategoryButtons;
 
 	// 사운드
 	UPROPERTY(EditAnywhere, Category = Sound )
@@ -62,10 +66,20 @@ public:
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UBorder* Border_14;
 	UPROPERTY ( meta = ( BindWidget ) )
-	class UBorder* Border_15;
+	class UBorder* Border_15;	
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UBorder* Border_20;	
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UBorder* Border_21;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UBorder* Border_22;	
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UBorder* Border_23;
 
 	UFUNCTION()
 	void ChangeBorder(int32 BorderNum);
+	UFUNCTION ( )
+	void ChangeCategoryButton ( int32 ButtonNum );
 
 	// httpactor
 	UPROPERTY( )
@@ -204,7 +218,11 @@ public:
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UButton* DystopiaButton;	
 	UPROPERTY ( meta = ( BindWidget ) )
-	class UButton* FairytaleButton;
+	class UButton* FairytaleButton;	
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* OceanThemeButton;	
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* SkyThemeButton;
 
 	UFUNCTION( )
 	void OnNaturalButtonClicked( );
@@ -215,7 +233,11 @@ public:
 	UFUNCTION ( )
 	void OnFairytaleButtonClicked ( );
 	UFUNCTION ( )
-	void OnCyberpunkButtonClicked ( );
+	void OnCyberpunkButtonClicked ( );	
+	UFUNCTION ( )
+	void OnOceanThemeButtonClicked ( );
+	UFUNCTION ( )
+	void OnSkyThemeButtonClicked ( );
 
 	//특수효과 바꾸기
 	UPROPERTY ( meta = ( BindWidget ) )
@@ -226,8 +248,11 @@ public:
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UButton* EffectButton2;	
 	UPROPERTY ( meta = ( BindWidget ) )
-	class UButton* EffectButton3;
-
+	class UButton* EffectButton3;	
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* EffectButton4;	
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* EffectButton5;
 	
 	UFUNCTION( )
 	void OnEffectButton1Clicked ();
@@ -235,9 +260,10 @@ public:
 	void OnEffectButton2Clicked ();
 	UFUNCTION( )
 	void OnEffectButton3Clicked ( );
-
-
-
+	UFUNCTION( )
+	void OnEffectButton4Clicked ( );
+	UFUNCTION( )
+	void OnEffectButton5Clicked ( );
 	//선택버튼 뒤에 배경
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UBorder* ChooseBackground;
@@ -273,4 +299,8 @@ public:
 	class UTextBlock* StageNameText_1;
 
 	virtual void NativeConstruct() override;
+	
+	UPROPERTY()
+    UButton* CurrentHoveredButton;
+
 };

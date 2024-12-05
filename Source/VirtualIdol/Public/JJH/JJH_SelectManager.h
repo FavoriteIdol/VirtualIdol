@@ -82,9 +82,9 @@ public:
 
 	//레벨 배열
 	TArray<FName> Levels = {
-		FName ( "LV_Island_JSW" ),
-		FName ( "BP_ThirdLevel" ),
-		FName ( "BP_Land-Dystopia_JSW" ),
+		FName ( "LV_Theme-Island_JSW" ),
+		FName ( "BP_Theme-City" ),
+		FName ( "BP_Theme-Dystopia_JSW" ),
 		FName ( "LV_Forest_JSW" )
 	};
 
