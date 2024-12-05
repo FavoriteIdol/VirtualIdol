@@ -125,6 +125,7 @@ void AHSW_GameState_Auditorium::MultiRPC_ShowCountDown_Implementation ( )
 
 void AHSW_GameState_Auditorium::MultiRPC_FeverGauge_Implementation ( float feverValue )
 {
+    CurrentGauge = feverValue;
     for (APlayerState* PlayerState : PlayerArray)
     {
         APawn* Pawn = PlayerState->GetPawn ( );
@@ -132,8 +133,8 @@ void AHSW_GameState_Auditorium::MultiRPC_FeverGauge_Implementation ( float fever
         {
             if (Character && Character->IsLocallyControlled ( ))
             {
-                Character->CurrentGauge = feverValue;
-                Character->audienceWidget->FeverGauge->SetFeverGauge ( Character->CurrentGauge );
+                Character->CurrentGauge = CurrentGauge;
+                //Character->audienceWidget->FeverGauge->SetFeverGauge ( Character->CurrentGauge );
             }
         }
         else if (Pawn && Pawn->FindComponentByClass<UVirtual_KMK> ( ))
@@ -141,8 +142,8 @@ void AHSW_GameState_Auditorium::MultiRPC_FeverGauge_Implementation ( float fever
             UVirtual_KMK* Vir = Pawn->FindComponentByClass<UVirtual_KMK> ( );
             if (Vir && Pawn->IsLocallyControlled ( ))
             {
-                Vir->currentGauge = feverValue;
-                Vir->virtualWidget->FeverGauge->SetFeverGauge ( Vir->currentGauge );
+                Vir->currentGauge = CurrentGauge;
+                //Vir->virtualWidget->FeverGauge->SetFeverGauge ( Vir->currentGauge );
             }
         }
     }
