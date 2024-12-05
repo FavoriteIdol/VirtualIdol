@@ -24,9 +24,8 @@ void UJJH_MapSelectWidget::NativeConstruct ( )
 			   Border_6, Border_7, Border_8, Border_9, Border_10, Border_11,
 			   Border_12, Border_13, Border_14, Border_15, Border_20, Border_21, Border_22, Border_23 };
 
-	CategoryBorders = { Border_16, Border_17, Border_18, Border_19 };
-
-	// 디버깅: Borders 배열 확인
+	CategoryButtons = { WeatherButton, ThemeButton, EffectButton, FloorButton };
+		// 디버깅: 배열 확인
 	for (int32 i = 0; i < Borders.Num ( ); i++)
 	{
 		if (Borders[i])
@@ -92,7 +91,10 @@ void UJJH_MapSelectWidget::NativeConstruct ( )
 	
 	//4팝업
 	ReturnToMenuButton_1->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnReturnToMenuButtonClicked );
+
+	
 }
+
 
 void UJJH_MapSelectWidget::ChangeBorder ( int32 BorderNum )
 {
@@ -134,6 +136,43 @@ void UJJH_MapSelectWidget::ChangeBorder ( int32 BorderNum )
 	// 디버깅: 변경된 상태 출력
 	UE_LOG ( LogTemp , Warning , TEXT ( "Changed texture for Border_%d to SelectedBox" ) , BorderNum );
 }
+//카테고리 보더 바꾸끼
+void UJJH_MapSelectWidget::ChangeCategoryButton ( int32 ButtonNum )
+{
+	// 유효한 인덱스인지 확인
+	if (ButtonNum < 0 || ButtonNum >= CategoryButtons.Num ( ))
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "Invalid BorderNum: %d" ) , ButtonNum );
+		return;
+	}
+
+	// 모든 Borders 순회
+	for (int32 i = 0; i < CategoryButtons.Num ( ); i++)
+	{
+		if (CategoryButtons[i])
+		{
+			FSlateBrush Brush;
+
+			// 선택된 인덱스는 SelectedBox 텍스처 적용
+			if (i == ButtonNum)
+			{
+				if (SelectedBox)
+				{
+					CategoryButtons[i]->SetRenderScale(FVector2D(1.3f, 1.3f));
+				}
+			}
+			// 나머지 인덱스는 SelectBox 텍스처 적용
+			else
+			{
+				if (SelectBox)
+				{
+					CategoryButtons[i]->SetRenderScale( FVector2D ( 1.f , 1.f ) );
+				}
+			}
+		}
+	}
+
+}
 
 void UJJH_MapSelectWidget::OnWeatherButtonClicked ( )
 {
@@ -141,7 +180,9 @@ void UJJH_MapSelectWidget::OnWeatherButtonClicked ( )
 	ThemeHorizontal->SetVisibility ( ESlateVisibility::Hidden );
 	VFXHorizontal->SetVisibility ( ESlateVisibility::Hidden );
 	FloorHorizontal->SetVisibility ( ESlateVisibility::Hidden );
-// 	ChooseBackground->SetBrushColor(FLinearColor::Green);
+
+	ChangeCategoryButton(0);
+	ChooseBackground->SetContentColorAndOpacity( FLinearColor::Red );
 // 
 // 	WeatherButton->SetBackgroundColor( FLinearColor::Green);
 // 	ThemeButton->SetBackgroundColor ( FLinearColor::Gray );
@@ -155,6 +196,8 @@ void UJJH_MapSelectWidget::OnThemeButtonClicked ( )
 	ThemeHorizontal->SetVisibility(ESlateVisibility::Visible );
 	VFXHorizontal->SetVisibility(ESlateVisibility::Hidden);
 	FloorHorizontal->SetVisibility ( ESlateVisibility::Hidden );
+
+	ChangeCategoryButton ( 1 );
 // 	ChooseBackground->SetBrushColor(FLinearColor::Blue);
 
 // 	ThemeButton->SetBackgroundColor ( FLinearColor::Blue );
@@ -169,6 +212,8 @@ void UJJH_MapSelectWidget::OnEffectButtonClicked ( )
 	ThemeHorizontal->SetVisibility ( ESlateVisibility::Hidden );
 	VFXHorizontal->SetVisibility ( ESlateVisibility::Visible );
 	FloorHorizontal->SetVisibility ( ESlateVisibility::Hidden );
+
+	ChangeCategoryButton ( 2 );
 /*	ChooseBackground->SetBrushColor ( FLinearColor::Red);*/
 
 // 	EffectButton->SetBackgroundColor ( FLinearColor::Red );
@@ -183,6 +228,8 @@ void UJJH_MapSelectWidget::OnFloorButtonClicked ( )
 	ThemeHorizontal->SetVisibility ( ESlateVisibility::Hidden );
 	VFXHorizontal->SetVisibility ( ESlateVisibility::Hidden );
 	FloorHorizontal->SetVisibility ( ESlateVisibility::Visible );
+
+	ChangeCategoryButton ( 3 );
 // 	ChooseBackground->SetBrushColor ( FLinearColor::Yellow );
 // 
 // 	FloorButton->SetBackgroundColor ( FLinearColor::Yellow );

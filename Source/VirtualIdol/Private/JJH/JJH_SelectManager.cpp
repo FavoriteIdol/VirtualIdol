@@ -302,107 +302,35 @@ void AJJH_SelectManager::CreateStage ( const struct FStageInfo& info )
 {
 	GetWorld()->SpawnActor<AActor>(SkyFactory[info.sky], GetActorTransform ( ) );
 	
-	//if (info.theme == 1)
-	//{
-	//	UGameplayStatics::LoadStreamLevel (
-	//	GetWorld ( ) ,
-	//	FName ( "LV_Island_JSW" ) ,
-	//	true ,  // Whether to make the level visible
-	//	true ,  // Should block on load
-	//	FLatentActionInfo ( )
-	//		);
-	//}
-	//else
-	//{
-	//	UGameplayStatics::UnloadStreamLevel(
-	//	GetWorld ( ) ,
-	//	FName ( "LV_Island_JSW" ) ,
-	//	FLatentActionInfo ( ),	
-	//	true   // Should block on load
-	//	);
-	//	GetWorld ( )->SpawnActor<AActor> ( ThemeFactory[info.theme] , GetActorTransform ( ) );
-	//}
-		// 케이스 나누어서 하기
-
-	//FName LevelToLoad;
-	//FName LevelToUnload;
-
-	//if (info.theme == 1)
-	//{
-	//	LevelToLoad = FName ( "LV_Island_JSW" );
-	//	LevelToUnload = FName ( "BP_ThirdLevel" );
-	//}
-	//else if (info.theme == 2)
-	//{
-	//	LevelToLoad = FName ( "BP_ThirdLevel" );
-	//	LevelToUnload = FName ( "LV_Island_JSW" );
-	//}
-	//else
-	//{
-	//	 처리 없이 바로 반환
-	//	GetWorld ( )->SpawnActor<AActor> ( ThemeFactory[info.theme] , GetActorTransform ( ) );
-	//	LevelToUnload = FName ( "LV_Island_JSW" );
-	//	LevelToUnload = FName ( "BP_ThirdLevel" );
-	//}
-
-	//UGameplayStatics::LoadStreamLevel (
-	//	GetWorld ( ) ,
-	//	LevelToLoad ,
-	//	true ,  // 레벨을 보이게 할지 여부
-	//	true ,  // 로드 시 블록할지 여부
-	//	FLatentActionInfo ( )
-	//);
-
-	//// 일정 시간 후 이전 레벨을 언로드하는 타이머 설정
-	//FTimerHandle UnloadTimerHandle;
-	//GetWorld ( )->GetTimerManager ( ).SetTimer ( UnloadTimerHandle , [this , LevelToUnload]( )
-	//{
-	//	UGameplayStatics::UnloadStreamLevel (
-	//		GetWorld ( ) ,
-	//		LevelToUnload ,
-	//		FLatentActionInfo ( ) ,
-	//		true   // 언로드 시 블록할지 여부
-	//	);
-	//} , 0.2f , false ); // 0.2초의 지연 시간
-		// 각 인덱스에 대한 레벨 이름 정의
 	auto* gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance() );
-	if (info.theme == 3)
-	{
-		gi->spawnTrans = FTransform(FVector(0,0, 2000 ) );
-	}
-	else if(info.theme != 3)
-	{
-		gi->spawnTrans = FTransform(FVector(0 ) );
-	}
-	// 인덱스에 따라 로드할 레벨 결정
-	if (info.theme >= 1 && info.theme <= Levels.Num ( ))
-	{
-		LevelToLoad = Levels[info.theme - 1]; // 인덱스가 1부터 시작하므로 조정
 
-		// 로드 중인 레벨을 제외한 모든 레벨을 언로드 목록에 추가
-		for (int32 i = 0; i < Levels.Num ( ); i++)
-		{
-			if (i != info.theme - 1)
-			{
-				LevelsToUnload.Add ( Levels[i] );
-			}
-		}
-	}
-	else
+	// 현재 로드된 모든 레벨을 언로드 목록에 추가
+	for (const FName& Level : Levels)
 	{
-		// 인덱스가 범위를 벗어나면 새로운 테마 액터를 스폰하고 바로 반환
+		LevelsToUnload.Add ( Level );
+	}
+
+	if (info.theme >= 1 && info.theme <= Levels.Num ( )) // 레벨을 로드하는 경우
+	{
+		LevelToLoad = Levels[info.theme - 1];
+
+		// 로드할 레벨은 언로드 목록에서 제외
+		LevelsToUnload.Remove ( LevelToLoad );
+
+		// 새 레벨 로드
+		UGameplayStatics::LoadStreamLevel (
+			GetWorld ( ) ,
+			LevelToLoad ,
+			true ,
+			true ,
+			FLatentActionInfo ( )
+		);
+	}
+	else // 액터만 스폰하는 경우
+	{
+		// 새로운 테마 액터 스폰
 		GetWorld ( )->SpawnActor<AActor> ( ThemeFactory[info.theme] , GetActorTransform ( ) );
-		return;
 	}
-
-	// 선택된 레벨 로드
-	UGameplayStatics::LoadStreamLevel (
-		GetWorld ( ) ,
-		LevelToLoad ,
-		true ,  // 로드 후 보이게 설정
-		true ,  // 로드 시 블록 여부 설정
-		FLatentActionInfo ( )
-	);
 	UE_LOG ( LogTemp , Warning , TEXT ( "loading level: %s" ) , *LevelToLoad.ToString ( ) );
 
 	GetWorld ( )->SpawnActor<AActor> (FloorFactory[info.terrain] , GetActorTransform ( ) );

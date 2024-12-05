@@ -27,9 +27,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	TArray<class UBorder*> Borders;	
 	
-	//카테고리보더
+	//카테고리 버튼 보더
 	UPROPERTY ( EditAnywhere )
-	TArray<class UBorder*> CategoryBorders;
+	TArray<class UButton*> CategoryButtons;
 
 	// 사운드
 	UPROPERTY(EditAnywhere, Category = Sound )
@@ -75,19 +75,11 @@ public:
 	class UBorder* Border_22;	
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UBorder* Border_23;
-	
-	//카테고리
-	UPROPERTY ( meta = ( BindWidget ) )
-	class UBorder* Border_16;	
-	UPROPERTY ( meta = ( BindWidget ) )
-	class UBorder* Border_17;
-	UPROPERTY ( meta = ( BindWidget ) )
-	class UBorder* Border_18;	
-	UPROPERTY ( meta = ( BindWidget ) )
-	class UBorder* Border_19;
 
 	UFUNCTION()
 	void ChangeBorder(int32 BorderNum);
+	UFUNCTION ( )
+	void ChangeCategoryButton ( int32 ButtonNum );
 
 	// httpactor
 	UPROPERTY( )
@@ -307,4 +299,8 @@ public:
 	class UTextBlock* StageNameText_1;
 
 	virtual void NativeConstruct() override;
+	
+	UPROPERTY()
+    UButton* CurrentHoveredButton;
+
 };
