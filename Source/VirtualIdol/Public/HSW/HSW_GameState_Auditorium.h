@@ -23,6 +23,7 @@ public:
 	UPROPERTY ( EditDefaultsOnly , BlueprintReadWrite , Category = "GameState" )
 	bool bFever;
 
+	float CurrentGauge;
 // 	UFUNCTION(Server, Reliable)
 // 	void ServerSetPlayerName(const FString& newName);
 	UFUNCTION(NetMulticast, Reliable )
