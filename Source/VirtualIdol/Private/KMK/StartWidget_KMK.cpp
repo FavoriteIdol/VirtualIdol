@@ -114,6 +114,8 @@ void UStartWidget_KMK::NativeConstruct ( )
 	{
 		Butt_CreateTicket->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressCreateTicket );
 		Butt_CreateTicket1->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressCreateTicket );
+		Butt_CreateTicket->SetIsEnabled(false);
+		Butt_CreateTicket1->SetIsEnabled(false);
 	}
 #pragma endregion
 #pragma region Set Particle
@@ -256,7 +258,6 @@ void UStartWidget_KMK::OnMyLogin ( )
 		httpActor->ReqLogin(EditText_ID->GetText().ToString(), EditText_PW->GetText().ToString());
 		// 무대 조회하기
 		httpActor->ReqCheckAllOpenConcert();
-		StartSwitcher->SetActiveWidgetIndex ( 1 );
 	}
 }
 
@@ -270,7 +271,10 @@ void UStartWidget_KMK::OnFailLogin ( )
 #pragma region FourButtPanel
 void UStartWidget_KMK::ChangeMyProfile ( )
 {
-
+	if (gi->GetMyInfo ( ).texture != nullptr)
+	{
+		Image_Profile->SetBrushFromTexture( gi->GetMyInfo ( ).texture );
+	}
 	Text_MyCash->SetText(FText::AsNumber(gi->myCash));
 	Text_MyNick->SetText(FText::FromString(gi->GetMyInfo().userName));
 }
@@ -290,9 +294,9 @@ void UStartWidget_KMK::CreateStagePanel ( )
 // 공연 일정 잡는 판넬로 변경
 void UStartWidget_KMK::SettingStagePanel ( )
 {
-	StartSwitcher->SetActiveWidgetIndex ( 2 );
-	//StartSwitcher->SetActiveWidgetIndex ( 3 );
-	//httpActor->ReqCheckStage(this);
+	//StartSwitcher->SetActiveWidgetIndex ( 2 );
+	StartSwitcher->SetActiveWidgetIndex ( 3 );
+	httpActor->ReqCheckStage(this);
 	Butt_UserStage->SetVisibility(ESlateVisibility::Visible);
 	Butt_MyStage->SetVisibility(ESlateVisibility::Visible);
 	Butt_Star->SetVisibility(ESlateVisibility::Visible);
@@ -310,7 +314,7 @@ void UStartWidget_KMK::StartConcertPanel ( )
 
 void UStartWidget_KMK::ComeInStagePanel ( )
 {	
-	// 세션 찾기
+	
 	Butt_UserStage->SetVisibility(ESlateVisibility::Hidden);
 	Butt_MyStage->SetVisibility(ESlateVisibility::Hidden);
 	Butt_Star->SetVisibility(ESlateVisibility::Hidden);
@@ -415,6 +419,11 @@ void UStartWidget_KMK::PressSelectButt ( )
 
 }
 
+
+void UStartWidget_KMK::SetImageProfile ( class UTexture2D* texture )
+{
+	Image_Profile->SetBrushFromTexture(texture);
+}
 
 void UStartWidget_KMK::ChangeLoadMat ( float num )
 {
@@ -536,20 +545,22 @@ void UStartWidget_KMK::PressCreateTicket ( )
 	if(!EditMultiText_Ticket->GetText().IsEmpty()) UE_LOG(LogTemp, Warning, TEXT("Create!" ) );
 	TMap<FString, FString> data;
 	data.Add(TEXT("prompt" ), EditMultiText_Ticket->GetText().ToString());
+	Text_Price->SetText ( FText::GetEmpty ( ) );
+	Image_Coin->SetVisibility(ESlateVisibility::Hidden);
 	// 이 부분 정보는 BE에서 끌어와야함
-    FString year = TEXT ( "20" ) + EditText_Year->GetText ( ).ToString ( );
-    FString mon = ChangeString ( EditText_Day->GetText ( ).ToString ( ) );
-    FString day = ChangeString ( EditText_Day->GetText ( ).ToString ( ) );
-	
-    FString sH = EditText_SHour->GetText ( ).ToString ( );
-    FString sM = EditText_SMin->GetText ( ).ToString ( );
+ //   FString year = TEXT ( "20" ) + EditText_Year->GetText ( ).ToString ( );
+ //   FString mon = ChangeString ( EditText_Day->GetText ( ).ToString ( ) );
+ //   FString day = ChangeString ( EditText_Day->GetText ( ).ToString ( ) );
+	//
+ //   FString sH = EditText_SHour->GetText ( ).ToString ( );
+ //   FString sM = EditText_SMin->GetText ( ).ToString ( );
 
-	FString concertString = TEXT("공연 명 : ") + EditText_StageName->GetText ( ).ToString ( ) + TEXT ( "\n" ) 
-						TEXT("공연 날짜 : " ) + year + TEXT ( "년" )+ mon + TEXT("월") + day + TEXT("일") + TEXT("\n") + TEXT("공연 시간 : " ) + sH +TEXT("시") + sM +TEXT("분");
-	data.Add(TEXT("description"), *concertString);
+	//FString concertString = TEXT("공연 명 : ") + EditText_StageName->GetText ( ).ToString ( ) + TEXT ( "\n" ) 
+	//					TEXT("공연 날짜 : " ) + year + TEXT ( "년" )+ mon + TEXT("월") + day + TEXT("일") + TEXT("\n") + TEXT("공연 시간 : " ) + sH +TEXT("시") + sM +TEXT("분");
+	//data.Add(TEXT("description"), *concertString);
+	Image_Load->SetVisibility(ESlateVisibility::Visible);
 	// 티켓 만들기
-	//httpActor->ReqTicket(data);
-	//EditMultiText_Ticket->SetText ( FText::GetEmpty ( ) );
+	httpActor->ReqTicket(data);
 }
 // 티켓이 생성되면 관련 image를 ticekt으로 변경함
 void UStartWidget_KMK::CreateTicketMaterial ( UTexture2D* texture)
@@ -576,6 +587,7 @@ void UStartWidget_KMK::PressUpload ( )
             FString FileName = FPaths::GetCleanFilename(FilePath); 
 			// httpActor에 있는 ai용 multiform 링크 접속
 			httpActor->ReqMultipartCapturedWithAI(FilePath, TEXT("https://singular-swine-deeply.ngrok-free.app/upload" ) );
+			
         }
     }
     else
@@ -583,6 +595,12 @@ void UStartWidget_KMK::PressUpload ( )
         UE_LOG(LogTemp, Warning, TEXT("File Selected Failed!!!"))
     }
 }
+void UStartWidget_KMK::SetTicketButton ( )
+{
+	Butt_CreateTicket->SetIsEnabled ( true );
+	Butt_CreateTicket1->SetIsEnabled ( true );
+}
+
 // 로컬 컴퓨터 파일을 열기 위한 함수임
 bool UStartWidget_KMK::OpenFileExample(TArray<FString>& FileNames, FString DialogueTitle, FString FileTypes, bool multiselect)
 {
@@ -685,6 +703,7 @@ void UStartWidget_KMK::PressNextButt ( )
 	StagePayPanel->SetVisibility ( ESlateVisibility::Visible );
 	Text_Pay->SetVisibility ( ESlateVisibility::Visible );
 	Butt_PayMoney->SetVisibility ( ESlateVisibility::Visible );
+	Image_Coin->SetVisibility ( ESlateVisibility::Visible );
 	StageScalePanel->SetVisibility ( ESlateVisibility::Hidden );
 	Text_FinalCount->SetText ( EditText_ScaleNum->GetText() );
 	Text_FinalPay->SetText ( Text_Price->GetText() );
@@ -696,26 +715,28 @@ void UStartWidget_KMK::PressNextButt ( )
 	Text_Price->SetText(FText::GetEmpty ( ) );
 	EditText_ScaleNum->SetText ( FText::GetEmpty ( ) );
 }
+
+
 // 최종 결제를 누르게 되면
 void UStartWidget_KMK::PressMoneyPay ( )
 {
 	// 티켓이 만들어지지 않은 경우
-    //if (!bCreateTicket)
-    //{
-	//	// 팝업을 띄움
-    //    Text_Effect1->SetVisibility ( ESlateVisibility::Hidden );
-    //    MultiText_PopUp->SetVisibility ( ESlateVisibility::Visible );
-    //    EffectPopUp1->SetVisibility ( ESlateVisibility::Visible );
-    //    return;
-    //}
-    //else
-    //{
-	//	// 티넷 생성시, 최종 결제 창을 띄움
-    //    Text_Effect1->SetVisibility ( ESlateVisibility::Visible );
-    //    MultiText_PopUp->SetVisibility ( ESlateVisibility::Hidden );
-    //    EffectPopUp1->SetVisibility ( ESlateVisibility::Hidden );
-    //    Image_Load->SetVisibility ( ESlateVisibility::Hidden );
-    //}
+    if (!bCreateTicket)
+    {
+		// 팝업을 띄움
+        Text_Effect1->SetVisibility ( ESlateVisibility::Hidden );
+        MultiText_PopUp->SetVisibility ( ESlateVisibility::Visible );
+        EffectPopUp1->SetVisibility ( ESlateVisibility::Visible );
+        return;
+    }
+    else
+    {
+		// 티넷 생성시, 최종 결제 창을 띄움
+        Text_Effect1->SetVisibility ( ESlateVisibility::Visible );
+        MultiText_PopUp->SetVisibility ( ESlateVisibility::Hidden );
+        EffectPopUp1->SetVisibility ( ESlateVisibility::Hidden );
+        Image_Load->SetVisibility ( ESlateVisibility::Hidden );
+    }
 	// 
 	// 콘서트 예약시 사용된 stage 값을 넣음
 	concertInfo.stageId = gi->stageNum;
@@ -747,6 +768,7 @@ void UStartWidget_KMK::ResetWidget ( )
 	StagePayPanel->SetVisibility ( ESlateVisibility::Hidden );
 	Text_Pay->SetVisibility ( ESlateVisibility::Hidden );
 	Butt_PayMoney->SetVisibility ( ESlateVisibility::Hidden );
+	Image_Coin->SetVisibility ( ESlateVisibility::Hidden );
 	PayPopUpPanel->SetVisibility ( ESlateVisibility::Hidden );
 	Butt_Next->SetVisibility ( ESlateVisibility::Visible );
 	Butt_CreateTicket1->SetVisibility(ESlateVisibility::Hidden);

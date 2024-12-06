@@ -42,6 +42,8 @@ void UAudience_KMK::NativeConstruct ( )
     Super::NativeConstruct( );
     SetUpButtonInfo();
     gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance());
+    // 월드에 배치된 httpActor 찾기
+    httpActor = Cast<AHttpActor_KMK> ( UGameplayStatics::GetActorOfClass ( GetWorld ( ) , httpFact ) );
     if (Text_MyCash)
     {
         Text_MyCash->SetText(FText::AsNumber(gi->myCash));
@@ -107,12 +109,6 @@ void UAudience_KMK::NativeConstruct ( )
         CountDownPanel->SetVisibility ( ESlateVisibility::Hidden );
     }
 #pragma endregion
-#pragma region BeforeConcerForVirtual
-    if (Butt_MP3 && Butt_Model)
-    {
-        Butt_Model->OnClicked.AddDynamic ( this , &UAudience_KMK::PressButtModel);
-    }
-#pragma endregion
 #pragma region Imoji
     if (ImojiBox)
     {
@@ -147,6 +143,7 @@ void UAudience_KMK::NativePreConstruct ( )
 
 void UAudience_KMK::SetUpButtonInfo ( )
 {
+    // 
     for (int i = 1; i < buttonName.Num ( ); i++)
     {
         FName bName = FName(*FString::Printf(TEXT("Butt_") ) + buttonName[i]);
@@ -176,11 +173,17 @@ void UAudience_KMK::PressHiddenButt ( )
     if (!bHide)
     {
         ButtPanel->SetVisibility(ESlateVisibility::Hidden);
+        FWidgetTransform Transform = Butt_Hidden->RenderTransform; // 현재 Transform 가져오기
+        Transform.Angle = 180.0f; // 각도를 0으로 설정
+        Butt_Hidden->SetRenderTransform ( Transform ); // 수정된 Transform 적용
         bHide = true;
     }
     else 
     {
         ButtPanel->SetVisibility(ESlateVisibility::Visible);
+        FWidgetTransform Transform = Butt_Hidden->RenderTransform; // 현재 Transform 가져오기
+        Transform.Angle = 0.0f; // 각도를 0으로 설정
+        Butt_Hidden->SetRenderTransform ( Transform ); // 수정된 Transform 적용
         bHide = false;
     }
 }
@@ -299,6 +302,7 @@ void UAudience_KMK::PressEmotionButt ( )
         bEmotion = true;
         ChangeTextAndImage ( FLinearColor::Yellow , 3 , changeText );
         ImojiBox->SetVisibility(ESlateVisibility::Visible);
+        HB_CamPanel->SetVisibility(ESlateVisibility::Hidden );
     }
     else
     {
@@ -373,7 +377,7 @@ void UAudience_KMK::PressSendButt ( )
         {
             if (!EditText_Chat->GetText ( ).IsEmpty ( ))
             {
-                server->ServerRPCChat(gi->GetMyInfo().userName, EditText_Chat->GetText ( ).ToString ( ) );
+                httpActor->ReqTranslateChat( EditText_Chat->GetText ( ).ToString ( ), server);
 
                 EditText_Chat->SetText ( FText::GetEmpty ( ) );
             }
@@ -386,7 +390,8 @@ void UAudience_KMK::PressSendButt ( )
         {
             if (!EditText_Chat->GetText ( ).IsEmpty ( ))
             {
-                gs->ServerRPCChat (gi->GetMyInfo().userName, EditText_Chat->GetText ( ).ToString ( ) );
+                httpActor->ReqTranslateChat ( EditText_Chat->GetText ( ).ToString ( ) , gs );
+                
                 EditText_Chat->SetText ( FText::GetEmpty ( ) );
             }
         }
@@ -425,12 +430,27 @@ void UAudience_KMK::PressCancelButt ( )
 }
 
 #pragma region Cash
+
+void UAudience_KMK::ObjectButtEnable ( )
+{
+    Butt_Object0->SetIsEnabled ( false );
+    Butt_Object1->SetIsEnabled ( false );
+    Butt_Object2->SetIsEnabled ( false );
+}
+
 void UAudience_KMK::PressObjectButt ( )
 {
     gi->myCash -= 500;
     Text_MyCash->SetText(FText::AsNumber(gi->myCash));
+    if (gi->myCash <= 0)
+    {
+        gi->myCash = 0;
+        ObjectButtEnable ( );
+        return;
+    }
     // 오브젝트 생성
     Player->ThrowingObjectIndex = 0;
+
     Player->OnMyThorwHold();
     Player->OnMyThorwPitch ( );
     UE_LOG(LogTemp,Warning,TEXT("ObjectButton_0" ) );
@@ -438,7 +458,15 @@ void UAudience_KMK::PressObjectButt ( )
 void UAudience_KMK::PressObject1Butt ( )
 {
     gi->myCash -= 1000;
-    Text_MyCash->SetText(FText::AsNumber(gi->myCash));
+    Text_MyCash->SetText ( FText::AsNumber ( gi->myCash ) );
+    if (gi->myCash <= 0)
+    {
+        gi->myCash = 0;
+        ObjectButtEnable ( );
+        return;
+    }
+
+
     Player->ThrowingObjectIndex = 1;
     Player->OnMyThorwHold ( );
     Player->OnMyThorwPitch ( );
@@ -447,7 +475,14 @@ void UAudience_KMK::PressObject1Butt ( )
 void UAudience_KMK::PressObject2Butt ( )
 {
     gi->myCash -= 5000;
-    Text_MyCash->SetText(FText::AsNumber(gi->myCash));
+    Text_MyCash->SetText ( FText::AsNumber ( gi->myCash ) );
+    if (gi->myCash <= 0)
+    {
+        gi->myCash = 0;
+        ObjectButtEnable ( );
+        return;
+    }
+
     Player->ThrowingObjectIndex = 2;
     Player->OnMyThorwHold ( );
     Player->OnMyThorwPitch ( );
@@ -488,6 +523,11 @@ void UAudience_KMK::SetSImojiVisible ( ESlateVisibility visible, int32 index )
 }
 
 
+void UAudience_KMK::SetImojiBox ( )
+{
+    ImojiBox->SetVisibility ( ESlateVisibility::Hidden );
+}
+
 void UAudience_KMK::OnMyImoji01 ( )
 {
 	Player->Imoji (0);
@@ -522,134 +562,11 @@ void UAudience_KMK::ChangeTextClock ( const FString& text )
 }
 
 
-void UAudience_KMK::PressButtModel ( )
-{
-
-}
-// 파일 열기
-bool UAudience_KMK::OpenFileExample(TArray<FString>& FileNames, FString DialogueTitle, FString FileTypes, bool multiselect)
-{
-
-   IDesktopPlatform* DesktopPlatform = FDesktopPlatformModule::Get();
-   bool bOpened = false;
-   FString DefaultPath = FPaths::ProjectContentDir(); // 기본 경로를 프로젝트 콘텐츠 폴더로 설정
-
-   if (DesktopPlatform)
-   {
-      uint32 SelectionFlag = multiselect ? EFileDialogFlags::Multiple : EFileDialogFlags::None;
-      bOpened = DesktopPlatform->OpenFileDialog(
-         NULL,
-         DialogueTitle,
-         DefaultPath,
-         TEXT(""),
-         FileTypes,
-         SelectionFlag,
-         FileNames
-      );
-   }
-   return bOpened;
-}
-
 void UAudience_KMK::SetConcertName ( const FString& text )
 {
     if(TEXT_ConcertName) TEXT_ConcertName->SetText(FText::FromString(text));
 }
 
-// 오디오 파일을 불러와 USoundWave로 변환
-USoundWaveProcedural* UAudience_KMK::LoadWavFromFile(const FString& FilePath)
-{
-    TArray<uint8> RawFileData;
-
-    // 파일 데이터를 메모리로 로드
-    if (!FFileHelper::LoadFileToArray ( RawFileData , *FilePath ))
-    {
-        UE_LOG ( LogTemp , Error , TEXT ( "Failed to load file: %s" ) , *FilePath );
-        return nullptr;
-    }
-
-    // WAV 파일 헤더 정보 추출
-    FWaveModInfo WaveInfo;
-    if (!WaveInfo.ReadWaveInfo ( RawFileData.GetData ( ) , RawFileData.Num ( ) ))
-    {
-        UE_LOG ( LogTemp , Error , TEXT ( "Invalid WAV format: %s" ) , *FilePath );
-        return nullptr;
-    }
-
-    int32 BitsPerSample = *WaveInfo.pBitsPerSample;
-    int32 SampleRate = *WaveInfo.pSamplesPerSec;
-
-    USoundWaveProcedural* SoundWave = NewObject<USoundWaveProcedural> ( );
-    if (!SoundWave)
-    {
-        UE_LOG ( LogTemp , Error , TEXT ( "Failed to create SoundWave object." ) );
-        return nullptr;
-    }
-
-    SoundWave->NumChannels = *WaveInfo.pChannels;
-    SoundWave->SetSampleRate ( SampleRate );
-
-    uint32 BytesPerSample = ( *WaveInfo.pChannels ) * ( BitsPerSample / 8 );
-    uint32 TotalSamples = WaveInfo.SampleDataSize / BytesPerSample;
-    SoundWave->Duration = static_cast<float>( TotalSamples ) / static_cast<float>( SampleRate );
-
-    // 비트 깊이에 따른 필터 적용
-
-    // 비트 깊이에 따른 필터 적용 및 증폭
-    if (BitsPerSample == 16)
-    {
-        const int16* PCMDataStart = reinterpret_cast<const int16*>( WaveInfo.SampleDataStart );
-        TArray<int16> PCMData;
-        PCMData.Append ( PCMDataStart , WaveInfo.SampleDataSize / sizeof ( int16 ) );
-
-        SoundWave->QueueAudio ( reinterpret_cast<const uint8*>( PCMData.GetData ( ) ) , PCMData.Num ( ) * sizeof ( int16 ) );
-    }
-    else if (BitsPerSample == 24)
-    {
-        const uint8* PCMDataStart = reinterpret_cast<const uint8*>( WaveInfo.SampleDataStart );
-        if (!PCMDataStart)
-        {
-            UE_LOG ( LogTemp , Error , TEXT ( "Failed to cast SampleDataStart to uint8 for file: %s" ) , *FilePath );
-            return nullptr;
-        }
-
-        TArray<int32> PCMData;
-        PCMData.Reserve ( WaveInfo.SampleDataSize / 3 );
-
-        // 24비트 PCM 데이터를 32비트로 변환
-        for (uint32 i = 0; i < WaveInfo.SampleDataSize; i += 3)
-        {
-            int32 Sample = ( PCMDataStart[i] << 16 ) | ( PCMDataStart[i + 1] << 8 ) | PCMDataStart[i + 2];
-            PCMData.Add ( Sample );
-        }
-
-        // 다시 24비트로 저장 (필터링된 데이터를 3바이트로 다시 압축)
-        TArray<uint8> FilteredPCMData;
-        FilteredPCMData.Reserve ( PCMData.Num ( ) * 3 );
-        for (int32 Sample : PCMData)
-        {
-            FilteredPCMData.Add ( ( Sample >> 16 ) & 0xFF );
-            FilteredPCMData.Add ( ( Sample >> 8 ) & 0xFF );
-            FilteredPCMData.Add ( Sample & 0xFF );
-        }
-
-        // SoundWave에 24비트 데이터를 다시 3바이트 단위로 큐잉
-        SoundWave->QueueAudio ( FilteredPCMData.GetData ( ) , FilteredPCMData.Num ( ) );
-    }
-    else if (BitsPerSample == 32)
-    {
-        const float* PCMDataStart = reinterpret_cast<const float*>( WaveInfo.SampleDataStart );
-        TArray<float> PCMData;
-        PCMData.Append ( PCMDataStart , WaveInfo.SampleDataSize / sizeof ( float ) );
-
-        SoundWave->QueueAudio ( reinterpret_cast<const uint8*>( PCMData.GetData ( ) ) , PCMData.Num ( ) * sizeof ( float ) );
-    }
-    SoundWave->bLooping = false;
-    SoundWave->bProcedural = true;
-    SoundWave->SoundGroup = SOUNDGROUP_Default;
-    SoundWave->bStreaming = false;
-
-    return SoundWave;
-}
 
 void UAudience_KMK::ChangeVirtualWidget ( )
 {

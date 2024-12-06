@@ -71,7 +71,11 @@ struct FLoginInfo
 	UPROPERTY(BlueprintReadOnly)
 	FString token= TEXT("");
 	UPROPERTY(BlueprintReadOnly)
+	FString userImg= TEXT("");
+	UPROPERTY(BlueprintReadOnly)
 	FString userName= TEXT("");
+	UPROPERTY(BlueprintReadOnly)
+	class UTexture2D* texture = NULL;
 };
 
 //무대 정보
@@ -171,6 +175,8 @@ public:
 	void DownloadImageFromUrl ( const FString& imageUrl , const FStageInfo& stageInfo );
 	void OnImageDownComplete ( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bWasSuccessful , FStageInfo stageInfo );
 
+	void DownloadImageFromUrl ( const FString& imageUrl , const FLoginInfo& Info );
+	void OnImageDownComplete ( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bWasSuccessful , FLoginInfo Info );
 
 	// 특정 무대 요청
 	void ReqCheckIdStage( int32 num);
@@ -202,8 +208,10 @@ public:
 	void OnReqMultipartCapturedWithAI( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
 #pragma endregion
 #pragma region Translate
-	void ReqTranslateChat(const FString& json );
-	void OnReqTranslateChat( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
+	void ReqTranslateChat(const FString& json, class UAudienceServerComponent_KMK* server );
+	void ReqTranslateChat(const FString& json, class AHSW_GameState_Auditorium* gs );
+	void OnReqTranslateChat( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully, class UAudienceServerComponent_KMK* server );
+	void OnReqTranslateChat( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully, class AHSW_GameState_Auditorium* gs );
 #pragma endregion
 
 
