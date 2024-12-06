@@ -118,6 +118,13 @@ AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
 	ThrowingArrow->SetupAttachment(RootComponent);
 	ThrowingArrow->SetRelativeLocation(FVector(80,0,70));
 
+
+	VIPObject = CreateDefaultSubobject<UStaticMeshComponent> ( TEXT ( "VIPObject" ) );
+	VIPObject->SetupAttachment ( GetMesh() );
+	VIPObject->SetRelativeScale3D(FVector(0.3f));
+	VIPObject->SetRelativeLocation(FVector(0,0,200));
+	VIPObject->SetVisibility(true);
+
 // 	static ConstructorHelpers::FObjectFinder<UMaterial> LoadedOpacityMaterial ( TEXT ( "Material'/Game/Project/Personal/HSW/Resources/Imogi/M_Imoji_Opacity'" ) );
 // 	if (LoadedOpacityMaterial.Succeeded ( ))
 // 	{
