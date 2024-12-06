@@ -124,6 +124,8 @@ public:
     class UImage* Image_Stage;
 	UFUNCTION( )
 	void PressSelectButt( );
+	UFUNCTION( )
+	void SetImageProfile(class UTexture2D* texture );
 
 	UFUNCTION( )
 	void ChangeMyProfile( );
@@ -182,6 +184,8 @@ public:
     class UEditableText* EditText_Price;
 	UPROPERTY ( meta = ( BindWidget ) )
     class UImage* Image_SetStage;
+	UPROPERTY ( meta = ( BindWidget ) )
+    class UImage* Image_Coin;
 	UPROPERTY ( meta = ( BindWidget ) )
     class UButton* Butt_CreateTicket;
 	UPROPERTY ( meta = ( BindWidget ) )
@@ -286,6 +290,8 @@ public:
 	class UTextBlock* Text_Pay;	
 	UPROPERTY ( meta = ( BindWidget ) )
     class UButton* Butt_PayMoney;	
+	UFUNCTION( )
+	void SetTicketButton( );
 
 	UFUNCTION( )
 	void PressMoneyPay( );

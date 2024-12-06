@@ -43,6 +43,7 @@ FLoginInfo UJsonParseLib_KMK::ParsecMyInfo ( const FString& json )
             response->TryGetStringField ( TEXT ( "email" ), result.email );
             response->TryGetStringField ( TEXT ( "password" ), result.password );
             response->TryGetStringField ( TEXT ( "userName" ), result.userName );
+            response->TryGetStringField ( TEXT ( "userImg" ), result.userImg );
          }
     }
     UE_LOG(LogTemp, Log, TEXT ("%s" ) , *result.token );
@@ -230,8 +231,7 @@ FString UJsonParseLib_KMK::MakeChatTranslate ( const FString& translateText )
     // 로그인 데이터를 JsonObject 형식으로 만든다.
     TSharedPtr<FJsonObject> jsonObject = MakeShareable ( new FJsonObject ( ) );
 
-    //   jsonObject->SetStringField("email" , *id);
-       //jsonObject->SetStringField("password" , *pw);
+    jsonObject->SetStringField("text" , *translateText);
 
        // writer를 만들어서 JsonObject를 인코딩해서 
     FString json;
