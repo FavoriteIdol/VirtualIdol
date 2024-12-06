@@ -55,7 +55,7 @@ void AHttpActor_KMK::ReqLogin ( const FString& id , const FString& pw )
 	FHttpModule& httpModule = FHttpModule::Get ( );
 	TSharedRef<IHttpRequest> req = httpModule.CreateRequest ( );
 
-	req->SetURL(TEXT("http://master-of-prediction.shop:8123/api/v1/auth/login") );
+	req->SetURL(TEXT("http://back.reward-factory.shop:8123/api/v1/auth/login") );
 	req->SetVerb(TEXT("POST"));
 	req->SetHeader(TEXT("content-type") , TEXT("application/json"));
 	req->SetContentAsString(UJsonParseLib_KMK::MakeLoginJson(id , pw));
@@ -118,7 +118,7 @@ void AHttpActor_KMK::ReqSetMyConcert (FConcertInfo& concert )
 	FHttpModule& httpModule = FHttpModule::Get ( );
 	TSharedRef<IHttpRequest> req = httpModule.CreateRequest ( );
 
-	req->SetURL(TEXT("http://master-of-prediction.shop:8123/api/v1/concerts") );
+	req->SetURL(TEXT("http://back.reward-factory.shop:8123/api/v1/concerts") );
 	req->SetVerb(TEXT("POST"));
 	req->SetHeader(TEXT("content-type") , TEXT("application/json"));
 	concert.img = ticketURL;
@@ -168,7 +168,7 @@ void AHttpActor_KMK::ReqCheckStage (class UStartWidget_KMK* startWidget )
 	FString authHeader = FString::Printf ( TEXT ( "Bearer %s" ) , *gi->loginInfo.token );
     req->SetHeader(TEXT("Authorization"), *( authHeader ));
 	req->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
-	req->SetURL(TEXT("http://master-of-prediction.shop:8123/api/v1/stages") );
+	req->SetURL(TEXT("http://back.reward-factory.shop:8123/api/v1/stages") );
 	req->SetVerb ( TEXT ( "GET" ) );
 
 	req->ProcessRequest ( );
@@ -212,7 +212,7 @@ void AHttpActor_KMK::ReqCheckMyStage ( class UStartWidget_KMK* startWidget )
 	FString authHeader = FString::Printf ( TEXT ( "Bearer %s" ) , *gi->loginInfo.token );
     req->SetHeader(TEXT("Authorization"), *( authHeader ));
 	req->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
-	FString url = TEXT("http://master-of-prediction.shop:8123/api/v1/stages/user/") + FString::FormatAsNumber(gi->GetMyInfo().userId );
+	FString url = TEXT("http://back.reward-factory.shop:8123/api/v1/stages/user/") + FString::FormatAsNumber(gi->GetMyInfo().userId );
 	UE_LOG ( LogTemp , Warning , TEXT ( "ImagePath: %s" ) , *url );
 	req->SetURL(url );
 	req->SetVerb ( TEXT ( "GET" ) );
@@ -661,7 +661,7 @@ void AHttpActor_KMK::ReqCheckMyConcert ( )
 	FString AuthHeader = FString::Printf ( TEXT ( "Bearer %s" ) , *gi->loginInfo.token );
 	req->SetHeader ( TEXT ( "Authorization" ) , AuthHeader );
 	req->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
-	FString url = TEXT("http://master-of-prediction.shop:8123/api/v1/concerts/user/") + FString::FormatAsNumber(gi->GetMyInfo().userId );
+	FString url = TEXT("http://back.reward-factory.shop:8123/api/v1/concerts/user/") + FString::FormatAsNumber(gi->GetMyInfo().userId );
 	UE_LOG ( LogTemp , Warning , TEXT ( "ImagePath: %s" ) , *url );
 	req->SetURL(url );
 	req->SetVerb ( TEXT ( "GET" ) );
@@ -705,7 +705,7 @@ void AHttpActor_KMK::ReqCheckAllOpenConcert ( )
 	FString AuthHeader = FString::Printf ( TEXT ( "Bearer %s" ) , *gi->loginInfo.token );
 	req->SetHeader ( TEXT ( "Authorization" ) , AuthHeader );
 	req->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
-	req->SetURL(TEXT("http://master-of-prediction.shop:8123/api/v1/concerts" ) );
+	req->SetURL(TEXT("http://back.reward-factory.shop:8123/api/v1/concerts" ) );
 	req->SetVerb ( TEXT ( "GET" ) );
 
 	req->ProcessRequest ( );
@@ -756,7 +756,7 @@ void AHttpActor_KMK::ReqCheckIdStage ( int32 num )
 	FString authHeader = FString::Printf ( TEXT ( "Bearer %s" ) , *gi->loginInfo.token );
     req->SetHeader(TEXT("Authorization"), *( authHeader ));
 	req->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
-	FString url = TEXT("http://master-of-prediction.shop:8123/api/v1/stages/") + FString::FormatAsNumber(num );
+	FString url = TEXT("http://back.reward-factory.shop:8123/api/v1/stages/") + FString::FormatAsNumber(num );
 	UE_LOG ( LogTemp , Warning , TEXT ( "URL: %s" ) , *url );
 	req->SetURL(url );
 	req->SetVerb ( TEXT ( "GET" ) );
@@ -803,7 +803,7 @@ void AHttpActor_KMK::ReqMultipartCapturedURL ( FStageInfo& Stage , const FString
 	ImageUploadRequest->OnProcessRequestComplete ( ).BindUObject ( this , &AHttpActor_KMK::OnReqMultipartCapturedURL , &Stage );
 
 	// Set the URL and verb for the image upload request
-	ImageUploadRequest->SetURL ( TEXT ( "http://master-of-prediction.shop:8123/api/v1/files/upload" ) );
+	ImageUploadRequest->SetURL ( TEXT ( "http://back.reward-factory.shop:8123/api/v1/files/upload" ) );
 	ImageUploadRequest->SetVerb ( TEXT ( "POST" ) );
 
 	UE_LOG ( LogTemp , Warning , TEXT ( "ImagePath: %s" ) , *ImagePath );
@@ -883,7 +883,7 @@ void AHttpActor_KMK::ReqStageInfo ( const FStageInfo& Stage)
 
 	TSharedRef<IHttpRequest> Request = FHttpModule::Get ( ).CreateRequest ( );
 	Request->OnProcessRequestComplete ( ).BindUObject ( this , &AHttpActor_KMK::OnReqStageInfo );
-	Request->SetURL ( TEXT ( "http://master-of-prediction.shop:8123/api/v1/stages" ) );
+	Request->SetURL ( TEXT ( "http://back.reward-factory.shop:8123/api/v1/stages" ) );
 	Request->SetVerb ( TEXT ( "POST" ) );
 
 	// Add Authorization header
@@ -928,7 +928,7 @@ void AHttpActor_KMK::ReqCollcetionConcert ( int32 concertIndex )
 	FString authHeader = FString::Printf ( TEXT ( "Bearer %s" ) , *gi->loginInfo.token );
     req->SetHeader(TEXT("Authorization"), *( authHeader ));
 	req->SetHeader(TEXT("Content-Type"), TEXT("application/json"));
-	FString url = TEXT("http://master-of-prediction.shop:8123/api/user-activity/collect-concert");
+	FString url = TEXT("http://back.reward-factory.shop:8123/api/user-activity/collect-concert");
 	req->SetURL(url );
 	req->SetVerb ( TEXT ( "POST" ) );
 

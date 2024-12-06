@@ -136,43 +136,51 @@ void UJJH_MapSelectWidget::ChangeBorder ( int32 BorderNum )
 	// 디버깅: 변경된 상태 출력
 	UE_LOG ( LogTemp , Warning , TEXT ( "Changed texture for Border_%d to SelectedBox" ) , BorderNum );
 }
-//카테고리 보더 바꾸끼
 void UJJH_MapSelectWidget::ChangeCategoryButton ( int32 ButtonNum )
 {
-	// 유효한 인덱스인지 확인
 	if (ButtonNum < 0 || ButtonNum >= CategoryButtons.Num ( ))
 	{
 		UE_LOG ( LogTemp , Warning , TEXT ( "Invalid BorderNum: %d" ) , ButtonNum );
 		return;
 	}
 
-	// 모든 Borders 순회
 	for (int32 i = 0; i < CategoryButtons.Num ( ); i++)
 	{
 		if (CategoryButtons[i])
 		{
-			FSlateBrush Brush;
-
-			// 선택된 인덱스는 SelectedBox 텍스처 적용
 			if (i == ButtonNum)
 			{
-				if (SelectedBox)
+				NextClickButton = CategoryButtons[i];
+				if (AlreadyClickedButton && AlreadyClickedButton != NextClickButton)
 				{
-					CategoryButtons[i]->SetRenderScale(FVector2D(1.3f, 1.3f));
+					// 새로 클릭된 버튼 처리
+					FWidgetTransform NextcurrentTransform = NextClickButton->GetRenderTransform ( );
+					FVector2D nextTranslation = NextcurrentTransform.Translation;
+					NextcurrentTransform.Scale = FVector2D ( 1.1f , 1.0f );
+					NextClickButton->SetRenderTransform ( NextcurrentTransform );
+
+					// 이전에 클릭된 버튼 처리
+					FWidgetTransform AlreadyTransform = AlreadyClickedButton->GetRenderTransform ( );
+					FVector2D alreadyTranslation = AlreadyTransform.Translation;
+					AlreadyTransform.Translation = FVector2D ( alreadyTranslation.X + 10.0f , alreadyTranslation.Y );
+					AlreadyTransform.Scale = FVector2D ( 1.0f , 1.0f );
+					AlreadyClickedButton->SetRenderTransform ( AlreadyTransform );
 				}
-			}
-			// 나머지 인덱스는 SelectBox 텍스처 적용
-			else
-			{
-				if (SelectBox)
+				else if(AlreadyClickedButton == nullptr)  // 첫 클릭 처리
 				{
-					CategoryButtons[i]->SetRenderScale( FVector2D ( 1.f , 1.f ) );
+					// 첫 번째로 클릭된 버튼 처리
+					FWidgetTransform FirstClickTransform = NextClickButton->GetRenderTransform ( );
+					FVector2D firstTranslation = FirstClickTransform.Translation;
+					//FirstClickTransform.Translation = FVector2D ( firstTranslation.X + 10.0f , firstTranslation.Y );
+					FirstClickTransform.Scale = FVector2D ( 1.1f , 1.0f );
+					NextClickButton->SetRenderTransform ( FirstClickTransform );
 				}
+				AlreadyClickedButton = NextClickButton;
 			}
 		}
 	}
-
 }
+
 
 void UJJH_MapSelectWidget::OnWeatherButtonClicked ( )
 {

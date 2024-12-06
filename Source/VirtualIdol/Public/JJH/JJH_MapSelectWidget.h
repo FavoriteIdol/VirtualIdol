@@ -31,6 +31,13 @@ public:
 	UPROPERTY ( EditAnywhere )
 	TArray<class UButton*> CategoryButtons;
 
+	UPROPERTY()
+	class UButton* AlreadyClickedButton;	
+	
+	UPROPERTY ()
+	class UButton* NextClickButton;
+
+
 	// 사운드
 	UPROPERTY(EditAnywhere, Category = Sound )
 	class USoundBase* PopUpSFV;
