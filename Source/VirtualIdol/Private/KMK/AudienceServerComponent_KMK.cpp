@@ -66,6 +66,7 @@ void UAudienceServerComponent_KMK::BeginPlay()
 				SetVirtualVisible ( playerMesh , true );
 				// vip 여부에 따라 mesh를 변경함
 				playerMesh->GetMesh ( )->SetSkeletalMesh ( audienceMesh[playerMeshNum] );
+
 				// 승우가 만든 dynamic Material로 변경
 				UMaterialInstanceDynamic* meshMat = playerMesh->ChangeMyMeshMat ( playerMeshNum );
 				playerMesh->GetMesh()->SetMaterial(0, meshMat);
@@ -254,6 +255,11 @@ void UAudienceServerComponent_KMK::MultiRPC_ChangeMyMesh_Implementation ( int32 
 		// 이곳만 관객 관련 내용임
 		SetVirtualVisible ( TargetMesh , true );
 		TargetMesh->GetMesh ( )->SetSkeletalMesh ( audienceMesh[num] );
+
+		// 머리 위 스태틱 메쉬 보이게 할지 말지
+		if (num == 1) TargetMesh->VIPObject->SetVisibility ( true );
+		else TargetMesh->VIPObject->SetVisibility ( false );
+
 		UMaterialInstanceDynamic* meshMat = TargetMesh->ChangeMyMeshMat ( num );
 		TargetMesh->GetMesh()->SetMaterial(0, meshMat);
 	}
