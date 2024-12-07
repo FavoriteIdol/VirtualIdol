@@ -583,6 +583,44 @@ void UAudience_KMK::ChangeVirtualWidget ( )
 
 #pragma endregion
 #pragma region Upload Mp3
+void UAudience_KMK::PressButtMp3 ( )
+{
+    TArray<FString> SelectedFiles;
+
+    FString FileTypes = TEXT ( "Audio Files (*.mp3;*.wav)|*.mp3;*.wav|All Files (*.*)|*.*" );
+
+    // 파일 탐색기를 열고 사용자에게 파일 선택을 요청
+    bool bFileSelected = OpenFileExample ( SelectedFiles , TEXT ( "Select an Image to Upload" ) , FileTypes , true );
+
+    if (bFileSelected && SelectedFiles.Num ( ) > 0)
+    {
+        for (const FString& FilePath : SelectedFiles)
+        {
+            UE_LOG ( LogTemp , Warning , TEXT ( "Selected File: %s" ) , *FilePath );
+            FString FileName = FPaths::GetCleanFilename ( FilePath );  // "Example.wav"
+            if (SoundWave)
+            {
+                UAudioComponent* AudioComponent = NewObject<UAudioComponent> ( GetWorld ( ) , UAudioComponent::StaticClass ( ) );
+                
+                if (AudioComponent && SoundWave)
+                {
+                    AudioComponent->bAutoActivate = false;
+                    AudioComponent->SetSound ( SoundWave );
+                }
+            }
+            else
+            {
+                UE_LOG ( LogTemp , Error , TEXT ( "Failed to load audio: %s" ) , *FilePath );
+            }
+        }
+    }
+    else
+    {
+        UE_LOG ( LogTemp , Warning , TEXT ( "File Selected Failed!!!" ) )
+    }
+
+}
+
 // 파일 열기
 bool UAudience_KMK::OpenFileExample ( TArray<FString>& FileNames , FString DialogueTitle , FString FileTypes , bool multiselect )
 {
