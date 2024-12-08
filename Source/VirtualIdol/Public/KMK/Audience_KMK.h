@@ -323,8 +323,8 @@ public :
 	UFUNCTION( )
 	USoundWaveProcedural* LoadWavFromFile ( const FString& FilePath );
 
-	UPROPERTY( )
-	float soundGain = 2;
+// 	UPROPERTY( )
+// 	float soundGain = 2;
 #pragma endregion
 
 };

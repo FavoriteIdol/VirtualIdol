@@ -495,6 +495,10 @@ void AHttpActor_KMK::OnReqMultipartCapturedWithAI ( FHttpRequestPtr Request , FH
 			gi->widget->SetTicketButton();
 			UE_LOG ( LogTemp , Warning , TEXT ( "Image URL set to: %s" ) , *ticketURL );
 		}
+		else
+		{
+			UE_LOG ( LogTemp , Warning , TEXT ( "Ticket Image URL failed" ) );
+		}
 	}
 	else
 	{

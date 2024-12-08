@@ -598,6 +598,8 @@ void UAudience_KMK::PressButtMp3 ( )
         {
             UE_LOG ( LogTemp , Warning , TEXT ( "Selected File: %s" ) , *FilePath );
             FString FileName = FPaths::GetCleanFilename ( FilePath );  // "Example.wav"
+
+            USoundWaveProcedural* SoundWave = NewObject<USoundWaveProcedural> ( );
             if (SoundWave)
             {
                 UAudioComponent* AudioComponent = NewObject<UAudioComponent> ( GetWorld ( ) , UAudioComponent::StaticClass ( ) );
