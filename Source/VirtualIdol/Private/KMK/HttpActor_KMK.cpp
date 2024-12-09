@@ -398,6 +398,7 @@ void AHttpActor_KMK::OnResTicket ( FHttpRequestPtr Request , FHttpResponsePtr Re
         {
 			// 받은 이미지를 서버를 통해 경로를 받아놓음 => 서버에 올리기 위해 필요
 			ReqMultipartCapturedWithAI(FullPath);
+			UE_LOG ( LogTemp , Warning , TEXT ( "FullPath : %s "), *FullPath );
 			// 이미지 => 텍스쳐 변경
             UTexture2D* Texture = UJsonParseLib_KMK::MakeTexture(ImageData);
             if (Texture)
@@ -433,7 +434,7 @@ void AHttpActor_KMK::OnResTicket ( FHttpRequestPtr Request , FHttpResponsePtr Re
 }
 void AHttpActor_KMK::ReqMultipartCapturedWithAI (const FString& ImagePath , const FString& url )
 {
-	UE_LOG ( LogTemp , Warning , TEXT ( "Image upload start." ) );
+	UE_LOG ( LogTemp , Warning , TEXT ( "Image upload start. 2" ) );
 
 	// Create an HTTP request for the multipart upload
 	TSharedRef<IHttpRequest> ImageUploadRequest = FHttpModule::Get ( ).CreateRequest ( );
@@ -443,7 +444,9 @@ void AHttpActor_KMK::ReqMultipartCapturedWithAI (const FString& ImagePath , cons
 	ImageUploadRequest->SetURL ( url );
 	ImageUploadRequest->SetVerb ( TEXT ( "POST" ) );
 
+
 	UE_LOG ( LogTemp , Warning , TEXT ( "ImagePath: %s" ) , *ImagePath );
+	UE_LOG ( LogTemp , Warning , TEXT ( "ImageURL: %s" ) , *url );
 
 	// Prepare multipart form data for image upload
 	TArray<uint8> FileData;
@@ -490,10 +493,33 @@ void AHttpActor_KMK::OnReqMultipartCapturedWithAI ( FHttpRequestPtr Request , FH
 		int32 ResponseCode = Response->GetResponseCode ( );
 		if (ResponseCode == 200) // 성공적으로 응답받은 경우
 		{
-			// 응답 바디를 가져와 Stage의 img에 설정합니다.
-			ticketURL = Response->GetContentAsString ( );
-			gi->widget->SetTicketButton();
-			UE_LOG ( LogTemp , Warning , TEXT ( "Image URL set to: %s" ) , *ticketURL );
+			// JSon응답 문자열 가져오기
+			FString ResponseBody = Response->GetContentAsString ( );
+
+			// JSon 파싱
+			TSharedPtr<FJsonObject> JsonObject;
+			TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create ( ResponseBody );
+
+			if (FJsonSerializer::Deserialize ( Reader , JsonObject ) && JsonObject.IsValid ( ))
+			{
+				FString FilePath;
+				if (JsonObject->TryGetStringField ( TEXT ( "file_path" ) , FilePath ))
+				{
+					ticketURL = FilePath;
+					UE_LOG ( LogTemp , Warning , TEXT ( "Image URL set to: %s" ) , *ticketURL );
+
+					// 응답 바디를 가져와 Stage의 img에 설정합니다.
+					gi->widget->SetTicketButton();
+				}
+				else
+				{
+					UE_LOG ( LogTemp , Error , TEXT ( "Failed to find 'file_path' in JSON response" ) );
+				}
+			}
+			else
+			{
+				UE_LOG ( LogTemp , Error , TEXT ( "Failed to parse JSON response: %s" ) , *ResponseBody );
+			}
 		}
 		else
 		{
@@ -800,17 +826,19 @@ void AHttpActor_KMK::OnResCheckIdStage ( FHttpRequestPtr Request , FHttpResponse
 
 void AHttpActor_KMK::ReqMultipartCapturedURL ( FStageInfo& Stage , const FString& ImagePath )
 {   
-	UE_LOG ( LogTemp , Warning , TEXT ( "Image upload start." ) );
+	UE_LOG ( LogTemp , Warning , TEXT ( "Image upload start to BE." ) );
 
 	// Create an HTTP request for the multipart upload
 	TSharedRef<IHttpRequest> ImageUploadRequest = FHttpModule::Get ( ).CreateRequest ( );
-	ImageUploadRequest->OnProcessRequestComplete ( ).BindUObject ( this , &AHttpActor_KMK::OnReqMultipartCapturedURL , &Stage );
+	ImageUploadRequest->OnProcessRequestComplete ( ).BindUObject ( this , 
+&AHttpActor_KMK::OnReqMultipartCapturedURL , &Stage );
 
 	// Set the URL and verb for the image upload request
 	ImageUploadRequest->SetURL ( TEXT ( "http://back.reward-factory.shop:8123/api/v1/files/upload" ) );
 	ImageUploadRequest->SetVerb ( TEXT ( "POST" ) );
 
-	UE_LOG ( LogTemp , Warning , TEXT ( "ImagePath: %s" ) , *ImagePath );
+
+	UE_LOG ( LogTemp , Error , TEXT ( "Image to BE Path: %s" ) , *ImagePath );
 
 	// Prepare multipart form data for image upload
 	TArray<uint8> FileData;
