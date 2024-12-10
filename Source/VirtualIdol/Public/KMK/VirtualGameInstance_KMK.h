@@ -193,8 +193,14 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 	void ChangeTextureWidget(UTexture2D* texture );
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<TSubclassOf<AActor>>effectArray;
+	TArray<TSubclassOf<AActor>> effectArray;	
 	
+	UPROPERTY ( EditAnywhere , BlueprintReadWrite )
+	TArray<TSubclassOf<AActor>> effectArrayForEachFloor;
+	
+	UPROPERTY ( EditAnywhere , BlueprintReadWrite )
+	TSubclassOf<AActor> GINowEffect;
+
 	UPROPERTY( )
 	FStageInfo concertStageInfo;
 

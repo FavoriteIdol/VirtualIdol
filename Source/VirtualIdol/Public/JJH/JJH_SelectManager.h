@@ -85,7 +85,8 @@ public:
 		FName ( "LV_Theme-Island_JSW" ),
 		FName ( "BP_Theme-City" ),
 		FName ( "BP_Theme-Dystopia_JSW" ),
-		FName ( "LV_Forest_JSW" )
+		FName ( "LV_Forest_JSW" ),
+		FName ( "LV_Theme-Winter_JSW" )
 	};
 
 	FName LevelToLoad;

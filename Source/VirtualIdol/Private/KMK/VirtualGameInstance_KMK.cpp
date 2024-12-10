@@ -451,13 +451,17 @@ void UVirtualGameInstance_KMK::OnSetStageButt ( )
         // 이펙트 생성 위치 조절 부분
         if (myStageInfo.theme == 3)
         {
-            widget->spawnTrans = FTransform(FVector(0, 0, 3000 ) );
-            spawnTrans = FTransform(FVector(0, 0, 3000 ) );
+            widget->spawnTrans = FTransform(FVector(0 ) );
+            spawnTrans = FTransform(FVector(0));
         }
         else
         {
-            widget->spawnTrans = FTransform(FVector(0, 0, 1000  ) );
-            spawnTrans = FTransform(FVector(0, 0, 1000 ) );
+            widget->spawnTrans = FTransform(FVector(0) );
+            spawnTrans = FTransform(FVector(0) );
+        }
+        if (effectArrayForEachFloor.Num() != 0)
+        {
+            GINowEffect = effectArrayForEachFloor[myStageInfo.terrain];
         }
 	}
 }

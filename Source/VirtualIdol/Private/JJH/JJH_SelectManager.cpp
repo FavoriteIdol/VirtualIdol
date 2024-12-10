@@ -45,7 +45,6 @@ void AJJH_SelectManager::BeginPlay()
 	CaptureComponent2D->TextureTarget = RenderTarget;
 	CaptureComponent2D->CaptureSource = ESceneCaptureSource::SCS_FinalColorLDR; // 최종 색상 캡처
 
-
 }
 
 // Called every frame
