@@ -119,6 +119,10 @@
 		{
 			"Name": "RemoteControlProtocolDMX",
 			"Enabled": true
+		},
+		{
+			"Name": "MocopiLiveLink",
+			"Enabled": true
 		}
 	]
 }

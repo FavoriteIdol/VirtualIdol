@@ -112,7 +112,8 @@ void UVirtualGameInstance_KMK::OnMyCreateSessionComplete ( FName SessionName , b
 
         // 서버가 여행을 떠나고 싶다.
         //GetWorld ( )->ServerTravel ( TEXT ( "/Game/Project/Personal/KMK/Maps/KMK_TravelLevel?listen" ) );
-        GetWorld ( )->ServerTravel(TEXT("/Game/Project/CommonFile/Maps/BetaMain?listen"), ETravelType::TRAVEL_Absolute);
+        //GetWorld ( )->ServerTravel(TEXT("/Game/Project/CommonFile/Maps/BetaMain?listen"), ETravelType::TRAVEL_Absolute);
+        GetWorld ( )->ServerTravel ( TEXT ( "/Game/Project/CommonFile/Maps/EmptyLevel?listen" ) , ETravelType::TRAVEL_Absolute );
         PRINTLOG(TEXT("Server successfully created session: %s"), *SessionName.ToString());
     }
     else

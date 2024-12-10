@@ -300,9 +300,15 @@ void AJJH_SelectManager::SaveImage ( UTextureRenderTarget2D* RenderTarget2 )
 
 void AJJH_SelectManager::CreateStage ( const struct FStageInfo& info )
 {
-	GetWorld()->SpawnActor<AActor>(SkyFactory[info.sky], GetActorTransform ( ) );
-	
+
+	if (MapSelectWidget && MapSelectWidget->IsVisible ( ))
+	{
+		MapSelectWidget->SetVisibility(ESlateVisibility::Hidden);
+	}
+
 	auto* gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance() );
+
+	GetWorld()->SpawnActor<AActor>(SkyFactory[info.sky], GetActorTransform ( ) );
 
 	// 현재 로드된 모든 레벨을 언로드 목록에 추가
 	for (const FName& Level : Levels)

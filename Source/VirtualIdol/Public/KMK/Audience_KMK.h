@@ -308,4 +308,32 @@ public :
 #pragma endregion
 
 
+#pragma region MP3 & Model
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* Butt_Model;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* Butt_MP3;
+	UFUNCTION( )
+	void PressButtMp3( );
+	UFUNCTION( )
+	void PressButtModel( );
+	UFUNCTION( )
+	bool OpenFileExample(TArray<FString>& FileNames, FString DialogueTitle, FString FileTypes, bool multiselect);
+
+	UFUNCTION( )
+	USoundWaveProcedural* LoadWavFromFile ( const FString& FilePath );
+
+// 	UPROPERTY( )
+// 	float soundGain = 2;
+#pragma endregion
+
 };
+void ApplyHighPassFilter16 ( TArray<int16>& PCMData , float CutoffFrequency , int32 SampleRate );
+void ApplyLowPassFilter16 ( TArray<int16>& PCMData , float CutoffFrequency , int32 SampleRate );
+void ApplyHighPassFilter24 ( TArray<int32>& PCMData , float CutoffFrequency , int32 SampleRate );
+void ApplyLowPassFilter24 ( TArray<int32>& PCMData , float CutoffFrequency , int32 SampleRate );
+void ApplyHighPassFilter32 ( TArray<float>& PCMData , float CutoffFrequency , int32 SampleRate );
+void ApplyLowPassFilter32 ( TArray<float>& PCMData , float CutoffFrequency , int32 SampleRate );
+void AmplifyPCM16 ( TArray<int16>& PCMData , float Gain );
+void AmplifyPCM24 ( TArray<int32>& PCMData , float Gain );
+void AmplifyPCM32 ( TArray<float>& PCMData , float Gain );
