@@ -141,8 +141,8 @@ public:
 	// 응답
 	void OnResSetConcert( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully );
 
-
 #pragma endregion
+
 #pragma region with Ai for Ticket
 	// 티켓 정보 저장
 	TMap<FString , FString> ticketData;
@@ -232,5 +232,14 @@ public:
 #pragma endregion
 	void ReqCollcetionConcert(int32 concertIndex );
 	void OnReqMultiCollectionConcert(FHttpRequestPtr Request , FHttpResponsePtr Response , bool bConnectedSuccessfully  );
+
+#pragma region BE Music
+	// 요청
+	void ReqMusic ( int64 ConcertId );
+	// 응답
+	void OnReqMusic ( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bWasSuccessful, int64 ConcertId );
+	// Wav파일 저장하기
+	void SaveWavToFile ( const FString & FileName , const TArray<uint8>&Data );
+#pragma endregion
 
 };

@@ -113,6 +113,9 @@ void UVirtualGameInstance_KMK::OnMyCreateSessionComplete ( FName SessionName , b
         // 서버가 여행을 떠나고 싶다.
         //GetWorld ( )->ServerTravel ( TEXT ( "/Game/Project/Personal/KMK/Maps/KMK_TravelLevel?listen" ) );
         //GetWorld ( )->ServerTravel(TEXT("/Game/Project/CommonFile/Maps/BetaMain?listen"), ETravelType::TRAVEL_Absolute);
+
+        HttpActor->ReqMusic( concerInfo.concertId );
+        UE_LOG(LogTemp, Warning, TEXT("Concert ID: %d"), concerInfo.concertId );
         GetWorld ( )->ServerTravel ( TEXT ( "/Game/Project/CommonFile/Maps/EmptyLevel?listen" ) , ETravelType::TRAVEL_Absolute );
         PRINTLOG(TEXT("Server successfully created session: %s"), *SessionName.ToString());
     }
@@ -373,11 +376,11 @@ void UVirtualGameInstance_KMK::SetConcertInfo ( const TArray<FConcertInfo> info,
             widget->SetButtEnable(true);
         }
     }
+    HttpActor = http;
 
     // FString start = FString::FromInt(year) + TEXT("-") + ChangeString(FString::FromInt(mon))+ TEXT("-") +ChangeString( FString::FromInt(day));
-    
-   
 }
+
 FString UVirtualGameInstance_KMK::ChangeString ( const FString& editText )
 {
     FString s = editText;
@@ -392,8 +395,8 @@ FConcertInfo UVirtualGameInstance_KMK::GetConcertInfo ( )
     // 내가 연 콘서트장을 반환
     return concerInfo;
 }
-
 #pragma endregion
+
 #pragma region Chat
 void UVirtualGameInstance_KMK::SetWidget ( class UAudience_KMK* wid )
 {
