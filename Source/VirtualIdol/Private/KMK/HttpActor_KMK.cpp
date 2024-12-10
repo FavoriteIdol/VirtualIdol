@@ -394,11 +394,11 @@ void AHttpActor_KMK::OnResTicket ( FHttpRequestPtr Request , FHttpResponsePtr Re
         FParse::Value(*RequestUrl, TEXT("filename="), Nickname);
         FString FullPath = FPaths::ProjectSavedDir() / TEXT("Pictures/") / Nickname + TEXT(".png");
 
+		UE_LOG ( LogTemp , Warning , TEXT ( "FullPath : %s "), *FullPath );
         if (FFileHelper::SaveArrayToFile(ImageData, *FullPath))
         {
 			// 받은 이미지를 서버를 통해 경로를 받아놓음 => 서버에 올리기 위해 필요
 			ReqMultipartCapturedWithAI(FullPath);
-			UE_LOG ( LogTemp , Warning , TEXT ( "FullPath : %s "), *FullPath );
 			// 이미지 => 텍스쳐 변경
             UTexture2D* Texture = UJsonParseLib_KMK::MakeTexture(ImageData);
             if (Texture)
@@ -422,7 +422,7 @@ void AHttpActor_KMK::OnResTicket ( FHttpRequestPtr Request , FHttpResponsePtr Re
    {
        if (Response.IsValid())
        {
-           UE_LOG(LogTemp, Error, TEXT("Failed to download image. Response code: %d"), Response->GetResponseCode());
+           UE_LOG(LogTemp, Error, TEXT("Failed to download AI Ticket image. Response code: %d"), Response->GetResponseCode());
        }
        else
        {
@@ -490,36 +490,42 @@ void AHttpActor_KMK::OnReqMultipartCapturedWithAI ( FHttpRequestPtr Request , FH
 {
 	if (bConnectedSuccessfully && Response.IsValid ( ))
 	{
+
 		int32 ResponseCode = Response->GetResponseCode ( );
 		if (ResponseCode == 200) // 성공적으로 응답받은 경우
 		{
-			// JSon응답 문자열 가져오기
-			FString ResponseBody = Response->GetContentAsString ( );
+// 			// 응답 바디를 가져와 Stage의 img에 설정합니다.
+			ticketURL = Response->GetContentAsString ( );
+			gi->widget->SetTicketButton ( );
+			UE_LOG ( LogTemp , Warning , TEXT ( "Image URL set to: %s" ) , *ticketURL );
 
-			// JSon 파싱
-			TSharedPtr<FJsonObject> JsonObject;
-			TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create ( ResponseBody );
-
-			if (FJsonSerializer::Deserialize ( Reader , JsonObject ) && JsonObject.IsValid ( ))
-			{
-				FString FilePath;
-				if (JsonObject->TryGetStringField ( TEXT ( "file_path" ) , FilePath ))
-				{
-					ticketURL = FilePath;
-					UE_LOG ( LogTemp , Warning , TEXT ( "Image URL set to: %s" ) , *ticketURL );
-
-					// 응답 바디를 가져와 Stage의 img에 설정합니다.
-					gi->widget->SetTicketButton();
-				}
-				else
-				{
-					UE_LOG ( LogTemp , Error , TEXT ( "Failed to find 'file_path' in JSON response" ) );
-				}
-			}
-			else
-			{
-				UE_LOG ( LogTemp , Error , TEXT ( "Failed to parse JSON response: %s" ) , *ResponseBody );
-			}
+// 			// JSon응답 문자열 가져오기
+// 			FString ResponseBody = Response->GetContentAsString ( );
+// 
+// 			// JSon 파싱
+// 			TSharedPtr<FJsonObject> JsonObject;
+// 			TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create ( ResponseBody );
+// 
+// 			if (FJsonSerializer::Deserialize ( Reader , JsonObject ) && JsonObject.IsValid ( ))
+// 			{
+// 				FString FilePath;
+// 				if (JsonObject->TryGetStringField ( TEXT ( "file_path" ) , FilePath ))
+// 				{
+// 					ticketURL = FilePath;
+// 					UE_LOG ( LogTemp , Warning , TEXT ( "Image URL set to: %s" ) , *ticketURL );
+// 
+// 					// 응답 바디를 가져와 Stage의 img에 설정합니다.
+// 					gi->widget->SetTicketButton();
+// 				}
+// 				else
+// 				{
+// 					UE_LOG ( LogTemp , Error , TEXT ( "Failed to find 'file_path' in JSON response" ) );
+// 				}
+// 			}
+// 			else
+// 			{
+// 				UE_LOG ( LogTemp , Error , TEXT ( "Failed to parse JSON response: %s" ) , *ResponseBody );
+// 			}
 		}
 		else
 		{
