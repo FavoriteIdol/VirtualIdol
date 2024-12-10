@@ -1,4 +1,4 @@
-// VRM4U Copyright (c) 2021-2024 Haruyoshi Yamamoto. This software is released under the MIT License.
+﻿// VRM4U Copyright (c) 2021-2024 Haruyoshi Yamamoto. This software is released under the MIT License.
 
 #pragma once
 
@@ -84,7 +84,7 @@ public:
 
 	/** Add IK Bone */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, AdvancedDisplay, Category = Mesh, meta = (ImportType = "StaticMesh|SkeletalMesh", DisplayName = "Generate IK Bone"))
-	bool bGenerateIKBone = false;
+	bool bGenerateIKBone = true;
 
 	/** Add RigIK asset*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, AdvancedDisplay, Category = Mesh, meta = (ImportType = "StaticMesh|SkeletalMesh", DisplayName = "Generate RigIK Asset"))
