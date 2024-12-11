@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "HttpActor_KMK.h"
 #include "Virtual_KMK.generated.h"
 
 
@@ -83,4 +84,29 @@ public:
 
 	UPROPERTY( )
 	class APlayerController* pc;
+
+	UPROPERTY ( EditAnywhere , BlueprintReadWrite )
+	TSubclassOf<class AHSW_AudioLoadingActor> AudioActorFactory;
+
+#pragma region Music
+
+	UPROPERTY ( EditDefaultsOnly , BlueprintReadWrite )
+	int32 CurrentSongIndex = 0;
+
+	UPROPERTY ( EditDefaultsOnly , BlueprintReadWrite )
+	TArray<FWavFileInfo> WavFiles;
+
+	UFUNCTION( )
+	void SetWavFiles ( );
+
+	UFUNCTION( )
+	void SetCurrentSongIndex ( );
+
+	UFUNCTION( )
+	FText GetCurrentSongTitle ( );
+
+	bool bCanPlaySong = true;
+	UFUNCTION( )
+	void CreateAudioActor( );
+#pragma endregion
 };

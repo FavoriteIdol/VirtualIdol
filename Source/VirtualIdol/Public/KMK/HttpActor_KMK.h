@@ -102,6 +102,25 @@ struct FStageInfo
 
 };
 
+// 음악정보
+USTRUCT(BlueprintType)
+struct FWavFileInfo
+{
+    GENERATED_BODY()
+
+    UPROPERTY(BlueprintReadOnly)
+    int32 ConcertID;
+
+    UPROPERTY(BlueprintReadOnly)
+    int32 SongID;
+
+    UPROPERTY(BlueprintReadOnly)
+    FString Title;
+
+	UPROPERTY(BlueprintReadOnly)
+    FString FilePath;
+};
+
 UCLASS()
 class VIRTUALIDOL_API AHttpActor_KMK : public AActor
 {
