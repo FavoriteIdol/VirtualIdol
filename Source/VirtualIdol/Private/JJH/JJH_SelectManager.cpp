@@ -63,6 +63,56 @@ void AJJH_SelectManager::Tick(float DeltaTime)
 	}
 }
 
+void AJJH_SelectManager::CreateDummyStage ( const struct FStageInfo& info )
+{
+
+	if (MapSelectWidget && MapSelectWidget->IsVisible ( ))
+	{
+		MapSelectWidget->SetVisibility ( ESlateVisibility::Hidden );
+	}
+
+	auto* gi = Cast<UVirtualGameInstance_KMK> ( GetWorld ( )->GetGameInstance ( ) );
+
+	GetWorld ( )->SpawnActor<AActor> ( SkyFactory[info.sky] , GetActorTransform ( ) );
+
+	// 현재 로드된 모든 레벨을 언로드 목록에 추가
+	for (const FName& Level : Levels)
+	{
+		LevelsToUnload.Add ( Level );
+	}
+
+	if (info.theme >= 1 && info.theme <= Levels.Num ( )) // 레벨을 로드하는 경우
+	{
+		LevelToLoad = Levels[info.theme - 1];
+
+		// 로드할 레벨은 언로드 목록에서 제외
+		LevelsToUnload.Remove ( LevelToLoad );
+
+		// 새 레벨 로드
+		UGameplayStatics::LoadStreamLevel (
+			GetWorld ( ) ,
+			LevelToLoad ,
+			true ,
+			true ,
+			FLatentActionInfo ( )
+		);
+	}
+	else // 액터만 스폰하는 경우
+	{
+		// 새로운 테마 액터 스폰
+		GetWorld ( )->SpawnActor<AActor> ( ThemeFactory[info.theme] , GetActorTransform ( ) );
+	}
+	UE_LOG ( LogTemp , Warning , TEXT ( "loading level: %s" ) , *LevelToLoad.ToString ( ) );
+
+	if (DummyFloor[info.terrain])
+	{
+		GetWorld ( )->SpawnActor<AActor> ( DummyFloor[info.terrain] , GetActorTransform ( ) );
+	}
+	GetWorld ( )->SpawnActor<AActor> ( VFXFactory[info.specialEffect] , GetActorTransform ( ) );
+
+	UE_LOG ( LogTemp , Warning , TEXT ( "%d, %d, %d, %d" ) , info.sky , info.theme , info.terrain , info.specialEffect );
+}
+
 void AJJH_SelectManager::UpdateSunNightPosition (int32 index)
 {
 	if(index >= SkyFactory.Num() && SkyFactory[index] != nullptr) return;

@@ -26,6 +26,13 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	//더미있는 액터 목록
+	UPROPERTY(EditAnywhere)
+	TArray<TSubclassOf<AActor>> DummyFloor;
+
+	UFUNCTION ()
+	void CreateDummyStage( const struct FStageInfo& info );
+
 	//태양 위치 바꾸기
     UFUNCTION(BlueprintCallable, Category = "Time")
     void UpdateSunNightPosition(int32 index);
