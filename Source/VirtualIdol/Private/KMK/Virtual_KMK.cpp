@@ -64,7 +64,7 @@ void UVirtual_KMK::BeginPlay()
 	}
     if (sm)
     {
-        sm->CreateDummyStage( gi->GetConcertStageInfo() );
+        //sm->CreateDummyStage( gi->GetConcertStageInfo() );
 // 		if (gi->GetConcertStageInfo ( ).theme == 3)
 // 		{
 // 			gi->spawnTrans = FTransform(FVector(0, 0, 2000 ) );
@@ -400,10 +400,10 @@ void UVirtual_KMK::DestroyAudioActor ( )
 
 void UVirtual_KMK::SetSongList ( )
 {
-	UE_LOG(LogTemp,Error,TEXT("SetSongList 함수 실행" ));
+	//UE_LOG(LogTemp,Error,TEXT("SetSongList 함수 실행" ));
 	for (FWavFileInfo songInfo : WavFiles)
 	{
-		virtualWidget->AddSongList( songInfo );
+		if(virtualWidget) virtualWidget->AddSongList( songInfo );
 	}
 }
 

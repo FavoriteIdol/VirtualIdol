@@ -139,7 +139,7 @@ public:
 	void MulticastFeverEffect( );
 
 	UPROPERTY(Replicated )
-	bool bFever;
+	bool bFever=true;
 
 	UPROPERTY ( EditDefaultsOnly , Category = Fever )
 	class UParticleSystem* FeverEffect_Particle;
@@ -358,5 +358,12 @@ public:
 	void SetChatWidget(const FString& nickName, const FString& text );
 #pragma endregion
 	int32 effectNum = -1;
+	
+	UPROPERTY( )
+	class UVirtual_KMK* VirtualCharacter;
+	
+	void PlayFeverVideoAnim( );
 
+	UFUNCTION( )
+	void FindVirtualCharacter( );
 };

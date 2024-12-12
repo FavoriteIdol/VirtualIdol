@@ -168,6 +168,7 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 
 	gm = Cast<AHSW_AuditoriumGameMode> ( GetWorld ( )->GetAuthGameMode ( ) );
 
+	FindVirtualCharacter ( );
 
 	FName tag = TEXT ( "InterviewLocation" );
 	FName tag2 = TEXT ( "FeverGaugeLocation" );
@@ -498,6 +499,16 @@ void AHSW_ThirdPersonCharacter::Look ( const FInputActionValue& Value )
 UMaterialInstanceDynamic* AHSW_ThirdPersonCharacter::ChangeMyMeshMat (int32 num )
 {
 	FeverDynamicMat = UMaterialInstanceDynamic::Create ( FeverCharactMat[num] , this );
+	if (num == 1)
+	{
+		VIPObject->SetVisibility ( true );
+		//UE_LOG ( LogTemp , Warning , TEXT ( "Multi RPC playerMeshNum: 1, " ) );
+	}
+	else
+	{
+		VIPObject->SetVisibility ( false );
+		//UE_LOG ( LogTemp , Warning , TEXT ( "Multi RPC playerMeshNum: 0, false" ) );
+	}
 	return FeverDynamicMat;
 }
 
@@ -616,11 +627,14 @@ void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value 
 		}
 		else
 		{
-			AudioActor->PlaySound0 ( 0.05 );
-			AudioActor->PlaySound1 ( 0.05 );
-			AudioActor->PlaySound2 ( 0.02 );
-			AudioActor->PlaySound3 ( 0.01 );
-			AudioActor->PlaySound4 ( 0.01 );
+			if (bFever)
+			{
+				AudioActor->PlaySound0 ( 0.05 );
+				AudioActor->PlaySound1 ( 0.05 );
+				AudioActor->PlaySound2 ( 0.02 );
+				AudioActor->PlaySound3 ( 0.01 );
+				AudioActor->PlaySound4 ( 0.01 );
+			}
 			//UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge else!!!! :%f" ) , CurrentGauge );
 		}
 		//MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
@@ -639,7 +653,6 @@ void AHSW_ThirdPersonCharacter::ServerRPCFeverGauge_Implementation ( float fever
 
 	else if (feverValue >=1)
 	{
-		bFever = true;
 		if (bFever)
 		{
 			MulticastFeverEffect( );
@@ -671,7 +684,8 @@ void AHSW_ThirdPersonCharacter::MulticastRPCBrightness_Implementation ( int inde
 
 void AHSW_ThirdPersonCharacter::ServerFeverReset_Implementation ( )
 {
-	FeverBright = 0;
+	FeverBright = 1;
+	bFever=true;
 	MulticastFeverReset( );
 	SetFeverGaugeMulti(0 );
 }
@@ -733,9 +747,8 @@ void AHSW_ThirdPersonCharacter::MulticastFeverEffect_Implementation ( )
 	if (gi->GetConcertInfo ( ).feverVFX >= 0)
 	{
 	//FeverEffect_Actor = GetWorld ( )->SpawnActor<AActor> (  gi->effectArray[gi->GetConcertInfo().feverVFX] , gi->spawnTrans );
-		//FeverEffect_Actor = GetWorld ( )->SpawnActor<AActor> (  gi->effectArray[2] , FTransform(FVector(0)) );
+		FeverEffect_Actor = GetWorld ( )->SpawnActor<AActor> (  gi->effectArray[2] , FTransform(FVector(0)) );
 	}
-	
 }
 
 // 인터뷰 =================================================================================================
@@ -950,6 +963,28 @@ void AHSW_ThirdPersonCharacter::SetChatWidget (const FString& nickName, const FS
 }
 
 #pragma endregion
+
+void AHSW_ThirdPersonCharacter::FindVirtualCharacter ( )
+{
+	TArray<AActor*> actorArray;
+	// 태그로 검색
+	UGameplayStatics::GetAllActorsWithTag ( GetWorld ( ) , TEXT ( "Virtual" ) , actorArray );
+	for (AActor* actor : actorArray)
+	{
+		// 버츄얼을 찾았다면 버츄얼에 달린 component를 검색함
+		UVirtual_KMK* virtualComp = actor->FindComponentByClass<UVirtual_KMK> ( );
+		if (virtualComp)
+		{
+			// 버츄얼 캐릭터가 있다면 안보이게 만듦
+			VirtualCharacter = virtualComp;
+			return; // 성공적으로 찾았으므로 종료
+		}
+	}
+	UE_LOG ( LogTemp , Warning , TEXT ( "Virtual Character not found, retrying..." ) );
+	// 버츄얼을 못찾았다면, 일정 시간 후 다시 시도
+	GetWorld ( )->GetTimerManager ( ).SetTimerForNextTick ( this , &AHSW_ThirdPersonCharacter::FindVirtualCharacter );
+}
+
 void AHSW_ThirdPersonCharacter::ClientPlayMusic_Implementation ( class UAudioComponent* selectedMusic )
 {
 	//	UGameplayStatics::PlaySound2D(this, Music );
