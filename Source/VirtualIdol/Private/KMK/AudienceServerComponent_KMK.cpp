@@ -79,15 +79,42 @@ void UAudienceServerComponent_KMK::BeginPlay()
 		// 관객의 초기 셋팅값 변경
 		if (playerMesh->IsLocallyControlled())
         {
-            playerMesh->SetActorLocation ( FVector ( 0, 0, 100 ) );
-
+			if (gi->concertStageInfo.terrain == 0)
+			{
+				playerMesh->SetActorLocation ( FVector ( 3600 , -100 , 300 ) );
+				playerMesh->SetActorRotation ( FRotator ( 0 , 0 , 0 ) );
+			}
+			else if (gi->concertStageInfo.terrain == 1)
+			{
+				playerMesh->SetActorLocation ( FVector ( 1600 , 0 , 400 ) );
+				playerMesh->SetActorRotation ( FRotator ( 0 , 0 , 0 ) );
+			}
+			else if (gi->concertStageInfo.terrain == 2)
+			{
+				playerMesh->SetActorLocation ( FVector ( 2260 , -200 , 100 ) );
+				playerMesh->SetActorRotation ( FRotator ( 0 , 0 , 0 ) );
+			}
+			else if (gi->concertStageInfo.terrain == 3)
+			{
+				playerMesh->SetActorLocation ( FVector ( 2700 , 0 , 300 ) );
+				playerMesh->SetActorRotation ( FRotator ( 0 , 0 , 0 ) );
+			}
+			else if (gi->concertStageInfo.terrain == 4)
+			{
+				playerMesh->SetActorLocation ( FVector ( 2700 , 0 , 300 ) );
+				playerMesh->SetActorRotation ( FRotator ( 0 , 0 , 0 ) );
+			}
+			else if (gi->concertStageInfo.terrain == 5)
+			{
+				playerMesh->SetActorLocation ( FVector ( 3300 , 0 , 300 ) );
+				playerMesh->SetActorRotation ( FRotator ( 0 , 0 , 0 ) );
+			}
+           // playerMesh->SetActorLocation ( FVector ( 0, 0, 100 ) );
         }
         else
         {
-            playerMesh->SetActorLocation ( FVector ( -4330, -150 , 730) );
-            playerMesh->SetActorRotation(FRotator(0, 0, 0));
+
         }
-		
 	}
 	else
 	{
