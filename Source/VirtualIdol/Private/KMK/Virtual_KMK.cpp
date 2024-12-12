@@ -73,7 +73,7 @@ void UVirtual_KMK::BeginPlay()
 // 		{
 // 			gi->spawnTrans = FTransform(FVector(0) );
 // 		}
-
+		gi->GINowEffect = gi->effectArrayForEachFloor[gi->concertStageInfo.terrain];
     }
 	//if (GetWorld ( )->GetCurrentLevel()->GetName ( ).Contains ( TEXT ( "Alpha" ) ))
 	//{
@@ -81,7 +81,7 @@ void UVirtual_KMK::BeginPlay()
 	//}
 	SetWavFiles( );
 	FTimerHandle timerHandle;
-	GetWorld ( )->GetTimerManager ( ).SetTimer ( timerHandle , this , &UVirtual_KMK::SetSongList , 0.3f , false );
+	GetWorld ( )->GetTimerManager ( ).SetTimer ( timerHandle , this , &UVirtual_KMK::SetSongList , 1.f , false );
 }
 
 

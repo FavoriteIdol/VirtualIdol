@@ -241,8 +241,6 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 		}
 	}
 
-	// UAudioComponent
-	// AmbientSoundCo`mponent01->
 }
 
 // Called every frame
@@ -594,6 +592,7 @@ void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value 
 		PersonalGauge++;
 		ServerRPCFeverGauge (CurrentGauge, 8*0.02);
 		//PrintFeverGaugeLogOnHead ( );
+
 		if(!AudioActor) return;
 		if (CurrentGauge <= 0.2 )
 		{
@@ -637,6 +636,7 @@ void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value 
 			}
 			//UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge else!!!! :%f" ) , CurrentGauge );
 		}
+		
 		//MainUI->FeverGauge->SetFeverGauge ( CurrentGauge );
 		//UGameplayStatics::SpawnEmitterAtLocation ( GetWorld ( ) , FeverEffect_Particle , FeverEffectLocation );
 	}
@@ -653,8 +653,10 @@ void AHSW_ThirdPersonCharacter::ServerRPCFeverGauge_Implementation ( float fever
 
 	else if (feverValue >=1)
 	{
+		//UE_LOG ( LogTemp , Warning , TEXT ( "fever Value: %f" ), feverValue );
 		if (bFever)
 		{
+			//UE_LOG ( LogTemp , Warning , TEXT ( "bFever" ) );
 			MulticastFeverEffect( );
 			bFever = false;
 		}
@@ -685,7 +687,7 @@ void AHSW_ThirdPersonCharacter::MulticastRPCBrightness_Implementation ( int inde
 void AHSW_ThirdPersonCharacter::ServerFeverReset_Implementation ( )
 {
 	FeverBright = 1;
-	bFever=true;
+	bFever = true;
 	MulticastFeverReset( );
 	SetFeverGaugeMulti(0 );
 }
@@ -749,6 +751,7 @@ void AHSW_ThirdPersonCharacter::MulticastFeverEffect_Implementation ( )
 	//FeverEffect_Actor = GetWorld ( )->SpawnActor<AActor> (  gi->effectArray[gi->GetConcertInfo().feverVFX] , gi->spawnTrans );
 		FeverEffect_Actor = GetWorld ( )->SpawnActor<AActor> (  gi->effectArray[2] , FTransform(FVector(0)) );
 	}
+	PlayFeverVideoAnim ( );
 }
 
 // 인터뷰 =================================================================================================
@@ -760,9 +763,12 @@ void AHSW_ThirdPersonCharacter::OnMyInterview ( const FInputActionValue& value )
 
 void AHSW_ThirdPersonCharacter::OnMyMute ( )
 {
-	AudioActor->PlaySound2 ( 0);
-	AudioActor->PlaySound3 ( 0);
-	AudioActor->PlaySound4 ( 0);
+	if (AudioActor) 
+	{
+		AudioActor->PlaySound2 ( 0 );
+		AudioActor->PlaySound3 ( 0 );
+		AudioActor->PlaySound4 ( 0 );
+	}
 }
 
 void AHSW_ThirdPersonCharacter::ServerRPCInterview_Implementation (  )
@@ -962,6 +968,29 @@ void AHSW_ThirdPersonCharacter::SetChatWidget (const FString& nickName, const FS
 	if(audienceWidget)audienceWidget->CreateChatWidget(nickName, text);
 }
 
+void AHSW_ThirdPersonCharacter::PlayFeverVideoAnim ( )
+{
+	//GetComponentByClass()
+	UE_LOG ( LogTemp , Warning , TEXT ( "FeverVideo Play" ) );
+	if (audienceWidget) audienceWidget->PlayFeverVideoFadeIn ( );
+	if(VirtualCharacter&&VirtualCharacter->virtualWidget) VirtualCharacter->virtualWidget->PlayFeverVideoFadeIn();
+	else
+	{
+		if (!VirtualCharacter)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("HSW_ThirdPersonCharacter.cpp: VirtualCharacter is None!" ));
+		}
+		else if (!VirtualCharacter->virtualWidget)
+		{
+			UE_LOG ( LogTemp , Warning , TEXT ( "HSW_ThirdPersonCharacter.cpp: VirtualWidget is None!" ) );
+		}
+		else
+		{
+			UE_LOG ( LogTemp , Warning , TEXT ( "HSW_ThirdPersonCharacter.cpp: Never None!" ) );
+		}
+	}
+}
+
 #pragma endregion
 
 void AHSW_ThirdPersonCharacter::FindVirtualCharacter ( )
@@ -997,4 +1026,25 @@ void AHSW_ThirdPersonCharacter::ClientPlayMusic_Implementation ( class UAudioCom
 	{
 		UE_LOG ( LogTemp , Warning , TEXT ( "not Music" ) );
 	}
+}
+
+void AHSW_ThirdPersonCharacter::FindVirtualCharacter ( )
+{
+	TArray<AActor*> actorArray;
+	// 태그로 검색
+	UGameplayStatics::GetAllActorsWithTag ( GetWorld ( ) , TEXT ( "Virtual" ) , actorArray );
+	for (AActor* actor : actorArray)
+	{
+		// 버츄얼을 찾았다면 버츄얼에 달린 component를 검색함
+		UVirtual_KMK* virtualComp = actor->FindComponentByClass<UVirtual_KMK> ( );
+		if (virtualComp)
+		{
+			// 버츄얼 캐릭터가 있다면 안보이게 만듦
+			VirtualCharacter = virtualComp;
+			return; // 성공적으로 찾았으므로 종료
+		}
+	}
+	UE_LOG ( LogTemp , Warning , TEXT ( "Virtual Character not found, retrying..." ) );
+	// 버츄얼을 못찾았다면, 일정 시간 후 다시 시도
+	GetWorld ( )->GetTimerManager ( ).SetTimerForNextTick ( this , &AHSW_ThirdPersonCharacter::FindVirtualCharacter );
 }

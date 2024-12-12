@@ -33,6 +33,7 @@ public:
 	UFUNCTION ()
 	void CreateDummyStage( const struct FStageInfo& info );
 
+	void CreateDummyStage2 ( const struct FStageInfo& info );
 	//태양 위치 바꾸기
     UFUNCTION(BlueprintCallable, Category = "Time")
     void UpdateSunNightPosition(int32 index);

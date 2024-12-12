@@ -33,7 +33,7 @@ public:
 	virtual void GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
 
 	UPROPERTY( Replicated )
-	bool bFever;
+	bool bFever = true;
 
 	UPROPERTY ( Replicated, EditDefaultsOnly , Category = Fever )
 	class UParticleSystem* FeverEffect_Particle;
