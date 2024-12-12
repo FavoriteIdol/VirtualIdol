@@ -115,7 +115,8 @@ void UStartWidget_KMK::NativeConstruct ( )
 		Butt_CreateTicket->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressCreateTicket );
 		Butt_CreateTicket1->OnClicked.AddDynamic ( this , &UStartWidget_KMK::PressCreateTicket );
 		Butt_CreateTicket->SetIsEnabled(false);
-		Butt_CreateTicket1->SetIsEnabled(false);
+		Butt_CreateTicket1->SetIsEnabled(false);		
+
 	}
 #pragma endregion
 #pragma region Set Particle
@@ -309,6 +310,7 @@ void UStartWidget_KMK::StartConcertPanel ( )
 	{
 		gi->playerMeshNum = -1;
 		gi->CreateMySession(gi->concerInfo.name, gi->concerInfo.peopleScale);
+		UE_LOG(LogTemp, Warning, TEXT("%s" ), *(gi->concerInfo.name));
 	}
 }
 
@@ -721,21 +723,22 @@ void UStartWidget_KMK::PressNextButt ( )
 void UStartWidget_KMK::PressMoneyPay ( )
 {
 	// 티켓이 만들어지지 않은 경우
+
     if (!bCreateTicket)
     {
-		// 팝업을 띄움
+		 //팝업을 띄움
         Text_Effect1->SetVisibility ( ESlateVisibility::Hidden );
         MultiText_PopUp->SetVisibility ( ESlateVisibility::Visible );
         EffectPopUp1->SetVisibility ( ESlateVisibility::Visible );
         return;
     }
     else
-    {
-		// 티넷 생성시, 최종 결제 창을 띄움
-        Text_Effect1->SetVisibility ( ESlateVisibility::Visible );
-        MultiText_PopUp->SetVisibility ( ESlateVisibility::Hidden );
-        EffectPopUp1->SetVisibility ( ESlateVisibility::Hidden );
-        Image_Load->SetVisibility ( ESlateVisibility::Hidden );
+    { 
+	// 티켓 생성시, 최종 결제 창을 띄움
+		Text_Effect1->SetVisibility ( ESlateVisibility::Visible );
+		MultiText_PopUp->SetVisibility ( ESlateVisibility::Hidden );
+		EffectPopUp1->SetVisibility ( ESlateVisibility::Hidden );
+		Image_Load->SetVisibility ( ESlateVisibility::Hidden );
     }
 	// 
 	// 콘서트 예약시 사용된 stage 값을 넣음
