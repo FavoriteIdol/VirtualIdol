@@ -144,6 +144,9 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 	FString ChangeString ( const FString& editText );
 	UFUNCTION (BlueprintCallable)
 	FConcertInfo GetConcertInfo(  );
+
+	// HttpActor
+	class AHttpActor_KMK* HttpActor;
 #pragma endregion
 #pragma region Chat
 

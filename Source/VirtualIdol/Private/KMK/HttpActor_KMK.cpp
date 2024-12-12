@@ -995,3 +995,124 @@ void AHttpActor_KMK::OnReqMultiCollectionConcert ( FHttpRequestPtr Request , FHt
 		UE_LOG ( LogTemp , Warning , TEXT ( "Failed Collcet concert" ) );
 	}
 }
+
+#pragma region BE Music
+void AHttpActor_KMK::ReqMusic ( int64 ConcertId )
+{
+	UE_LOG ( LogTemp , Warning , TEXT ( "ReqMusic Start" ) );
+
+	// API 요청 URL 생성
+	FString ApiUrl = FString::Printf ( TEXT ( "http://back.reward-factory.shop:8123/api/v1/songs/concert/%d" ) , ConcertId );
+
+	UE_LOG ( LogTemp , Warning , TEXT ( "Music API URL: *s" ), *ApiUrl );
+
+	// HTTP 요청 생성
+	TSharedRef<IHttpRequest> HttpRequest = FHttpModule::Get ( ).CreateRequest ( );
+	HttpRequest->SetURL ( ApiUrl );
+	HttpRequest->SetVerb ( TEXT ( "GET" ) );
+
+	FString AuthHeader = FString::Printf ( TEXT ( "Bearer %s" ) , *loginInfo.token );
+	HttpRequest->SetHeader ( TEXT ( "Authorization" ) , AuthHeader );
+
+	HttpRequest->OnProcessRequestComplete ( ).BindUObject ( this , &AHttpActor_KMK::OnReqMusic, ConcertId );
+	HttpRequest->ProcessRequest ( );
+}
+
+void AHttpActor_KMK::OnReqMusic ( FHttpRequestPtr Request , FHttpResponsePtr Response , bool bWasSuccessful, int64 ConcertId )
+{
+	UE_LOG ( LogTemp , Warning , TEXT ( "OnReqMusic Start" ) );
+	UE_LOG ( LogTemp , Warning , TEXT ( "Response Content: %s" ) , *Response->GetContentAsString ( ) )
+
+	if (!bWasSuccessful || !Response.IsValid ( ) || Response->GetResponseCode ( ) != 200)
+	{
+		UE_LOG ( LogTemp , Error , TEXT ( "HTTP 요청 실패 또는 잘못된 응답" ) );
+		return;
+	}
+
+
+	// JSON 파싱
+	TSharedPtr<FJsonValue> JsonParsed;
+	TSharedRef<TJsonReader<>> JsonReader = TJsonReaderFactory<>::Create ( Response->GetContentAsString ( ) );
+	if (!FJsonSerializer::Deserialize ( JsonReader , JsonParsed ) || !JsonParsed.IsValid ( ))
+	{
+		UE_LOG ( LogTemp , Error , TEXT ( "JSON 파싱 실패" ) );
+		return;
+	}
+
+	UE_LOG ( LogTemp , Warning , TEXT ( "JsonParsed Valid: %s" ) , JsonParsed.IsValid ( ) ? TEXT ( "true" ) : TEXT ( "false" ) );
+
+
+	const TArray<TSharedPtr<FJsonValue>>* Songs;
+
+	if (!JsonParsed->TryGetArray ( Songs ))
+	{
+		UE_LOG ( LogTemp , Error , TEXT ( "JSON 데이터가 배열이 아닙니다." ) );
+		return;
+	}
+
+	if (Songs && Songs->Num ( ) > 0)
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "Songs Array Size: %d" ) , Songs->Num ( ) );
+	}
+	else
+	{
+		UE_LOG ( LogTemp , Error , TEXT ( "Songs 배열이 비어있음." ) );
+		return;
+	}
+
+	// JSON 데이터 순회
+	for (const TSharedPtr<FJsonValue>& Song : *Songs)
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "Json for loop start" ));
+
+		const TSharedPtr<FJsonObject>* SongObject;
+		if (!Song->TryGetObject ( SongObject ))
+		{
+			UE_LOG ( LogTemp , Warning , TEXT ( "Json 배열의 요소가 객체가 아님." ) );
+			continue;
+		}
+
+		int32 SongId = ( *SongObject )->GetIntegerField ( TEXT ( "id" ) );
+		FString Title = ( *SongObject )->GetStringField ( TEXT ( "title" ) );
+		FString Url = ( *SongObject )->GetStringField ( TEXT ( "url" ) );
+
+		UE_LOG ( LogTemp , Warning , TEXT ( "This Song: %s"), *Title );
+
+		// HTTP 요청으로 WAV 다운로드
+		TSharedRef<IHttpRequest> WavRequest = FHttpModule::Get ( ).CreateRequest ( );
+		WavRequest->SetURL ( Url );
+		WavRequest->SetVerb ( TEXT ( "GET" ) );
+		WavRequest->OnProcessRequestComplete ( ).BindLambda ( [this , ConcertId , SongId , Title]( FHttpRequestPtr WavRequest , FHttpResponsePtr WavResponse , bool bWasWavSuccessful ) {
+			if (bWasWavSuccessful && WavResponse.IsValid ( ) && WavResponse->GetResponseCode ( ) == 200)
+			{
+				FString FileName = FString::Printf ( TEXT ( "%d_%d_%s.wav" ) , ConcertId , SongId , *Title );
+				UE_LOG ( LogTemp , Warning , TEXT ( "Song FileName: %s"), *FileName );
+				SaveWavToFile ( FileName , WavResponse->GetContent ( ) );
+			}
+			else
+			{
+				UE_LOG ( LogTemp , Error , TEXT ( "WAV 파일 다운로드 실패: %s" ) , *WavRequest->GetURL ( ) );
+			}
+		} );
+		WavRequest->ProcessRequest ( );
+	}
+}
+
+void AHttpActor_KMK::SaveWavToFile ( const FString& FileName , const TArray<uint8>& Data )
+{
+	UE_LOG ( LogTemp , Warning , TEXT ( "SaveWavToFile Start") );
+
+	FString SavePath = FPaths::ProjectSavedDir ( ) / TEXT ( "Music" );
+	IFileManager::Get ( ).MakeDirectory ( *SavePath , true );
+	FString FullPath = SavePath / FileName;
+
+	if (FFileHelper::SaveArrayToFile ( Data , *FullPath ))
+	{
+		UE_LOG ( LogTemp , Log , TEXT ( "WAV 파일 저장 완료: %s" ) , *FullPath );
+	}
+	else
+	{
+		UE_LOG ( LogTemp , Error , TEXT ( "WAV 파일 저장 실패: %s" ) , *FullPath );
+	}
+}
+#pragma endregion

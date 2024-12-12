@@ -14,6 +14,13 @@
 #include "JJH/JJH_SelectManager.h"
 #include "KMK/VirtualGameInstance_KMK.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Sound/SoundWaveProcedural.h"
+#include "Sound/SoundWave.h"
+#include "MediaSoundComponent.h"
+#include "MediaPlayer.h"
+#include "Internationalization/Text.h"
+#include "Components/TextBlock.h"
+#include "HSW_AudioLoadingActor.h"
 
 // Sets default values for this component's properties
 UVirtual_KMK::UVirtual_KMK()
@@ -22,7 +29,7 @@ UVirtual_KMK::UVirtual_KMK()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	// ...
+
 }
 
 
@@ -71,6 +78,7 @@ void UVirtual_KMK::BeginPlay()
 	//{
 	//	gi->spawnTrans = FTransform(FVector(0,0,2000 ) );
 	//}
+	SetWavFiles( );
 }
 
 
@@ -281,5 +289,143 @@ void UVirtual_KMK::CancleVoiceChat ( )
 	pc->StopTalking( );
 }
 
+
 #pragma endregion
 
+#pragma region Music
+
+void UVirtual_KMK::SetWavFiles ( )
+{
+	FString DirectoryPath = FPaths::ProjectSavedDir ( ) + TEXT ( "Music" );
+	TArray<FString> FileNames;
+	IFileManager& FileManager = IFileManager::Get ( );
+
+	// 디렉토리에서 모든 WAV 파일 검색
+	FileManager.FindFiles ( FileNames , *DirectoryPath , TEXT ( ".wav" ) );
+
+	WavFiles.Empty ( );
+
+	for (const FString& FileName : FileNames)
+	{
+		TArray<FString> SplitName;
+		FileName.ParseIntoArray ( SplitName , TEXT ( "_" ) );
+		//FileName.Split ( TEXT ( "_" ) , &SplitName , nullptr , ESearchCase::IgnoreCase );
+
+		for (FString Splited : SplitName)
+		{
+			UE_LOG ( LogTemp , Warning , TEXT ( "splited: %s" ), *Splited);
+		}
+		// 파일 이름에서 정보 추출 (형식: ConcertID_SongID_Title.wav)
+		if (SplitName.Num ( ) >= 3)
+		{
+
+			int32 FileConcertID = FCString::Atoi ( *SplitName[0] );
+			int32 SongID = FCString::Atoi ( *SplitName[1] );
+			FString Title = SplitName[2].Left ( SplitName[2].Len ( ) - 4 ); // ".wav" 제거
+
+			if (FileConcertID == gi->concerInfo.concertId)
+			{
+
+				FWavFileInfo CurrentFile;
+
+				FString FilePath = DirectoryPath + "/" + FileName;
+
+				CurrentFile.ConcertID = FileConcertID;
+				CurrentFile.SongID = SongID;
+				CurrentFile.Title = Title;
+				CurrentFile.FilePath = FilePath;
+
+				UE_LOG ( LogTemp , Warning , TEXT ( "Loaded: ConcertID=%d, SongID=%d, Title=%s, Path=%s" ) ,
+	CurrentFile.ConcertID , CurrentFile.SongID , *CurrentFile.Title , *CurrentFile.FilePath );
+
+				WavFiles.Add ( CurrentFile );
+			}
+		}
+	}
+
+	// 디버깅: 불러온 파일 로그 출력
+	if (!WavFiles.IsEmpty ( ))
+	{
+		// 		for (const auto& WavFile : WavFiles)
+		// 		{
+		// 			UE_LOG ( LogTemp , Warning , TEXT ( "Loaded: ConcertID=%d, SongID=%d, Title=%s, Path=%s" ) ,
+		// 				WavFile.ConcertID , WavFile.SongID , *WavFile.Title , *WavFile.FilePath );
+		// 		}
+	}
+	else
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "'WavFiles' is Empty!" ) );
+	}
+}
+
+void UVirtual_KMK::SetCurrentSongIndex ( )
+{
+	CurrentSongIndex++;
+	if (CurrentSongIndex == WavFiles.Num ( )) CurrentSongIndex = 0;
+}
+
+FText UVirtual_KMK::GetCurrentSongTitle ( )
+{
+	return FText::FromString ( WavFiles[CurrentSongIndex].Title );
+}
+
+void UVirtual_KMK::CreateAudioActor ( )
+{
+	if (bCanPlaySong)
+	{
+		GetWorld ( )->SpawnActor<AHSW_AudioLoadingActor> ( AudioActorFactory , FTransform::Identity );
+		bCanPlaySong = false;
+	}
+}
+
+#pragma endregion
+
+// USoundWave* UVirtual_KMK::WavToSoundWave ( const FString& FilePath )
+// {
+// 	TArray<uint8> RawFileData;
+// 	if (!FFileHelper::LoadFileToArray ( RawFileData , *FilePath ))
+// 	{
+// 		UE_LOG ( LogTemp , Error , TEXT ( "Failed to load file: %s" ) , *FilePath );
+// 		return nullptr;
+// 	}
+// 
+// 	// WAV 파일 헤더 검증
+// 	if (RawFileData.Num ( ) < 44 || FMemory::Memcmp ( RawFileData.GetData ( ) , "RIFF" , 4 ) != 0 ||
+// 		FMemory::Memcmp ( RawFileData.GetData ( ) + 8 , "WAVE" , 4 ) != 0)
+// 	{
+// 		UE_LOG ( LogTemp , Error , TEXT ( "Invalid WAV file format: %s" ) , *FilePath );
+// 		return nullptr;
+// 	}
+// 
+// 	// WAV 헤더 파싱
+// 	const uint8* Header = RawFileData.GetData ( );
+// 	int32 SampleRate = *reinterpret_cast<const int32*>( Header + 24 ); // 24번 오프셋에서 샘플 레이트
+// 	int32 Channels = *reinterpret_cast<const int16*>( Header + 22 );  // 22번 오프셋에서 채널 수
+// 	int32 BitsPerSample = *reinterpret_cast<const int16*>( Header + 34 ); // 34번 오프셋에서 비트 깊이
+// 	int32 DataSize = *reinterpret_cast<const int32*>( Header + 40 );  // 40번 오프셋에서 데이터 크기
+// 
+// 	if (DataSize <= 0 || DataSize > ( RawFileData.Num ( ) - 44 ) ||
+// 		SampleRate <= 0 || Channels <= 0 || BitsPerSample <= 0)
+// 	{
+// 		UE_LOG ( LogTemp , Error , TEXT ( "WAV file contains invalid metadata: %s" ) , *FilePath );
+// 		return nullptr;
+// 	}
+// 
+// 	// SoundWave 생성 및 데이터 설정
+// 	USoundWave* SoundWave = NewObject<USoundWave> ( );
+// 
+// 	SoundWave->RawData.Lock ( LOCK_READ_WRITE );
+// 	void* LockedData = SoundWave->RawData.Realloc ( DataSize );
+// 	FMemory::Memcpy ( LockedData , Header + 44 , DataSize ); // WAV 헤더 이후가 PCM 데이터
+// 	SoundWave->RawData.Unlock ( );
+// 
+// 	SoundWave->Duration = static_cast<float>( DataSize ) / ( SampleRate * Channels * BitsPerSample / 8 );
+// 	SoundWave->SampleRate = SampleRate;
+// 	SoundWave->NumChannels = Channels;
+// 
+// 	UE_LOG ( LogTemp , Warning , TEXT ( "Loaded WAV file: %s" ) , *FilePath );
+// 	UE_LOG ( LogTemp , Warning , TEXT ( "SampleRate: %d, Channels: %d, Duration: %.2f" ) ,
+// 		   SampleRate , Channels , SoundWave->Duration );
+// 
+// 	return SoundWave;
+// }
