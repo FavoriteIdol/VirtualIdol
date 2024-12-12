@@ -22,7 +22,7 @@ void UJJH_MapSelectWidget::NativeConstruct ( )
 	
 	Borders = { Border_0, Border_1, Border_2, Border_3, Border_4, Border_5,
 			   Border_6, Border_7, Border_8, Border_9, Border_10, Border_11,
-			   Border_12, Border_13, Border_14, Border_15, Border_20, Border_21, Border_22, Border_23 };
+			   Border_12, Border_13, Border_14, Border_15, Border_20, Border_21, Border_22, Border_23, Border_16};
 
 	CategoryButtons = { WeatherButton, ThemeButton, EffectButton, FloorButton };
 		// 디버깅: 배열 확인
@@ -74,6 +74,7 @@ void UJJH_MapSelectWidget::NativeConstruct ( )
 	OceanButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnOceanButtonClicked );
 	DystopiaGroundButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnDystopiaGroundButtonClicked );
 	BookButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnBookButtonClicked );
+	PresentButton->OnClicked.AddDynamic ( this , &UJJH_MapSelectWidget::OnPresentButtonClicked );
 
 	FloorHorizontal->SetVisibility ( ESlateVisibility::Hidden );
 	ThemeHorizontal->SetVisibility ( ESlateVisibility::Hidden );
@@ -369,6 +370,12 @@ void UJJH_MapSelectWidget::OnBookButtonClicked ( )
 {
 	if (SM) SM->ChangeFloor ( 4 );
 	ChangeBorder ( 15 );
+}
+
+void UJJH_MapSelectWidget::OnPresentButtonClicked ( )
+{
+	if (SM) SM->ChangeFloor ( 5 );
+	ChangeBorder ( 20 );
 }
 
 //이펙트 바꾸기

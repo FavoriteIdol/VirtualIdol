@@ -81,7 +81,10 @@ public:
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UBorder* Border_22;	
 	UPROPERTY ( meta = ( BindWidget ) )
-	class UBorder* Border_23;
+	class UBorder* Border_23;	
+	
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UBorder* Border_16;
 
 	UFUNCTION()
 	void ChangeBorder(int32 BorderNum);
@@ -157,7 +160,9 @@ public:
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UButton* DystopiaGroundButton;	
 	UPROPERTY ( meta = ( BindWidget ) )
-	class UButton* BookButton;
+	class UButton* BookButton;	
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* PresentButton;
 
 
 	UFUNCTION ( )
@@ -169,7 +174,9 @@ public:
 	UFUNCTION ( )
 	void OnDystopiaGroundButtonClicked ( );	
 	UFUNCTION ( )
-	void OnBookButtonClicked ( );
+	void OnBookButtonClicked ( );	
+	UFUNCTION ( )
+	void OnPresentButtonClicked ( );
 
 
 	//캡쳐

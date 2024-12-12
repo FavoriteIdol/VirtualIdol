@@ -92,7 +92,7 @@ struct FStageInfo
 	UPROPERTY(BlueprintReadOnly)
 	int32 sky = 0;
 	UPROPERTY(BlueprintReadOnly)
-	int32 theme = 0;
+	int32 theme = 6;
 	UPROPERTY(BlueprintReadOnly)
 	int32 specialEffect = 0;
 	UPROPERTY( )
@@ -140,6 +140,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<TSubclassOf<AActor>> effectArray;
+
+
 
 #pragma region with BE for Login
 	UPROPERTY( )
