@@ -340,6 +340,22 @@ public :
 
 #pragma endregion  Music
 
+#pragma region FeverVideo
+
+	UPROPERTY(EditAnywhere, meta= (BindWidgetAnim ) , Transient )
+	class UWidgetAnimation* FeverVideoFadeIn;
+
+	UPROPERTY(EditAnywhere, meta=(BindWidgetAnim ), Transient )
+	class UWidgetAnimation* FeverVideoFadeOut;
+
+	UFUNCTION( )
+	void PlayFeverVideoFadeIn( );
+	
+	UFUNCTION( )
+	void PlayFeverVideoFadeOut( );
+#pragma endregion
+
+
 
 };
 void ApplyHighPassFilter16 ( TArray<int16>& PCMData , float CutoffFrequency , int32 SampleRate );
