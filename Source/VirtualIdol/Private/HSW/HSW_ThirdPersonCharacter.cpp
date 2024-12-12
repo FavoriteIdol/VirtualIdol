@@ -1027,24 +1027,3 @@ void AHSW_ThirdPersonCharacter::ClientPlayMusic_Implementation ( class UAudioCom
 		UE_LOG ( LogTemp , Warning , TEXT ( "not Music" ) );
 	}
 }
-
-void AHSW_ThirdPersonCharacter::FindVirtualCharacter ( )
-{
-	TArray<AActor*> actorArray;
-	// 태그로 검색
-	UGameplayStatics::GetAllActorsWithTag ( GetWorld ( ) , TEXT ( "Virtual" ) , actorArray );
-	for (AActor* actor : actorArray)
-	{
-		// 버츄얼을 찾았다면 버츄얼에 달린 component를 검색함
-		UVirtual_KMK* virtualComp = actor->FindComponentByClass<UVirtual_KMK> ( );
-		if (virtualComp)
-		{
-			// 버츄얼 캐릭터가 있다면 안보이게 만듦
-			VirtualCharacter = virtualComp;
-			return; // 성공적으로 찾았으므로 종료
-		}
-	}
-	UE_LOG ( LogTemp , Warning , TEXT ( "Virtual Character not found, retrying..." ) );
-	// 버츄얼을 못찾았다면, 일정 시간 후 다시 시도
-	GetWorld ( )->GetTimerManager ( ).SetTimerForNextTick ( this , &AHSW_ThirdPersonCharacter::FindVirtualCharacter );
-}
