@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "KMK/HttpActor_KMK.h"
 #include "HSW_AudioLoadingActor.generated.h"
 
 UCLASS()
@@ -24,6 +25,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 public:
+	UPROPERTY( )
+	class USceneComponent* SceneComponent;
 
 	UPROPERTY( )
 	class UVirtualGameInstance_KMK* gi;
@@ -39,6 +42,7 @@ public:
 
 	UPROPERTY( )
 	class UFileMediaSource* FileMediaSource;
+
 	UFUNCTION( )
 	void PlayWavFile( );
 

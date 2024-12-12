@@ -14,12 +14,12 @@ void UHSW_SongUnit::NativeConstruct ( )
     gi = Cast<UVirtualGameInstance_KMK> ( GetWorld ( )->GetGameInstance ( ) );
     FindVirtualCharacter ( );
 
-    if (Button_Play)
+    if (Button_Play && !Button_Play->OnClicked.IsAlreadyBound ( this , &UHSW_SongUnit::MusicStart ))
     {
         Button_Play->OnClicked.AddDynamic ( this , &UHSW_SongUnit::MusicStart );
     }
 
-    if (Button_Stop)
+    if (Button_Stop && !Button_Stop->OnClicked.IsAlreadyBound ( this , &UHSW_SongUnit::MusicStop ))
     {
         Button_Stop->OnClicked.AddDynamic ( this , &UHSW_SongUnit::MusicStop );
     }
@@ -28,7 +28,7 @@ void UHSW_SongUnit::NativeConstruct ( )
 
 void UHSW_SongUnit::MusicStart ( )
 {
-    VirtualCharacter->CreateAudioActor ( );
+    VirtualCharacter->CreateAudioActor (SongInfo);
 }
 
 void UHSW_SongUnit::MusicStop ( )
@@ -49,8 +49,6 @@ void UHSW_SongUnit::FindVirtualCharacter ( )
         {
             // 버츄얼 캐릭터가 있다면 안보이게 만듦
             VirtualCharacter = virtualComp;
-            VirtualCharacter->SetVirtualVisible ( false );
-            //UE_LOG ( LogTemp , Warning , TEXT ( "Found Virtual Character: %s" ) , *actor->GetName ( ) );
             return; // 성공적으로 찾았으므로 종료
         }
     }

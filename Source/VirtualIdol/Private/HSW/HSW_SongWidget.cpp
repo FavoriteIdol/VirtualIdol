@@ -31,7 +31,7 @@ void UHSW_SongWidget::NativeConstruct ( )
 void UHSW_SongWidget::MusicStart ( )
 {
     UE_LOG(LogTemp, Warning, TEXT("UI: MusicStart.") );
-    VirtualCharacter->CreateAudioActor();
+    //VirtualCharacter->CreateAudioActor();
 }
 
 void UHSW_SongWidget::SetMusic ( )

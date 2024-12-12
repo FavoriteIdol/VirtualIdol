@@ -96,6 +96,9 @@ public:
 	UPROPERTY ( EditDefaultsOnly , BlueprintReadWrite )
 	TArray<FWavFileInfo> WavFiles;
 
+	UPROPERTY( )
+	FWavFileInfo SongInfo;
+
 	UFUNCTION( )
 	void SetWavFiles ( );
 
@@ -107,7 +110,8 @@ public:
 
 	bool bCanPlaySong = true;
 	UFUNCTION( )
-	void CreateAudioActor( );
+	void CreateAudioActor( FWavFileInfo currentSongInfo );
+
 	UFUNCTION( )
 	void FindAudioActor( );
 	UFUNCTION( )
