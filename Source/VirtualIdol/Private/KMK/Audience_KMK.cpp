@@ -36,6 +36,7 @@
 #include "HSW/HSW_AuditoriumGameMode.h"
 #include "HSW/HSW_GameState_Auditorium.h"
 #include "HSW_ThrowingObject.h"
+#include "HSW/HSW_SongUnit.h"
 
 void UAudience_KMK::NativeConstruct ( )
 {
@@ -753,6 +754,16 @@ USoundWaveProcedural* UAudience_KMK::LoadWavFromFile ( const FString& FilePath )
 
     return SoundWave;
 }
+
+void UAudience_KMK::AddSongList ( const FWavFileInfo& SongInfo )
+{
+    auto* songUnit = CreateWidget<UHSW_SongUnit> ( this , SongUnitFact );
+    songUnit->SongInfo = SongInfo;
+    songUnit->SetSongTitle();
+    SB_ChatLog->AddChild ( SB_SongList_1 );
+    SB_ChatLog->AddChild ( SB_SongList_2 );
+}
+
 #pragma endregion
 #pragma region Modeling
 

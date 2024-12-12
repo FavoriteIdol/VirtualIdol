@@ -86,7 +86,7 @@ public:
 	class APlayerController* pc;
 
 	UPROPERTY ( EditAnywhere , BlueprintReadWrite )
-	TSubclassOf<class AHSW_AudioLoadingActor> AudioActorFactory;
+	TSubclassOf<class AHSW_AudioLoadingActor> AudioLoadingActorFactory;
 
 #pragma region Music
 
@@ -103,10 +103,21 @@ public:
 	void SetCurrentSongIndex ( );
 
 	UFUNCTION( )
-	FText GetCurrentSongTitle ( );
+	FText GetSongTitle (int SongIndex);
 
 	bool bCanPlaySong = true;
 	UFUNCTION( )
 	void CreateAudioActor( );
+	UFUNCTION( )
+	void FindAudioActor( );
+	UFUNCTION( )
+	void DestroyAudioActor( );
+
+	UFUNCTION( )
+	void SetSongList();
+
+	UPROPERTY ( )
+	class AHSW_AudioLoadingActor* AudioLoadingActor;
+
 #pragma endregion
 };

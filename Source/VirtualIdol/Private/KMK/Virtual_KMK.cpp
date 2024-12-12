@@ -21,6 +21,7 @@
 #include "Internationalization/Text.h"
 #include "Components/TextBlock.h"
 #include "HSW_AudioLoadingActor.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values for this component's properties
 UVirtual_KMK::UVirtual_KMK()
@@ -364,17 +365,41 @@ void UVirtual_KMK::SetCurrentSongIndex ( )
 	if (CurrentSongIndex == WavFiles.Num ( )) CurrentSongIndex = 0;
 }
 
-FText UVirtual_KMK::GetCurrentSongTitle ( )
+FText UVirtual_KMK::GetSongTitle ( int SongIndex )
 {
-	return FText::FromString ( WavFiles[CurrentSongIndex].Title );
+	return FText::FromString ( WavFiles[SongIndex].Title );
 }
 
 void UVirtual_KMK::CreateAudioActor ( )
 {
-	if (bCanPlaySong)
+	FindAudioActor( );
+	if (!AudioLoadingActor && bCanPlaySong)
 	{
-		GetWorld ( )->SpawnActor<AHSW_AudioLoadingActor> ( AudioActorFactory , FTransform::Identity );
+		GetWorld ( )->SpawnActor<AHSW_AudioLoadingActor> ( AudioLoadingActorFactory , FTransform::Identity );
 		bCanPlaySong = false;
+	}
+}
+
+void UVirtual_KMK::FindAudioActor ( )
+{
+	AudioLoadingActor = Cast<AHSW_AudioLoadingActor>(UGameplayStatics::GetActorOfClass(GetWorld(), AHSW_AudioLoadingActor::StaticClass( ) ));
+}
+
+void UVirtual_KMK::DestroyAudioActor ( )
+{
+	if(AudioLoadingActor) 
+	{
+		AudioLoadingActor->Destroy();
+		bCanPlaySong = true;
+	}
+}
+
+
+void UVirtual_KMK::SetSongList ( )
+{
+	for (FWavFileInfo songInfo : WavFiles)
+	{
+		virtualWidget->AddSongList( songInfo );
 	}
 }
 

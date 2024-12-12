@@ -1,46 +1,42 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "HSW/HSW_SongWidget.h"
+#include "HSW/HSW_SongUnit.h"
 #include "Components/Button.h"
 #include "KMK/VirtualGameInstance_KMK.h"
 #include "Kismet/GameplayStatics.h"
 #include "KMK/Virtual_KMK.h"
 #include "Components/TextBlock.h"
 
-void UHSW_SongWidget::NativeConstruct ( )
+void UHSW_SongUnit::NativeConstruct ( )
 {
-	Super::NativeConstruct ( );
-	gi = Cast<UVirtualGameInstance_KMK> ( GetWorld ( )->GetGameInstance ( ) );
+    Super::NativeConstruct ( );
+    gi = Cast<UVirtualGameInstance_KMK> ( GetWorld ( )->GetGameInstance ( ) );
+    FindVirtualCharacter ( );
 
-	if (Button_Play)
-	{
-		Button_Play->OnClicked.AddDynamic ( this , &UHSW_SongWidget::MusicStart );
-	}
+    if (Button_Play)
+    {
+        Button_Play->OnClicked.AddDynamic ( this , &UHSW_SongUnit::MusicStart );
+    }
 
-	if (Button_Next)
-	{
-		Button_Next->OnClicked.AddDynamic ( this , &UHSW_SongWidget::SetMusic );
-	}
+    if (Button_Stop)
+    {
+        Button_Stop->OnClicked.AddDynamic ( this , &UHSW_SongUnit::MusicStop );
+    }
 
-    FindVirtualCharacter( );
-
-    //Text_CurrentSongTitle->SetText ( VirtualCharacter->GetCurrentSongTitle ( ) );
 }
 
-void UHSW_SongWidget::MusicStart ( )
+void UHSW_SongUnit::MusicStart ( )
 {
-    UE_LOG(LogTemp, Warning, TEXT("UI: MusicStart.") );
-    VirtualCharacter->CreateAudioActor();
+    VirtualCharacter->CreateAudioActor ( );
 }
 
-void UHSW_SongWidget::SetMusic ( )
+void UHSW_SongUnit::MusicStop ( )
 {
-    VirtualCharacter->SetCurrentSongIndex();
-    //Text_CurrentSongTitle->SetText( VirtualCharacter->GetCurrentSongTitle() );
+    VirtualCharacter->DestroyAudioActor ( );
 }
 
-void UHSW_SongWidget::FindVirtualCharacter ( )
+void UHSW_SongUnit::FindVirtualCharacter ( )
 {
     TArray<AActor*> actorArray;
     // 태그로 검색
@@ -60,5 +56,11 @@ void UHSW_SongWidget::FindVirtualCharacter ( )
     }
     UE_LOG ( LogTemp , Warning , TEXT ( "Virtual Character not found, retrying..." ) );
     // 버츄얼을 못찾았다면, 일정 시간 후 다시 시도
-    GetWorld ( )->GetTimerManager ( ).SetTimerForNextTick ( this , &UHSW_SongWidget::FindVirtualCharacter );
+    GetWorld ( )->GetTimerManager ( ).SetTimerForNextTick ( this , &UHSW_SongUnit::FindVirtualCharacter );
+}
+
+void UHSW_SongUnit::SetSongTitle ( )
+{
+    if (SongInfo.Title.IsEmpty()) return;
+    Text_SongTitle->SetText ( FText::FromString(SongInfo.Title ));
 }
