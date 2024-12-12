@@ -81,7 +81,7 @@ void UVirtual_KMK::BeginPlay()
 	//}
 	SetWavFiles( );
 	FTimerHandle timerHandle;
-	GetWorld ( )->GetTimerManager ( ).SetTimer ( timerHandle , this , &UVirtual_KMK::SetSongList , 0.3f , false );
+	GetWorld ( )->GetTimerManager ( ).SetTimer ( timerHandle , this , &UVirtual_KMK::SetSongList , 1.f , false );
 }
 
 
@@ -403,7 +403,7 @@ void UVirtual_KMK::SetSongList ( )
 	UE_LOG(LogTemp,Error,TEXT("SetSongList 함수 실행" ));
 	for (FWavFileInfo songInfo : WavFiles)
 	{
-		virtualWidget->AddSongList( songInfo );
+		if(virtualWidget) virtualWidget->AddSongList( songInfo );
 	}
 }
 

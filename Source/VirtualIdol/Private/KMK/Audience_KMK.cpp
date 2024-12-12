@@ -756,17 +756,36 @@ USoundWaveProcedural* UAudience_KMK::LoadWavFromFile ( const FString& FilePath )
 
 void UAudience_KMK::AddSongList ( const FWavFileInfo& SongInfo )
 {
+
     auto* songUnit1 = CreateWidget<UHSW_SongUnit> ( this , SongUnitFact );
     auto* songUnit2 = CreateWidget<UHSW_SongUnit> ( this , SongUnitFact );
     
-    songUnit1->SongInfo = SongInfo;
-    songUnit1->SetSongTitle();
-    songUnit2->SongInfo = SongInfo;
-    songUnit2->SetSongTitle ( );
-    SB_SongList_1->AddChild ( songUnit1 );
-    SB_SongList_1->ScrollToEnd ( );
-    SB_SongList_2->AddChild ( songUnit2 );
-    SB_SongList_2->ScrollToEnd ( );
+    if (songUnit1)
+    {
+        songUnit1->SongInfo = SongInfo;
+        songUnit1->SetSongTitle();
+        SB_SongList_1->AddChild ( songUnit1 );
+        SB_SongList_1->ScrollToEnd ( );
+    }
+    if (songUnit2)
+    {
+		songUnit2->SongInfo = SongInfo;
+		songUnit2->SetSongTitle ( );
+		SB_SongList_2->AddChild ( songUnit2 );
+		SB_SongList_2->ScrollToEnd ( );
+    }
+}
+
+void UAudience_KMK::PlayFeverVideoFadeIn ( )
+{
+    PlayAnimation( FeverVideoFadeIn );
+    FTimerHandle timerHandle;
+    GetWorld ( )->GetTimerManager ( ).SetTimer ( timerHandle , this , &UAudience_KMK::PlayFeverVideoFadeOut , 10.f , false );
+}
+
+void UAudience_KMK::PlayFeverVideoFadeOut ( )
+{
+    PlayAnimation ( FeverVideoFadeOut );
 }
 
 #pragma endregion
