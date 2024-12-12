@@ -36,6 +36,8 @@
 #include "HSW/HSW_AuditoriumGameMode.h"
 #include "HSW/HSW_GameState_Auditorium.h"
 #include "HSW_ThrowingObject.h"
+#include "HSW/HSW_SongUnit.h"
+#include "KMK/Virtual_KMK.h"
 
 void UAudience_KMK::NativeConstruct ( )
 {
@@ -131,8 +133,6 @@ void UAudience_KMK::NativeConstruct ( )
 	Player = Cast<AHSW_ThirdPersonCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn() );
 	if(Player)ImojiComponent = Player->GetComponentByClass<UHSW_ImojiConponent>();
 #pragma endregion
-
-
 
 }
 
@@ -753,6 +753,22 @@ USoundWaveProcedural* UAudience_KMK::LoadWavFromFile ( const FString& FilePath )
 
     return SoundWave;
 }
+
+void UAudience_KMK::AddSongList ( const FWavFileInfo& SongInfo )
+{
+    auto* songUnit1 = CreateWidget<UHSW_SongUnit> ( this , SongUnitFact );
+    auto* songUnit2 = CreateWidget<UHSW_SongUnit> ( this , SongUnitFact );
+    
+    songUnit1->SongInfo = SongInfo;
+    songUnit1->SetSongTitle();
+    songUnit2->SongInfo = SongInfo;
+    songUnit2->SetSongTitle ( );
+    SB_SongList_1->AddChild ( songUnit1 );
+    SB_SongList_1->ScrollToEnd ( );
+    SB_SongList_2->AddChild ( songUnit2 );
+    SB_SongList_2->ScrollToEnd ( );
+}
+
 #pragma endregion
 #pragma region Modeling
 

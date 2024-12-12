@@ -86,7 +86,7 @@ public:
 	class APlayerController* pc;
 
 	UPROPERTY ( EditAnywhere , BlueprintReadWrite )
-	TSubclassOf<class AHSW_AudioLoadingActor> AudioActorFactory;
+	TSubclassOf<class AHSW_AudioLoadingActor> AudioLoadingActorFactory;
 
 #pragma region Music
 
@@ -96,6 +96,9 @@ public:
 	UPROPERTY ( EditDefaultsOnly , BlueprintReadWrite )
 	TArray<FWavFileInfo> WavFiles;
 
+	UPROPERTY( )
+	FWavFileInfo SongInfo;
+
 	UFUNCTION( )
 	void SetWavFiles ( );
 
@@ -103,10 +106,22 @@ public:
 	void SetCurrentSongIndex ( );
 
 	UFUNCTION( )
-	FText GetCurrentSongTitle ( );
+	FText GetSongTitle (int SongIndex);
 
 	bool bCanPlaySong = true;
 	UFUNCTION( )
-	void CreateAudioActor( );
+	void CreateAudioActor( FWavFileInfo currentSongInfo );
+
+	UFUNCTION( )
+	void FindAudioActor( );
+	UFUNCTION( )
+	void DestroyAudioActor( );
+
+	UFUNCTION( )
+	void SetSongList();
+
+	UPROPERTY ( )
+	class AHSW_AudioLoadingActor* AudioLoadingActor;
+
 #pragma endregion
 };

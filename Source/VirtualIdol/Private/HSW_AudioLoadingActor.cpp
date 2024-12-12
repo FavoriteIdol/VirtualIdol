@@ -14,7 +14,11 @@ AHSW_AudioLoadingActor::AHSW_AudioLoadingActor()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	SceneComponent = CreateDefaultSubobject<USceneComponent> ( TEXT ( "RootSceneComponent" ) );
+	RootComponent = SceneComponent;
+
 	MediaSoundComp = CreateDefaultSubobject<UMediaSoundComponent> ( TEXT ( "MediaSoundComp" ) );
+	MediaSoundComp->SetupAttachment ( RootComponent );
 }
 
 // Called when the game starts or when spawned
@@ -30,8 +34,11 @@ void AHSW_AudioLoadingActor::BeginPlay()
 
 	MediaPlayer = NewObject<UMediaPlayer> ( );
 	MediaPlayer->OnEndReached.AddDynamic ( this , &AHSW_AudioLoadingActor::OnPlayEnded );
+// 
+// 	FTimerHandle timerHandle;
+// 	GetWorld ( )->GetTimerManager ( ).SetTimer ( timerHandle , this , &AHSW_AudioLoadingActor::PlayWavFile , 0.3f , false );
 
-	PlayWavFile ( );
+	PlayWavFile( );
 }
 
 // Called every frame
@@ -43,12 +50,13 @@ void AHSW_AudioLoadingActor::Tick(float DeltaTime)
 
 void AHSW_AudioLoadingActor::PlayWavFile ( )
 {
-	UE_LOG ( LogTemp , Warning , TEXT ( "PlayWavFile" ) );
-	if (MediaPlayer && MediaPlayer->OpenFile ( VirtualCharacter->WavFiles[VirtualCharacter->CurrentSongIndex].FilePath ))
+	//UE_LOG ( LogTemp , Warning , TEXT ( "PlayWavFile" ) );
+	if (MediaPlayer && MediaPlayer->OpenFile ( VirtualCharacter->SongInfo.FilePath ))
 	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "Wav File Path: %s" ), *VirtualCharacter->SongInfo.FilePath );
 		if (MediaSoundComp)
 		{
-			UE_LOG ( LogTemp , Warning , TEXT ( "SongPlay" ) );
+			//UE_LOG ( LogTemp , Warning , TEXT ( "SongPlay" ) );
 			MediaSoundComp->SetMediaPlayer ( MediaPlayer );
 		}
 	}
@@ -74,8 +82,6 @@ void AHSW_AudioLoadingActor::FindVirtualCharacter ( )
 		{
 			// 버츄얼 캐릭터가 있다면 안보이게 만듦
 			VirtualCharacter = virtualComp;
-			VirtualCharacter->SetVirtualVisible ( false );
-			//UE_LOG ( LogTemp , Warning , TEXT ( "Found Virtual Character: %s" ) , *actor->GetName ( ) );
 			return; // 성공적으로 찾았으므로 종료
 		}
 	}

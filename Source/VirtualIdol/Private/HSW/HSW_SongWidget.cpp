@@ -25,19 +25,19 @@ void UHSW_SongWidget::NativeConstruct ( )
 
     FindVirtualCharacter( );
 
-    Text_CurrentSongTitle->SetText ( VirtualCharacter->GetCurrentSongTitle ( ) );
+    //Text_CurrentSongTitle->SetText ( VirtualCharacter->GetCurrentSongTitle ( ) );
 }
 
 void UHSW_SongWidget::MusicStart ( )
 {
     UE_LOG(LogTemp, Warning, TEXT("UI: MusicStart.") );
-    VirtualCharacter->CreateAudioActor();
+    //VirtualCharacter->CreateAudioActor();
 }
 
 void UHSW_SongWidget::SetMusic ( )
 {
     VirtualCharacter->SetCurrentSongIndex();
-    Text_CurrentSongTitle->SetText( VirtualCharacter->GetCurrentSongTitle() );
+    //Text_CurrentSongTitle->SetText( VirtualCharacter->GetCurrentSongTitle() );
 }
 
 void UHSW_SongWidget::FindVirtualCharacter ( )

@@ -327,6 +327,20 @@ public :
 // 	float soundGain = 2;
 #pragma endregion
 
+#pragma region Music
+
+	UPROPERTY(meta = (BindWidget))
+	class UScrollBox* SB_SongList_1;
+	UPROPERTY(meta = (BindWidget))
+	class UScrollBox* SB_SongList_2;
+	UFUNCTION( )
+	void AddSongList(const FWavFileInfo& SongInfo);
+	UPROPERTY(EditDefaultsOnly )
+	TSubclassOf<class UHSW_SongUnit> SongUnitFact;
+
+#pragma endregion  Music
+
+
 };
 void ApplyHighPassFilter16 ( TArray<int16>& PCMData , float CutoffFrequency , int32 SampleRate );
 void ApplyLowPassFilter16 ( TArray<int16>& PCMData , float CutoffFrequency , int32 SampleRate );
