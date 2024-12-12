@@ -17,6 +17,11 @@ class VIRTUALIDOL_API UStartWidget_KMK : public UUserWidget
 	GENERATED_BODY()
 
 public:
+//이펙트
+
+	UPROPERTY ( EditAnywhere , BlueprintReadWrite )
+	TSubclassOf<AActor> NowEffect;
+
 	virtual void NativeConstruct() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 	UPROPERTY(meta = (BindWidget))
