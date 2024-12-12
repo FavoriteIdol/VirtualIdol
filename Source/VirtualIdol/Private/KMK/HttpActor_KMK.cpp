@@ -444,7 +444,6 @@ void AHttpActor_KMK::ReqMultipartCapturedWithAI (const FString& ImagePath , cons
 	ImageUploadRequest->SetURL ( url );
 	ImageUploadRequest->SetVerb ( TEXT ( "POST" ) );
 
-
 	UE_LOG ( LogTemp , Warning , TEXT ( "ImagePath: %s" ) , *ImagePath );
 	UE_LOG ( LogTemp , Warning , TEXT ( "ImageURL: %s" ) , *url );
 
@@ -492,6 +491,7 @@ void AHttpActor_KMK::OnReqMultipartCapturedWithAI ( FHttpRequestPtr Request , FH
 	{
 
 		int32 ResponseCode = Response->GetResponseCode ( );
+		UE_LOG(LogTemp, Error, TEXT("%d" ), Response->GetResponseCode());
 		if (ResponseCode == 200) // 성공적으로 응답받은 경우
 		{
 // 			// 응답 바디를 가져와 Stage의 img에 설정합니다.

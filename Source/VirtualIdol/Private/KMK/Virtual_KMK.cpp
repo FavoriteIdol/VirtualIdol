@@ -73,7 +73,7 @@ void UVirtual_KMK::BeginPlay()
 // 		{
 // 			gi->spawnTrans = FTransform(FVector(0) );
 // 		}
-
+		gi->GINowEffect = gi->effectArrayForEachFloor[gi->concertStageInfo.terrain];
     }
 	//if (GetWorld ( )->GetCurrentLevel()->GetName ( ).Contains ( TEXT ( "Alpha" ) ))
 	//{

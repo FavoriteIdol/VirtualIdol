@@ -65,6 +65,17 @@ void AJJH_SelectManager::Tick(float DeltaTime)
 
 void AJJH_SelectManager::CreateDummyStage ( const struct FStageInfo& info )
 {
+	DeleteStage();
+	FTimerHandle TimerHandle;
+	// 또는 방법 2: 람다 사용
+	GetWorld ( )->GetTimerManager ( ).SetTimer ( TimerHandle , [this , info]( )
+	{
+		CreateDummyStage2 ( info );
+	} , 1.1f , false );
+}
+
+void AJJH_SelectManager::CreateDummyStage2 ( const struct FStageInfo& info )
+{
 
 	if (MapSelectWidget && MapSelectWidget->IsVisible ( ))
 	{
@@ -112,6 +123,8 @@ void AJJH_SelectManager::CreateDummyStage ( const struct FStageInfo& info )
 
 	UE_LOG ( LogTemp , Warning , TEXT ( "%d, %d, %d, %d" ) , info.sky , info.theme , info.terrain , info.specialEffect );
 }
+
+
 
 void AJJH_SelectManager::UpdateSunNightPosition (int32 index)
 {
