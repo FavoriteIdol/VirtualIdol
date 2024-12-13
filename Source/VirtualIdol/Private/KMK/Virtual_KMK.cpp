@@ -96,7 +96,7 @@ void UVirtual_KMK::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
         {
 			virtualWidget->BeforeStartConcertCount(diffTime);
             // virtualWidget->SetConcertName ( gi->concerInfo.name );
-            virtualWidget->SetConcertName ( TEXT("STARLIGHT ARIN" ) );
+            virtualWidget->SetConcertName ( TEXT("STARLIGHT SION" ) );
         }
     }
 	//if (bTime)
