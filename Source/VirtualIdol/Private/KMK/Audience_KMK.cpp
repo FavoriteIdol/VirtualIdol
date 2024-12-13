@@ -786,6 +786,8 @@ void UAudience_KMK::PlayFeverVideoFadeIn ( )
 void UAudience_KMK::PlayFeverVideoFadeOut ( )
 {
     PlayAnimation ( FeverVideoFadeOut );
+    if(Player) Player->ServerFeverReset();
+  
 }
 
 #pragma endregion

@@ -973,6 +973,7 @@ void AHSW_ThirdPersonCharacter::PlayFeverVideoAnim ( )
 	//GetComponentByClass()
 	UE_LOG ( LogTemp , Warning , TEXT ( "FeverVideo Play" ) );
 	if (audienceWidget) audienceWidget->PlayFeverVideoFadeIn ( );
+
 	if(VirtualCharacter&&VirtualCharacter->virtualWidget) VirtualCharacter->virtualWidget->PlayFeverVideoFadeIn();
 	else
 	{
