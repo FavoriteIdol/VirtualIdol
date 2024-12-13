@@ -746,10 +746,17 @@ void AHSW_ThirdPersonCharacter::MulticastFeverEffect_Implementation ( )
 // 	DamagedEffect->SetAutoDestroy ( true );
 	auto* gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance() );
 
-	if (gi->GetConcertInfo ( ).feverVFX >= 0)
+	//if (gi->GetConcertInfo ( ).feverVFX >= 0)
+	if(gi->effectArray.Num()>=2)
 	{
 	//FeverEffect_Actor = GetWorld ( )->SpawnActor<AActor> (  gi->effectArray[gi->GetConcertInfo().feverVFX] , gi->spawnTrans );
 		FeverEffect_Actor = GetWorld ( )->SpawnActor<AActor> (  gi->effectArray[2] , FTransform(FVector(0)) );
+		if(AudioActor) 
+		{
+			AudioActor->PlaySound_Effect01(0.8 );
+			AudioActor->PlaySound3( 0.3 );
+		}
+
 	}
 	PlayFeverVideoAnim ( );
 	if(AudioActor) AudioActor->PlaySound_Fever(0.3);
