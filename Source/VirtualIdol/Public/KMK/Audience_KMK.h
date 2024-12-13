@@ -353,6 +353,9 @@ public :
 	
 	UFUNCTION( )
 	void PlayFeverVideoFadeOut( );
+
+	UFUNCTION( )
+	void FeverReset( );
 #pragma endregion
 
 

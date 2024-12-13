@@ -19,7 +19,8 @@ AHSW_AudioActor::AHSW_AudioActor()
 	AmbientSoundComponent04 = CreateDefaultSubobject<UAudioComponent> ( TEXT ( "AudioComponent04" ) );
 	AmbientSoundComponent05 = CreateDefaultSubobject<UAudioComponent> ( TEXT ( "AudioComponent05" ) );
 	AmbientSoundComponent_start = CreateDefaultSubobject<UAudioComponent> ( TEXT ( "AudioComponent_start" ) );
-
+	FeverSoundComponent = CreateDefaultSubobject<UAudioComponent> ( TEXT ( "FeverSoundComponent" ) );
+	EffectSoundComponent01 = CreateDefaultSubobject<UAudioComponent> ( TEXT ( "EffectSoundComponent01" ) );
 //     ConstructorHelpers::FObjectFinder<USoundCue> SoundCueAsset ( TEXT ( "SoundCue'/Game/Audio/MySoundCue.MySoundCue'" ) );
 //     if (SoundCueAsset.Succeeded ( ))
 //     {
@@ -142,4 +143,28 @@ void AHSW_AudioActor::PlaySound_start ( float SoundVolume )
 	{
 		AmbientSoundComponent_start->SetVolumeMultiplier ( SoundVolume );
 	}
+}
+
+void AHSW_AudioActor::PlaySound_Fever ( float SoundVolume )
+{
+	if (FeverSoundComponent && SoundCue_Fever && !FeverSoundComponent->IsPlaying ( ))
+	{
+
+		FeverSoundComponent->SetSound ( SoundCue_Fever );
+		FeverSoundComponent->SetVolumeMultiplier ( SoundVolume ); // 음량 조절
+		FeverSoundComponent->Play ( ); // 사운드 재생
+	}
+	else if (FeverSoundComponent->IsPlaying ( ))
+	{
+		FeverSoundComponent->SetVolumeMultiplier ( SoundVolume );
+	}
+}
+
+void AHSW_AudioActor::PlaySound_Effect01 ( float SoundVolume )
+{
+
+	EffectSoundComponent01->SetSound ( SoundCue_Effect );
+	EffectSoundComponent01->SetVolumeMultiplier ( SoundVolume ); // 음량 조절
+	EffectSoundComponent01->Play ( ); // 사운드 재생
+
 }
