@@ -752,6 +752,7 @@ void AHSW_ThirdPersonCharacter::MulticastFeverEffect_Implementation ( )
 		FeverEffect_Actor = GetWorld ( )->SpawnActor<AActor> (  gi->effectArray[2] , FTransform(FVector(0)) );
 	}
 	PlayFeverVideoAnim ( );
+	if(AudioActor) AudioActor->PlaySound_Fever(0.3);
 }
 
 // 인터뷰 =================================================================================================

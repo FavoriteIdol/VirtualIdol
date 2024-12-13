@@ -780,14 +780,19 @@ void UAudience_KMK::PlayFeverVideoFadeIn ( )
 {
     PlayAnimation( FeverVideoFadeIn );
     FTimerHandle timerHandle;
-    GetWorld ( )->GetTimerManager ( ).SetTimer ( timerHandle , this , &UAudience_KMK::PlayFeverVideoFadeOut , 10.f , false );
+    GetWorld ( )->GetTimerManager ( ).SetTimer ( timerHandle , this , &UAudience_KMK::PlayFeverVideoFadeOut , 10.5f , false );
 }
 
 void UAudience_KMK::PlayFeverVideoFadeOut ( )
 {
     PlayAnimation ( FeverVideoFadeOut );
-    if(Player) Player->ServerFeverReset();
-  
+    FTimerHandle timerHandle2;
+    GetWorld ( )->GetTimerManager ( ).SetTimer ( timerHandle2 , this , &UAudience_KMK::FeverReset , 0.5f , false );
+}
+
+void UAudience_KMK::FeverReset ( )
+{
+    if (Player) Player->ServerFeverReset ( );
 }
 
 #pragma endregion

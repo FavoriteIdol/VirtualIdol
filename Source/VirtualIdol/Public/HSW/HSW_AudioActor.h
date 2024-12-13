@@ -64,6 +64,13 @@ public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
     class USoundCue* SoundCue_start;
+
+	UPROPERTY( EditDefaultsOnly, BlueprintReadWrite, Category = "Audio" )
+	class UAudioComponent* FeverSoundComponent;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+    class USoundCue* SoundCue_Fever;
+
     
 	UFUNCTION(BlueprintCallable, Category = "Audio")
 	void PlaySound0(float SoundVolume );
@@ -85,4 +92,8 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Audio")
     void PlaySound_start( float SoundVolume );
+
+    UFUNCTION(BlueprintCallable, Category = "Audio")
+    void PlaySound_Fever( float SoundVolume );
+
 };
