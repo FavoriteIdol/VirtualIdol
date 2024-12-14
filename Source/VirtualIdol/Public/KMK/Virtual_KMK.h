@@ -112,6 +112,9 @@ public:
 	UFUNCTION( )
 	void CreateAudioActor( FWavFileInfo currentSongInfo );
 
+	UFUNCTION(BlueprintCallable)
+	void CreateAudioActorWithIndex( );
+
 	UFUNCTION( )
 	void FindAudioActor( );
 	UFUNCTION( )

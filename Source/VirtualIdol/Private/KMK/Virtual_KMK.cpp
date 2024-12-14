@@ -64,7 +64,7 @@ void UVirtual_KMK::BeginPlay()
 	}
     if (sm)
     {
-        sm->CreateDummyStage( gi->GetConcertStageInfo() );
+        //sm->CreateDummyStage( gi->GetConcertStageInfo() );
 // 		if (gi->GetConcertStageInfo ( ).theme == 3)
 // 		{
 // 			gi->spawnTrans = FTransform(FVector(0, 0, 2000 ) );
@@ -96,7 +96,7 @@ void UVirtual_KMK::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
         {
 			virtualWidget->BeforeStartConcertCount(diffTime);
             // virtualWidget->SetConcertName ( gi->concerInfo.name );
-            virtualWidget->SetConcertName ( TEXT("STARLIGHT ARIN" ) );
+            virtualWidget->SetConcertName ( TEXT("STARLIGHT SION" ) );
         }
     }
 	//if (bTime)
@@ -383,6 +383,18 @@ void UVirtual_KMK::CreateAudioActor ( FWavFileInfo currentSongInfo )
 	}
 }
 
+void UVirtual_KMK::CreateAudioActorWithIndex ( )
+{
+	FindAudioActor ( );
+	if (!AudioLoadingActor && bCanPlaySong)
+	{
+		SongInfo = WavFiles[CurrentSongIndex];
+		CurrentSongIndex++;
+		AudioLoadingActor = GetWorld ( )->SpawnActor<AHSW_AudioLoadingActor> ( AudioLoadingActorFactory , FTransform::Identity );
+		bCanPlaySong = false;
+	}
+}
+
 void UVirtual_KMK::FindAudioActor ( )
 {
 	AudioLoadingActor = Cast<AHSW_AudioLoadingActor>(UGameplayStatics::GetActorOfClass(GetWorld(), AHSW_AudioLoadingActor::StaticClass( ) ));
@@ -400,7 +412,7 @@ void UVirtual_KMK::DestroyAudioActor ( )
 
 void UVirtual_KMK::SetSongList ( )
 {
-	UE_LOG(LogTemp,Error,TEXT("SetSongList 함수 실행" ));
+	//UE_LOG(LogTemp,Error,TEXT("SetSongList 함수 실행" ));
 	for (FWavFileInfo songInfo : WavFiles)
 	{
 		if(virtualWidget) virtualWidget->AddSongList( songInfo );

@@ -167,8 +167,8 @@ void AHSW_ThirdPersonCharacter::BeginPlay()
 	}
 
 	gm = Cast<AHSW_AuditoriumGameMode> ( GetWorld ( )->GetAuthGameMode ( ) );
-	
-	FindVirtualCharacter( );
+
+	FindVirtualCharacter ( );
 
 	FName tag = TEXT ( "InterviewLocation" );
 	FName tag2 = TEXT ( "FeverGaugeLocation" );
@@ -497,6 +497,16 @@ void AHSW_ThirdPersonCharacter::Look ( const FInputActionValue& Value )
 UMaterialInstanceDynamic* AHSW_ThirdPersonCharacter::ChangeMyMeshMat (int32 num )
 {
 	FeverDynamicMat = UMaterialInstanceDynamic::Create ( FeverCharactMat[num] , this );
+	if (num == 1)
+	{
+		VIPObject->SetVisibility ( true );
+		//UE_LOG ( LogTemp , Warning , TEXT ( "Multi RPC playerMeshNum: 1, " ) );
+	}
+	else
+	{
+		VIPObject->SetVisibility ( false );
+		//UE_LOG ( LogTemp , Warning , TEXT ( "Multi RPC playerMeshNum: 0, false" ) );
+	}
 	return FeverDynamicMat;
 }
 
@@ -618,12 +628,11 @@ void AHSW_ThirdPersonCharacter::OnMyFeverGauge ( const FInputActionValue& value 
 		{
 			if (bFever)
 			{
-
-			AudioActor->PlaySound0 ( 0.05 );
-			AudioActor->PlaySound1 ( 0.05 );
-			AudioActor->PlaySound2 ( 0.02 );
-			AudioActor->PlaySound3 ( 0.01 );
-			AudioActor->PlaySound4 ( 0.01 );
+				AudioActor->PlaySound0 ( 0.05 );
+				AudioActor->PlaySound1 ( 0.05 );
+				AudioActor->PlaySound2 ( 0.02 );
+				AudioActor->PlaySound3 ( 0.01 );
+				AudioActor->PlaySound4 ( 0.01 );
 			}
 			//UE_LOG ( LogTemp , Warning , TEXT ( "CurrentGauge else!!!! :%f" ) , CurrentGauge );
 		}
@@ -737,12 +746,20 @@ void AHSW_ThirdPersonCharacter::MulticastFeverEffect_Implementation ( )
 // 	DamagedEffect->SetAutoDestroy ( true );
 	auto* gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance() );
 
-	if (gi->GetConcertInfo ( ).feverVFX >= 0)
+	//if (gi->GetConcertInfo ( ).feverVFX >= 0)
+	if(gi->effectArray.Num()>=2)
 	{
-		FeverEffect_Actor = GetWorld ( )->SpawnActor<AActor> (  gi->effectArray[gi->GetConcertInfo().feverVFX] , gi->spawnTrans );
-		//FeverEffect_Actor = GetWorld ( )->SpawnActor<AActor> (  gi->effectArray[2] , FTransform(FVector(0)) );
+	//FeverEffect_Actor = GetWorld ( )->SpawnActor<AActor> (  gi->effectArray[gi->GetConcertInfo().feverVFX] , gi->spawnTrans );
+		FeverEffect_Actor = GetWorld ( )->SpawnActor<AActor> (  gi->effectArray[2] , FTransform(FVector(0)) );
+		if(AudioActor) 
+		{
+			AudioActor->PlaySound_Effect01(0.8 );
+			AudioActor->PlaySound3( 0.3 );
+		}
+
 	}
 	PlayFeverVideoAnim ( );
+	if(AudioActor) AudioActor->PlaySound_Fever(0.3);
 }
 
 // 인터뷰 =================================================================================================
@@ -964,6 +981,7 @@ void AHSW_ThirdPersonCharacter::PlayFeverVideoAnim ( )
 	//GetComponentByClass()
 	UE_LOG ( LogTemp , Warning , TEXT ( "FeverVideo Play" ) );
 	if (audienceWidget) audienceWidget->PlayFeverVideoFadeIn ( );
+
 	if(VirtualCharacter&&VirtualCharacter->virtualWidget) VirtualCharacter->virtualWidget->PlayFeverVideoFadeIn();
 	else
 	{
@@ -983,19 +1001,6 @@ void AHSW_ThirdPersonCharacter::PlayFeverVideoAnim ( )
 }
 
 #pragma endregion
-void AHSW_ThirdPersonCharacter::ClientPlayMusic_Implementation ( class UAudioComponent* selectedMusic )
-{
-	//	UGameplayStatics::PlaySound2D(this, Music );
-	if (selectedMusic)
-	{
-		selectedMusic->Play ( );
-		UE_LOG ( LogTemp , Warning , TEXT ( "Music Play" ) );
-	}
-	else
-	{
-		UE_LOG ( LogTemp , Warning , TEXT ( "not Music" ) );
-	}
-}
 
 void AHSW_ThirdPersonCharacter::FindVirtualCharacter ( )
 {
@@ -1016,4 +1021,18 @@ void AHSW_ThirdPersonCharacter::FindVirtualCharacter ( )
 	UE_LOG ( LogTemp , Warning , TEXT ( "Virtual Character not found, retrying..." ) );
 	// 버츄얼을 못찾았다면, 일정 시간 후 다시 시도
 	GetWorld ( )->GetTimerManager ( ).SetTimerForNextTick ( this , &AHSW_ThirdPersonCharacter::FindVirtualCharacter );
+}
+
+void AHSW_ThirdPersonCharacter::ClientPlayMusic_Implementation ( class UAudioComponent* selectedMusic )
+{
+	//	UGameplayStatics::PlaySound2D(this, Music );
+	if (selectedMusic)
+	{
+		selectedMusic->Play ( );
+		UE_LOG ( LogTemp , Warning , TEXT ( "Music Play" ) );
+	}
+	else
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "not Music" ) );
+	}
 }
