@@ -116,7 +116,7 @@ void UVirtualGameInstance_KMK::OnMyCreateSessionComplete ( FName SessionName , b
 
         HttpActor->ReqMusic( concerInfo.concertId );
         UE_LOG(LogTemp, Warning, TEXT("Concert ID: %d"), concerInfo.concertId );
-        GetWorld ( )->ServerTravel ( TEXT ( "/Game/Project/CommonFile/Maps/BetaMain?listen" ) , ETravelType::TRAVEL_Absolute );
+        GetWorld ( )->ServerTravel ( TEXT ( "/Game/Project/CommonFile/Maps/EmptyLevel?listen" ) , ETravelType::TRAVEL_Absolute );
         PRINTLOG(TEXT("Server successfully created session: %s"), *SessionName.ToString());
     }
     else
