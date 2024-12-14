@@ -383,6 +383,18 @@ void UVirtual_KMK::CreateAudioActor ( FWavFileInfo currentSongInfo )
 	}
 }
 
+void UVirtual_KMK::CreateAudioActorWithIndex ( )
+{
+	FindAudioActor ( );
+	if (!AudioLoadingActor && bCanPlaySong)
+	{
+		SongInfo = WavFiles[CurrentSongIndex];
+		CurrentSongIndex++;
+		AudioLoadingActor = GetWorld ( )->SpawnActor<AHSW_AudioLoadingActor> ( AudioLoadingActorFactory , FTransform::Identity );
+		bCanPlaySong = false;
+	}
+}
+
 void UVirtual_KMK::FindAudioActor ( )
 {
 	AudioLoadingActor = Cast<AHSW_AudioLoadingActor>(UGameplayStatics::GetActorOfClass(GetWorld(), AHSW_AudioLoadingActor::StaticClass( ) ));
