@@ -1,4 +1,4 @@
-{
+﻿{
 	"FileVersion": 3,
 	"EngineAssociation": "5.4",
 	"Category": "",
@@ -118,10 +118,6 @@
 		},
 		{
 			"Name": "RemoteControlProtocolDMX",
-			"Enabled": true
-		},
-		{
-			"Name": "MocopiLiveLink",
 			"Enabled": true
 		}
 	]
