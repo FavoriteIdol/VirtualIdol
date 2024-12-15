@@ -28,7 +28,7 @@ public:
 	class UWidgetSwitcher* StartSwitcher;
 
 	UPROPERTY(EditAnywhere, Category = Price)
-	int32 concertPrice = 100000;
+	int32 concertPrice = 10000;
 	UFUNCTION ()
 	void GoBack();
 	

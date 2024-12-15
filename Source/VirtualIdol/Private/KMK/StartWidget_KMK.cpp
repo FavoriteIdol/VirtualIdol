@@ -731,6 +731,14 @@ void UStartWidget_KMK::PressNextButt ( )
 	Text_FinalPay->SetText ( Text_Price->GetText() );
 	FString s = Text_Price->GetText().ToString();
 	// 내가 가진 캐쉬에서 차감
+	if (gi->myCash < FCString::Atoi ( *s ))
+	{
+		// 결제에 실패했습니다.
+		Text_Effect1->SetText ( FText::FromString ( TEXT ( "충전된 금액이 부족합니다." ) ) );
+		EffectPopUp->SetVisibility ( ESlateVisibility::Visible );
+		UGameplayStatics::PlaySound2D ( GetWorld ( ) , PopUpSFV );
+		return;
+	}
 	gi->myCash -= FCString::Atoi(*s);
 	Butt_Next->SetVisibility ( ESlateVisibility::Hidden );
 	Butt_CreateTicket1->SetVisibility(ESlateVisibility::Visible);
