@@ -64,15 +64,15 @@ void UVirtual_KMK::BeginPlay()
 	}
     if (sm)
     {
-        //sm->CreateDummyStage( gi->GetConcertStageInfo() );
-// 		if (gi->GetConcertStageInfo ( ).theme == 3)
-// 		{
-// 			gi->spawnTrans = FTransform(FVector(0, 0, 2000 ) );
-// 		}
-// 		else if(gi->GetConcertStageInfo ( ).theme != 3)
-// 		{
-// 			gi->spawnTrans = FTransform(FVector(0) );
-// 		}
+		sm->CreateDummyStage ( gi->GetConcertStageInfo ( ) );
+		if (gi->GetConcertStageInfo ( ).theme == 3)
+		{
+			gi->spawnTrans = FTransform ( FVector ( 0 , 0 , 2000 ) );
+		}
+		else if (gi->GetConcertStageInfo ( ).theme != 3)
+		{
+			gi->spawnTrans = FTransform ( FVector ( 0 ) );
+		}
 		gi->GINowEffect = gi->effectArrayForEachFloor[gi->concertStageInfo.terrain];
     }
 	//if (GetWorld ( )->GetCurrentLevel()->GetName ( ).Contains ( TEXT ( "Alpha" ) ))

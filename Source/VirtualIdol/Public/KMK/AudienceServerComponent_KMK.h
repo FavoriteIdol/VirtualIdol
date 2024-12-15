@@ -21,6 +21,10 @@ protected:
 	virtual void BeginPlay() override;
 
 public:	
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastRPC_SetInitialLocation(int32 terrain);
+
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 

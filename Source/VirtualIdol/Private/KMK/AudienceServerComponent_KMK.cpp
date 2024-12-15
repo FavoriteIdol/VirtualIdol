@@ -78,73 +78,45 @@ void UAudienceServerComponent_KMK::BeginPlay()
 	{
 		// 관객의 초기 셋팅값 변경
  		if (playerMesh->IsLocallyControlled())
-         {
-// 			if (gi->concertStageInfo.terrain == 0)
-// 			{
-// 				playerMesh->SetActorLocation ( FVector ( 3600 , -100 , 300 ) );
-// 				playerMesh->SetActorRotation ( FRotator ( 0 , 0 , 0 ) );
-// 			}
-// 			else if (gi->concertStageInfo.terrain == 1)
-// 			{
-// 				playerMesh->SetActorLocation ( FVector ( 1600 , 0 , 400 ) );
-// 				playerMesh->SetActorRotation ( FRotator ( 0 , 0 , 0 ) );
-// 			}
-// 			else if (gi->concertStageInfo.terrain == 2)
-// 			{
-// 				playerMesh->SetActorLocation ( FVector ( 2260 , -200 , 100 ) );
-// 				playerMesh->SetActorRotation ( FRotator ( 0 , 0 , 0 ) );
-// 			}
-// 			else if (gi->concertStageInfo.terrain == 3)
-// 			{
-// 				playerMesh->SetActorLocation ( FVector ( 2700 , 0 , 300 ) );
-// 				playerMesh->SetActorRotation ( FRotator ( 0 , 0 , 0 ) );
-// 			}
-// 			else if (gi->concertStageInfo.terrain == 4)
-// 			{
-// 				playerMesh->SetActorLocation ( FVector ( 2700 , 0 , 300 ) );
-// 				playerMesh->SetActorRotation ( FRotator ( 0 , 0 , 0 ) );
-// 			}
-// 			else if (gi->concertStageInfo.terrain == 5)
-// 			{
-// 				playerMesh->SetActorLocation ( FVector ( 3300 , 0 , 300 ) );
-// 				playerMesh->SetActorRotation ( FRotator ( 0 , 0 , 0 ) );
-// 			}
-           // playerMesh->SetActorLocation ( FVector ( 0, 0, 100 ) );
+        {
+			//if (gi->concertStageInfo.terrain == 0)
+			//{
+			//	playerMesh->SetActorLocation ( FVector ( 3600 , -100 , 300 ) );
+			//	playerMesh->SetActorRotation ( FRotator ( 0 , 0 , 0 ) );
+			//}
+			//else if (gi->concertStageInfo.terrain == 1)
+			//{
+			//	playerMesh->SetActorLocation ( FVector ( 1600 , 0 , 400 ) );
+			//	playerMesh->SetActorRotation ( FRotator ( 0 , 0 , 0 ) );
+			//}
+			//else if (gi->concertStageInfo.terrain == 2)
+			//{
+			//	playerMesh->SetActorLocation ( FVector ( 2260 , -200 , 100 ) );
+			//	playerMesh->SetActorRotation ( FRotator ( 0 , 0 , 0 ) );
+			//}
+			//else if (gi->concertStageInfo.terrain == 3)
+			//{
+			//	playerMesh->SetActorLocation ( FVector ( 2700 , 0 , 300 ) );
+			//	playerMesh->SetActorRotation ( FRotator ( 0 , 0 , 0 ) );
+			//}
+			//else if (gi->concertStageInfo.terrain == 4)
+			//{
+			//	playerMesh->SetActorLocation ( FVector ( 2700 , 0 , 300 ) );
+			//	playerMesh->SetActorRotation ( FRotator ( 0 , 0 , 0 ) );
+			//}
+			//else if (gi->concertStageInfo.terrain == 5)
+			//{
+			//	playerMesh->SetActorLocation ( FVector ( 2364 , 60 , 89 ) );
+			//	playerMesh->SetActorRotation ( FRotator ( 0 , 0 , 0 ) );
+			//}
+   //        
         }
         else
         {
-			playerMesh->SetActorLocation ( FVector ( 4330 , -150 , 730 ) );
-			playerMesh->SetActorRotation ( FRotator ( 0 , 180, 0 ) );
-// 			if (gi->concertStageInfo.terrain == 0)
-// 			{
-// 				playerMesh->SetActorLocation ( FVector ( 3600 , -100 , 300 ) );
-// 				playerMesh->SetActorRotation ( FRotator ( 0 , 0 , 0 ) );
-// 			}
-// 			else if (gi->concertStageInfo.terrain == 1)
-// 			{
-// 				playerMesh->SetActorLocation ( FVector ( 1600 , 0 , 400 ) );
-// 				playerMesh->SetActorRotation ( FRotator ( 0 , 0 , 0 ) );
-// 			}
-// 			else if (gi->concertStageInfo.terrain == 2)
-// 			{
-// 				playerMesh->SetActorLocation ( FVector ( 2260 , -200 , 100 ) );
-// 				playerMesh->SetActorRotation ( FRotator ( 0 , 0 , 0 ) );
-// 			}
-// 			else if (gi->concertStageInfo.terrain == 3)
-// 			{
-// 				playerMesh->SetActorLocation ( FVector ( 2700 , 0 , 300 ) );
-// 				playerMesh->SetActorRotation ( FRotator ( 0 , 0 , 0 ) );
-// 			}
-// 			else if (gi->concertStageInfo.terrain == 4)
-// 			{
-// 				playerMesh->SetActorLocation ( FVector ( 2700 , 0 , 300 ) );
-// 				playerMesh->SetActorRotation ( FRotator ( 0 , 0 , 0 ) );
-// 			}
-// 			else if (gi->concertStageInfo.terrain == 5)
-// 			{
-// 				playerMesh->SetActorLocation ( FVector ( 3300 , 0 , 300 ) );
-// 				playerMesh->SetActorRotation ( FRotator ( 0 , 0 , 0 ) );
-// 			}
+			//playerMesh->SetActorLocation ( FVector ( 4330 , -150 , 730 ) );
+			//playerMesh->SetActorRotation ( FRotator ( 0 , 180, 0 ) );
+			// 현재 위치를 모든 클라이언트에 동기화
+			MulticastRPC_SetInitialLocation ( gi->concertStageInfo.terrain );
         }
 	}
 	else
@@ -152,9 +124,45 @@ void UAudienceServerComponent_KMK::BeginPlay()
 		// 버츄얼 찾고 할당하는 함수
 		FindVirtualCharacter ( );
 	}
-
-
 }
+
+void UAudienceServerComponent_KMK::MulticastRPC_SetInitialLocation_Implementation( int32 terrain )
+{
+	if (!playerMesh) return;
+
+	FVector newLocation;
+	FRotator newRotation ( 0 , 180 , 0 );
+
+	switch (terrain)
+	{
+	case 0:
+		newLocation = FVector ( 3600 , -137 , 400 );
+		break;
+	case 1:
+		newLocation = FVector ( 1785 , -137 , 150 );
+		break;
+	case 2:
+		newLocation = FVector ( 1575 , -200 , 490 );
+		break;
+	case 3:
+		newLocation = FVector ( 2540 , 0 , 300 );
+		break;
+	case 4:
+		newLocation = FVector ( 2540 , 0 , 300 );
+		break;
+	case 5:
+		newLocation = FVector ( 1995 , -347 , 150 );
+		break;
+	default:
+		return;
+	}
+
+	playerMesh->SetActorLocation ( newLocation );
+	playerMesh->SetActorRotation ( newRotation );
+}
+
+
+
 // 월드상에서 버츄얼 찾기
 void UAudienceServerComponent_KMK::FindVirtualCharacter ( )
 {
