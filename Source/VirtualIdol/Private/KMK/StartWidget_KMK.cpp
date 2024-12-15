@@ -26,6 +26,7 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "IDesktopPlatform.h"
 #include "DesktopPlatformModule.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 void UStartWidget_KMK::NativeConstruct ( )
 {	
@@ -77,6 +78,15 @@ void UStartWidget_KMK::NativeConstruct ( )
 		Butt_Login->OnClicked.AddDynamic(this, &UStartWidget_KMK::OnMyLogin);
 		Butt_FailLogin->OnClicked.AddDynamic(this, &UStartWidget_KMK::OnFailLogin);
 		FailLoginPanel->SetVisibility(ESlateVisibility::Hidden);
+	}
+#pragma endregion
+
+#pragma region Homepage
+	if (Button_Homepage_1 && Button_Homepage_2 && Butt_SignIn)
+	{
+		Button_Homepage_1->OnClicked.AddDynamic ( this , &UStartWidget_KMK::OnHomepage );
+		Button_Homepage_2->OnClicked.AddDynamic ( this , &UStartWidget_KMK::OnHomepage );
+		Butt_SignIn->OnClicked.AddDynamic ( this , &UStartWidget_KMK::OnSignInPage );
 	}
 #pragma endregion
 
@@ -265,6 +275,16 @@ void UStartWidget_KMK::OnMyLogin ( )
 void UStartWidget_KMK::OnFailLogin ( )
 {
 	FailLoginPanel->SetVisibility(ESlateVisibility::Hidden);
+}
+
+void UStartWidget_KMK::OnHomepage ( )
+{
+	UKismetSystemLibrary::LaunchURL ( "http://tripleyoung.synology.me:3334" );
+}
+
+void UStartWidget_KMK::OnSignInPage ( )
+{
+	UKismetSystemLibrary::LaunchURL ( "http://tripleyoung.synology.me:3334/ko/signin" );
 }
 
 #pragma endregion
