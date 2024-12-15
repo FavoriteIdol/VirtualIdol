@@ -569,6 +569,10 @@ void UStartWidget_KMK::PressCreateTicket ( )
 	data.Add(TEXT("prompt" ), EditMultiText_Ticket->GetText().ToString());
 	Text_Price->SetText ( FText::GetEmpty ( ) );
 	Image_Coin->SetVisibility(ESlateVisibility::Hidden);
+	if (Image_FinalStageImage->Brush.GetResourceObject ( ))
+	{
+		Image_FinalStageImage->Brush.SetResourceObject(nullptr);
+	}
 	// 이 부분 정보는 BE에서 끌어와야함
  //   FString year = TEXT ( "20" ) + EditText_Year->GetText ( ).ToString ( );
  //   FString mon = ChangeString ( EditText_Day->GetText ( ).ToString ( ) );
