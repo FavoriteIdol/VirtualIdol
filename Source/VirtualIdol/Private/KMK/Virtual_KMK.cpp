@@ -89,7 +89,8 @@ void UVirtual_KMK::BeginPlay()
 void UVirtual_KMK::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	if (pc->HasAuthority ( ) && pc->IsLocalController ( ))
+	
+	if (pc->HasAuthority ( ) && pc->IsLocalController ( ) && virtualWidget->IsVisible())
     {
 		diffTime = GetTimeDifference ( setConcertTime );
         if (virtualWidget)
