@@ -226,4 +226,7 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 	UPROPERTY( )
 	FTransform spawnTrans = FTransform(FVector(0 ) );
 
+	UFUNCTION( )
+	void MusicReload( );
+
 };

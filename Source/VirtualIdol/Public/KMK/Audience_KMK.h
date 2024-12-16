@@ -40,6 +40,9 @@ public :
 	UPROPERTY( )
 	class AHSW_ThirdPersonCharacter* pc;
 
+	UPROPERTY( )
+	class UVirtual_KMK* VirtualCharacter;
+
 	void OnOffFunction(class UTextBlock* textBlocks, int32 num, bool bAllVisib = false );
 	void ChangeTextAndImage ( FLinearColor color , int32 num , TArray<FString> textArray , bool bMyAuth = false );
 		
@@ -341,6 +344,10 @@ public :
 
 	UFUNCTION( )
 	void AddSongList(const FWavFileInfo& SongInfo);
+	
+	UFUNCTION( )
+	void ClearSongList( );
+
 	UPROPERTY(EditDefaultsOnly )
 	TSubclassOf<class UHSW_SongUnit> SongUnitFact;
 
@@ -367,8 +374,8 @@ public :
 	void FeverReset( );
 #pragma endregion
 
-
-
+	UFUNCTION( )
+	void FindVirtualCharacter( );
 };
 void ApplyHighPassFilter16 ( TArray<int16>& PCMData , float CutoffFrequency , int32 SampleRate );
 void ApplyLowPassFilter16 ( TArray<int16>& PCMData , float CutoffFrequency , int32 SampleRate );
