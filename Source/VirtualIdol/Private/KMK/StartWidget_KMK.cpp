@@ -736,7 +736,7 @@ void UStartWidget_KMK::PressNextButt ( )
 	FString s = Text_Price->GetText().ToString();
 	s = s.Replace ( TEXT ( "," ) , TEXT ( "" ) );
 	s = s.Replace ( TEXT ( " " ) , TEXT ( "" ) );
-	int32 price = FCString::Atoi ( *s )
+	int32 price = FCString::Atoi ( *s );
 	// 내가 가진 캐쉬에서 차감
 	if (gi->myCash < price)
 	{
@@ -907,5 +907,3 @@ void UStartWidget_KMK::SetLoadImage ( )
 }
 
 #pragma endregion
-
-

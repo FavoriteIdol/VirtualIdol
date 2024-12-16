@@ -46,6 +46,8 @@ void UAudience_KMK::NativeConstruct ( )
     gi = Cast<UVirtualGameInstance_KMK>(GetWorld()->GetGameInstance());
     // 월드에 배치된 httpActor 찾기
     httpActor = Cast<AHttpActor_KMK> ( UGameplayStatics::GetActorOfClass ( GetWorld ( ) , httpFact ) );
+    FindVirtualCharacter( );
+
     if (Text_MyCash)
     {
         Text_MyCash->SetText(FText::AsNumber(gi->myCash));
@@ -781,12 +783,24 @@ void UAudience_KMK::AddSongList ( const FWavFileInfo& SongInfo )
     }
 }
 
+void UAudience_KMK::ClearSongList ( )
+{
+    SB_SongList_1->ClearChildren();
+    SB_SongList_2->ClearChildren ( );
+}
+
 void UAudience_KMK::OnReloadMusic ( )
 {
     if (httpActor && gi)
     {
-        httpActor->ReqMusic(gi->concerInfo.concertId);
+        httpActor->ReqMusic ( gi->concerInfo.concertId );
     }
+    if (VirtualCharacter)
+    {
+        VirtualCharacter->SetWavFiles( );
+        VirtualCharacter->SetSongList();
+    }
+
 }
 
 void UAudience_KMK::PlayFeverVideoFadeIn ( )
@@ -806,6 +820,27 @@ void UAudience_KMK::PlayFeverVideoFadeOut ( )
 void UAudience_KMK::FeverReset ( )
 {
     if (Player) Player->ServerFeverReset ( );
+}
+
+void UAudience_KMK::FindVirtualCharacter ( )
+{
+    TArray<AActor*> actorArray;
+    // 태그로 검색
+    UGameplayStatics::GetAllActorsWithTag ( GetWorld ( ) , TEXT ( "Virtual" ) , actorArray );
+    for (AActor* actor : actorArray)
+    {
+        // 버츄얼을 찾았다면 버츄얼에 달린 component를 검색함
+        UVirtual_KMK* virtualComp = actor->FindComponentByClass<UVirtual_KMK> ( );
+        if (virtualComp)
+        {
+            // 버츄얼 캐릭터가 있다면 안보이게 만듦
+            VirtualCharacter = virtualComp;
+            return; // 성공적으로 찾았으므로 종료
+        }
+    }
+    UE_LOG ( LogTemp , Warning , TEXT ( "Virtual Character not found, retrying..." ) );
+    // 버츄얼을 못찾았다면, 일정 시간 후 다시 시도
+    GetWorld ( )->GetTimerManager ( ).SetTimerForNextTick ( this , &UAudience_KMK::FindVirtualCharacter );
 }
 
 #pragma endregion

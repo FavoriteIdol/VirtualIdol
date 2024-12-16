@@ -519,3 +519,7 @@ FString UVirtualGameInstance_KMK::GetRandomName()
 
     return FString("Name Not Found");
 }
+
+void UVirtualGameInstance_KMK::MusicReload ( )
+{
+}

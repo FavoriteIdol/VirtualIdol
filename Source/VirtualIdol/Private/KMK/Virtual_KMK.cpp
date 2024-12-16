@@ -316,7 +316,7 @@ void UVirtual_KMK::SetWavFiles ( )
 
 		for (FString Splited : SplitName)
 		{
-			UE_LOG ( LogTemp , Warning , TEXT ( "splited: %s" ), *Splited);
+			//UE_LOG ( LogTemp , Warning , TEXT ( "splited: %s" ), *Splited);
 		}
 		// 파일 이름에서 정보 추출 (형식: ConcertID_SongID_Title.wav)
 		if (SplitName.Num ( ) >= 3)
@@ -415,10 +415,14 @@ void UVirtual_KMK::DestroyAudioActor ( )
 
 void UVirtual_KMK::SetSongList ( )
 {
-	//UE_LOG(LogTemp,Error,TEXT("SetSongList 함수 실행" ));
-	for (FWavFileInfo songInfo : WavFiles)
+	if(virtualWidget)
 	{
-		if(virtualWidget) virtualWidget->AddSongList( songInfo );
+		virtualWidget->ClearSongList();
+		//UE_LOG(LogTemp,Error,TEXT("SetSongList 함수 실행" ));
+		for (FWavFileInfo songInfo : WavFiles)
+		{
+			virtualWidget->AddSongList( songInfo );
+		}
 	}
 }
 
