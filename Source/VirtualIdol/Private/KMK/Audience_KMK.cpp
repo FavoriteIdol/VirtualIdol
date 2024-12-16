@@ -808,6 +808,7 @@ void UAudience_KMK::OnReloadMusic ( )
 
 void UAudience_KMK::PlayFeverVideoFadeIn ( )
 {
+    //UE_LOG(LogTemp,Error, TEXT("Play Fever Video Fade In" ));
     PlayAnimation( FeverVideoFadeIn );
     FTimerHandle timerHandle;
     GetWorld ( )->GetTimerManager ( ).SetTimer ( timerHandle , this , &UAudience_KMK::PlayFeverVideoFadeOut , 10.5f , false );

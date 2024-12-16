@@ -41,6 +41,7 @@
 #include "Components/AudioComponent.h"
 #include "Components/TextBlock.h"
 #include "HSW/HSW_AudioActor.h"
+#include "HSW_AudioLoadingActor.h"
 
 // Sets default values
 AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
@@ -979,10 +980,18 @@ void AHSW_ThirdPersonCharacter::SetChatWidget (const FString& nickName, const FS
 void AHSW_ThirdPersonCharacter::PlayFeverVideoAnim ( )
 {
 	//GetComponentByClass()
-	UE_LOG ( LogTemp , Warning , TEXT ( "FeverVideo Play" ) );
-	if (audienceWidget) audienceWidget->PlayFeverVideoFadeIn ( );
+	//UE_LOG ( LogTemp , Warning , TEXT ( "FeverVideo Play" ) );
+	if (audienceWidget)
+	{
+		//UE_LOG ( LogTemp , Warning , TEXT ( "audienceWidget exits" ) );
+		if (IsLocallyControlled ( ))
+		{
+			//UE_LOG ( LogTemp , Warning , TEXT ( "audienceWidget : Is Locally Controlled" ) );
+			audienceWidget->PlayFeverVideoFadeIn ( );
+		}
+	}
 
-	if(VirtualCharacter&&VirtualCharacter->virtualWidget) VirtualCharacter->virtualWidget->PlayFeverVideoFadeIn();
+	if(VirtualCharacter&&VirtualCharacter->virtualWidget&&HasAuthority()) VirtualCharacter->virtualWidget->PlayFeverVideoFadeIn();
 	else
 	{
 		if (!VirtualCharacter)
@@ -1035,4 +1044,9 @@ void AHSW_ThirdPersonCharacter::ClientPlayMusic_Implementation ( class UAudioCom
 	{
 		UE_LOG ( LogTemp , Warning , TEXT ( "not Music" ) );
 	}
+}
+
+void AHSW_ThirdPersonCharacter::ClientRPC_CreateAudioActorWithIndex_Implementation (int32 SongIndex )
+{
+	AudioLoadingActor = GetWorld ( )->SpawnActor<AHSW_AudioLoadingActor> ( AudioLoadingActorFactory , FTransform::Identity );
 }

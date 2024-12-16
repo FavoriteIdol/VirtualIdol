@@ -360,11 +360,19 @@ public:
 	int32 effectNum = -1;
 
 
-	UPROPERTY( )
+	UPROPERTY(BlueprintReadWrite )
 	class UVirtual_KMK* VirtualCharacter;
 	
 	void PlayFeverVideoAnim( );
 
 	UFUNCTION( )
 	void FindVirtualCharacter( );
+
+	UPROPERTY ( )
+	class AHSW_AudioLoadingActor* AudioLoadingActor;
+	UPROPERTY ( EditAnywhere , BlueprintReadWrite )
+	TSubclassOf<class AHSW_AudioLoadingActor> AudioLoadingActorFactory;
+
+	UFUNCTION( Client , Reliable, BlueprintCallable )
+	void ClientRPC_CreateAudioActorWithIndex(int32 SongIndex );
 };
