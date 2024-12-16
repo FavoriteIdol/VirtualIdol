@@ -569,6 +569,7 @@ void UAudience_KMK::OnMyImoji04 ( )
 
 void UAudience_KMK::ChangeTextClock ( const FString& text )
 {
+
     TEXT_Min->SetText(FText::FromString(text));
     TEXT_Min1->SetText(FText::FromString(text));
 }
