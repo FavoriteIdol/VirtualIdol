@@ -785,8 +785,11 @@ void UAudience_KMK::AddSongList ( const FWavFileInfo& SongInfo )
 
 void UAudience_KMK::ClearSongList ( )
 {
-    SB_SongList_1->ClearChildren();
-    SB_SongList_2->ClearChildren ( );
+    if(SB_SongList_1&& SB_SongList_2)
+    {
+        SB_SongList_1->ClearChildren();
+        SB_SongList_2->ClearChildren ( );
+    }
 }
 
 void UAudience_KMK::OnReloadMusic ( )
