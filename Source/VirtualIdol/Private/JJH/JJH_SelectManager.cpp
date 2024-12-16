@@ -26,8 +26,22 @@ void AJJH_SelectManager::BeginPlay()
 	Super::BeginPlay();
 
 	if(!MapSelectWidgetFactory) return;
-	MapSelectWidget = CreateWidget<UJJH_MapSelectWidget> ( GetWorld() , MapSelectWidgetFactory );
-	if (MapSelectWidget) MapSelectWidget->AddToViewport ( );
+	//MapSelectWidget = CreateWidget<UJJH_MapSelectWidget> ( GetWorld() , MapSelectWidgetFactory );
+	//if (MapSelectWidget) MapSelectWidget->AddToViewport ( );
+	// 현재 레벨의 이름을 가져옵니다
+	FString CurrentLevelName = GetWorld ( )->GetMapName ( );
+	// GetMapName은 경로를 포함하므로, 실제 맵 이름만 추출합니다
+	CurrentLevelName.RemoveFromStart ( GetWorld ( )->StreamingLevelsPrefix );
+
+	// JJH_SetupLevel 인지 확인합니다
+	if (CurrentLevelName.Contains ( "JJH_SetupMap" ))
+	{
+		MapSelectWidget = CreateWidget<UJJH_MapSelectWidget> ( GetWorld ( ) , MapSelectWidgetFactory );
+		if (MapSelectWidget)
+		{
+			MapSelectWidget->AddToViewport ( );
+		}
+	}
 
 	// SceneCaptureComponent2D를 생성
 	CaptureComponent2D = NewObject<USceneCaptureComponent2D> ( this );
