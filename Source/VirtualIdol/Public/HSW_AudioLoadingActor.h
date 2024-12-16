@@ -33,17 +33,20 @@ public:
 	UPROPERTY( )
 	class UVirtualGameInstance_KMK* gi;
 
-	UPROPERTY( Replicated , EditDefaultsOnly , BlueprintReadWrite )
+	UPROPERTY(  EditDefaultsOnly , BlueprintReadWrite )
 	class UVirtual_KMK* VirtualCharacter;
 
-	UPROPERTY( Replicated , EditDefaultsOnly , BlueprintReadWrite )
+	UPROPERTY(  EditDefaultsOnly , BlueprintReadWrite )
 	class UMediaPlayer* MediaPlayer;
 
-	UPROPERTY( Replicated , EditDefaultsOnly , BlueprintReadWrite )
+	UPROPERTY(  EditDefaultsOnly , BlueprintReadWrite )
 	class UMediaSoundComponent* MediaSoundComp;
 
-	UPROPERTY( Replicated , EditDefaultsOnly , BlueprintReadWrite )
+	UPROPERTY(  EditDefaultsOnly , BlueprintReadWrite )
 	class UFileMediaSource* FileMediaSource;
+
+	UPROPERTY(Replicated)
+	FString SongFilePath;
 
 	UFUNCTION( Server , Reliable )
 	void ServerRPC_PlayWaveFile( );

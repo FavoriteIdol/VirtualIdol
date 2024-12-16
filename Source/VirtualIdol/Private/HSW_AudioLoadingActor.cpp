@@ -20,6 +20,8 @@ AHSW_AudioLoadingActor::AHSW_AudioLoadingActor()
 
 	MediaSoundComp = CreateDefaultSubobject<UMediaSoundComponent> ( TEXT ( "MediaSoundComp" ) );
 	MediaSoundComp->SetupAttachment ( RootComponent );
+
+	bReplicates = true;
 }
 
 // Called when the game starts or when spawned
@@ -32,12 +34,15 @@ void AHSW_AudioLoadingActor::BeginPlay()
 	gi = Cast<UVirtualGameInstance_KMK> ( GetWorld ( )->GetGameInstance ( ) );
 
 	FindVirtualCharacter ( );
-
 // 
 // 	FTimerHandle timerHandle;
 // 	GetWorld ( )->GetTimerManager ( ).SetTimer ( timerHandle , this , &AHSW_AudioLoadingActor::PlayWavFile , 0.3f , false );
 
-	ServerRPC_PlayWaveFile( );
+	if (HasAuthority ( ))
+	{
+		SongFilePath = VirtualCharacter->SongInfo.FilePath;
+		ServerRPC_PlayWaveFile( );
+	}
 
 }
 
@@ -51,30 +56,36 @@ void AHSW_AudioLoadingActor::Tick(float DeltaTime)
 void AHSW_AudioLoadingActor::GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& OutLifetimeProps ) const
 {
 	Super::GetLifetimeReplicatedProps ( OutLifetimeProps );
+	DOREPLIFETIME ( AHSW_AudioLoadingActor , SongFilePath );
+	
 
-	DOREPLIFETIME ( AHSW_AudioLoadingActor , MediaPlayer );
-	DOREPLIFETIME ( AHSW_AudioLoadingActor , MediaSoundComp );
-	DOREPLIFETIME ( AHSW_AudioLoadingActor , FileMediaSource ); 
-	DOREPLIFETIME ( AHSW_AudioLoadingActor , VirtualCharacter );
 }
 
 void AHSW_AudioLoadingActor::ServerRPC_PlayWaveFile_Implementation ( )
 {
-	MediaPlayer = NewObject<UMediaPlayer> ( );
-	MediaPlayer->OnEndReached.AddDynamic ( this , &AHSW_AudioLoadingActor::OnPlayEnded );
 	MultiRPC_PlayWavFile( );
 }
 
 void AHSW_AudioLoadingActor::MultiRPC_PlayWavFile_Implementation ( )
 {
-	//UE_LOG ( LogTemp , Warning , TEXT ( "PlayWavFile" ) );
-	if (MediaPlayer && MediaPlayer->OpenFile ( VirtualCharacter->SongInfo.FilePath ))
+	if (!MediaPlayer)
 	{
-		UE_LOG ( LogTemp , Warning , TEXT ( "Wav File Path: %s" ) , *VirtualCharacter->SongInfo.FilePath );
+		MediaPlayer = NewObject<UMediaPlayer> ( );
+		if (MediaPlayer)
+		{
+			MediaPlayer->OnEndReached.AddDynamic ( this , &AHSW_AudioLoadingActor::OnPlayEnded );
+		}
+
+	}
+	//UE_LOG ( LogTemp , Warning , TEXT ( "PlayWavFile" ) );
+ 	UE_LOG ( LogTemp , Warning , TEXT ( "Wav File Path: %s" ) , *SongFilePath );
+	if (MediaPlayer && MediaPlayer->OpenFile ( SongFilePath ))
+	{
 		if (MediaSoundComp)
 		{
-			//UE_LOG ( LogTemp , Warning , TEXT ( "SongPlay" ) );
+			UE_LOG ( LogTemp , Warning , TEXT ( "SongPlay" ) );
 			MediaSoundComp->SetMediaPlayer ( MediaPlayer );
+			MediaPlayer->Play();
 		}
 	}
 }
