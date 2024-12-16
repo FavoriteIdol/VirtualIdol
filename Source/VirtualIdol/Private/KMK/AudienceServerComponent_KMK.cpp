@@ -73,8 +73,9 @@ void UAudienceServerComponent_KMK::BeginPlay()
 			}
 		}
 	}
-
-	if (playerMesh && playerMesh->HasAuthority())
+	if (gi) ServerRPC_SetInitialLocation ( gi->concertStageInfo.terrain );
+	
+	if (playerMesh && playerMesh->HasAuthority ( ))
 	{
 		// 관객의 초기 셋팅값 변경
  		if (playerMesh->IsLocallyControlled())
@@ -86,7 +87,7 @@ void UAudienceServerComponent_KMK::BeginPlay()
 			//playerMesh->SetActorLocation ( FVector ( 4330 , -150 , 730 ) );
 			//playerMesh->SetActorRotation ( FRotator ( 0 , 180, 0 ) );
 			// 현재 위치를 모든 클라이언트에 동기화
-			MulticastRPC_SetInitialLocation ( gi->concertStageInfo.terrain );
+			
         }
 	}
 	else
@@ -106,22 +107,22 @@ void UAudienceServerComponent_KMK::MulticastRPC_SetInitialLocation_Implementatio
 	switch (terrain)
 	{
 	case 0:
-		newLocation = FVector ( 3600 , -137 , 400 );
+		newLocation = FVector ( 3600 , -137 , 600 );
 		break;
 	case 1:
-		newLocation = FVector ( 1785 , -137 , 150 );
+		newLocation = FVector ( 1785 , -137 , 300 );
 		break;
 	case 2:
-		newLocation = FVector ( 1575 , -200 , 490 );
+		newLocation = FVector ( 1575 , -200 , 690 );
 		break;
 	case 3:
-		newLocation = FVector ( 2540 , 0 , 300 );
+		newLocation = FVector ( 2540 , 0 , 500 );
 		break;
 	case 4:
-		newLocation = FVector ( 2540 , 0 , 300 );
+		newLocation = FVector ( 2540 , 0 , 500 );
 		break;
 	case 5:
-		newLocation = FVector ( 1995 , -347 , 150 );
+		newLocation = FVector ( 1995 , -347 , 300 );
 		break;
 	default:
 		return;
@@ -134,6 +135,11 @@ void UAudienceServerComponent_KMK::MulticastRPC_SetInitialLocation_Implementatio
 }
 
 
+
+void UAudienceServerComponent_KMK::ServerRPC_SetInitialLocation_Implementation ( int32 terrain )
+{
+	MulticastRPC_SetInitialLocation(terrain);
+}
 
 // 월드상에서 버츄얼 찾기
 void UAudienceServerComponent_KMK::FindVirtualCharacter ( )
