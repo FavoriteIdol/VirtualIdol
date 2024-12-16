@@ -24,6 +24,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
+
 public:
 	UPROPERTY( )
 	class USceneComponent* SceneComponent;
@@ -31,16 +33,16 @@ public:
 	UPROPERTY( )
 	class UVirtualGameInstance_KMK* gi;
 
-	UPROPERTY( )
+	UPROPERTY( Replicated , EditDefaultsOnly , BlueprintReadWrite )
 	class UVirtual_KMK* VirtualCharacter;
 
-	UPROPERTY( )
+	UPROPERTY( Replicated , EditDefaultsOnly , BlueprintReadWrite )
 	class UMediaPlayer* MediaPlayer;
 
-	UPROPERTY( )
+	UPROPERTY( Replicated , EditDefaultsOnly , BlueprintReadWrite )
 	class UMediaSoundComponent* MediaSoundComp;
 
-	UPROPERTY( )
+	UPROPERTY( Replicated , EditDefaultsOnly , BlueprintReadWrite )
 	class UFileMediaSource* FileMediaSource;
 
 	UFUNCTION( Server , Reliable )
@@ -54,4 +56,5 @@ public:
 
 	UFUNCTION( )
 	void FindVirtualCharacter ( );
+
 };

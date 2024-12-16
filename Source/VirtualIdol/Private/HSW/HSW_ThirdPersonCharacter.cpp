@@ -41,6 +41,7 @@
 #include "Components/AudioComponent.h"
 #include "Components/TextBlock.h"
 #include "HSW/HSW_AudioActor.h"
+#include "HSW_AudioLoadingActor.h"
 
 // Sets default values
 AHSW_ThirdPersonCharacter::AHSW_ThirdPersonCharacter()
@@ -980,7 +981,14 @@ void AHSW_ThirdPersonCharacter::PlayFeverVideoAnim ( )
 {
 	//GetComponentByClass()
 	UE_LOG ( LogTemp , Warning , TEXT ( "FeverVideo Play" ) );
-	if (audienceWidget) audienceWidget->PlayFeverVideoFadeIn ( );
+	if (audienceWidget) 
+	{
+		audienceWidget->PlayFeverVideoFadeIn ( );
+	}
+	else
+	{
+		UE_LOG ( LogTemp , Warning , TEXT ( "audienceWidget None" ) );
+	}
 
 	if(VirtualCharacter&&VirtualCharacter->virtualWidget) VirtualCharacter->virtualWidget->PlayFeverVideoFadeIn();
 	else
@@ -1035,4 +1043,9 @@ void AHSW_ThirdPersonCharacter::ClientPlayMusic_Implementation ( class UAudioCom
 	{
 		UE_LOG ( LogTemp , Warning , TEXT ( "not Music" ) );
 	}
+}
+
+void AHSW_ThirdPersonCharacter::ClientRPC_CreateAudioActorWithIndex_Implementation (int32 SongIndex )
+{
+	AudioLoadingActor = GetWorld ( )->SpawnActor<AHSW_AudioLoadingActor> ( AudioLoadingActorFactory , FTransform::Identity );
 }

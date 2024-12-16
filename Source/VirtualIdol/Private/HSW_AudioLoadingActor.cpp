@@ -7,6 +7,7 @@
 #include "KMK/VirtualGameInstance_KMK.h"
 #include "Kismet/GameplayStatics.h"
 #include "KMK/Virtual_KMK.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 AHSW_AudioLoadingActor::AHSW_AudioLoadingActor()
@@ -30,15 +31,14 @@ void AHSW_AudioLoadingActor::BeginPlay()
 
 	gi = Cast<UVirtualGameInstance_KMK> ( GetWorld ( )->GetGameInstance ( ) );
 
-	FindVirtualCharacter( );
+	FindVirtualCharacter ( );
 
-	MediaPlayer = NewObject<UMediaPlayer> ( );
-	MediaPlayer->OnEndReached.AddDynamic ( this , &AHSW_AudioLoadingActor::OnPlayEnded );
 // 
 // 	FTimerHandle timerHandle;
 // 	GetWorld ( )->GetTimerManager ( ).SetTimer ( timerHandle , this , &AHSW_AudioLoadingActor::PlayWavFile , 0.3f , false );
 
 	ServerRPC_PlayWaveFile( );
+
 }
 
 // Called every frame
@@ -48,8 +48,20 @@ void AHSW_AudioLoadingActor::Tick(float DeltaTime)
 }
 
 
+void AHSW_AudioLoadingActor::GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& OutLifetimeProps ) const
+{
+	Super::GetLifetimeReplicatedProps ( OutLifetimeProps );
+
+	DOREPLIFETIME ( AHSW_AudioLoadingActor , MediaPlayer );
+	DOREPLIFETIME ( AHSW_AudioLoadingActor , MediaSoundComp );
+	DOREPLIFETIME ( AHSW_AudioLoadingActor , FileMediaSource ); 
+	DOREPLIFETIME ( AHSW_AudioLoadingActor , VirtualCharacter );
+}
+
 void AHSW_AudioLoadingActor::ServerRPC_PlayWaveFile_Implementation ( )
 {
+	MediaPlayer = NewObject<UMediaPlayer> ( );
+	MediaPlayer->OnEndReached.AddDynamic ( this , &AHSW_AudioLoadingActor::OnPlayEnded );
 	MultiRPC_PlayWavFile( );
 }
 
@@ -94,3 +106,4 @@ void AHSW_AudioLoadingActor::FindVirtualCharacter ( )
 	// 버츄얼을 못찾았다면, 일정 시간 후 다시 시도
 	GetWorld ( )->GetTimerManager ( ).SetTimerForNextTick ( this , &AHSW_AudioLoadingActor::FindVirtualCharacter );
 }
+
