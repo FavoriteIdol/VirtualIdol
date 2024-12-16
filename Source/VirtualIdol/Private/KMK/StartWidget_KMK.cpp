@@ -734,8 +734,11 @@ void UStartWidget_KMK::PressNextButt ( )
 	Text_FinalCount->SetText ( EditText_ScaleNum->GetText() );
 	Text_FinalPay->SetText ( Text_Price->GetText() );
 	FString s = Text_Price->GetText().ToString();
+	s = s.Replace ( TEXT ( "," ) , TEXT ( "" ) );
+	s = s.Replace ( TEXT ( " " ) , TEXT ( "" ) );
+	int32 price = FCString::Atoi ( *s );
 	// 내가 가진 캐쉬에서 차감
-	if (gi->myCash < FCString::Atoi ( *s ))
+	if (gi->myCash < price)
 	{
 		// 결제에 실패했습니다.
 		Text_Effect1->SetText ( FText::FromString ( TEXT ( "충전된 금액이 부족합니다." ) ) );
@@ -743,7 +746,7 @@ void UStartWidget_KMK::PressNextButt ( )
 		UGameplayStatics::PlaySound2D ( GetWorld ( ) , PopUpSFV );
 		return;
 	}
-	gi->myCash -= FCString::Atoi(*s);
+	gi->myCash -= price;
 	Butt_Next->SetVisibility ( ESlateVisibility::Hidden );
 	Butt_CreateTicket1->SetVisibility(ESlateVisibility::Visible);
 	Text_Price->SetText(FText::GetEmpty ( ) );
@@ -904,5 +907,3 @@ void UStartWidget_KMK::SetLoadImage ( )
 }
 
 #pragma endregion
-
-

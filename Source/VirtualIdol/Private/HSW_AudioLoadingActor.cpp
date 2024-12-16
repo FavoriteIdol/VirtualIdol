@@ -45,7 +45,6 @@ void AHSW_AudioLoadingActor::BeginPlay()
 void AHSW_AudioLoadingActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 
