@@ -11,6 +11,8 @@
 #include "Components/ArrowComponent.h"
 #include "HSW_ThrowingObject.h"
 #include "HSW_AnimInstance_Audience.h"
+#include "GameFramework/CharacterMovementComponent.h"
+
 
 // Sets default values
 ADummy_KMK::ADummy_KMK ( )
@@ -42,54 +44,66 @@ void ADummy_KMK::BeginPlay ( )
       TempMesh->SetMaterial ( 0 , FeverDynamicMat );
       TempMesh->SetMaterial ( 2 , FaceDynamicMat );
    }
-
+   
    ThrowingObjectIndex = FMath::RandRange ( 0 , 2 );
+
+   GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 }
 
 // Called every frame
 void ADummy_KMK::Tick ( float DeltaTime )
 {
-   Super::Tick ( DeltaTime );
-   switch (state)
-   {
-   case DummyState::Idle:
-      IdleFucn ( DeltaTime );
-      break;
-   case DummyState::Jump:
-      if (HasAuthority ( )) ServerRPC_Jump ( DeltaTime );
-      break;
-   case DummyState::Move:
-      MoveFucn ( DeltaTime );
-      break;
-   case DummyState::Emoji:
-      EmojiFucn ( DeltaTime );
-      break;
-   case DummyState::Fever:
-      if (HasAuthority ( )) ServerRPC_Shake ( 0.03 );
-      break;
-   case DummyState::Throw:
-      CreateThrowingObject( );
-      break;
-   }
+    Super::Tick ( DeltaTime );
 
-   FaceTimer += DeltaTime;
-   ImojiTimer += DeltaTime;
-   ThrowTimer += DeltaTime;
+//    UE_LOG ( LogTemp , Warning , TEXT ( "IsFalling: %s" ) , GetCharacterMovement ( )->IsFalling ( ) ? TEXT ( "True" ) : TEXT ( "False" ) );
+    UE_LOG ( LogTemp , Warning , TEXT ( "CanJump: %s" ) , CanJump ( ) ? TEXT ( "True" ) : TEXT ( "False" ) );
+   UE_LOG ( LogTemp , Warning , TEXT ( "MovementMode: %d" ) , (int32)GetCharacterMovement ( )->MovementMode );
+//    UE_LOG ( LogTemp , Warning , TEXT ( "JumpZVelocity: %f" ) , GetCharacterMovement ( )->JumpZVelocity );
+//    UE_LOG ( LogTemp , Warning , TEXT ( "GravityScale: %f" ) , GetCharacterMovement ( )->GravityScale );
+//   UE_LOG ( LogTemp , Warning , TEXT ( "MaxWalkSpeed: %f" ) , GetCharacterMovement ( )->MaxWalkSpeed );
+/*   UE_LOG ( LogTemp , Warning , TEXT ( "CanEverJump: %s" ) , GetCharacterMovement ( )->CanEverJump ( ) ? TEXT ( "True" ) : TEXT ( "False" ) );*/
 
-   if (FaceRand == 0 && FaceTimer >= 3)
-   {
-      // 상큼한 표정
-      FaceRand = FMath::RandRange ( 0 , 1 );
-      FaceTimer = 0;
-      SetFace ( 0.5 );
-   }
-   else if (!( FaceRand == 0 ) && FaceTimer >= 2)
-   {
-      // 기본 표정
-      FaceRand = FMath::RandRange ( 0 , 1 );
-      FaceTimer = 0;
-      SetFace ( 1 );
-   }
+    switch (state)
+    {
+    case DummyState::Idle:
+        IdleFucn ( DeltaTime );
+        break;
+    case DummyState::Jump:
+       //JumpFunc( DeltaTime );
+       if (HasAuthority ( )) ServerRPC_Jump ( DeltaTime );
+       break;
+    case DummyState::Move:
+       MoveFucn ( DeltaTime );
+       break;
+    case DummyState::Emoji:
+       EmojiFucn ( DeltaTime );
+       break;
+    case DummyState::Fever:
+       if (HasAuthority ( )) ServerRPC_Shake ( 0.03 );
+       break;
+    case DummyState::Throw:
+       CreateThrowingObject( );
+       break;
+    }
+
+    FaceTimer += DeltaTime;
+    ImojiTimer += DeltaTime;
+    ThrowTimer += DeltaTime;
+
+    if (FaceRand == 0 && FaceTimer >= 3)
+    {
+       // 상큼한 표정
+       FaceRand = FMath::RandRange ( 0 , 1 );
+       FaceTimer = 0;
+       SetFace ( 0.5 );
+    }
+    else if (!( FaceRand == 0 ) && FaceTimer >= 2)
+    {
+       // 기본 표정
+       FaceRand = FMath::RandRange ( 0 , 1 );
+       FaceTimer = 0;
+       SetFace ( 1 );
+    }
 }
 
 // Called to bind functionality to input
@@ -175,8 +189,21 @@ void ADummy_KMK::IdleFucn ( const float& DeltaTime )
 
 void ADummy_KMK::JumpFunc ( const float& DeltaTime )
 {
-   Jump ( );
-
+    if (!isJump)
+    {
+        int32 rand = FMath::RandRange ( 0 , 40 );
+        if (rand == 0)
+        {
+            //UE_LOG ( LogTemp , Warning , TEXT ( "ServerRPC_Jump: Call MultiRPC Jump" ) );
+            Jump();
+            isJump = true;
+        }
+    }
+    else
+    {
+        state = DummyState::Idle;
+        isJump = false;
+    }
 }
 
 void ADummy_KMK::MoveFucn ( const float& DeltaTime )
@@ -252,11 +279,13 @@ void ADummy_KMK::MulticastRPC_Shake_Implementation ( float brightValue )
 
 void ADummy_KMK::ServerRPC_Jump_Implementation ( const float& DeltaTime )
 {
+   //UE_LOG(LogTemp,Warning,TEXT("ServerRPC_Jump" ) );
    if (!isJump)
    {
       int32 rand = FMath::RandRange ( 0 , 40 );
       if (rand == 0)
       {
+         //UE_LOG ( LogTemp , Warning , TEXT ( "ServerRPC_Jump: Call MultiRPC Jump" ) );
          MulticastRPC_Jump ( DeltaTime );
          isJump = true;
       }
@@ -271,7 +300,8 @@ void ADummy_KMK::ServerRPC_Jump_Implementation ( const float& DeltaTime )
 void ADummy_KMK::MulticastRPC_Jump_Implementation ( const float& DeltaTime )
 {
    // 더미끼리의 점프
-   if (IsLocallyControlled ( )) Jump ( );
+   //UE_LOG ( LogTemp , Warning , TEXT ( "Jump!!" ) );
+   Jump ( );
    //if(!HasAuthority()&&!IsLocallyControlled())   UE_LOG ( LogTemp , Warning , TEXT ( "Jump" ) );
    /*JumpFunc ( DeltaTime );*/
 }
