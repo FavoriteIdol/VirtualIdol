@@ -43,8 +43,11 @@ public:
 	UPROPERTY( )
 	class UFileMediaSource* FileMediaSource;
 
-	UFUNCTION( )
-	void PlayWavFile( );
+	UFUNCTION( Server , Reliable )
+	void ServerRPC_PlayWaveFile( );
+
+	UFUNCTION( NetMulticast, Reliable )
+	void MultiRPC_PlayWavFile( );
 
 	UFUNCTION( )
 	void OnPlayEnded (  );

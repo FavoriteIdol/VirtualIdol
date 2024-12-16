@@ -333,10 +333,19 @@ public :
 	class UScrollBox* SB_SongList_1;
 	UPROPERTY(meta = (BindWidget))
 	class UScrollBox* SB_SongList_2;
+
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* Butt_Reload_1;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* Butt_Reload_2;
+
 	UFUNCTION( )
 	void AddSongList(const FWavFileInfo& SongInfo);
 	UPROPERTY(EditDefaultsOnly )
 	TSubclassOf<class UHSW_SongUnit> SongUnitFact;
+
+	UFUNCTION( )
+	void OnReloadMusic ( );
 
 #pragma endregion  Music
 

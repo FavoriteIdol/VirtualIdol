@@ -129,6 +129,11 @@ void UAudience_KMK::NativeConstruct ( )
 	    Btn_Imoji_4->OnClicked.AddDynamic ( this , &UAudience_KMK::OnMyImoji04 );
     }
 
+    if (Butt_Reload_1 && Butt_Reload_2)
+    {
+        Butt_Reload_1->OnClicked.AddDynamic ( this , &UAudience_KMK::OnReloadMusic );
+        Butt_Reload_2->OnClicked.AddDynamic ( this , &UAudience_KMK::OnReloadMusic );
+    }
 
 	Player = Cast<AHSW_ThirdPersonCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn() );
 	if(Player)ImojiComponent = Player->GetComponentByClass<UHSW_ImojiConponent>();
@@ -773,6 +778,14 @@ void UAudience_KMK::AddSongList ( const FWavFileInfo& SongInfo )
 		songUnit2->SetSongTitle ( );
 		SB_SongList_2->AddChild ( songUnit2 );
 		SB_SongList_2->ScrollToEnd ( );
+    }
+}
+
+void UAudience_KMK::OnReloadMusic ( )
+{
+    if (httpActor && gi)
+    {
+        httpActor->ReqMusic(gi->concerInfo.concertId);
     }
 }
 

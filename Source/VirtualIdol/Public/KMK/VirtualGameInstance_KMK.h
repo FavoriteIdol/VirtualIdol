@@ -187,7 +187,7 @@ class VIRTUALIDOL_API UVirtualGameInstance_KMK : public UGameInstance
 	class URoomWidget_KMK* sessionWidget;
 
 	UPROPERTY(EditAnywhere, Category = Cash )
-	int32 myCash = 50000;
+	int32 myCash = 1000000;
 
 	UFUNCTION( )
 	void SetMyProfile( );

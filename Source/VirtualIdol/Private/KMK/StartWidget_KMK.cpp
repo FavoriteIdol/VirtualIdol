@@ -26,6 +26,7 @@
 #include "Materials/MaterialInstanceDynamic.h"
 #include "IDesktopPlatform.h"
 #include "DesktopPlatformModule.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 void UStartWidget_KMK::NativeConstruct ( )
 {	
@@ -77,6 +78,15 @@ void UStartWidget_KMK::NativeConstruct ( )
 		Butt_Login->OnClicked.AddDynamic(this, &UStartWidget_KMK::OnMyLogin);
 		Butt_FailLogin->OnClicked.AddDynamic(this, &UStartWidget_KMK::OnFailLogin);
 		FailLoginPanel->SetVisibility(ESlateVisibility::Hidden);
+	}
+#pragma endregion
+
+#pragma region Homepage
+	if (Button_Homepage_1 && Button_Homepage_2 && Butt_SignIn)
+	{
+		Button_Homepage_1->OnClicked.AddDynamic ( this , &UStartWidget_KMK::OnHomepage );
+		Button_Homepage_2->OnClicked.AddDynamic ( this , &UStartWidget_KMK::OnHomepage );
+		Butt_SignIn->OnClicked.AddDynamic ( this , &UStartWidget_KMK::OnSignInPage );
 	}
 #pragma endregion
 
@@ -265,6 +275,16 @@ void UStartWidget_KMK::OnMyLogin ( )
 void UStartWidget_KMK::OnFailLogin ( )
 {
 	FailLoginPanel->SetVisibility(ESlateVisibility::Hidden);
+}
+
+void UStartWidget_KMK::OnHomepage ( )
+{
+	UKismetSystemLibrary::LaunchURL ( "http://tripleyoung.synology.me:3334" );
+}
+
+void UStartWidget_KMK::OnSignInPage ( )
+{
+	UKismetSystemLibrary::LaunchURL ( "http://tripleyoung.synology.me:3334/ko/signin" );
 }
 
 #pragma endregion
@@ -549,6 +569,10 @@ void UStartWidget_KMK::PressCreateTicket ( )
 	data.Add(TEXT("prompt" ), EditMultiText_Ticket->GetText().ToString());
 	Text_Price->SetText ( FText::GetEmpty ( ) );
 	Image_Coin->SetVisibility(ESlateVisibility::Hidden);
+	if (Image_FinalStageImage->Brush.GetResourceObject ( ))
+	{
+		Image_FinalStageImage->Brush.SetResourceObject(nullptr);
+	}
 	// 이 부분 정보는 BE에서 끌어와야함
  //   FString year = TEXT ( "20" ) + EditText_Year->GetText ( ).ToString ( );
  //   FString mon = ChangeString ( EditText_Day->GetText ( ).ToString ( ) );
@@ -711,6 +735,14 @@ void UStartWidget_KMK::PressNextButt ( )
 	Text_FinalPay->SetText ( Text_Price->GetText() );
 	FString s = Text_Price->GetText().ToString();
 	// 내가 가진 캐쉬에서 차감
+	if (gi->myCash < FCString::Atoi ( *s ))
+	{
+		// 결제에 실패했습니다.
+		Text_Effect1->SetText ( FText::FromString ( TEXT ( "충전된 금액이 부족합니다." ) ) );
+		EffectPopUp->SetVisibility ( ESlateVisibility::Visible );
+		UGameplayStatics::PlaySound2D ( GetWorld ( ) , PopUpSFV );
+		return;
+	}
 	gi->myCash -= FCString::Atoi(*s);
 	Butt_Next->SetVisibility ( ESlateVisibility::Hidden );
 	Butt_CreateTicket1->SetVisibility(ESlateVisibility::Visible);

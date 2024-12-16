@@ -28,7 +28,7 @@ public:
 	class UWidgetSwitcher* StartSwitcher;
 
 	UPROPERTY(EditAnywhere, Category = Price)
-	int32 concertPrice = 100000;
+	int32 concertPrice = 10000;
 	UFUNCTION ()
 	void GoBack();
 	
@@ -69,11 +69,24 @@ public:
     class UButton* Butt_FailLogin;
 	UPROPERTY ( meta = ( BindWidget ) )
 	class UCanvasPanel* FailLoginPanel;
+
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* Button_Homepage_1;
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* Button_Homepage_2;
+
+	UPROPERTY ( meta = ( BindWidget ) )
+	class UButton* Butt_SignIn;
+	
 	// 버튼 연동 함수
 	UFUNCTION ()
 	void OnMyLogin();
 	UFUNCTION ()
 	void OnFailLogin();
+	UFUNCTION( )
+	void OnHomepage( );
+	UFUNCTION( )
+	void OnSignInPage( );
 #pragma endregion
 #pragma region  Four Button Widget Panel
 // ================================================================
