@@ -1,4 +1,4 @@
-// VRM4U Copyright (c) 2021-2024 Haruyoshi Yamamoto. This software is released under the MIT License.
+﻿// VRM4U Copyright (c) 2021-2024 Haruyoshi Yamamoto. This software is released under the MIT License.
 // Copyright 1998-2018 Epic Games, Inc. All Rights Reserved.
 // ApplicationLifecycleComponent.cpp: Component to handle receiving notifications from the OS about application state (activated, suspended, termination, etc)
 
@@ -9,7 +9,9 @@
 #include "Windows/AllowWindowsPlatformTypes.h"
 #include "commdlg.h"
 #include "Windows/HideWindowsPlatformTypes.h"
+#include <windows.h>
 #endif
+
 
 UVrmDropFilesComponent::FStaticOnDropFiles	UVrmDropFilesComponent::StaticOnDropFilesDelegate;
 UVrmDropFilesComponent *UVrmDropFilesComponent::s_LatestActiveComponent = nullptr;
@@ -36,6 +38,8 @@ void UVrmDropFilesComponent::OnRegister()
 	FCoreDelegates::OnTemperatureChange.AddUObject(this, &UApplicationLifecycleComponent::OnTemperatureChangeDelegate_Handler);
 	FCoreDelegates::OnLowPowerMode.AddUObject(this, &UApplicationLifecycleComponent::OnLowPowerModeDelegate_Handler);
 	*/
+	
+	
 	StaticOnDropFilesDelegate.AddUObject(this, &UVrmDropFilesComponent::OnDropFilesDelegate_Handler);
 
 	s_LatestActiveComponent = this;
