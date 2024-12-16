@@ -391,7 +391,6 @@ void UVirtual_KMK::CreateAudioActorWithIndex ( )
 		if(WavFiles[CurrentSongIndex].ConcertID != 0)
 		{
 			SongInfo = WavFiles[CurrentSongIndex];
-			CurrentSongIndex++;
 			AudioLoadingActor = GetWorld ( )->SpawnActor<AHSW_AudioLoadingActor> ( AudioLoadingActorFactory , FTransform::Identity );
 			bCanPlaySong = false;
 		}

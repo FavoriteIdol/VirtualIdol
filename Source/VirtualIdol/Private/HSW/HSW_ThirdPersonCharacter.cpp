@@ -980,17 +980,18 @@ void AHSW_ThirdPersonCharacter::SetChatWidget (const FString& nickName, const FS
 void AHSW_ThirdPersonCharacter::PlayFeverVideoAnim ( )
 {
 	//GetComponentByClass()
-	UE_LOG ( LogTemp , Warning , TEXT ( "FeverVideo Play" ) );
-	if (audienceWidget) 
+	//UE_LOG ( LogTemp , Warning , TEXT ( "FeverVideo Play" ) );
+	if (audienceWidget)
 	{
-		audienceWidget->PlayFeverVideoFadeIn ( );
-	}
-	else
-	{
-		UE_LOG ( LogTemp , Warning , TEXT ( "audienceWidget None" ) );
+		//UE_LOG ( LogTemp , Warning , TEXT ( "audienceWidget exits" ) );
+		if (IsLocallyControlled ( ))
+		{
+			//UE_LOG ( LogTemp , Warning , TEXT ( "audienceWidget : Is Locally Controlled" ) );
+			audienceWidget->PlayFeverVideoFadeIn ( );
+		}
 	}
 
-	if(VirtualCharacter&&VirtualCharacter->virtualWidget) VirtualCharacter->virtualWidget->PlayFeverVideoFadeIn();
+	if(VirtualCharacter&&VirtualCharacter->virtualWidget&&HasAuthority()) VirtualCharacter->virtualWidget->PlayFeverVideoFadeIn();
 	else
 	{
 		if (!VirtualCharacter)
