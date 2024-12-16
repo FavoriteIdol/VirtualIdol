@@ -67,7 +67,7 @@ void UVirtual_KMK::BeginPlay()
 		sm->CreateDummyStage ( gi->GetConcertStageInfo ( ) );
 		if (gi->GetConcertStageInfo ( ).theme == 3)
 		{
-			gi->spawnTrans = FTransform ( FVector ( 0 , 0 , 2000 ) );
+			gi->spawnTrans = FTransform ( FVector ( 0 ) );
 		}
 		else if (gi->GetConcertStageInfo ( ).theme != 3)
 		{

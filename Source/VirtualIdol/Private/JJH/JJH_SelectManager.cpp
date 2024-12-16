@@ -72,9 +72,42 @@ void AJJH_SelectManager::CreateDummyStage ( const struct FStageInfo& info )
 	{
 		CreateDummyStage2 ( info );
 	} , 1.1f , false );
+	UE_LOG ( LogTemp , Warning , TEXT ( "HasAuthority" ) );
+	
+
 }
 
-void AJJH_SelectManager::CreateDummyStage2 ( const struct FStageInfo& info )
+void AJJH_SelectManager::CreateClientDummyStage ( const struct FStageInfo& info )
+{
+
+	if (MapSelectWidget && MapSelectWidget->IsVisible ( ))
+	{
+		MapSelectWidget->SetVisibility ( ESlateVisibility::Hidden );
+	}
+
+	UVirtualGameInstance_KMK* gi = Cast<UVirtualGameInstance_KMK> ( GetWorld ( )->GetGameInstance ( ) );
+
+	GetWorld ( )->SpawnActor<AActor> ( SkyFactory[info.sky] , GetActorTransform ( ) );
+
+	// 현재 로드된 모든 레벨을 언로드 목록에 추가
+	// 버튜버면 레벨포함 전부 업로드, 아니면  
+	if(info.theme > Levels.Num ( ))
+	{
+		// 새로운 테마 액터 스폰
+		GetWorld ( )->SpawnActor<AActor> ( ThemeFactory[info.theme] , GetActorTransform ( ) );
+	}
+	
+
+	if (DummyFloor[info.terrain])
+	{
+		GetWorld ( )->SpawnActor<AActor> ( DummyFloor[info.terrain] , GetActorTransform ( ) );
+	}
+	GetWorld ( )->SpawnActor<AActor> ( VFXFactory[info.specialEffect] , GetActorTransform ( ) );
+
+	UE_LOG ( LogTemp , Warning , TEXT ( "%d, %d, %d, %d" ) , info.sky , info.theme , info.terrain , info.specialEffect );
+}
+
+void AJJH_SelectManager::CreateDummyStage2 ( const FStageInfo& info )
 {
 
 	if (MapSelectWidget && MapSelectWidget->IsVisible ( ))
@@ -83,10 +116,16 @@ void AJJH_SelectManager::CreateDummyStage2 ( const struct FStageInfo& info )
 	}
 
 	auto* gi = Cast<UVirtualGameInstance_KMK> ( GetWorld ( )->GetGameInstance ( ) );
-
+	if (DummyFloor[info.terrain])
+	{
+		GetWorld ( )->SpawnActor<AActor> ( DummyFloor[info.terrain] , GetActorTransform ( ) );
+	}
+	GetWorld ( )->SpawnActor<AActor> ( VFXFactory[info.specialEffect] , GetActorTransform ( ) );
 	GetWorld ( )->SpawnActor<AActor> ( SkyFactory[info.sky] , GetActorTransform ( ) );
 
 	// 현재 로드된 모든 레벨을 언로드 목록에 추가
+	// 버튜버면 레벨포함 전부 업로드, 아니면  
+
 	for (const FName& Level : Levels)
 	{
 		LevelsToUnload.Add ( Level );
@@ -113,13 +152,9 @@ void AJJH_SelectManager::CreateDummyStage2 ( const struct FStageInfo& info )
 		// 새로운 테마 액터 스폰
 		GetWorld ( )->SpawnActor<AActor> ( ThemeFactory[info.theme] , GetActorTransform ( ) );
 	}
-	UE_LOG ( LogTemp , Warning , TEXT ( "loading level: %s" ) , *LevelToLoad.ToString ( ) );
+	
+	UE_LOG ( LogTemp , Warning , TEXT ( "Dummy loading level: %s" ) , *LevelToLoad.ToString ( ) );
 
-	if (DummyFloor[info.terrain])
-	{
-		GetWorld ( )->SpawnActor<AActor> ( DummyFloor[info.terrain] , GetActorTransform ( ) );
-	}
-	GetWorld ( )->SpawnActor<AActor> ( VFXFactory[info.specialEffect] , GetActorTransform ( ) );
 
 	UE_LOG ( LogTemp , Warning , TEXT ( "%d, %d, %d, %d" ) , info.sky , info.theme , info.terrain , info.specialEffect );
 }
@@ -399,7 +434,7 @@ void AJJH_SelectManager::CreateStage ( const struct FStageInfo& info )
 		// 새로운 테마 액터 스폰
 		GetWorld ( )->SpawnActor<AActor> ( ThemeFactory[info.theme] , GetActorTransform ( ) );
 	}
-	UE_LOG ( LogTemp , Warning , TEXT ( "loading level: %s" ) , *LevelToLoad.ToString ( ) );
+	UE_LOG ( LogTemp , Warning , TEXT ( "create loading level: %s" ) , *LevelToLoad.ToString ( ) );
 
 	GetWorld ( )->SpawnActor<AActor> (FloorFactory[info.terrain] , GetActorTransform ( ) );
 	GetWorld ( )->SpawnActor<AActor> (VFXFactory[info.specialEffect] , GetActorTransform ( ) );
@@ -436,7 +471,7 @@ void AJJH_SelectManager::DeleteStage ( )
 				FLatentActionInfo ( ) ,
 				true  // 언로드 시 블록 여부 설정
 			);
-			UE_LOG ( LogTemp , Warning , TEXT ( "Unloading level: %s" ) , *Level.ToString ( ) );
+			UE_LOG ( LogTemp , Warning , TEXT ( "Delete level Unloading level: %s" ) , *Level.ToString ( ) );
 
 		} , 0.2f * ( i + 1 ) , false );  // 첫 번째 레벨도 0.4초 지연 후 언로드 <- 비동기적이라 이거 해야함
 	}
