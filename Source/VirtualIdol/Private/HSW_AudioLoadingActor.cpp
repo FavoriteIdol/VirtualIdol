@@ -38,7 +38,7 @@ void AHSW_AudioLoadingActor::BeginPlay()
 // 	FTimerHandle timerHandle;
 // 	GetWorld ( )->GetTimerManager ( ).SetTimer ( timerHandle , this , &AHSW_AudioLoadingActor::PlayWavFile , 0.3f , false );
 
-	PlayWavFile( );
+	ServerRPC_PlayWaveFile( );
 }
 
 // Called every frame
@@ -48,12 +48,18 @@ void AHSW_AudioLoadingActor::Tick(float DeltaTime)
 
 }
 
-void AHSW_AudioLoadingActor::PlayWavFile ( )
+
+void AHSW_AudioLoadingActor::ServerRPC_PlayWaveFile_Implementation ( )
+{
+	MultiRPC_PlayWavFile( );
+}
+
+void AHSW_AudioLoadingActor::MultiRPC_PlayWavFile_Implementation ( )
 {
 	//UE_LOG ( LogTemp , Warning , TEXT ( "PlayWavFile" ) );
 	if (MediaPlayer && MediaPlayer->OpenFile ( VirtualCharacter->SongInfo.FilePath ))
 	{
-		UE_LOG ( LogTemp , Warning , TEXT ( "Wav File Path: %s" ), *VirtualCharacter->SongInfo.FilePath );
+		UE_LOG ( LogTemp , Warning , TEXT ( "Wav File Path: %s" ) , *VirtualCharacter->SongInfo.FilePath );
 		if (MediaSoundComp)
 		{
 			//UE_LOG ( LogTemp , Warning , TEXT ( "SongPlay" ) );
