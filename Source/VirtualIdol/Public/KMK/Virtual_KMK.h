@@ -102,7 +102,7 @@ public:
 	UFUNCTION( )
 	void SetWavFiles ( );
 
-	UFUNCTION( )
+	UFUNCTION( BlueprintCallable)
 	void SetCurrentSongIndex ( );
 
 	UFUNCTION( )
