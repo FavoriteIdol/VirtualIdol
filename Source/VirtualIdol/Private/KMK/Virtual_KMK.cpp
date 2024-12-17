@@ -224,7 +224,8 @@ void UVirtual_KMK::CallGMShowServer ( )
 	if (gi->effectArray.Num ( ) > 0)
 	{
 		UE_LOG(LogTemp, Error, TEXT("apperedVFX: %d" ), gi->GetConcertInfo ( ).appearedVFX );
-		GetWorld ( )->SpawnActor<AActor> ( gi->effectArray[gi->GetConcertInfo ( ).appearedVFX] , gi->spawnTrans );
+		//GetWorld ( )->SpawnActor<AActor> ( gi->effectArray[gi->GetConcertInfo ( ).appearedVFX] , gi->spawnTrans );
+		GetWorld ( )->SpawnActor<AActor> ( gi->GINowEffect, gi->spawnTrans );
 	}
 	AHSW_GameState_Auditorium* gs = GetWorld ( )->GetGameState<AHSW_GameState_Auditorium> ( );
 	if (gs)
