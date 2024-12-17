@@ -40,7 +40,7 @@ void AHSW_AudioLoadingActor::BeginPlay()
 
 	if (HasAuthority ( ))
 	{
-		SongFilePath = VirtualCharacter->SongInfo.FilePath;
+		SongFilePath = FPaths::Combine(FPaths::ProjectSavedDir ( ) ,TEXT ( "Music" ), VirtualCharacter->SongInfo.FilePath);
 		ServerRPC_PlayWaveFile( );
 	}
 
@@ -55,9 +55,7 @@ void AHSW_AudioLoadingActor::Tick(float DeltaTime)
 
 void AHSW_AudioLoadingActor::GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& OutLifetimeProps ) const
 {
-	Super::GetLifetimeReplicatedProps ( OutLifetimeProps );
-	DOREPLIFETIME ( AHSW_AudioLoadingActor , SongFilePath );
-	
+	Super::GetLifetimeReplicatedProps ( OutLifetimeProps );	
 
 }
 
