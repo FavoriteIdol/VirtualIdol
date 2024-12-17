@@ -223,7 +223,7 @@ void UVirtual_KMK::CallGMShowServer ( )
 {
 	if (gi->effectArray.Num ( ) > 0)
 	{
-		UE_LOG(LogTemp, Error, TEXT("apperedVFX: %d" ), gi->GetConcertInfo ( ).appearedVFX );
+		//UE_LOG(LogTemp, Error, TEXT("apperedVFX: %d" ), gi->GetConcertInfo ( ).appearedVFX );
 		//GetWorld ( )->SpawnActor<AActor> ( gi->effectArray[gi->GetConcertInfo ( ).appearedVFX] , gi->spawnTrans );
 		GetWorld ( )->SpawnActor<AActor> ( gi->GINowEffect, gi->spawnTrans );
 	}
@@ -384,7 +384,8 @@ void UVirtual_KMK::CreateAudioActor ( FWavFileInfo currentSongInfo )
 	FindAudioActor( );
 	if (!AudioLoadingActor && bCanPlaySong)
 	{
-		SongInfo= currentSongInfo;
+
+		SongInfo = currentSongInfo;
 		AudioLoadingActor = GetWorld ( )->SpawnActor<AHSW_AudioLoadingActor> ( AudioLoadingActorFactory , FTransform::Identity );
 		bCanPlaySong = false;
 	}
@@ -400,6 +401,7 @@ void UVirtual_KMK::CreateAudioActorWithIndex ( )
 			SongInfo = WavFiles[CurrentSongIndex];
 			AudioLoadingActor = GetWorld ( )->SpawnActor<AHSW_AudioLoadingActor> ( AudioLoadingActorFactory , FTransform::Identity );
 			bCanPlaySong = false;
+			SetCurrentSongIndex( );
 		}
 	}
 }
