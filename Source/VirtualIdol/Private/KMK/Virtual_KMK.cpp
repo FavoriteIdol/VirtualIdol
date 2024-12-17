@@ -223,8 +223,8 @@ void UVirtual_KMK::CallGMShowServer ( )
 {
 	if (gi->effectArray.Num ( ) > 0)
 	{
-		//UE_LOG(LogTemp, Error, TEXT("apperedVFX: %d" ), gi->GetConcertInfo ( ).appearedVFX );
-		//GetWorld ( )->SpawnActor<AActor> ( gi->effectArray[gi->GetConcertInfo ( ).appearedVFX] , gi->spawnTrans );
+		UE_LOG(LogTemp, Error, TEXT("apperedVFX: %d" ), gi->GetConcertInfo ( ).appearedVFX );
+		//GetWorld ( )->SpawnActor<AActor> ( gi->effectArray[gi->GetConcertInfo ( ).appearedVFX] , FTransform(FVector(200, 0, 0 )));
 		GetWorld ( )->SpawnActor<AActor> ( gi->GINowEffect, gi->spawnTrans );
 	}
 	AHSW_GameState_Auditorium* gs = GetWorld ( )->GetGameState<AHSW_GameState_Auditorium> ( );
@@ -238,7 +238,7 @@ void UVirtual_KMK::StartCountDown ( )
 {
     SetVirtualVisible ( true );
     virtualWidget->CountDownPanelVisible ( ESlateVisibility::Hidden );
-    if (gi->effectArray.Num ( ) > 0) GetWorld ( )->SpawnActor<AActor> ( gi->effectArray[gi->GetConcertInfo ( ).appearedVFX] , gi->spawnTrans );
+    //if (gi->effectArray.Num ( ) > 0) GetWorld ( )->SpawnActor<AActor> ( gi->effectArray[gi->GetConcertInfo ( ).appearedVFX] , gi->spawnTrans );
 	//if (gi->effectArray.Num ( ) > 0) GetWorld ( )->SpawnActor<AActor> ( gi->effectArray[3] ,FTransform(FVector(0, 0, 2000 )) );
     UE_LOG ( LogTemp , Warning , TEXT ( "%d" ) , gi->GetConcertInfo ( ).appearedVFX );
 
