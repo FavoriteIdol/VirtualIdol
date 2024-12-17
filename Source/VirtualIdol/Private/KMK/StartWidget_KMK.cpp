@@ -219,6 +219,13 @@ void UStartWidget_KMK::NativeTick ( const FGeometry& MyGeometry , float InDeltaT
 			FString s = EditText_ScaleNum->GetText().ToString();
 			// atoi을 사용하여 string값을 변경함 : a = 수용인원 * 우리가 설정한 가격(concertPrice)
 			int a = FCString::Atoi(*s) * concertPrice;
+
+			a += 100000; //기본금
+			// FString을 int32로 변환
+
+			// 시간 차이 계산
+			int32 timeDifference = FCString::Atoi ( *EditText_H->GetText ( ).ToString ( ) );
+			a += timeDifference * 100000; //시간당 금액
 			// 최종 가격을 작성
 			Text_Price->SetText(FText::AsNumber(a));
 		}
