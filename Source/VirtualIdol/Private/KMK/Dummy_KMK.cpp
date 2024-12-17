@@ -56,8 +56,8 @@ void ADummy_KMK::Tick ( float DeltaTime )
     Super::Tick ( DeltaTime );
 
 //    UE_LOG ( LogTemp , Warning , TEXT ( "IsFalling: %s" ) , GetCharacterMovement ( )->IsFalling ( ) ? TEXT ( "True" ) : TEXT ( "False" ) );
-    UE_LOG ( LogTemp , Warning , TEXT ( "CanJump: %s" ) , CanJump ( ) ? TEXT ( "True" ) : TEXT ( "False" ) );
-   UE_LOG ( LogTemp , Warning , TEXT ( "MovementMode: %d" ) , (int32)GetCharacterMovement ( )->MovementMode );
+//     UE_LOG ( LogTemp , Warning , TEXT ( "CanJump: %s" ) , CanJump ( ) ? TEXT ( "True" ) : TEXT ( "False" ) );
+//    UE_LOG ( LogTemp , Warning , TEXT ( "MovementMode: %d" ) , (int32)GetCharacterMovement ( )->MovementMode );
 //    UE_LOG ( LogTemp , Warning , TEXT ( "JumpZVelocity: %f" ) , GetCharacterMovement ( )->JumpZVelocity );
 //    UE_LOG ( LogTemp , Warning , TEXT ( "GravityScale: %f" ) , GetCharacterMovement ( )->GravityScale );
 //   UE_LOG ( LogTemp , Warning , TEXT ( "MaxWalkSpeed: %f" ) , GetCharacterMovement ( )->MaxWalkSpeed );
