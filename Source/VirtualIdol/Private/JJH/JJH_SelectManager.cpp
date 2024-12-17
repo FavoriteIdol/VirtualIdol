@@ -408,6 +408,56 @@ void AJJH_SelectManager::SaveImage ( UTextureRenderTarget2D* RenderTarget2 )
 	}
 }
 
+void AJJH_SelectManager::TakeScreenShotSelfCam_Implementation ( USceneCaptureComponent2D* BPCaptureComponent2D , UTextureRenderTarget2D* BPRenderTarget )
+{
+	if (BPCaptureComponent2D && BPRenderTarget)
+	{
+		// 화면을 캡처
+		BPCaptureComponent2D->CaptureScene ( );
+
+		// 렌더 타겟을 텍스처로 변환
+		UTexture2D* CaptureTexture = RenderTargetToTexture2D ( BPRenderTarget );
+
+		// 파일명 생성 (현재 날짜와 시간)
+		FString FileName = FDateTime::Now ( ).ToString ( TEXT ( "%Y%m%d_%H%M%S" ) );
+
+		// 캡처한 텍스처를 파일로 저장
+		SaveImageSelfCam ( BPRenderTarget );
+	}
+}
+
+void AJJH_SelectManager::SaveImageSelfCam ( UTextureRenderTarget2D* RenderTarget2 )
+{
+	if (!RenderTarget2) return;
+
+	FTextureRenderTargetResource* RenderTargetResource = RenderTarget2->GameThread_GetRenderTargetResource ( );
+
+	// 비트맵 데이터 준비
+	TArray<FColor> Bitmap;
+	Bitmap.SetNum ( 1920 * 1080 );
+
+	// 픽셀 데이터 읽기
+	RenderTargetResource->ReadPixels ( Bitmap );
+
+	// 저장 경로 설정
+	FString ScreenshotPath = FPaths::ProjectSavedDir ( ) / TEXT ( "Memories" );
+	FString FileName = FDateTime::Now ( ).ToString ( TEXT ( "%Y%m%d_%H%M%S" ) ) + TEXT ( ".png" );
+	FullFileName = ScreenshotPath / FileName;
+
+	// 디렉토리 생성
+	IFileManager::Get ( ).MakeDirectory ( *ScreenshotPath , true );
+
+	// FImageView 생성 및 이미지 저장
+	FImageView ImageView (
+		Bitmap.GetData ( ) ,
+		1920 ,  // Width
+		1080 ,  // Height
+		ERawImageFormat::BGRA8
+	);
+
+	FImageUtils::SaveImageAutoFormat ( *FullFileName , ImageView , 100 );  // 100은 품질 설정
+}
+
 
 void AJJH_SelectManager::CreateStage ( const struct FStageInfo& info )
 {

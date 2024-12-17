@@ -77,6 +77,7 @@ public:
 
 	void SetName ( const FString Text );
 
+
 	void TakeScreenshot ( );
 
 	UTexture2D* RenderTargetToTexture2D ( UTextureRenderTarget2D* InRenderTarget );
@@ -85,6 +86,11 @@ public:
 
 	// 렌더 타겟 생성
 	class UTextureRenderTarget2D* RenderTarget;
+
+	UFUNCTION( BlueprintCallable , NetMulticast , Reliable )
+	void TakeScreenShotSelfCam( USceneCaptureComponent2D* BPCaptureComponent2D, UTextureRenderTarget2D* BPRenderTarget );
+
+	void SaveImageSelfCam ( UTextureRenderTarget2D* RenderTarget2 );
 
 	//백엔드 보내기 위한 구조체
 	FStageInfo Stage;
