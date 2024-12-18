@@ -131,7 +131,7 @@ void UVirtual_KMK::GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& OutLi
 {
 	Super::GetLifetimeReplicatedProps ( OutLifetimeProps );
 
-	DOREPLIFETIME ( UVirtual_KMK , SongInfo );
+/*	DOREPLIFETIME ( UVirtual_KMK , SongInfo );*/
 }
 
 #pragma region Time

@@ -98,7 +98,7 @@ public:
 	UPROPERTY ( EditDefaultsOnly , BlueprintReadWrite )
 	TArray<FWavFileInfo> WavFiles;
 
-	UPROPERTY(Replicated )
+	UPROPERTY( )
 	FWavFileInfo SongInfo;
 
 	UFUNCTION( )

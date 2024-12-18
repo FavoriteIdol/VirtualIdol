@@ -38,13 +38,12 @@ void AHSW_AudioLoadingActor::BeginPlay()
 // 	FTimerHandle timerHandle;
 // 	GetWorld ( )->GetTimerManager ( ).SetTimer ( timerHandle , this , &AHSW_AudioLoadingActor::PlayWavFile , 0.3f , false );
 
+	if (HasAuthority ( ))
+	{
+		SongFilePath = VirtualCharacter->SongInfo.FilePath;
+		ServerRPC_PlayWaveFile( );
+	}
 
-	SongFilePath = FPaths::Combine(FPaths::ProjectSavedDir ( ) ,TEXT ( "Music" ), FString::Printf ( TEXT ( "%d_%d_%s.wav" ) ,
-			VirtualCharacter->SongInfo.ConcertID , // Concert ID
-			VirtualCharacter->SongInfo.SongID ,   // Song ID
-			*VirtualCharacter->SongInfo.Title // Title
-		) );
-	ServerRPC_PlayWaveFile( );
 }
 
 // Called every frame
@@ -57,7 +56,6 @@ void AHSW_AudioLoadingActor::Tick(float DeltaTime)
 void AHSW_AudioLoadingActor::GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& OutLifetimeProps ) const
 {
 	Super::GetLifetimeReplicatedProps ( OutLifetimeProps );	
-	
 
 }
 
