@@ -25,6 +25,8 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	virtual void GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& OutLifetimeProps ) const override;
+
 	UPROPERTY ( EditAnywhere , BlueprintReadWrite )
 	class UAudience_KMK* virtualWidget;
 
@@ -96,7 +98,7 @@ public:
 	UPROPERTY ( EditDefaultsOnly , BlueprintReadWrite )
 	TArray<FWavFileInfo> WavFiles;
 
-	UPROPERTY( )
+	UPROPERTY(Replicated )
 	FWavFileInfo SongInfo;
 
 	UFUNCTION( )

@@ -22,6 +22,7 @@
 #include "Components/TextBlock.h"
 #include "HSW_AudioLoadingActor.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values for this component's properties
 UVirtual_KMK::UVirtual_KMK()
@@ -125,6 +126,14 @@ void UVirtual_KMK::TickComponent(float DeltaTime, ELevelTick TickType, FActorCom
 	//	}
 	//}
 }
+
+void UVirtual_KMK::GetLifetimeReplicatedProps ( TArray<FLifetimeProperty>& OutLifetimeProps ) const
+{
+	Super::GetLifetimeReplicatedProps ( OutLifetimeProps );
+
+	DOREPLIFETIME ( UVirtual_KMK , SongInfo );
+}
+
 #pragma region Time
 FString UVirtual_KMK::GetTimeDifference ( const FString& SetTime )
 {
