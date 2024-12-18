@@ -766,27 +766,24 @@ void UStartWidget_KMK::PressMoneyPay ( )
 {
 	// 티켓이 만들어지지 않은 경우
 
- //   if (!bCreateTicket)
- //   {
-	//	 //팝업을 띄움
- //       Text_Effect1->SetVisibility ( ESlateVisibility::Hidden );
- //       MultiText_PopUp->SetVisibility ( ESlateVisibility::Visible );
- //       EffectPopUp1->SetVisibility ( ESlateVisibility::Visible );
- //       return;
- //   }
- //   else
- //   { 
-	//// 티켓 생성시, 최종 결제 창을 띄움
-	//	Text_Effect1->SetVisibility ( ESlateVisibility::Visible );
-	//	MultiText_PopUp->SetVisibility ( ESlateVisibility::Hidden );
-	//	EffectPopUp1->SetVisibility ( ESlateVisibility::Hidden );
-	//	Image_Load->SetVisibility ( ESlateVisibility::Hidden );
- //   }
+    if (!bCreateTicket)
+    {
+		 //팝업을 띄움
+        Text_Effect1->SetVisibility ( ESlateVisibility::Hidden );
+        MultiText_PopUp->SetVisibility ( ESlateVisibility::Visible );
+        EffectPopUp1->SetVisibility ( ESlateVisibility::Visible );
+        return;
+    }
+    else
+    { 
+	// 티켓 생성시, 최종 결제 창을 띄움
+		Text_Effect1->SetVisibility ( ESlateVisibility::Visible );
+		MultiText_PopUp->SetVisibility ( ESlateVisibility::Hidden );
+		EffectPopUp1->SetVisibility ( ESlateVisibility::Hidden );
+		Image_Load->SetVisibility ( ESlateVisibility::Hidden );
+    }
 	// 
-	Text_Effect1->SetVisibility ( ESlateVisibility::Visible );
-	MultiText_PopUp->SetVisibility ( ESlateVisibility::Hidden );
-	EffectPopUp1->SetVisibility ( ESlateVisibility::Hidden );
-	Image_Load->SetVisibility ( ESlateVisibility::Hidden );
+
 	// 콘서트 예약시 사용된 stage 값을 넣음
 	concertInfo.stageId = gi->stageNum;
 	// 서버에 콘서트 예약한 정보를 보냄
