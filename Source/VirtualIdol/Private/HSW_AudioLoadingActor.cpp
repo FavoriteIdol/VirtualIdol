@@ -40,7 +40,11 @@ void AHSW_AudioLoadingActor::BeginPlay()
 
 	if (HasAuthority ( ))
 	{
-		SongFilePath = FPaths::Combine(FPaths::ProjectSavedDir ( ) ,TEXT ( "Music" ), VirtualCharacter->SongInfo.Title);
+		SongFilePath = FPaths::Combine(FPaths::ProjectSavedDir ( ) ,TEXT ( "Music" ), FString::Printf ( TEXT ( "%d_%d_%s.wav" ) ,
+			VirtualCharacter->SongInfo.ConcertID , // Concert ID
+			VirtualCharacter->SongInfo.SongID ,   // Song ID
+			*VirtualCharacter->SongInfo.Title // Title
+		) );
 		ServerRPC_PlayWaveFile( );
 	}
 
