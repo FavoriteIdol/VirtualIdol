@@ -44,6 +44,7 @@ void AHSW_AudioLoadingActor::BeginPlay()
 		ServerRPC_PlayWaveFile( );
 	}
 
+
 }
 
 // Called every frame
