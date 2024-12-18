@@ -45,7 +45,7 @@ public:
 	UPROPERTY(  EditDefaultsOnly , BlueprintReadWrite )
 	class UFileMediaSource* FileMediaSource;
 
-	UPROPERTY()
+	UPROPERTY(Replicated)
 	FString SongFilePath;
 
 	UFUNCTION( Server , Reliable )

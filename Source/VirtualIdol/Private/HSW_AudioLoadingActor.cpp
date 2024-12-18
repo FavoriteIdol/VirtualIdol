@@ -57,6 +57,7 @@ void AHSW_AudioLoadingActor::GetLifetimeReplicatedProps ( TArray<FLifetimeProper
 {
 	Super::GetLifetimeReplicatedProps ( OutLifetimeProps );	
 
+	DOREPLIFETIME ( AHSW_AudioLoadingActor , SongFilePath );
 }
 
 void AHSW_AudioLoadingActor::ServerRPC_PlayWaveFile_Implementation ( )
